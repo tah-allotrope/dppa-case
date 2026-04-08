@@ -1,0 +1,141 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - paragraph [ref=e6]: Vietnam synthetic DPPA
+      - heading "Neon CFO calculator" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Show how load and solar overlap, where EVN and developer payments come from, and why the market-linked pieces mostly cancel back to strike price plus DPPA charge and loss adjustment.
+    - generic [ref=e9]:
+      - generic [ref=e10]: Local browser demo
+      - generic [ref=e11]: Firebase-ready
+      - generic [ref=e12]: Finance-first story
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]:
+            - paragraph [ref=e18]: Profiles
+            - heading "Load vs solar overlap" [level=2] [ref=e19]
+          - paragraph [ref=e20]: Move the sliders to see matched volume, shortfall, and excess generation reshape the settlement.
+        - generic [ref=e21]:
+          - button "Load > Gen" [ref=e22] [cursor=pointer]
+          - button "Load = Gen" [ref=e23] [cursor=pointer]
+          - button "Load < Gen" [ref=e24] [cursor=pointer]
+        - generic "Load and generation chart" [ref=e26]
+        - generic [ref=e27]:
+          - article [ref=e28]:
+            - paragraph [ref=e29]: Matched volume
+            - paragraph [ref=e30]: 33,080 kWh
+            - paragraph [ref=e31]: Renewable energy actually serving load.
+          - article [ref=e32]:
+            - paragraph [ref=e33]: Shortfall exposure
+            - paragraph [ref=e34]: 58,220 kWh
+            - paragraph [ref=e35]: Still billed at retail tariff.
+          - article [ref=e36]:
+            - paragraph [ref=e37]: Excess generation
+            - paragraph [ref=e38]: 0 kWh
+            - paragraph [ref=e39]: Potential overgeneration / settlement mismatch.
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - paragraph [ref=e43]: Controls
+            - heading "Scenario and pricing inputs" [level=2] [ref=e44]
+          - button "Reset defaults" [ref=e45] [cursor=pointer]
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - generic [ref=e48]: Load scale
+            - slider "Load scale 1.00x" [ref=e49]: "1"
+            - strong [ref=e50]: 1.00x
+          - generic [ref=e51]:
+            - generic [ref=e52]: Solar scale
+            - slider "Solar scale 1.00x" [ref=e53]: "1"
+            - strong [ref=e54]: 1.00x
+          - generic [ref=e55]:
+            - generic [ref=e56]: Strike price (VND/kWh)
+            - slider "Strike price (VND/kWh) 2,100 VND/kWh" [ref=e57]: "2100"
+            - strong [ref=e58]: 2,100 VND/kWh
+          - generic [ref=e59]:
+            - generic [ref=e60]: Market price / FMP
+            - slider "Market price / FMP 1,700 VND/kWh" [ref=e61]: "1700"
+            - strong [ref=e62]: 1,700 VND/kWh
+          - generic [ref=e63]:
+            - generic [ref=e64]: DPPA charge
+            - slider "DPPA charge 523.34 VND/kWh" [ref=e65]: "523"
+            - strong [ref=e66]: 523.34 VND/kWh
+          - generic [ref=e67]:
+            - generic [ref=e68]: Loss factor
+            - slider "Loss factor 1.027" [ref=e69]: "1.027"
+            - strong [ref=e70]: "1.027"
+          - generic [ref=e71]:
+            - generic [ref=e72]: Retail tariff
+            - slider "Retail tariff 1,833 VND/kWh" [ref=e73]: "1830"
+            - strong [ref=e74]: 1,833 VND/kWh
+          - generic [ref=e75]:
+            - generic [ref=e76]: Settlement quantity mode
+            - combobox "Settlement quantity mode Matched consumption only" [ref=e77]:
+              - option "Matched consumption only" [selected]
+              - option "Allocated generation"
+              - option "Generation regardless of consumption"
+              - option "Minimum of load and generation"
+            - strong [ref=e78]: Matched consumption only
+    - generic [ref=e79]:
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - paragraph [ref=e83]: Payments
+            - heading "EVN vs developer vs total" [level=2] [ref=e84]
+          - paragraph [ref=e85]: Keep matched-kWh price separate from the blended plant average.
+        - generic [ref=e86]:
+          - article [ref=e87]:
+            - paragraph [ref=e88]: EVN payment
+            - paragraph [ref=e89]: 181,798,509 VND
+            - paragraph [ref=e90]: Market-linked + DPPA charge + retail shortfall
+          - article [ref=e91]:
+            - paragraph [ref=e92]: Developer payment
+            - paragraph [ref=e93]: +13,232,000 VND
+            - paragraph [ref=e94]: CfD settlement against strike vs market.
+          - article [ref=e95]:
+            - paragraph [ref=e96]: Total buyer cost
+            - paragraph [ref=e97]: 195,030,509 VND
+            - paragraph [ref=e98]: All-in daily cost under the selected scenario.
+          - article [ref=e99]:
+            - paragraph [ref=e100]: Matched kWh price
+            - paragraph [ref=e101]: 2,669.69 VND/kWh
+            - paragraph [ref=e102]: Best lens for the cancellation story.
+          - article [ref=e103]:
+            - paragraph [ref=e104]: Blended plant average
+            - paragraph [ref=e105]: 2,136.15 VND/kWh
+            - paragraph [ref=e106]: Includes shortfall retail energy.
+          - article [ref=e107]:
+            - paragraph [ref=e108]: Savings vs no DPPA
+            - paragraph [ref=e109]: "-27,677,609 VND"
+            - paragraph [ref=e110]: Baseline average 1,833.00 VND/kWh.
+        - generic "Payment composition chart" [ref=e112]
+      - generic [ref=e113]:
+        - generic [ref=e115]:
+          - paragraph [ref=e116]: Cancellation effect
+          - heading "Why the market terms mostly cancel" [level=2] [ref=e117]
+        - generic [ref=e118]:
+          - generic [ref=e119]:
+            - paragraph [ref=e120]: Payment to EVN
+            - generic [ref=e121]: matched x market price x loss factor + matched x DPPA charge + shortfall x retail tariff
+          - generic [ref=e122]:
+            - paragraph [ref=e123]: Payment to developer
+            - generic [ref=e124]: contract quantity x (strike price - market price)
+          - generic [ref=e125]:
+            - paragraph [ref=e126]: Buyer shortcut result
+            - generic [ref=e127]: matched kWh ~= strike + DPPA charge + loss adjustment = 2,669.69 VND/kWh
+        - list [ref=e128]:
+          - listitem [ref=e129]: EVN market-linked charge and developer CfD reference the same market price.
+          - listitem [ref=e130]: When contract quantity tracks matched consumption, the market price mostly cancels.
+          - listitem [ref=e131]: Matched kWh trends toward strike (2100) + DPPA charge (523.34) + loss adjustment (46.35).
+          - listitem [ref=e132]: "Current implied matched-kWh result: 2669.69 VND/kWh."
+        - generic [ref=e133]: Current setup is more expensive than the no-DPPA baseline because either strike is high, DPPA charge is large, or matched volume is too low.
+      - generic [ref=e134]:
+        - generic [ref=e136]:
+          - paragraph [ref=e137]: Assumptions
+          - heading "What this model simplifies" [level=2] [ref=e138]
+        - list [ref=e139]:
+          - listitem [ref=e140]: Hourly teaching model rather than legal invoice engine.
+          - listitem [ref=e141]: Flat market and retail rates in version 1 for clarity.
+          - listitem [ref=e142]: The CFO story centers on matched kWh and the cancellation effect.
+          - listitem [ref=e143]: Settlement quantity mode stays explicit to demonstrate overgeneration risk.

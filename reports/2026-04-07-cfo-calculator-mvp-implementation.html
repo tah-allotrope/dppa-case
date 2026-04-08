@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: CFO Calculator MVP Implementation</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      securityLevel: 'loose',
+      themeVariables: {
+        primaryColor: '#111111',
+        primaryTextColor: '#e8f6ff',
+        primaryBorderColor: '#00f5ff',
+        lineColor: '#39ff14',
+        secondaryColor: '#121a1a',
+        tertiaryColor: '#111111',
+        background: '#0d0d0d',
+        mainBkg: '#0d0d0d',
+        nodeBorder: '#00f5ff',
+        clusterBkg: '#111111',
+        clusterBorder: '#39ff14',
+        edgeLabelBackground: '#0d0d0d'
+      }
+    });
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg-soft: #111111;
+      --panel: rgba(13, 13, 13, 0.88);
+      --panel-strong: rgba(19, 19, 19, 0.96);
+      --line: rgba(0, 245, 255, 0.26);
+      --line-strong: rgba(57, 255, 20, 0.38);
+      --text: #e9f6ff;
+      --muted: #8ea3ad;
+      --accent-blue: #00f5ff;
+      --accent-green: #39ff14;
+      --glow-blue: 0 0 18px rgba(0, 245, 255, 0.42);
+      --glow-green: 0 0 18px rgba(57, 255, 20, 0.28);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(0, 245, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(57, 255, 20, 0.08), transparent 24%),
+        linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text);
+      font-family: var(--narrative-font);
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(circle at center, black 45%, transparent 92%);
+      opacity: 0.4;
+    }
+    a { color: var(--accent-blue); }
+    code, pre, .technical, .meta-chip, .section-kicker, .pill, .metric-label, .metric-value, .repo-tag, .mermaid { font-family: var(--technical-font); }
+    .page-shell { width: min(1180px, calc(100vw - 32px)); margin: 0 auto; padding: 32px 0 72px; position: relative; z-index: 1; }
+    .hero {
+      position: relative; overflow: hidden; padding: 28px; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 28px;
+      background: linear-gradient(145deg, rgba(0, 245, 255, 0.08), transparent 28%), linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)), var(--panel-strong);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+    .hero::after { content: ""; position: absolute; inset: auto -10% -55% 42%; height: 280px; background: radial-gradient(circle, rgba(0, 245, 255, 0.18), transparent 64%); filter: blur(12px); pointer-events: none; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr); gap: 22px; align-items: end; }
+    .section-kicker { margin: 0 0 12px; color: var(--accent-green); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; text-shadow: var(--glow-green); }
+    .phase-title { margin: 0; max-width: 13ch; font-size: clamp(2.4rem, 4.8vw, 4.4rem); line-height: 0.94; letter-spacing: -0.05em; color: #f5feff; text-transform: uppercase; text-wrap: balance; text-shadow: 0 0 24px rgba(0, 245, 255, 0.2); }
+    .hero-summary { margin: 18px 0 0; max-width: 60ch; color: var(--muted); font-size: 0.98rem; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .pill { padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(0, 245, 255, 0.22); background: rgba(0, 245, 255, 0.06); color: var(--accent-blue); font-size: 0.8rem; }
+    .hero-meta { display: grid; gap: 12px; }
+    .meta-card { padding: 16px 18px; border: 1px solid rgba(57, 255, 20, 0.2); border-radius: 18px; background: rgba(255, 255, 255, 0.025); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.24); }
+    .meta-label { margin-bottom: 6px; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.16em; }
+    .meta-chip { color: var(--accent-blue); font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; text-shadow: var(--glow-blue); word-break: break-word; }
+    .repo-tag { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; border: 1px solid rgba(0, 245, 255, 0.24); border-radius: 999px; background: rgba(0, 245, 255, 0.08); color: var(--accent-blue); font-size: 0.82rem; letter-spacing: 0.04em; }
+    .section { position: relative; margin-top: 22px; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--panel); box-shadow: var(--shadow); backdrop-filter: blur(14px); }
+    .section::before { content: ""; position: absolute; left: 24px; right: 24px; top: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.9), rgba(57, 255, 20, 0.9), transparent); transform: translateY(-1px); }
+    .section-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .section-title { margin: 0; font-size: clamp(1.2rem, 2vw, 1.7rem); line-height: 1.1; color: #f0feff; }
+    .section-index { display: inline-flex; align-items: center; gap: 10px; color: var(--accent-green); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    .summary-grid, .two-col, .chart-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .summary-card, .technical-frame, .question-frame, .diagram-frame, .empty-state { border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); background: rgba(255,255,255,0.025); padding: 16px 18px; }
+    .summary-card h3, .technical-frame h3, .question-frame h3 { margin: 0 0 8px; color: #f5feff; }
+    .summary-card ul, .technical-frame ul, .question-frame ul { margin: 0; padding-left: 18px; }
+    .summary-card p, .technical-frame p, .question-frame p, li { color: var(--muted); }
+    .diagram-frame { overflow-x: auto; }
+    .viz-frame { display: grid; gap: 16px; }
+    .chart-card { border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 16px; background: rgba(255,255,255,0.025); }
+    .chart-card h3 { margin: 0 0 12px; }
+    .footer-note { margin-top: 18px; color: var(--muted); font-size: 0.84rem; text-transform: uppercase; letter-spacing: 0.12em; }
+    canvas { width: 100% !important; height: 320px !important; }
+    @media (max-width: 900px) {
+      .hero-grid, .summary-grid, .two-col, .chart-grid { grid-template-columns: 1fr; }
+      .page-shell { width: min(100vw - 20px, 1180px); padding: 20px 0 48px; }
+      .section, .hero { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <div class="section-kicker">Phase Header</div>
+          <h1 class="phase-title">CFO Calculator MVP Implementation</h1>
+          <p class="hero-summary">This phase turned the written DPPA buyer explanation into a working neon browser app for finance conversations: visual load-versus-solar overlap on the left, settlement and cancellation logic on the right, plus tested formulas and local-demo packaging.</p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">project :: dppa-case</span>
+            <span class="pill">date :: 2026-04-07</span>
+          </div>
+          <div class="repo-tag">repo :: dppa-case (local workspace)</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">dppa-case</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">local workspace / non-git</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-04-07</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Input -> Output</div>
+          <h2 class="section-title">Input -> Output Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h3>Inputs and constraints</h3>
+          <ul>
+            <li>Use the existing DPPA research and buyer guide as the factual base.</li>
+            <li>Implement the multi-phase plan as a local-first browser app.</li>
+            <li>Target a CFO audience with a neon visual style and simple explanations.</li>
+            <li>Show three scenarios: <code>load &gt; gen</code>, <code>load = gen</code>, and <code>load &lt; gen</code>.</li>
+            <li>Make the cancellation effect the center of the narrative.</li>
+          </ul>
+        </div>
+        <div class="summary-card">
+          <h3>Outputs produced</h3>
+          <ul>
+            <li>Built a Vite static app in <code>app/</code> with a finance-facing neon interface.</li>
+            <li>Added tested settlement logic modules, scenario presets, and contract quantity modes.</li>
+            <li>Rendered two live Chart.js visualizations for profile overlap and payment composition.</li>
+            <li>Added formula explanation cards and warning banners for overgeneration risk.</li>
+            <li>Documented assumptions, formulas, and local run steps in <code>app/docs/</code> and <code>app/README.md</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Logic Flow</div>
+          <h2 class="section-title">Logic Flow</h2>
+        </div>
+      </div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">flowchart TD
+          A[Read plan and prior buyer report] --> B{Choose MVP architecture}
+          B -->|Static app wins| C[Scaffold Vite + Chart.js app]
+          B -->|Streamlit deferred| D[Keep as second-best alternative]
+          C --> E[Lock MVP assumptions in activeContext]
+          E --> F[Write settlement engine tests first]
+          F --> G[Implement volume + payment modules]
+          G --> H[Build neon UI shell and control panels]
+          H --> I[Wire scenario tabs, sliders, charts]
+          I --> J{Runtime/browser issues?}
+          J -->|Yes| K[Inspect console and fix favicon 404 noise]
+          J -->|No| L[Run test + build verification]
+          K --> L
+          L --> M[Live browser smoke test]
+          M --> N[Package README and assumptions docs]
+          N --> O[Generate end-of-phase report]</div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Math / Algorithm Used</div>
+          <h2 class="section-title">Math / Algorithm Used</h2>
+        </div>
+      </div>
+      <div class="technical-frame">
+        <h3>Material math used in the phase</h3>
+        <div class="two-col">
+          <div>
+            <p>The core algorithm computes hourly load-versus-generation overlap and then derives settlement components from those interval volumes.</p>
+            <ul>
+              <li><code>Q_match[t] = min(load, generation)</code></li>
+              <li><code>Q_shortfall[t] = max(load - generation, 0)</code></li>
+              <li><code>Q_excess[t] = max(generation - load, 0)</code></li>
+              <li><code>EVN = matched x market x loss + matched x DPPA + shortfall x retail</code></li>
+              <li><code>Developer = contract quantity x (strike - market)</code></li>
+            </ul>
+          </div>
+          <div>
+            <p>The app also calculates a simplified matched-kWh intuition:</p>
+            <ul>
+              <li><code>matched kWh ~= strike + DPPA charge + loss adjustment</code></li>
+              <li>This is only surfaced as the headline shortcut when contract quantity tracks matched consumption.</li>
+              <li>When contract quantity exceeds matched consumption, the app raises an explicit warning because the simplification breaks.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Tools / Formulas / Methods</div>
+          <h2 class="section-title">Tools / Formulas / Methods</h2>
+        </div>
+      </div>
+      <div class="technical-frame technical">
+        <ul>
+          <li><code>npm create vite@latest app -- --template vanilla</code> to create a deployable static web app foundation.</li>
+          <li><code>chart.js</code> for live profile and payment visualizations.</li>
+          <li><code>vitest</code> for test-first verification of settlement math against the documented examples.</li>
+          <li>Playwright browser tools for live smoke testing beyond the unit tests.</li>
+          <li>Document extraction work from the earlier phase remained the factual basis for the calculator formulas.</li>
+          <li>Settlement quantity heuristics implemented as four modes: matched, allocated, generation, and minimum.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Results &amp; Visualizations</div>
+          <h2 class="section-title">Results &amp; Visualizations</h2>
+        </div>
+      </div>
+      <div class="viz-frame">
+        <div class="chart-grid">
+          <div class="chart-card">
+            <h3>Verification checks completed</h3>
+            <canvas id="checksChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>MVP scope composition</h3>
+            <canvas id="scopeChart"></canvas>
+          </div>
+        </div>
+        <div class="summary-card">
+          <h3>Quantitative facts from this phase</h3>
+          <ul>
+            <li>3 settlement tests passed.</li>
+            <li>2 live charts rendered in the app.</li>
+            <li>3 preset scenarios implemented.</li>
+            <li>4 settlement quantity modes exposed in the UI.</li>
+            <li>1 browser runtime issue encountered, then resolved.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Limitations / Second-Best Alternative</div>
+          <h2 class="section-title">Limitations / Second-Best Alternative</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <h3>Chosen path limitations</h3>
+        <ul>
+          <li>The MVP uses hourly intervals and flat pricing assumptions; it is a teaching model, not an invoice engine.</li>
+          <li>The "allocated generation" mode uses a heuristic 88% factor to create a realistic-feeling intermediate case, not a regulatory allocation engine.</li>
+          <li>The current app is local-first; Firebase deployment was intentionally deferred so the finance narrative could be proven first.</li>
+        </ul>
+        <h3>Second-best alternative</h3>
+        <p>Streamlit was the second-best path because it would have made Python-side financial modeling easy, but it lost to the static Vite app on visual polish, local demo smoothness, and future Firebase Hosting compatibility.</p>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Errors / Warnings / Flags</div>
+          <h2 class="section-title">Errors / Warnings / Flags Encountered</h2>
+        </div>
+      </div>
+      <div class="question-frame technical">
+        <ul>
+          <li><strong>Patch collision:</strong> the first bulk patch removed <code>src/main.js</code> after re-adding it; resolved by restoring the intended entrypoint and re-reading the core files before verification.</li>
+          <li><strong>Test expectation drift:</strong> the first EVN total assertion incorrectly divided by 24; resolved by tightening the test to the single-interval example values from the buyer report.</li>
+          <li><strong>Browser console noise:</strong> the app served cleanly but produced a <code>favicon.ico</code> 404; resolved by adding <code>app/public/favicon.ico</code> so the demo has no distracting runtime error.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Open Questions / Next Phase Seeds</div>
+          <h2 class="section-title">Open Questions / Next Phase Seeds</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li>Add a dedicated presentation mode with larger KPI cards and a simplified script for finance meetings.</li>
+          <li>Replace the heuristic allocated-generation mode with a more policy-grounded allocation rule if you want closer commercial realism.</li>
+          <li>Deploy the static app to Firebase Hosting once the local demo flow is approved.</li>
+          <li>Add CSV upload and scenario comparison only after the current narrative is proven with your CFO.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+
+  <script>
+    const checksCtx = document.getElementById('checksChart');
+    if (checksCtx) {
+      new Chart(checksCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Unit tests', 'Build checks', 'Browser smoke checks'],
+          datasets: [{
+            label: 'Count',
+            data: [3, 1, 1],
+            backgroundColor: ['#00f5ff', '#39ff14', '#ff7de9'],
+            borderColor: ['#89fbff', '#9cff8a', '#ffc7f5'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#cfefff' }, grid: { color: 'rgba(255,255,255,0.08)' } },
+            y: { beginAtZero: true, ticks: { color: '#cfefff', precision: 0 }, grid: { color: 'rgba(255,255,255,0.08)' } }
+          }
+        }
+      });
+    }
+
+    const scopeCtx = document.getElementById('scopeChart');
+    if (scopeCtx) {
+      new Chart(scopeCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Scenario presets', 'Settlement modes', 'Live charts', 'Docs + README'],
+          datasets: [{
+            data: [3, 4, 2, 3],
+            backgroundColor: ['#00f5ff', '#39ff14', '#ff7de9', '#ffd95e'],
+            borderColor: '#0d0d0d',
+            borderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: '#cfefff' } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

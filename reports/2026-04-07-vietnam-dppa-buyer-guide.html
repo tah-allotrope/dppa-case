@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vietnam DPPA Buyer Guide</title>
+  <style>
+    :root {
+      --bg: #f5f1e8;
+      --panel: #fffdf8;
+      --ink: #1f2a2e;
+      --muted: #5e6b66;
+      --line: #d9cfbf;
+      --accent: #0d6b57;
+      --accent-soft: #dff1eb;
+      --warn: #9a4f1a;
+      --warn-soft: #f7e8d8;
+      --shadow: 0 12px 30px rgba(31, 42, 46, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(13,107,87,0.08), transparent 34%),
+        linear-gradient(180deg, #f8f5ee 0%, var(--bg) 100%);
+      line-height: 1.55;
+    }
+
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 40px 20px 72px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(13,107,87,0.96), rgba(20,82,71,0.92));
+      color: #f7fbf9;
+      padding: 30px;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      font-size: 1.05rem;
+      color: rgba(247,251,249,0.9);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .card, .section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card {
+      padding: 18px;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .big {
+      margin: 0;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .section {
+      margin-top: 18px;
+      padding: 26px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      margin: 22px 0 10px;
+      font-size: 1.1rem;
+    }
+
+    p, li { font-size: 1rem; }
+    ul, ol { padding-left: 20px; }
+
+    code, pre {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.95rem;
+    }
+
+    pre {
+      margin: 12px 0;
+      padding: 14px;
+      background: #f3efe6;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow-x: auto;
+    }
+
+    .note {
+      padding: 14px 16px;
+      background: var(--accent-soft);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+    }
+
+    .warn {
+      padding: 14px 16px;
+      background: var(--warn-soft);
+      border-left: 4px solid var(--warn);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.97rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .wrap { padding: 18px 14px 40px; }
+      .hero, .section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Vietnam synthetic DPPA</p>
+      <h1>What are you actually paying per kWh?</h1>
+      <p>Simple buyer view: your DPPA-covered kWh is usually not just the strike price. In the reviewed 2025 examples, it is roughly the strike price plus the regulated DPPA adder, with a small extra effect from market-loss mechanics.</p>
+    </section>
+
+    <div class="grid">
+      <article class="card">
+        <p class="eyebrow">Fast estimate</p>
+        <p class="big">~2,623</p>
+        <p>VND/kWh for matched DPPA energy using <strong>2,100 strike + 523.34 DPPA adder</strong>.</p>
+      </article>
+      <article class="card">
+        <p class="eyebrow">Worked example</p>
+        <p class="big">~2,670</p>
+        <p>VND/kWh for matched energy after including the example loss coefficient.</p>
+      </article>
+      <article class="card">
+        <p class="eyebrow">Shortfall energy</p>
+        <p class="big">Retail</p>
+        <p>Any load not covered by DPPA generation still pays normal EVN retail tariff.</p>
+      </article>
+      <article class="card">
+        <p class="eyebrow">Main risk</p>
+        <p class="big">Excess CfD</p>
+        <p>If the contract settles on more generation than you consume, your effective consumed-kWh price rises.</p>
+      </article>
+    </div>
+
+    <section class="section">
+      <h2>Bottom line</h2>
+      <pre>all-in matched kWh ~= strike price + DPPA charge + small basis/loss adjustment</pre>
+      <div class="note">
+        The market-linked charge you pay EVN and the market-price leg inside the CfD mostly cancel each other out. What remains is basically the strike price, plus regulated DPPA system charges, plus a small adjustment from loss and basis effects.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>The confusing terms, translated</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Term</th>
+            <th>Simple meaning</th>
+            <th>Why you care</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Strike price</strong></td>
+            <td>Your negotiated fixed price in the CfD with the generator.</td>
+            <td>This is the commercial anchor price; example reviewed: 2,100 VND/kWh.</td>
+          </tr>
+          <tr>
+            <td><strong>FMP</strong></td>
+            <td>Wholesale market reference price used in settlement; one source defines it as SMP + CAN.</td>
+            <td>It determines whether you pay the generator or the generator pays you under the CfD.</td>
+          </tr>
+          <tr>
+            <td><strong>CFMP</strong></td>
+            <td>The market-linked EVN PC price for DPPA-covered volume.</td>
+            <td>This is part of what you still pay EVN, even under DPPA.</td>
+          </tr>
+          <tr>
+            <td><strong>CDPPAdv / CCL</strong></td>
+            <td>Regulated DPPA system charges and clearing charges.</td>
+            <td>The example materials combine them into a practical 2025 adder of 523.34 VND/kWh.</td>
+          </tr>
+          <tr>
+            <td><strong>KPP</strong></td>
+            <td>Loss coefficient multiplier.</td>
+            <td>This is why the exact number is slightly above the shortcut formula.</td>
+          </tr>
+          <tr>
+            <td><strong>CBL / retail tariff</strong></td>
+            <td>Normal retail power price for any shortfall between your load and RE generation.</td>
+            <td>Your total savings depend heavily on how much retail tariff you actually avoid.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>The buyer payment stack</h2>
+      <pre>Total buyer payment = payment to EVN PC + CfD payment to/from generator</pre>
+      <h3>Payment to EVN PC</h3>
+      <pre>matched volume x CFMP x KPP
++ matched volume x DPPA charge
++ shortfall volume x retail tariff</pre>
+      <h3>Payment under the CfD</h3>
+      <pre>CfD payment = contracted quantity x (strike price - FMP)</pre>
+      <div class="note">
+        If the strike price is above FMP, you pay the generator. If it is below FMP, the generator pays you.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>The practical formula to use</h2>
+      <pre>all-in matched kWh ~= (CFMP x KPP + DPPA charge) + (strike - FMP)</pre>
+      <p>If CFMP is close to FMP, this becomes:</p>
+      <pre>all-in matched kWh ~= strike + DPPA charge + small basis/loss adjustment</pre>
+      <p>Fast buyer shortcut using the reviewed 2025 example inputs:</p>
+      <pre>all-in matched kWh ~= strike + 523.34 VND/kWh</pre>
+    </section>
+
+    <section class="section">
+      <h2>Worked example from the documents</h2>
+      <p>Reviewed assumptions: load 5,000 kWh, strike 2,100 VND/kWh, FMP/CFMP 1,700 VND/kWh, KPP 1.027263, combined DPPA adder 523.34 VND/kWh.</p>
+      <pre>(1,700 x 1.027263) + 523.34 + (2,100 - 1,700)
+= 2,669.6871 VND/kWh</pre>
+      <table>
+        <thead>
+          <tr>
+            <th>Case</th>
+            <th>Total buyer cost</th>
+            <th>Effective average on consumed load</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Case A</strong><br>2,000 kWh matched, 3,000 kWh shortfall</td>
+            <td>10,838,374.2 VND</td>
+            <td>2,167.67 VND/kWh across the full 5,000 kWh load</td>
+            <td>The matched DPPA kWh is expensive at about 2,669.69 VND/kWh, but the shortfall still pays normal retail tariff.</td>
+          </tr>
+          <tr>
+            <td><strong>Case B</strong><br>5,000 kWh load, 7,500 kWh generation, CfD settled on 7,500 kWh</td>
+            <td>14,348,435.5 VND</td>
+            <td>2,869.69 VND/kWh across the consumed 5,000 kWh</td>
+            <td>This shows the danger of paying CfD on excess contracted generation beyond your actual load.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="warn">
+        The biggest buyer-side commercial risk is not only the strike price. It is whether the settlement quantity can exceed your actual consumption in a trading interval.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What to check before signing</h2>
+      <ol>
+        <li>How is the CfD settlement quantity defined: generated volume, allocated volume, consumed volume, or the minimum of those?</li>
+        <li>Can you be charged on excess generation in intervals when the plant produces more than you consume?</li>
+        <li>Are CDPPAdv and CCL billed separately or effectively bundled into one adder?</li>
+        <li>What loss coefficient applies at your voltage level?</li>
+        <li>What retail tariff do you avoid in each time period when DPPA generation actually matches your load?</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2>Sources reviewed</h2>
+      <ul>
+        <li><code>background/Ecoplexus_ DPPA Presentation_Fof CEBA Workshop.pdf</code></li>
+        <li><code>background/Simplified DPPA CfD Settlement Scenario .pptx</code></li>
+        <li><code>background/synthetic DPPA Vietnam policy and regulation.pdf</code></li>
+      </ul>
+      <p class="footer">Cross-checked themes: FMP as the generator market reference, CfD as strike-minus-market settlement, EVN buyer charges as market-linked energy plus DPPA charges plus retail shortfall, and a practical 2025 total DPPA adder of 523.34 VND/kWh in the worked examples.</p>
+    </section>
+  </div>
+</body>
+</html>
