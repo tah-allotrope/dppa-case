@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildFormulaBreakdown, calculateSettlement, classifyInterval } from './settlement'
+import { buildFormulaBreakdown, buildSelectedWalkthroughCase, buildWalkthroughCases, calculateSettlement, classifyInterval } from './settlement'
 
 describe('calculateSettlement', () => {
   it('reproduces the simple matched case from the report logic', () => {
@@ -129,6 +129,52 @@ describe('calculateSettlement', () => {
     expect(classifyInterval({ load: 5, generation: 2 }).key).toBe('shortfall')
     expect(classifyInterval({ load: 2, generation: 5 }).key).toBe('excess')
     expect(classifyInterval({ load: 4, generation: 4 }).key).toBe('balanced')
+  })
+
+  it('builds CFO walkthrough cases for shortfall, balanced, and excess intervals', () => {
+    const inputs = {
+      loadProfile: [5000, 4700, 3600],
+      generationProfile: [2400, 4700, 5200],
+      settlementMode: 'matched',
+      strikePrice: 1741.35,
+      marketPrice: 1700,
+      dppaCharge: 523.34,
+      lossFactor: 1.027263,
+      retailTariff: 1833,
+    }
+
+    const result = calculateSettlement(inputs)
+    const cases = buildWalkthroughCases(inputs, result.intervals)
+
+    expect(cases).toHaveLength(3)
+    expect(cases.map((item) => item.classification.key)).toEqual(['shortfall', 'balanced', 'excess'])
+    expect(cases[0].caseLabel).toBe('Load > Gen')
+    expect(cases[1].caseLabel).toBe('Load = Gen')
+    expect(cases[2].caseLabel).toBe('Load < Gen')
+    expect(cases[0].headline).toContain('Under-supply')
+    expect(cases[1].headline).toContain('Balanced')
+    expect(cases[2].headline).toContain('Over-supply')
+  })
+
+  it('builds the single walkthrough card for the currently selected hour', () => {
+    const inputs = {
+      loadProfile: [5000, 4700, 3600],
+      generationProfile: [2400, 4700, 5200],
+      settlementMode: 'matched',
+      strikePrice: 1741.35,
+      marketPrice: 1700,
+      dppaCharge: 523.34,
+      lossFactor: 1.027263,
+      retailTariff: 1833,
+    }
+
+    const result = calculateSettlement(inputs)
+    const selectedCase = buildSelectedWalkthroughCase(inputs, result.intervals[2])
+
+    expect(selectedCase.caseLabel).toBe('Load < Gen')
+    expect(selectedCase.headline).toContain('Over-supply')
+    expect(selectedCase.hour).toBe(2)
+    expect(selectedCase.totalNoDppa).toBe(result.intervals[2].baseline)
   })
 
   it('keeps the default strike price at 5% below the weighted retail tariff basis', async () => {

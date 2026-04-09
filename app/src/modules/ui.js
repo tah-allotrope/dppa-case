@@ -1,5 +1,14 @@
 import { formatMoney, formatNumber } from './formatters'
 
+const tariffWindows = [
+  { label: 'Off-peak', time: '22:00 - 04:00', tone: 'offpeak' },
+  { label: 'Standard', time: '04:00 - 09:30', tone: 'standard' },
+  { label: 'Peak', time: '09:30 - 11:30', tone: 'peak' },
+  { label: 'Standard', time: '11:30 - 17:00', tone: 'standard' },
+  { label: 'Peak', time: '17:00 - 20:00', tone: 'peak' },
+  { label: 'Standard', time: '20:00 - 22:00', tone: 'standard' },
+]
+
 function metricCard(label, value, detail, tone = 'default') {
   return `
     <article class="metric-card ${tone}">
@@ -65,6 +74,35 @@ function paymentEquation(label, rate, quantityText, amount, formula, tone = 'def
   `
 }
 
+function walkthroughCaseCard(item, currency) {
+  return `
+    <article class="walkthrough-card ${item.tone} is-selected">
+      <div class="walkthrough-head">
+        <div class="walkthrough-step">${item.step}</div>
+        <div>
+          <p class="metric-label">${item.caseLabel}</p>
+          <h3>${item.headline}</h3>
+        </div>
+        <span class="walkthrough-hour">${item.hourLabel}</span>
+      </div>
+      <div class="walkthrough-metrics">
+        ${compactPill('Load', `${formatNumber(item.load)} kWh`, 'default')}
+        ${compactPill('Solar', `${formatNumber(item.generation)} kWh`, 'accent')}
+        ${compactPill('Matched', `${formatNumber(item.matched)} kWh`, 'result')}
+        ${compactPill('Contract', `${formatNumber(item.contractQuantity)} kWh`, item.contractQuantity === item.matched ? 'result' : 'warning')}
+      </div>
+      <div class="walkthrough-lines">
+        <p>CFD = ${formatMoney(item.cfdUnitRate, { currency, precise: true, perKwh: true, signed: true })} x ${formatNumber(item.contractQuantity)} kWh = ${formatMoney(item.cfdAmount, { currency, signed: true })}</p>
+        <p>EVN = ${formatMoney(item.evnAmount, { currency })}</p>
+        <p>Total (DPPA) = ${formatMoney(item.totalDppa, { currency })}</p>
+        <p>Total (No-DPPA) = ${formatMoney(item.totalNoDppa, { currency })}</p>
+        <p>Savings (DPPA) = ${formatMoney(item.savingsVsBau, { currency, signed: true })}</p>
+      </div>
+      <p class="walkthrough-note">${item.cancellationNote}</p>
+    </article>
+  `
+}
+
 export function renderAppShell(root, scenarios, settlementModes) {
   root.innerHTML = `
     <div class="app-shell">
@@ -98,13 +136,44 @@ export function renderAppShell(root, scenarios, settlementModes) {
             <div class="scenario-tabs" id="scenarioTabs">
               ${scenarios.map((scenario) => `<button class="scenario-tab" data-scenario="${scenario.id}">${scenario.label}</button>`).join('')}
             </div>
+            <div class="chart-story-overlay" id="chartStoryOverlay"></div>
             <div class="chart-wrap profile-wrap">
               <canvas id="profileChart" aria-label="Load and generation chart"></canvas>
             </div>
           </div>
+
+          <section class="panel walkthrough-panel glow-frame">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Load-vs-generation cases</p>
+                <h2>Selected-hour case from the clicked graph node</h2>
+              </div>
+            </div>
+            <div class="walkthrough-grid" id="walkthroughCases"></div>
+          </section>
         </section>
 
         <section class="story-column">
+          <div class="panel bau-panel stage-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Selected hour comparison</p>
+                <h2>What changes for the factory in this hour</h2>
+              </div>
+            </div>
+            <div class="comparison-grid" id="bauComparison"></div>
+          </div>
+
+          <div class="panel details-panel stage-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Selected hour details</p>
+                <h2>EVN and developer payment build-up</h2>
+              </div>
+            </div>
+            <div id="selectedHourDetailsPanel"></div>
+          </div>
+
           <div class="panel hour-panel prime-panel selected-hour-stage">
             <div class="panel-header">
               <div>
@@ -122,26 +191,6 @@ export function renderAppShell(root, scenarios, settlementModes) {
       </main>
 
       <section class="lower-grid">
-        <div class="panel bau-panel">
-          <div class="panel-header">
-            <div>
-              <p class="eyebrow">Selected hour comparison</p>
-              <h2>What changes for the factory in this hour</h2>
-            </div>
-          </div>
-          <div class="comparison-grid" id="bauComparison"></div>
-        </div>
-
-        <div class="panel details-panel">
-          <div class="panel-header">
-            <div>
-              <p class="eyebrow">Selected hour details</p>
-              <h2>EVN and developer payment build-up</h2>
-            </div>
-          </div>
-          <div id="selectedHourDetailsPanel"></div>
-        </div>
-
         <div class="panel formula-panel glow-frame">
           <div class="panel-header">
             <div>
@@ -225,6 +274,37 @@ export function renderAppShell(root, scenarios, settlementModes) {
       </section>
     </div>
   `
+}
+
+export function renderChartStoryOverlay(container, inputs, selectedHour) {
+  container.innerHTML = `
+    <div class="chart-story-banner">
+      <div>
+        <p class="eyebrow">Tariff walk-through on the chart</p>
+        <h3>DPPA strike ${formatMoney(inputs.strikePrice, { currency: inputs.currency, precise: true, perKwh: true })}</h3>
+      </div>
+      <div class="chart-story-pills">
+        ${compactPill('Spot / FMP', formatMoney(inputs.marketPrice, { currency: inputs.currency, precise: true, perKwh: true }), 'evn')}
+        ${compactPill('Retail basis', formatMoney(inputs.retailTariff, { currency: inputs.currency, precise: true, perKwh: true }), 'warning')}
+        ${compactPill('Selected hour', `${String(selectedHour).padStart(2, '0')}:00`, 'result')}
+      </div>
+    </div>
+    <div class="chart-tariff-band-row">
+      ${tariffWindows.map((window) => `
+        <div class="chart-tariff-band ${window.tone}">
+          <span>${window.label}</span>
+          <strong>${window.time}</strong>
+        </div>
+      `).join('')}
+    </div>
+    <p class="chart-story-note">A simplified tariff frame sits on top of the graph: familiar time bands for the CFO, but the math still uses the existing weighted retail default so the cancellation story stays clean.</p>
+  `
+}
+
+export function renderWalkthroughCases(container, selectedCase, currency) {
+  container.innerHTML = selectedCase
+    ? walkthroughCaseCard(selectedCase, currency)
+    : ''
 }
 
 export function renderVolumeSummary(container, totals) {

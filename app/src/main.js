@@ -2,8 +2,8 @@ import './style.css'
 import mermaid from 'mermaid'
 import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes } from './data/default-scenarios'
 import { renderProfileChart } from './modules/chart'
-import { buildSelectedIntervalNarrative, buildFormulaBreakdown, calculateSettlement } from './modules/settlement'
-import { renderAppShell, renderBauComparison, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderVolumeSummary, setActiveCurrency, setActiveDetailView, setActiveScenario, updateControlOutputs } from './modules/ui'
+import { buildSelectedIntervalNarrative, buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement } from './modules/settlement'
+import { renderAppShell, renderBauComparison, renderChartStoryOverlay, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderVolumeSummary, renderWalkthroughCases, setActiveCurrency, setActiveDetailView, setActiveScenario, updateControlOutputs } from './modules/ui'
 
 mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' })
 
@@ -43,12 +43,19 @@ function updateView() {
   const hourLabels = hours.map((hour) => `${String(hour).padStart(2, '0')}:00`)
   const selectedInterval = settlement.intervals[state.selectedHour] ?? settlement.intervals[12]
   const formulas = buildFormulaBreakdown(inputs, selectedInterval)
+  const selectedWalkthroughCase = buildSelectedWalkthroughCase(inputs, selectedInterval)
 
   renderProfileChart(document.querySelector('#profileChart'), hourLabels, settlement.intervals, selectedInterval.hour, (hour) => {
     state.selectedHour = hour
     updateView()
   })
+  renderChartStoryOverlay(
+    document.querySelector('#chartStoryOverlay'),
+    inputs,
+    selectedInterval.hour,
+  )
   renderVolumeSummary(document.querySelector('#volumeSummary'), settlement.totals)
+  renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedWalkthroughCase, state.currency)
   renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
   renderSelectedHour(
     document.querySelector('#selectedHourPanel'),

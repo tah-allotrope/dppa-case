@@ -113,6 +113,112 @@ export function calculateSettlement(inputs) {
   }
 }
 
+function getCasePresentation(key) {
+  switch (key) {
+    case 'shortfall':
+      return {
+        caseLabel: 'Load > Gen',
+        headline: 'Under-supply case',
+        tone: 'warning',
+      }
+    case 'excess':
+      return {
+        caseLabel: 'Load < Gen',
+        headline: 'Over-supply case',
+        tone: 'accent',
+      }
+    default:
+      return {
+        caseLabel: 'Load = Gen',
+        headline: 'Balanced case',
+        tone: 'result',
+      }
+  }
+}
+
+function pickRepresentativeInterval(intervals, key) {
+  if (!intervals.length) return null
+
+  const exactMatches = intervals.filter((interval) => interval.classification?.key === key)
+
+  if (key === 'shortfall') {
+    const source = exactMatches.length ? exactMatches : intervals
+    return source.reduce((best, interval) => {
+      const bestGap = best.load - best.generation
+      const nextGap = interval.load - interval.generation
+      return nextGap > bestGap ? interval : best
+    })
+  }
+
+  if (key === 'excess') {
+    const source = exactMatches.length ? exactMatches : intervals
+    return source.reduce((best, interval) => {
+      const bestGap = best.generation - best.load
+      const nextGap = interval.generation - interval.load
+      return nextGap > bestGap ? interval : best
+    })
+  }
+
+  const source = exactMatches.length ? exactMatches : intervals
+  return source.reduce((best, interval) => {
+    const bestGap = Math.abs(best.load - best.generation)
+    const nextGap = Math.abs(interval.load - interval.generation)
+    return nextGap < bestGap ? interval : best
+  })
+}
+
+function formatHourLabel(hour) {
+  return `${String(hour).padStart(2, '0')}:00 - ${String((hour + 1) % 24).padStart(2, '0')}:00`
+}
+
+function buildWalkthroughCase(inputs, interval, step = 1) {
+  const presentation = getCasePresentation(interval.classification.key)
+  const breakdown = buildFormulaBreakdown(inputs, interval)
+
+  return {
+    step,
+    key: interval.classification.key,
+    tone: presentation.tone,
+    caseLabel: presentation.caseLabel,
+    headline: presentation.headline,
+    hour: interval.hour,
+    hourLabel: formatHourLabel(interval.hour),
+    classification: interval.classification,
+    sourceScenario: interval.sourceScenario,
+    load: interval.load,
+    generation: interval.generation,
+    matched: interval.matched,
+    shortfall: interval.shortfall,
+    excess: interval.excess,
+    contractQuantity: interval.contractQuantity,
+    cfdUnitRate: inputs.strikePrice - inputs.marketPrice,
+    cfdAmount: interval.developer,
+    evnAmount: interval.evnTotal,
+    totalDppa: interval.total,
+    totalNoDppa: interval.baseline,
+    savingsVsBau: interval.baseline - interval.total,
+    cancellationNote: breakdown.cleanCancellation
+      ? 'Cancellation is clean on the aligned matched slice, so the market reference mostly collapses back to strike price + DPPA charge + loss adjustment.'
+      : 'Cancellation only applies on matched energy here, so any contract mismatch stays visible in the selected-hour economics.',
+  }
+}
+
+export function buildSelectedWalkthroughCase(inputs, interval) {
+  return buildWalkthroughCase(inputs, interval, 1)
+}
+
+export function buildWalkthroughCases(inputs, intervals) {
+  return ['shortfall', 'balanced', 'excess']
+    .map((key, index) => {
+      const interval = pickRepresentativeInterval(intervals, key)
+
+      if (!interval) return null
+
+      return buildWalkthroughCase(inputs, interval, index + 1)
+    })
+    .filter(Boolean)
+}
+
 export function buildFormulaBreakdown(inputs, interval) {
   const lossAdjustment = inputs.marketPrice * inputs.lossFactor - inputs.marketPrice
   const cleanCancellation = interval.matched > 0 && interval.contractQuantity === interval.matched

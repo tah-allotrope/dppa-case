@@ -207,7 +207,7 @@ h3 { font-size: 1.02rem; }
 }
 
 .story-column {
-  grid-template-rows: 1fr;
+  grid-template-rows: auto;
 }
 
 .focus-column {
@@ -219,7 +219,8 @@ h3 { font-size: 1.02rem; }
 .details-panel,
 .formula-panel,
 .hour-panel,
-.controls-panel {
+.controls-panel,
+.walkthrough-panel {
   padding: 12px;
 }
 
@@ -270,6 +271,141 @@ h3 { font-size: 1.02rem; }
 
 .profile-wrap {
   flex: 1;
+}
+
+.chart-story-overlay {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.chart-story-banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(71, 215, 255, 0.18);
+  background: linear-gradient(135deg, rgba(10, 34, 68, 0.82), rgba(10, 20, 44, 0.76));
+}
+
+.chart-story-banner h3 {
+  margin-top: 2px;
+}
+
+.chart-story-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.summary-pill.evn { border-color: rgba(71, 215, 255, 0.35); }
+
+.chart-tariff-band-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.chart-tariff-band {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 16px;
+  border: 1px dashed rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.03);
+}
+
+.chart-tariff-band span {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.chart-tariff-band strong {
+  font-size: 0.84rem;
+  line-height: 1.25;
+}
+
+.chart-tariff-band.offpeak { border-color: rgba(71, 215, 255, 0.26); }
+.chart-tariff-band.standard { border-color: rgba(255, 216, 79, 0.24); }
+.chart-tariff-band.peak { border-color: rgba(255, 104, 216, 0.26); }
+
+.chart-story-note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  padding: 0 2px;
+}
+
+.walkthrough-panel {
+  margin-top: 12px;
+}
+
+.walkthrough-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.walkthrough-card {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  display: grid;
+  gap: 10px;
+}
+
+.walkthrough-card.warning { background: linear-gradient(180deg, rgba(133, 20, 22, 0.9), rgba(120, 18, 24, 0.82)); }
+.walkthrough-card.result { background: linear-gradient(180deg, rgba(39, 106, 190, 0.9), rgba(28, 86, 159, 0.84)); }
+.walkthrough-card.accent { background: linear-gradient(180deg, rgba(15, 131, 172, 0.9), rgba(13, 101, 149, 0.84)); }
+
+.walkthrough-card.is-selected {
+  outline: 2px solid rgba(255,255,255,0.5);
+  transform: translateY(-2px);
+}
+
+.walkthrough-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.walkthrough-step,
+.walkthrough-hour {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  min-width: 2.2rem;
+  padding: 0.35rem 0.7rem;
+  background: rgba(7, 13, 28, 0.34);
+  border: 1px solid rgba(255,255,255,0.16);
+  font-weight: 700;
+}
+
+.walkthrough-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.walkthrough-lines {
+  display: grid;
+  gap: 6px;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.walkthrough-note {
+  color: rgba(244, 251, 255, 0.82);
+  font-size: 0.8rem;
+  line-height: 1.38;
 }
 
 .chart-panel {
@@ -354,18 +490,17 @@ h3 { font-size: 1.02rem; }
   align-content: start;
 }
 
-.bau-panel {
+.stage-panel {
   align-self: start;
-  grid-column: 1 / -1;
 }
 
 .selected-hour-stage {
   min-height: 100%;
 }
 
+.bau-panel,
 .details-panel {
   align-self: start;
-  grid-column: 1 / -1;
 }
 
 .formula-panel {
@@ -719,6 +854,8 @@ h3 { font-size: 1.02rem; }
 @media (max-width: 1280px) {
   .story-grid { grid-template-columns: 1fr; }
   .lower-grid { grid-template-columns: 1fr; }
+  .chart-tariff-band-row,
+  .walkthrough-grid { grid-template-columns: 1fr; }
   .comparison-grid { grid-template-columns: 1fr; }
   .panel-note { text-align: left; }
 }
@@ -728,19 +865,22 @@ h3 { font-size: 1.02rem; }
   .topbar,
   .chart-headline,
   .panel-header,
-  .hour-topline { flex-direction: column; align-items: flex-start; }
+   .hour-topline,
+   .chart-story-banner { flex-direction: column; align-items: flex-start; }
   .brand-block { align-items: flex-start; }
   .brand-logo { width: 72px; }
   .cancellation-figures,
   .flow-grid,
-  .bars-grid,
-  .settlement-grid,
-  .formula-grid,
-   .controls-grid { grid-template-columns: 1fr; }
+   .bars-grid,
+   .settlement-grid,
+   .formula-grid,
+   .controls-grid,
+   .chart-tariff-band-row { grid-template-columns: 1fr; }
   .payment-equation-head,
   .equation-footer { flex-direction: column; align-items: flex-start; }
   .summary-pills { justify-content: flex-start; }
   .chart-headline { gap: 10px; }
+   .chart-story-pills { justify-content: flex-start; }
   .summary-pill { padding: 0.32rem 0.6rem; font-size: 0.72rem; }
   .scenario-tabs { gap: 6px; }
   .scenario-tab,
@@ -752,10 +892,14 @@ h3 { font-size: 1.02rem; }
   }
   .profile-wrap { flex: none; }
   .comparison-grid { grid-template-columns: 1fr; }
+  .story-column {
+    display: contents;
+  }
 }
 
 @media (max-width: 520px) {
   .chart-panel,
+  .walkthrough-panel,
   .hour-panel,
   .details-panel,
   .formula-panel,
