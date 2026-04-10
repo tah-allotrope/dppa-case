@@ -53,7 +53,7 @@ function buildCallouts(intervals, inputs, currency) {
 
   return ['shortfall', 'balanced', 'excess'].map((type) => {
     const iv = bestHour(type)
-    const cfdRate = inputs.strikePrice - inputs.marketPrice
+    const cfdRate = inputs.strikePrice - iv.fmp
     const cfdAmount = iv.contractQuantity * cfdRate
     const volLabel = type === 'shortfall'
       ? `Under supply: ${(iv.shortfall / 1000).toFixed(0)} MWh`
@@ -114,6 +114,32 @@ function makeTariffPlugin(getState) {
       const h = area.bottom - area.top
       const state = getState()
 
+      // ── strike price reference line on yFmp axis ─────────────────────────
+      if (state.inputs && state.inputs.strikePrice) {
+        const yFmpScale = chart.scales['yFmp']
+        if (yFmpScale) {
+          const strikeY = yFmpScale.getPixelForValue(state.inputs.strikePrice)
+          if (strikeY >= area.top && strikeY <= area.bottom) {
+            ctx.save()
+            ctx.setLineDash([8, 5])
+            ctx.strokeStyle = 'rgba(82, 144, 255, 0.65)'
+            ctx.lineWidth = 1.4
+            ctx.beginPath()
+            ctx.moveTo(area.left, strikeY)
+            ctx.lineTo(area.right, strikeY)
+            ctx.stroke()
+            ctx.setLineDash([])
+            // Label on right edge
+            ctx.font = '8px "Segoe UI", sans-serif'
+            ctx.fillStyle = 'rgba(82, 144, 255, 0.9)'
+            ctx.textAlign = 'right'
+            ctx.textBaseline = 'bottom'
+            ctx.fillText(`Strike ${Math.round(state.inputs.strikePrice).toLocaleString()}`, area.right - 2, strikeY - 2)
+            ctx.restore()
+          }
+        }
+      }
+
       // ── dashed vertical dividers ─────────────────────────────────────────
       ctx.save()
       ctx.setLineDash([5, 5])
@@ -169,9 +195,13 @@ function makeTariffPlugin(getState) {
           ctx.fillStyle = band.textColor
           ctx.fillText(`${Math.round(state.inputs.retailTariff).toLocaleString()} VND/kWh`, cx, area.top + 27)
 
-          // Spot price in cyan
-          ctx.fillStyle = '#47d7ff'
-          ctx.fillText(`Spot: ${Math.round(state.inputs.marketPrice).toLocaleString()} VND/kWh`, cx, area.top + 38)
+          // Per-band FMP: use the midpoint hour of this band to read from fmpCurve
+          const midHour = Math.floor((band.startHour + band.endHour) / 2)
+          const bandFmp = state.inputs.fmpCurve
+            ? (state.inputs.fmpCurve[midHour] ?? state.inputs.marketPrice)
+            : state.inputs.marketPrice
+          ctx.fillStyle = '#ff9d4f'
+          ctx.fillText(`FMP: ${Math.round(bandFmp).toLocaleString()} VND/kWh`, cx, area.top + 38)
         }
 
         ctx.restore()
@@ -266,7 +296,15 @@ function makeTariffPlugin(getState) {
   }
 }
 
-function baseOptions() {
+function baseOptions(inputs) {
+  // Determine a sensible range for the FMP axis based on the curve + strike
+  const strikePrice = inputs?.strikePrice ?? 1741
+  const fmpCurve = inputs?.fmpCurve ?? []
+  const fmpMin = fmpCurve.length ? Math.min(...fmpCurve) : 800
+  const fmpMax = fmpCurve.length ? Math.max(...fmpCurve) : 3000
+  const yFmpMin = Math.floor(Math.min(fmpMin, strikePrice) * 0.88 / 100) * 100
+  const yFmpMax = Math.ceil(Math.max(fmpMax, strikePrice) * 1.08 / 100) * 100
+
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -287,6 +325,23 @@ function baseOptions() {
     scales: {
       x: { grid: { color: neonGrid }, ticks: { color: tickColor } },
       y: { grid: { color: neonGrid }, ticks: { color: tickColor } },
+      yFmp: {
+        type: 'linear',
+        position: 'right',
+        min: yFmpMin,
+        max: yFmpMax,
+        grid: { drawOnChartArea: false },
+        ticks: {
+          color: '#ff9d4f',
+          callback: (v) => `${(v / 1000).toFixed(1)}k`,
+        },
+        title: {
+          display: true,
+          text: 'VND/kWh',
+          color: '#ff9d4f',
+          font: { size: 10 },
+        },
+      },
     },
   }
 }
@@ -313,6 +368,7 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
         pointRadius: ivs.map((_, idx) => idx === selHour ? 5 : 1.5),
         pointHoverRadius: ivs.map((_, idx) => idx === selHour ? 7 : 4),
         pointBackgroundColor: ivs.map((_, idx) => idx === selHour ? '#c9f7ff' : '#47d7ff'),
+        yAxisID: 'y',
       },
       {
         label: 'Solar generation',
@@ -325,6 +381,7 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
         pointRadius: ivs.map((_, idx) => idx === selHour ? 5 : 1.5),
         pointHoverRadius: ivs.map((_, idx) => idx === selHour ? 7 : 4),
         pointBackgroundColor: ivs.map((_, idx) => idx === selHour ? '#fff1b5' : '#ffd84f'),
+        yAxisID: 'y',
       },
       {
         label: 'Matched volume',
@@ -335,6 +392,21 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
         tension: 0.25,
         borderWidth: 2,
         pointRadius: 0,
+        yAxisID: 'y',
+      },
+      {
+        label: 'FMP (VND/kWh)',
+        data: ivs.map(i => i.fmp),
+        borderColor: '#ff9d4f',
+        backgroundColor: 'rgba(255,157,79,0)',
+        fill: false,
+        tension: 0.35,
+        borderWidth: 2,
+        borderDash: [6, 4],
+        pointRadius: ivs.map((_, idx) => idx === selHour ? 4 : 1),
+        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? 6 : 3),
+        pointBackgroundColor: '#ff9d4f',
+        yAxisID: 'yFmp',
       },
     ]
   }
@@ -344,6 +416,10 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
     state.callouts = buildCallouts(intervals, inputs, currency)
     profileChart.data.datasets = buildDatasets(intervals, selectedHour)
     profileChart.data.labels = labels
+    // Refresh scale bounds when inputs change (e.g. slider moved)
+    const updatedOptions = baseOptions(inputs)
+    profileChart.options.scales.yFmp.min = updatedOptions.scales.yFmp.min
+    profileChart.options.scales.yFmp.max = updatedOptions.scales.yFmp.max
     profileChart.options.onClick = (event) => {
       const pts = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
       if (pts.length) onSelect(pts[0].index)
@@ -356,7 +432,7 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
     type: 'line',
     data: { labels, datasets: buildDatasets(intervals, selectedHour) },
     options: {
-      ...baseOptions(),
+      ...baseOptions(inputs),
       onClick: (event) => {
         const pts = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
         if (pts.length) onSelect(pts[0].index)

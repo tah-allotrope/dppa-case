@@ -46,10 +46,13 @@ export function calculateSettlement(inputs) {
   }))
 
   const intervals = volumes.map((volume) => {
-    const evnMarket = volume.matched * inputs.marketPrice * inputs.lossFactor
+    const fmp = (inputs.fmpCurve && inputs.fmpCurve[volume.hour] != null)
+      ? inputs.fmpCurve[volume.hour]
+      : inputs.marketPrice
+    const evnMarket = volume.matched * fmp * inputs.lossFactor
     const evnDppa = volume.matched * inputs.dppaCharge
     const evnRetail = volume.shortfall * inputs.retailTariff
-    const developer = volume.contractQuantity * (inputs.strikePrice - inputs.marketPrice)
+    const developer = volume.contractQuantity * (inputs.strikePrice - fmp)
     const evnTotal = evnMarket + evnDppa + evnRetail
     const total = evnTotal + developer
     const baseline = volume.load * inputs.retailTariff
@@ -58,6 +61,7 @@ export function calculateSettlement(inputs) {
 
     return {
       ...volume,
+      fmp,
       classification,
       evnMarket,
       evnDppa,
@@ -85,8 +89,11 @@ export function calculateSettlement(inputs) {
   const matchedPrice = matchedVolume > 0 ? (evnMarketTotal + evnDppaTotal + developerTotal) / matchedVolume : 0
   const blendedPrice = loadTotal > 0 ? totalCost / loadTotal : 0
   const noDppaBlended = loadTotal > 0 ? baselineCost / loadTotal : 0
+  const avgFmp = intervals.length > 0
+    ? intervals.reduce((sum, iv) => sum + iv.fmp, 0) / intervals.length
+    : inputs.marketPrice
   const impliedCancellation = matchedVolume > 0
-    ? inputs.strikePrice + inputs.dppaCharge + (inputs.marketPrice * inputs.lossFactor - inputs.marketPrice)
+    ? inputs.strikePrice + inputs.dppaCharge + (avgFmp * inputs.lossFactor - avgFmp)
     : 0
 
   return {
@@ -191,7 +198,7 @@ function buildWalkthroughCase(inputs, interval, step = 1) {
     shortfall: interval.shortfall,
     excess: interval.excess,
     contractQuantity: interval.contractQuantity,
-    cfdUnitRate: inputs.strikePrice - inputs.marketPrice,
+    cfdUnitRate: inputs.strikePrice - interval.fmp,
     cfdAmount: interval.developer,
     evnAmount: interval.evnTotal,
     totalDppa: interval.total,
@@ -220,13 +227,14 @@ export function buildWalkthroughCases(inputs, intervals) {
 }
 
 export function buildFormulaBreakdown(inputs, interval) {
-  const lossAdjustment = inputs.marketPrice * inputs.lossFactor - inputs.marketPrice
+  const fmp = interval.fmp ?? inputs.marketPrice
+  const lossAdjustment = fmp * inputs.lossFactor - fmp
   const cleanCancellation = interval.matched > 0 && interval.contractQuantity === interval.matched
   const mismatchVolume = interval.contractQuantity - interval.matched
   const bauCost = interval.load * inputs.retailTariff
   const dppaCost = interval.total
   const savingsVsBau = bauCost - dppaCost
-  const evnMarketReference = interval.matched * inputs.marketPrice
+  const evnMarketReference = interval.matched * fmp
   const evnLossCharge = interval.evnMarket - evnMarketReference
   const cleanCancelledEnergy = Math.min(interval.matched, interval.contractQuantity)
   const uncancelledContractVolume = Math.max(interval.contractQuantity - interval.matched, 0)
@@ -241,14 +249,14 @@ export function buildFormulaBreakdown(inputs, interval) {
   const evnRetailUnitOnLoad = interval.load > 0 ? interval.evnRetail / interval.load : 0
   const evnUnitCost = interval.load > 0 ? interval.evnTotal / interval.load : 0
   const developerUnitCost = interval.load > 0 ? interval.developer / interval.load : 0
-  const spotMarketVisibleRate = interval.load > 0 ? interval.matched / interval.load * inputs.marketPrice : 0
-  const cancellationViaSwapRate = interval.load > 0 ? -(Math.min(interval.matched, interval.contractQuantity) / interval.load * inputs.marketPrice) : 0
+  const spotMarketVisibleRate = interval.load > 0 ? interval.matched / interval.load * fmp : 0
+  const cancellationViaSwapRate = interval.load > 0 ? -(Math.min(interval.matched, interval.contractQuantity) / interval.load * fmp) : 0
   const retainedStrikeRate = interval.load > 0 ? interval.contractQuantity / interval.load * inputs.strikePrice : 0
   const retainedEnergyRate = spotMarketVisibleRate + cancellationViaSwapRate + retainedStrikeRate + evnDppaUnitOnLoad + (interval.load > 0 ? evnLossCharge / interval.load : 0)
-  const cancellationBaseUnit = inputs.marketPrice
-  const cancellationSwapUnit = interval.contractQuantity > 0 ? inputs.marketPrice - inputs.strikePrice : 0
-  const cancellationRecoveredUnit = interval.matched > 0 ? Math.min(interval.matched, interval.contractQuantity) / interval.load * inputs.marketPrice : 0
-  const uncancelledContractUnit = interval.load > 0 ? uncancelledContractVolume / interval.load * (inputs.strikePrice - inputs.marketPrice) : 0
+  const cancellationBaseUnit = fmp
+  const cancellationSwapUnit = interval.contractQuantity > 0 ? fmp - inputs.strikePrice : 0
+  const cancellationRecoveredUnit = interval.matched > 0 ? Math.min(interval.matched, interval.contractQuantity) / interval.load * fmp : 0
+  const uncancelledContractUnit = interval.load > 0 ? uncancelledContractVolume / interval.load * (inputs.strikePrice - fmp) : 0
 
   // Five-term cancellation algebra strip for the CFO visualisation.
   // role: 'shown' = amber (FMP appears), 'cancel' = red strikethrough (FMP cancels),
@@ -259,15 +267,15 @@ export function buildFormulaBreakdown(inputs, interval) {
     {
       label: 'FMP × matched',
       termVolume: interval.matched,
-      termRate: inputs.marketPrice,
-      value: interval.load > 0 ? interval.matched / interval.load * inputs.marketPrice : 0,
+      termRate: fmp,
+      value: interval.load > 0 ? interval.matched / interval.load * fmp : 0,
       role: 'shown',
     },
     {
       label: '− FMP × aligned',
       termVolume: alignedVol,
-      termRate: inputs.marketPrice,
-      value: interval.load > 0 ? -(alignedVol / interval.load * inputs.marketPrice) : 0,
+      termRate: fmp,
+      value: interval.load > 0 ? -(alignedVol / interval.load * fmp) : 0,
       role: 'cancel',
     },
     {
@@ -308,11 +316,11 @@ export function buildFormulaBreakdown(inputs, interval) {
     shortfall: interval.shortfall,
     contractQuantity: interval.contractQuantity,
     strikePrice: inputs.strikePrice,
-    marketPrice: inputs.marketPrice,
+    marketPrice: fmp,
     retailTariff: inputs.retailTariff,
     dppaCharge: inputs.dppaCharge,
-    marketPerMatched: inputs.marketPrice * inputs.lossFactor,
-    developerSwapPerContract: inputs.strikePrice - inputs.marketPrice,
+    marketPerMatched: fmp * inputs.lossFactor,
+    developerSwapPerContract: inputs.strikePrice - fmp,
     lossAdjustment,
     impliedCancellation: inputs.strikePrice + inputs.dppaCharge + lossAdjustment,
     currentMatchedPrice: interval.intervalMatchedPrice,

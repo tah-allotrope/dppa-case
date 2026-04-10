@@ -1,6 +1,6 @@
 import './style.css'
 import mermaid from 'mermaid'
-import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes } from './data/default-scenarios'
+import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve } from './data/default-scenarios'
 import { renderProfileChart } from './modules/chart'
 import { buildSelectedIntervalNarrative, buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement } from './modules/settlement'
 import { renderAppShell, renderBauComparison, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderVolumeSummary, renderWalkthroughCases, setActiveCurrency, setActiveDetailView, setActiveScenario, updateControlOutputs } from './modules/ui'
@@ -21,6 +21,7 @@ function buildInputs() {
     ...state,
     loadProfile: scenario.loadProfile,
     generationProfile: scenario.generationProfile,
+    fmpCurve: buildFmpCurve(state.marketPrice),
   }
 }
 

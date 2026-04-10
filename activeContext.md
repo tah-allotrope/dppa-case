@@ -52,19 +52,26 @@
 - All comparison cards, equation formulas, and settlement cards have tightened padding
 - 16 tests pass, build clean, live at https://dppa-case.web.app
 
-## New Round: Canvas-Native Tariff Overlay
+## Synthetic FMP Curve Feature
 
 ### Plan
-- [x] Remove `tariffWindows`, `renderChartStoryOverlay`, and `#chartStoryOverlay` HTML div from `ui.js`
-- [x] Remove `renderChartStoryOverlay` import and call from `main.js`; pass `inputs` as 6th arg to `renderProfileChart`
-- [x] Remove all HTML overlay CSS classes from `style.css`
-- [x] Rewrite `chart.js` with a Chart.js custom plugin (`tariffOverlay`) that draws band fills, dashed dividers, time/tariff/spot labels, numbered callout boxes with connector lines — all on canvas
-- [x] Update `ui.test.js` to match new structure (no more `renderChartStoryOverlay` references)
-- [x] Run `npm test -- --run` — all 16 tests pass
-- [x] Run `npm run build` — build succeeds (chunk warnings expected from Mermaid/Chart.js)
-- [x] Run `firebase deploy --only hosting --project dppa-case` — deployed to https://dppa-case.web.app
+- [x] Add `buildFmpCurve(midpoint)` to `default-scenarios.js` — 24-hour synthetic daily shape using `FMP_SHAPE` multipliers centred on `marketPrice`; add `fmpCurve` to `defaultInputs`
+- [x] Update `settlement.js` — attach `interval.fmp` (from `fmpCurve[hour]`) to every interval; replace all `inputs.marketPrice` in EVN market, developer swap, and formula breakdown with per-hour `fmp`; average-fmp for `impliedCancellation` totals
+- [x] Update `chart.js` — add FMP as 4th dataset (dashed orange line, `yAxisID: 'yFmp'`); add secondary right-side Y axis `yFmp` with auto-ranging; draw strike-price reference line on canvas via plugin; fix callout `cfdRate` to `iv.fmp`; change band label from "Spot:" to "FMP:" using band-midpoint fmp value
+- [x] Update `main.js` — `buildInputs()` now calls `buildFmpCurve(state.marketPrice)` so moving the FMP slider shifts the whole curve
+- [x] Update `ui.test.js` — import `buildFmpCurve`; add `fmpCurve: buildFmpCurve(1700)` to all manual test input objects
+- [x] `npm test -- --run` — 16/16 pass
+- [x] `npm run build` — clean (pre-existing chunk-size warnings only)
+- [x] `firebase deploy --only hosting --project dppa-case` — deployed
 
 ### Review / Results
-- All HTML overlay approaches have been fully removed. The tariff storytelling now lives exclusively inside the Chart.js canvas via a custom plugin.
-- The plugin draws coloured vertical bands, dashed dividers, time/tariff/spot price labels at the top of the chart area, and three numbered callout boxes with connector lines — matching the reference screenshot in `background/Screenshot 2026-04-09 125837.png`.
-- All 16 tests pass, build is clean, and the app is live at https://dppa-case.web.app.
+- FMP curve crosses the strike price (~1741 VND/kWh) at multiple points across the day:
+  - Off-peak (00–04, 22–24): FMP ~1190–1260, below strike — developer pays factory (CfD positive)
+  - Morning standard (04–09): FMP rises ~1445–1870, crosses strike around hour 07–08
+  - Peak (09–11, 17–20): FMP ~2244–2448, well above strike — factory pays developer (CfD negative)
+  - Both directions of cancellation are visible, which is the key CFO insight
+- The `marketPrice` slider still works: adjusting it shifts the entire FMP curve proportionally via `buildFmpCurve(state.marketPrice)` in `buildInputs()`
+- All settlement formulas, formula breakdown, FMP cancellation strip, and callout boxes now use the per-hour FMP value
+- Strike price horizontal reference line drawn on canvas via the tariffOverlay plugin on the `yFmp` axis
+- 16 tests pass, build clean, live at https://dppa-case.web.app
+

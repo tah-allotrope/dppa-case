@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
-import { defaultInputs, scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios'
+import { buildFmpCurve, defaultInputs, scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios'
 import { buildSelectedWalkthroughCase, calculateSettlement, buildFormulaBreakdown, buildSelectedIntervalNarrative } from './settlement'
 import { renderAppShell, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderWalkthroughCases } from './ui'
 
@@ -38,6 +38,7 @@ describe('selected-hour layout', () => {
       settlementMode: 'matched',
       strikePrice: 1741.35,
       marketPrice: 1700,
+      fmpCurve: buildFmpCurve(1700),
       dppaCharge: 523.34,
       lossFactor: 1.027263,
       retailTariff: 1833,
@@ -109,6 +110,7 @@ describe('selected-hour layout', () => {
       settlementMode: 'matched',
       strikePrice: 1741.35,
       marketPrice: 1700,
+      fmpCurve: buildFmpCurve(1700),
       dppaCharge: 523.34,
       lossFactor: 1.027263,
       retailTariff: 1833,
