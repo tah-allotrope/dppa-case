@@ -2,8 +2,8 @@ import './style.css'
 import mermaid from 'mermaid'
 import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve } from './data/default-scenarios'
 import { renderProfileChart } from './modules/chart'
-import { buildSelectedIntervalNarrative, buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement } from './modules/settlement'
-import { renderAppShell, renderBauComparison, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderVolumeSummary, renderWalkthroughCases, setActiveCurrency, setActiveDetailView, setActiveScenario, updateControlOutputs } from './modules/ui'
+import { buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement } from './modules/settlement'
+import { renderAppShell, renderFormulas, renderSelectedHourDetails, renderVolumeSummary, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
 
 mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' })
 
@@ -51,27 +51,17 @@ function updateView() {
     updateView()
   }, inputs)
   renderVolumeSummary(document.querySelector('#volumeSummary'), settlement.totals)
-  renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedWalkthroughCase, state.currency)
+  renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedWalkthroughCase, state.currency, formulas)
   renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
-  renderSelectedHour(
-    document.querySelector('#selectedHourPanel'),
-    selectedInterval,
-    buildSelectedIntervalNarrative(selectedInterval, inputs),
-    state.currency,
-    state.detailView,
-    inputs,
-  )
   renderSelectedHourDetails(
     document.querySelector('#selectedHourDetailsPanel'),
     selectedInterval,
     state.currency,
     inputs,
   )
-  renderBauComparison(document.querySelector('#bauComparison'), formulas, state.currency)
   updateControlOutputs(state, settlementModes, state.currency)
   setActiveScenario(state.scenarioId)
   setActiveCurrency(state.currency)
-  setActiveDetailView(state.detailView)
   mermaid.run({ nodes: [document.querySelector('#cancellationMermaid')] })
 }
 
@@ -120,13 +110,6 @@ function syncControls() {
     const button = event.target.closest('[data-currency]')
     if (!button) return
     state.currency = button.dataset.currency
-    updateView()
-  })
-
-  document.querySelector('#detailViewToggle').addEventListener('click', (event) => {
-    const button = event.target.closest('[data-detail-view]')
-    if (!button) return
-    state.detailView = button.dataset.detailView
     updateView()
   })
 

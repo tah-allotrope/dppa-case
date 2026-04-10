@@ -143,7 +143,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
         <div class="brand-block">
           <img class="brand-logo" src="/brand/allotrope-logo.png" alt="Allotrope logo" />
           <div>
-            <p class="eyebrow">Vietnam synthetic DPPA</p>
+            <p class="eyebrow">Rob — Vietnam synthetic DPPA</p>
             <h1>DPPA CFO visual explainer</h1>
             <p class="hero-copy">Click any hour to compare BAU without DPPA against DPPA payment using the weighted 22 kV to below 110 kV retail tariff.</p>
           </div>
@@ -183,18 +183,6 @@ export function renderAppShell(root, scenarios, settlementModes) {
             </div>
             <div class="walkthrough-grid" id="walkthroughCases"></div>
           </section>
-        </section>
-
-        <section class="story-column">
-          <div class="panel bau-panel stage-panel">
-            <div class="panel-header">
-              <div>
-                <p class="eyebrow">Selected hour comparison</p>
-                <h2>What changes for the factory in this hour</h2>
-              </div>
-            </div>
-            <div class="comparison-grid" id="bauComparison"></div>
-          </div>
 
           <div class="panel details-panel stage-panel">
             <div class="panel-header">
@@ -205,21 +193,8 @@ export function renderAppShell(root, scenarios, settlementModes) {
             </div>
             <div id="selectedHourDetailsPanel"></div>
           </div>
-
-          <div class="panel hour-panel prime-panel selected-hour-stage">
-            <div class="panel-header">
-              <div>
-                <p class="eyebrow">Selected hour</p>
-                <h2>BAU without DPPA vs DPPA payment</h2>
-              </div>
-              <div class="toggle-group" id="detailViewToggle" aria-label="Selected hour visual mode">
-                <button class="toggle-button" data-detail-view="flow" type="button">Flow view</button>
-                <button class="toggle-button" data-detail-view="bars" type="button">Bars view</button>
-              </div>
-            </div>
-            <div id="selectedHourPanel"></div>
-          </div>
         </section>
+
       </main>
 
       <section class="lower-grid">
@@ -308,10 +283,15 @@ export function renderAppShell(root, scenarios, settlementModes) {
   `
 }
 
-export function renderWalkthroughCases(container, selectedCase, currency) {
-  container.innerHTML = selectedCase
-    ? walkthroughCaseCard(selectedCase, currency)
+export function renderWalkthroughCases(container, selectedCase, currency, formulas) {
+  if (!selectedCase) {
+    container.innerHTML = ''
+    return
+  }
+  const strip = formulas && formulas.fmpCancellationSteps
+    ? fmpCancelStrip(formulas.fmpCancellationSteps, formulas.dppaUnitCost, currency)
     : ''
+  container.innerHTML = walkthroughCaseCard(selectedCase, currency) + strip
 }
 
 export function renderVolumeSummary(container, totals) {

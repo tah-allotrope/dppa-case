@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
 import { buildFmpCurve, defaultInputs, scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios'
-import { buildSelectedWalkthroughCase, calculateSettlement, buildFormulaBreakdown, buildSelectedIntervalNarrative } from './settlement'
-import { renderAppShell, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderWalkthroughCases } from './ui'
+import { buildSelectedWalkthroughCase, calculateSettlement, buildFormulaBreakdown } from './settlement'
+import { renderAppShell, renderFormulas, renderSelectedHourDetails, renderWalkthroughCases } from './ui'
 
 describe('storytelling shell', () => {
   it('renders chart canvas and walkthrough cases section with correct DOM order', () => {
@@ -26,9 +26,9 @@ describe('storytelling shell', () => {
 })
 
 describe('selected-hour layout', () => {
-  it('keeps the top selected-hour panel compact and moves payment equations below', () => {
+  it('renders walkthrough card with FMP strip and payment equations below in details panel', () => {
     document.body.innerHTML = `
-      <div id="selectedHourPanel"></div>
+      <div id="walkthroughCases"></div>
       <div id="selectedHourDetailsPanel"></div>
     `
 
@@ -46,15 +46,10 @@ describe('selected-hour layout', () => {
 
     const settlement = calculateSettlement(inputs)
     const interval = settlement.intervals[0]
+    const formulas = buildFormulaBreakdown(inputs, interval)
+    const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
 
-    renderSelectedHour(
-      document.querySelector('#selectedHourPanel'),
-      interval,
-      buildSelectedIntervalNarrative(interval, inputs),
-      'VND',
-      'flow',
-      inputs,
-    )
+    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', formulas)
 
     renderSelectedHourDetails(
       document.querySelector('#selectedHourDetailsPanel'),
@@ -63,11 +58,11 @@ describe('selected-hour layout', () => {
       inputs,
     )
 
-    expect(document.querySelector('#selectedHourPanel .settlement-grid')).toBeNull()
-    expect(document.querySelector('#selectedHourPanel').textContent).toContain('DPPA total this hour')
+    // FMP cancel strip is embedded in the walkthrough panel
+    expect(document.querySelector('#walkthroughCases').textContent).toContain('FMP cancellation')
+    // Payment build-up is in the details panel
     expect(document.querySelector('#selectedHourDetailsPanel .settlement-grid')).not.toBeNull()
     expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('Payment to EVN per kWh of factory load')
-    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('FMP cancellation')
   })
 
   it('renders only the selected-hour load-vs-gen case card', () => {
@@ -91,9 +86,9 @@ describe('selected-hour layout', () => {
     expect(document.querySelectorAll('#walkthroughCases .walkthrough-card')).toHaveLength(1)
   })
 
-  it('shows spot market price and its cancellation explicitly for a CFO reader', () => {
+  it('shows FMP cancellation terms explicitly for a CFO reader', () => {
     document.body.innerHTML = `
-      <div id="selectedHourPanel"></div>
+      <div id="walkthroughCases"></div>
       <div id="selectedHourDetailsPanel"></div>
       <div id="cancellationFigures"></div>
       <pre id="evnExpression"></pre>
@@ -119,15 +114,9 @@ describe('selected-hour layout', () => {
     const settlement = calculateSettlement(inputs)
     const interval = settlement.intervals[0]
     const breakdown = buildFormulaBreakdown(inputs, interval)
+    const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
 
-    renderSelectedHour(
-      document.querySelector('#selectedHourPanel'),
-      interval,
-      buildSelectedIntervalNarrative(interval, inputs),
-      'VND',
-      'flow',
-      inputs,
-    )
+    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
 
     renderSelectedHourDetails(
       document.querySelector('#selectedHourDetailsPanel'),
@@ -138,8 +127,9 @@ describe('selected-hour layout', () => {
 
     renderFormulas(breakdown, '', 'VND')
 
-    expect(document.querySelector('#selectedHourPanel').textContent).toContain('Spot market reference')
-    expect(document.querySelector('#selectedHourPanel').textContent).toContain('Cancellation via developer swap')
+    // FMP strip is in the walkthrough panel
+    expect(document.querySelector('#walkthroughCases').textContent).toContain('FMP cancellation')
+    // FMP terms are in the details panel
     expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('FMP × matched')
     expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('− FMP × aligned')
     expect(document.querySelector('#cancellationResult').textContent).toContain('spot market price is shown first')

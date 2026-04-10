@@ -1,5 +1,4 @@
 import Chart from 'chart.js/auto'
-import { formatMoney } from './formatters'
 
 let profileChart
 
@@ -18,70 +17,8 @@ const TARIFF_BANDS = [
   { label: 'Off-peak',  time: '10 pm – 12 am',      startHour: 22, endHour: 24, fill: 'rgba(71,215,255,0.06)',   lineColor: 'rgba(71,215,255,0.40)',  textColor: '#47d7ff' },
 ]
 
-const CALLOUT_COLORS = {
-  shortfall: { bg: 'rgba(155,20,24,0.93)',   border: 'rgba(215,55,55,0.9)',   text: '#fff' },
-  balanced:  { bg: 'rgba(12,78,158,0.93)',   border: 'rgba(55,135,220,0.9)',  text: '#fff' },
-  excess:    { bg: 'rgba(8,106,152,0.93)',   border: 'rgba(55,175,220,0.9)',  text: '#fff' },
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath()
-  ctx.moveTo(x + r, y)
-  ctx.lineTo(x + w - r, y)
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
-  ctx.lineTo(x + w, y + h - r)
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
-  ctx.lineTo(x + r, y + h)
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
-  ctx.lineTo(x, y + r)
-  ctx.quadraticCurveTo(x, y, x + r, y)
-  ctx.closePath()
-}
-
-function buildCallouts(intervals, inputs, currency) {
-  if (!intervals || !intervals.length) return []
-
-  function bestHour(key) {
-    const pool = intervals.filter(i => i.classification?.key === key)
-    const src = pool.length ? pool : intervals
-    if (key === 'shortfall') return src.reduce((a, b) => (b.load - b.generation > a.load - a.generation ? b : a))
-    if (key === 'excess')    return src.reduce((a, b) => (b.generation - b.load > a.generation - a.load ? b : a))
-    return src.reduce((a, b) => (Math.abs(b.load - b.generation) < Math.abs(a.load - a.generation) ? b : a))
-  }
-
-  const fmt = (v) => formatMoney(v, { currency, signed: false })
-
-  return ['shortfall', 'balanced', 'excess'].map((type) => {
-    const iv = bestHour(type)
-    const cfdRate = inputs.strikePrice - iv.fmp
-    const cfdAmount = iv.contractQuantity * cfdRate
-    const volLabel = type === 'shortfall'
-      ? `Under supply: ${(iv.shortfall / 1000).toFixed(0)} MWh`
-      : `Over supply: ${(iv.excess / 1000).toFixed(0)} MWh`
-
-    return {
-      hour: iv.hour,
-      type,
-      lines: [
-        volLabel,
-        `CfD = ${Math.round(cfdRate)}x${(iv.contractQuantity/1000).toFixed(0)}kWh = ${fmt(cfdAmount)}`,
-        `EVN = ${fmt(iv.evnTotal)}`,
-        `Total (DPPA) = ${fmt(iv.total)}`,
-        `Total (No-DPPA) = ${fmt(iv.baseline)}`,
-        `Savings (DPPA) = ${formatMoney(iv.baseline - iv.total, { currency, signed: true })}`,
-      ],
-      // Compact version used on narrow canvases (< 320px wide)
-      linesCompact: [
-        volLabel,
-        `CfD = ${fmt(cfdAmount)}`,
-        `EVN = ${fmt(iv.evnTotal)}`,
-        `DPPA = ${fmt(iv.total)}`,
-        `BAU = ${fmt(iv.baseline)}`,
-        `Saving = ${formatMoney(iv.baseline - iv.total, { currency, signed: true })}`,
-      ],
-    }
-  })
-}
+// Vivid magenta-red for FMP so it is unmistakably distinct from the amber solar line
+const FMP_COLOR = '#ff3d7f'
 
 function makeTariffPlugin(getState) {
   return {
@@ -111,7 +48,6 @@ function makeTariffPlugin(getState) {
 
       const totalHours = 24
       const w = area.right - area.left
-      const h = area.bottom - area.top
       const state = getState()
 
       // ── strike price reference line on yFmp axis ─────────────────────────
@@ -200,98 +136,12 @@ function makeTariffPlugin(getState) {
           const bandFmp = state.inputs.fmpCurve
             ? (state.inputs.fmpCurve[midHour] ?? state.inputs.marketPrice)
             : state.inputs.marketPrice
-          ctx.fillStyle = '#ff9d4f'
+          ctx.fillStyle = FMP_COLOR
           ctx.fillText(`FMP: ${Math.round(bandFmp).toLocaleString()} VND/kWh`, cx, area.top + 38)
         }
 
         ctx.restore()
       }
-
-      // ── callout boxes ─────────────────────────────────────────────────────
-      const callouts = state.callouts
-      if (!callouts || !callouts.length) return
-
-      // Scale callout boxes down on narrow canvases (mobile)
-      const narrow  = w < 320
-      const lineH   = narrow ? 11 : 12.5
-      const padX    = narrow ? 5 : 8
-      const padY    = narrow ? 5 : 7
-      const radius  = 5
-      // On narrow canvases use 42% of chart width so compact lines fit
-      const boxW    = narrow ? Math.min(130, w * 0.42) : Math.min(165, w * 0.24)
-
-      callouts.forEach((callout, idx) => {
-        const hourX = area.left + ((callout.hour + 0.5) / totalHours) * w
-        const colors = CALLOUT_COLORS[callout.type] || CALLOUT_COLORS.balanced
-        // Use compact lines on narrow canvases
-        const lines  = narrow && callout.linesCompact ? callout.linesCompact : callout.lines
-        const boxH   = lines.length * lineH + padY * 2
-
-        // Vertical placement: shortfall and excess float near the top (below header),
-        // balanced floats in the lower half.
-        const headerBottom = area.top + 56
-        let boxY
-        if (callout.type === 'balanced') {
-          boxY = area.top + h * 0.54
-        } else {
-          boxY = headerBottom + 6
-        }
-
-        // Clamp horizontally inside the chart area
-        let boxX = hourX - boxW / 2
-        boxX = Math.max(area.left + 2, Math.min(boxX, area.right - boxW - 2))
-
-        // Box fill + border
-        ctx.save()
-        roundRect(ctx, boxX, boxY, boxW, boxH, radius)
-        ctx.fillStyle = colors.bg
-        ctx.fill()
-        ctx.strokeStyle = colors.border
-        ctx.lineWidth = 1.4
-        ctx.stroke()
-
-        // Text lines
-        ctx.font = `${narrow ? 8 : 9.5}px "Segoe UI", sans-serif`
-        ctx.fillStyle = colors.text
-        ctx.textAlign = 'left'
-        ctx.textBaseline = 'top'
-        lines.forEach((line, li) => {
-          ctx.fillText(line, boxX + padX, boxY + padY + li * lineH, boxW - padX * 2)
-        })
-        ctx.restore()
-
-        // Numbered badge
-        const badgeR = 9
-        const badgeCX = boxX + badgeR + 4
-        const badgeCY = boxY - badgeR - 1
-
-        ctx.save()
-        ctx.beginPath()
-        ctx.arc(badgeCX, badgeCY, badgeR, 0, Math.PI * 2)
-        ctx.fillStyle = colors.border
-        ctx.fill()
-        ctx.font = 'bold 10px "Segoe UI", sans-serif'
-        ctx.fillStyle = '#fff'
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillText(String(idx + 1), badgeCX, badgeCY)
-        ctx.restore()
-
-        // Dashed connector from badge bottom to hourX at mid-chart
-        const connectorY = callout.type === 'balanced' ? boxY - 4 : boxY + boxH + 4
-        const anchorY    = callout.type === 'balanced' ? area.top + h * 0.38 : area.top + h * 0.52
-
-        ctx.save()
-        ctx.setLineDash([3, 4])
-        ctx.strokeStyle = colors.border
-        ctx.lineWidth = 1
-        ctx.beginPath()
-        ctx.moveTo(badgeCX, callout.type === 'balanced' ? badgeCY - badgeR : badgeCY + badgeR)
-        ctx.lineTo(hourX, anchorY)
-        ctx.stroke()
-        ctx.setLineDash([])
-        ctx.restore()
-      })
     },
   }
 }
@@ -332,13 +182,13 @@ function baseOptions(inputs) {
         max: yFmpMax,
         grid: { drawOnChartArea: false },
         ticks: {
-          color: '#ff9d4f',
+          color: FMP_COLOR,
           callback: (v) => `${(v / 1000).toFixed(1)}k`,
         },
         title: {
           display: true,
           text: 'VND/kWh',
-          color: '#ff9d4f',
+          color: FMP_COLOR,
           font: { size: 10 },
         },
       },
@@ -347,13 +197,8 @@ function baseOptions(inputs) {
 }
 
 export function renderProfileChart(canvas, labels, intervals, selectedHour, onSelect, inputs) {
-  const currency = inputs?.currency ?? 'VND'
-
   // Mutable state bag read by the plugin on every draw
-  const state = {
-    inputs,
-    callouts: buildCallouts(intervals, inputs, currency),
-  }
+  const state = { inputs }
 
   function buildDatasets(ivs, selHour) {
     return [
@@ -397,15 +242,15 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
       {
         label: 'FMP (VND/kWh)',
         data: ivs.map(i => i.fmp),
-        borderColor: '#ff9d4f',
-        backgroundColor: 'rgba(255,157,79,0)',
+        borderColor: FMP_COLOR,
+        backgroundColor: 'rgba(255,61,127,0)',
         fill: false,
         tension: 0.35,
-        borderWidth: 2,
+        borderWidth: 2.5,
         borderDash: [6, 4],
         pointRadius: ivs.map((_, idx) => idx === selHour ? 4 : 1),
         pointHoverRadius: ivs.map((_, idx) => idx === selHour ? 6 : 3),
-        pointBackgroundColor: '#ff9d4f',
+        pointBackgroundColor: FMP_COLOR,
         yAxisID: 'yFmp',
       },
     ]
@@ -413,7 +258,6 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
 
   if (profileChart) {
     state.inputs = inputs
-    state.callouts = buildCallouts(intervals, inputs, currency)
     profileChart.data.datasets = buildDatasets(intervals, selectedHour)
     profileChart.data.labels = labels
     // Refresh scale bounds when inputs change (e.g. slider moved)

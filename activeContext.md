@@ -75,3 +75,21 @@
 - Strike price horizontal reference line drawn on canvas via the tariffOverlay plugin on the `yFmp` axis
 - 16 tests pass, build clean, live at https://dppa-case.web.app
 
+## UI Refinements: layout restructure (changes 4–7)
+
+### Plan
+- [x] Change 4: Move FMP cancel strip from `renderBauComparison` into `renderWalkthroughCases` — `formulas` passed as 4th arg; strip appended after the walkthrough card
+- [x] Change 5: Move `details-panel` (`#selectedHourDetailsPanel`) from `.story-column` into `.focus-column` below `.walkthrough-panel`; removed from story-column
+- [x] Change 6: Remove `bau-panel` from `renderAppShell` in `ui.js`; remove `renderBauComparison` call from `main.js`; remove `renderBauComparison` from imports
+- [x] Change 7: Remove `hour-panel` (`#selectedHourPanel`, `#detailViewToggle`) from `renderAppShell`; remove `renderSelectedHour`, `setActiveDetailView`, `detailViewToggle` listener, `buildSelectedIntervalNarrative` import from `main.js`
+- [x] Update `ui.test.js`: remove `renderSelectedHour`/`buildSelectedIntervalNarrative` imports; rewrite tests to match new layout (FMP strip in walkthrough panel, payment build-up in details panel)
+- [x] `npm test -- --run` — 16/16 pass
+- [x] `npm run build` — clean
+- [x] `firebase deploy --only hosting --project dppa-case` — deployed
+
+### Review / Results
+- Focus column now: chart → walkthrough card + FMP cancel strip → EVN/developer payment build-up
+- Story column removed; `.story-grid` now has only `.focus-column` with `.lower-grid` below
+- `renderSelectedHour`, `renderBauComparison`, `setActiveDetailView` removed from `ui.js` exports and `main.js` calls
+- 16 tests pass, build clean, live at https://dppa-case.web.app
+
