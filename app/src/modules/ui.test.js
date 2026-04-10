@@ -82,7 +82,7 @@ describe('selected-hour layout', () => {
     renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND')
 
     expect(document.querySelector('#walkthroughCases').textContent).toContain('Load = Gen')
-    expect(document.querySelector('#walkthroughCases').textContent).toContain('Total (No-DPPA)')
+    expect(document.querySelector('#walkthroughCases').textContent).toContain('EVN =')
     expect(document.querySelectorAll('#walkthroughCases .walkthrough-card')).toHaveLength(1)
   })
 
@@ -127,11 +127,9 @@ describe('selected-hour layout', () => {
 
     renderFormulas(breakdown, '', 'VND')
 
-    // FMP strip is in the walkthrough panel
+    // FMP strip is in the walkthrough panel (not in the details panel)
     expect(document.querySelector('#walkthroughCases').textContent).toContain('FMP cancellation')
-    // FMP terms are in the details panel
-    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('FMP × matched')
-    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('− FMP × aligned')
+    expect(document.querySelector('#selectedHourDetailsPanel').textContent).not.toContain('FMP cancellation')
     expect(document.querySelector('#cancellationResult').textContent).toContain('spot market price is shown first')
   })
 })

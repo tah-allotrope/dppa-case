@@ -93,7 +93,6 @@ function fmpCancelStrip(steps, resultValue, currency) {
     <div class="fmp-cancel-strip">
       <div class="fmp-cancel-header">
         <span class="fmp-cancel-title">FMP cancellation — per kWh on factory load</span>
-        <span class="fmp-cancel-hint">Drag the FMP slider below to watch the amber terms offset each other in real time</span>
       </div>
       <div class="fmp-cancel-equation">
         ${terms}
@@ -108,6 +107,11 @@ function fmpCancelStrip(steps, resultValue, currency) {
 }
 
 function walkthroughCaseCard(item, currency) {
+  const evnFormula = item.shortfall > 0
+    ? `(${formatNumber(item.matched)} × ${formatMoney(item.marketPerMatched, { currency, precise: true, perKwh: true })}) + (${formatNumber(item.matched)} × ${formatMoney(item.dppaCharge, { currency, precise: true, perKwh: true })}) + (${formatNumber(item.shortfall)} × ${formatMoney(item.retailTariff, { currency, precise: true, perKwh: true })})`
+    : `(${formatNumber(item.matched)} × ${formatMoney(item.marketPerMatched, { currency, precise: true, perKwh: true })}) + (${formatNumber(item.matched)} × ${formatMoney(item.dppaCharge, { currency, precise: true, perKwh: true })})`
+  const devFormula = `${formatNumber(item.contractQuantity)} × (${formatMoney(item.fmp, { currency, precise: true, perKwh: true })} − ${formatMoney(item.fmp - item.cfdUnitRate, { currency, precise: true, perKwh: true })})`
+
   return `
     <article class="walkthrough-card ${item.tone} is-selected">
       <div class="walkthrough-head">
@@ -121,17 +125,12 @@ function walkthroughCaseCard(item, currency) {
       <div class="walkthrough-metrics">
         ${compactPill('Load', `${formatNumber(item.load)} kWh`, 'default')}
         ${compactPill('Solar', `${formatNumber(item.generation)} kWh`, 'accent')}
-        ${compactPill('Matched', `${formatNumber(item.matched)} kWh`, 'result')}
         ${compactPill('Contract', `${formatNumber(item.contractQuantity)} kWh`, item.contractQuantity === item.matched ? 'result' : 'warning')}
       </div>
       <div class="walkthrough-lines">
-        <p>CFD = ${formatMoney(item.cfdUnitRate, { currency, precise: true, perKwh: true, signed: true })} x ${formatNumber(item.contractQuantity)} kWh = ${formatMoney(item.cfdAmount, { currency, signed: true })}</p>
-        <p>EVN = ${formatMoney(item.evnAmount, { currency })}</p>
-        <p>Total (DPPA) = ${formatMoney(item.totalDppa, { currency })}</p>
-        <p>Total (No-DPPA) = ${formatMoney(item.totalNoDppa, { currency })}</p>
-        <p>Savings (DPPA) = ${formatMoney(item.savingsVsBau, { currency, signed: true })}</p>
+        <p>EVN = ${formatMoney(item.evnAmount, { currency })} = ${evnFormula}</p>
+        <p>Developer = ${formatMoney(item.cfdAmount, { currency, signed: true })} = ${devFormula}</p>
       </div>
-      <p class="walkthrough-note">${item.cancellationNote}</p>
     </article>
   `
 }
@@ -448,23 +447,6 @@ export function renderSelectedHour(container, interval, narrative, currency, det
 export function renderSelectedHourDetails(container, interval, currency, inputs) {
   const evnUnitCost = interval.load > 0 ? interval.evnTotal / interval.load : 0
   const developerUnitCost = interval.load > 0 ? interval.developer / interval.load : 0
-  const cancellationRate = interval.load > 0 ? Math.min(interval.matched, interval.contractQuantity) / interval.load * inputs.marketPrice : 0
-  const retainedEnergySliceRate = cancellationRate + developerUnitCost + (interval.load > 0 ? interval.evnDppa / interval.load : 0) + (interval.load > 0 ? (interval.evnMarket - interval.matched * inputs.marketPrice) / interval.load : 0)
-
-  // Build fmpCancellationSteps locally so the strip renders without needing buildFormulaBreakdown
-  const alignedVol = Math.min(interval.matched, interval.contractQuantity)
-  const evnLossCharge = interval.evnMarket - interval.matched * inputs.marketPrice
-  const fmpSteps = [
-    { label: 'FMP × matched', termVolume: interval.matched, termRate: inputs.marketPrice, value: interval.load > 0 ? interval.matched / interval.load * inputs.marketPrice : 0, role: 'shown' },
-    { label: '− FMP × aligned', termVolume: alignedVol, termRate: inputs.marketPrice, value: interval.load > 0 ? -(alignedVol / interval.load * inputs.marketPrice) : 0, role: 'cancel' },
-    { label: 'Strike × contract', termVolume: interval.contractQuantity, termRate: inputs.strikePrice, value: interval.load > 0 ? interval.contractQuantity / interval.load * inputs.strikePrice : 0, role: 'strike' },
-    { label: 'DPPA charge', termVolume: interval.matched, termRate: inputs.dppaCharge, value: interval.load > 0 ? interval.evnDppa / interval.load : 0, role: 'charge' },
-    { label: 'Loss adj.', termVolume: null, termRate: null, value: interval.load > 0 ? evnLossCharge / interval.load : 0, role: 'loss' },
-    ...(interval.shortfall > 0 ? [{ label: 'Shortfall retail', termVolume: interval.shortfall, termRate: inputs.retailTariff, value: interval.load > 0 ? interval.evnRetail / interval.load : 0, role: 'retail' }] : []),
-  ]
-
-  const dppaUnitCost = interval.load > 0 ? interval.total / interval.load : 0
-  const cleanCancellation = interval.matched > 0 && interval.contractQuantity === interval.matched
 
   container.innerHTML = `
     <div class="settlement-grid">
@@ -521,13 +503,6 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
         </div>
       </div>
     </div>
-    ${fmpCancelStrip(fmpSteps, dppaUnitCost, currency)}
-    <p class="cancellation-note-inline ${cleanCancellation ? 'is-clean' : 'is-partial'}">
-      ${cleanCancellation
-        ? `Clean cancellation: matched (${formatNumber(interval.matched)} kWh) equals contracted (${formatNumber(interval.contractQuantity)} kWh), so the amber FMP terms above are exactly equal and opposite — they zero out, leaving only Strike + DPPA charge + loss adj.`
-        : `Partial cancellation: matched = ${formatNumber(interval.matched)} kWh but contracted = ${formatNumber(interval.contractQuantity)} kWh. The FMP terms only cancel on the aligned ${formatNumber(alignedVol)} kWh — the difference stays as uncancelled exposure.`
-      }
-    </p>
   `
 }
 
