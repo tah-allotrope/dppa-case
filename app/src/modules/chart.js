@@ -76,7 +76,8 @@ function makeTariffPlugin(getState) {
         }
       }
 
-      // ── dashed vertical dividers ─────────────────────────────────────────
+      // ── dashed vertical dividers (start below the 52px label block) ──────
+      const labelZoneBottom = area.top + 52
       ctx.save()
       ctx.setLineDash([5, 5])
       ctx.lineWidth = 1
@@ -85,7 +86,7 @@ function makeTariffPlugin(getState) {
         const x = area.left + (band.startHour / totalHours) * w
         ctx.strokeStyle = band.lineColor
         ctx.beginPath()
-        ctx.moveTo(x, area.top)
+        ctx.moveTo(x, labelZoneBottom)
         ctx.lineTo(x, area.bottom)
         ctx.stroke()
       }
@@ -159,7 +160,7 @@ function baseOptions(inputs) {
     responsive: true,
     maintainAspectRatio: false,
     animation: { duration: 350 },
-    layout: { padding: { top: 8 } },
+    layout: { padding: { top: 64 } },
     plugins: {
       legend: {
         labels: { color: tickColor, usePointStyle: true, boxWidth: 10, boxHeight: 10 },

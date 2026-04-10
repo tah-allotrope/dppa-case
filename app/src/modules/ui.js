@@ -107,10 +107,22 @@ function fmpCancelStrip(steps, resultValue, currency) {
 }
 
 function walkthroughCaseCard(item, currency) {
-  const evnFormula = item.shortfall > 0
-    ? `(${formatNumber(item.matched)} × ${formatMoney(item.marketPerMatched, { currency, precise: true, perKwh: true })}) + (${formatNumber(item.matched)} × ${formatMoney(item.dppaCharge, { currency, precise: true, perKwh: true })}) + (${formatNumber(item.shortfall)} × ${formatMoney(item.retailTariff, { currency, precise: true, perKwh: true })})`
-    : `(${formatNumber(item.matched)} × ${formatMoney(item.marketPerMatched, { currency, precise: true, perKwh: true })}) + (${formatNumber(item.matched)} × ${formatMoney(item.dppaCharge, { currency, precise: true, perKwh: true })})`
-  const devFormula = `${formatNumber(item.contractQuantity)} × (${formatMoney(item.fmp, { currency, precise: true, perKwh: true })} − ${formatMoney(item.fmp - item.cfdUnitRate, { currency, precise: true, perKwh: true })})`
+  const fmt = (v) => formatMoney(v, { currency, precise: true, perKwh: true })
+  const fmtN = (v) => formatNumber(v)
+  const fmtT = (v) => formatMoney(v, { currency })
+
+  // Row 1: rate labels × quantities
+  const evnRow1 = item.shortfall > 0
+    ? `FMP×Kpp (${fmt(item.marketPerMatched)}) × ${fmtN(item.matched)} kWh + CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh + Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`
+    : `FMP×Kpp (${fmt(item.marketPerMatched)}) × ${fmtN(item.matched)} kWh + CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`
+
+  // Row 2: component totals
+  const evnRow2 = item.shortfall > 0
+    ? `${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)} + ${fmtT(item.evnRetail)}`
+    : `${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)}`
+
+  // Developer: (Strike − FMP) × contract quantity
+  const devRow1 = `(Strike − FMP) (${fmt(item.cfdUnitRate)}) × ${fmtN(item.contractQuantity)} kWh`
 
   return `
     <article class="walkthrough-card ${item.tone} is-selected">
@@ -123,13 +135,16 @@ function walkthroughCaseCard(item, currency) {
         <span class="walkthrough-hour">${item.hourLabel}</span>
       </div>
       <div class="walkthrough-metrics">
-        ${compactPill('Load', `${formatNumber(item.load)} kWh`, 'default')}
-        ${compactPill('Solar', `${formatNumber(item.generation)} kWh`, 'accent')}
-        ${compactPill('Contract', `${formatNumber(item.contractQuantity)} kWh`, item.contractQuantity === item.matched ? 'result' : 'warning')}
+        ${compactPill('Load', `${fmtN(item.load)} kWh`, 'default')}
+        ${compactPill('Solar', `${fmtN(item.generation)} kWh`, 'accent')}
+        ${compactPill('DPPA', `${fmtN(item.contractQuantity)} kWh`, item.contractQuantity === item.matched ? 'result' : 'warning')}
       </div>
       <div class="walkthrough-lines">
-        <p>EVN = ${formatMoney(item.evnAmount, { currency })} = ${evnFormula}</p>
-        <p>Developer = ${formatMoney(item.cfdAmount, { currency, signed: true })} = ${devFormula}</p>
+        <p>EVN = ${fmtT(item.evnAmount)}</p>
+        <p class="formula-indent">= ${evnRow1}</p>
+        <p class="formula-indent">= ${evnRow2}</p>
+        <p>Developer = ${fmtT(item.cfdAmount)}</p>
+        <p class="formula-indent">= ${devRow1}</p>
       </div>
     </article>
   `

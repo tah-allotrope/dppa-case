@@ -93,3 +93,22 @@
 - `renderSelectedHour`, `renderBauComparison`, `setActiveDetailView` removed from `ui.js` exports and `main.js` calls
 - 16 tests pass, build clean, live at https://dppa-case.web.app
 
+## UI Refinements: chart overlap + summary pills + formula format (changes 1–4)
+
+### Plan
+- [x] Change 1 (chart overlap): `layout.padding.top` raised to 64 in `baseOptions()`; dashed vertical dividers now start at `area.top + 52` (below label block) in `chart.js`
+- [x] Change 2: Remove `renderVolumeSummary` call and import from `main.js`; `#volumeSummary` div left empty in shell HTML
+- [x] Change 3: Rename `'Contract'` pill to `'DPPA'` in `walkthroughCaseCard` (`ui.js`)
+- [x] Change 4: Reformat EVN and Developer formula lines in `walkthroughCaseCard` to the reference-doc multi-row format: `EVN = total` / `= rate × qty + …` / `= component + …` and `Developer = total` / `= (Strike − FMP) × qty`; added `.formula-indent` CSS rule for indented expansion rows
+- [x] `npm test -- --run` — 16/16 pass
+- [x] `npm run build` — clean
+- [x] `firebase deploy --only hosting --project dppa-case` — deployed
+
+### Review / Results
+- Chart band labels no longer overlap the Chart.js legend or plotted data lines (64px top padding gives the label block full clearance)
+- Volume summary pills (Matched / Shortfall / Excess) removed from the Profiles chart headline
+- Pill in walkthrough card now reads `DPPA` instead of `Contract`
+- EVN and Developer formula lines now expand across three rows each, matching the reference document format: total on first line, rate × quantity breakdown on second, component totals on third
+- 16 tests pass, build clean, live at https://dppa-case.web.app
+
+
