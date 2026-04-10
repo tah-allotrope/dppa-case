@@ -3,7 +3,7 @@ import mermaid from 'mermaid'
 import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes } from './data/default-scenarios'
 import { renderProfileChart } from './modules/chart'
 import { buildSelectedIntervalNarrative, buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement } from './modules/settlement'
-import { renderAppShell, renderBauComparison, renderChartStoryOverlay, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderVolumeSummary, renderWalkthroughCases, setActiveCurrency, setActiveDetailView, setActiveScenario, updateControlOutputs } from './modules/ui'
+import { renderAppShell, renderBauComparison, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderVolumeSummary, renderWalkthroughCases, setActiveCurrency, setActiveDetailView, setActiveScenario, updateControlOutputs } from './modules/ui'
 
 mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' })
 
@@ -48,12 +48,7 @@ function updateView() {
   renderProfileChart(document.querySelector('#profileChart'), hourLabels, settlement.intervals, selectedInterval.hour, (hour) => {
     state.selectedHour = hour
     updateView()
-  })
-  renderChartStoryOverlay(
-    document.querySelector('#chartStoryOverlay'),
-    inputs,
-    selectedInterval.hour,
-  )
+  }, inputs)
   renderVolumeSummary(document.querySelector('#volumeSummary'), settlement.totals)
   renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedWalkthroughCase, state.currency)
   renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)

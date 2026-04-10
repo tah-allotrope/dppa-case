@@ -273,73 +273,6 @@ h3 { font-size: 1.02rem; }
   flex: 1;
 }
 
-.chart-story-overlay {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.chart-story-banner {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  align-items: flex-start;
-  padding: 10px 12px;
-  border-radius: 18px;
-  border: 1px solid rgba(71, 215, 255, 0.18);
-  background: linear-gradient(135deg, rgba(10, 34, 68, 0.82), rgba(10, 20, 44, 0.76));
-}
-
-.chart-story-banner h3 {
-  margin-top: 2px;
-}
-
-.chart-story-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.summary-pill.evn { border-color: rgba(71, 215, 255, 0.35); }
-
-.chart-tariff-band-row {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.chart-tariff-band {
-  display: grid;
-  gap: 4px;
-  padding: 8px 10px;
-  border-radius: 16px;
-  border: 1px dashed rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.03);
-}
-
-.chart-tariff-band span {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-
-.chart-tariff-band strong {
-  font-size: 0.84rem;
-  line-height: 1.25;
-}
-
-.chart-tariff-band.offpeak { border-color: rgba(71, 215, 255, 0.26); }
-.chart-tariff-band.standard { border-color: rgba(255, 216, 79, 0.24); }
-.chart-tariff-band.peak { border-color: rgba(255, 104, 216, 0.26); }
-
-.chart-story-note {
-  color: var(--muted);
-  font-size: 0.78rem;
-  line-height: 1.35;
-  padding: 0 2px;
-}
 
 .walkthrough-panel {
   margin-top: 12px;
@@ -517,6 +450,205 @@ h3 { font-size: 1.02rem; }
 .comparison-card.result { box-shadow: inset 0 0 0 1px rgba(154, 255, 222, 0.22); }
 .comparison-card.warning { box-shadow: inset 0 0 0 1px rgba(255, 200, 75, 0.22); }
 .comparison-card.developer { box-shadow: inset 0 0 0 1px rgba(255, 104, 216, 0.18); }
+
+/* ─── FMP Cancellation Strip ─────────────────────────────────────────────── */
+.fmp-cancel-strip {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.fmp-cancel-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.fmp-cancel-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, rgba(255, 255, 255, 0.45));
+}
+
+.fmp-cancel-hint {
+  font-size: 0.68rem;
+  color: var(--text-muted, rgba(255, 255, 255, 0.32));
+  font-style: italic;
+}
+
+.fmp-cancel-equation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  row-gap: 8px;
+}
+
+.cancel-eq-term {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  min-width: 80px;
+  text-align: center;
+  cursor: default;
+  transition: box-shadow 0.2s;
+}
+
+.cancel-eq-sign {
+  font-size: 0.65rem;
+  font-weight: 600;
+  opacity: 0.7;
+  align-self: flex-start;
+  min-height: 12px;
+}
+
+.cancel-eq-value {
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.cancel-eq-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  white-space: nowrap;
+}
+
+.cancel-eq-separator {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 0 2px;
+  align-self: center;
+}
+
+.cancel-eq-equals {
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* FMP term — shown in amber, labelled so the CFO knows it can cancel */
+.cancel-term-shown {
+  background: rgba(255, 185, 30, 0.10);
+  border-color: rgba(255, 185, 30, 0.30);
+  color: rgb(255, 215, 90);
+}
+.cancel-term-shown .cancel-eq-value {
+  color: rgb(255, 215, 90);
+  text-shadow: 0 0 12px rgba(255, 185, 30, 0.5);
+}
+
+/* FMP cancellation term — red with strikethrough on the value */
+.cancel-term-cancel {
+  background: rgba(255, 80, 80, 0.10);
+  border-color: rgba(255, 80, 80, 0.30);
+  color: rgb(255, 120, 120);
+  position: relative;
+}
+.cancel-term-cancel .cancel-eq-value {
+  color: rgb(255, 110, 110);
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 80, 80, 0.9);
+  text-decoration-thickness: 2px;
+  text-shadow: 0 0 10px rgba(255, 60, 60, 0.4);
+}
+.cancel-term-cancel .cancel-eq-label::before {
+  content: '✕ ';
+  opacity: 0.7;
+}
+
+/* Strike price — blue/teal */
+.cancel-term-strike {
+  background: rgba(63, 184, 255, 0.10);
+  border-color: rgba(63, 184, 255, 0.28);
+}
+.cancel-term-strike .cancel-eq-value {
+  color: rgb(110, 200, 255);
+  text-shadow: 0 0 12px rgba(63, 184, 255, 0.4);
+}
+
+/* DPPA charge — cyan */
+.cancel-term-charge {
+  background: rgba(71, 215, 255, 0.08);
+  border-color: rgba(71, 215, 255, 0.24);
+}
+.cancel-term-charge .cancel-eq-value {
+  color: rgb(100, 230, 255);
+  text-shadow: 0 0 10px rgba(71, 215, 255, 0.35);
+}
+
+/* Loss adjustment — muted grey */
+.cancel-term-loss {
+  background: rgba(180, 180, 200, 0.06);
+  border-color: rgba(180, 180, 200, 0.18);
+}
+.cancel-term-loss .cancel-eq-value {
+  color: rgba(200, 200, 210, 0.75);
+}
+
+/* Shortfall retail — amber-yellow */
+.cancel-term-retail {
+  background: rgba(255, 200, 75, 0.08);
+  border-color: rgba(255, 200, 75, 0.22);
+}
+.cancel-term-retail .cancel-eq-value {
+  color: rgb(255, 210, 100);
+}
+
+/* Result chip — green */
+.cancel-term-result {
+  background: rgba(154, 255, 222, 0.10);
+  border-color: rgba(154, 255, 222, 0.30);
+}
+.cancel-term-result .cancel-eq-value {
+  color: rgb(154, 255, 222);
+  font-size: 1rem;
+  text-shadow: 0 0 14px rgba(154, 255, 222, 0.45);
+}
+.cancel-term-result .cancel-eq-label {
+  color: rgba(154, 255, 222, 0.65);
+}
+
+/* Inline note below the details strip */
+.cancellation-note-inline {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.cancellation-note-inline.is-clean {
+  background: rgba(154, 255, 222, 0.05);
+  border-left: 3px solid rgba(154, 255, 222, 0.35);
+  color: rgba(154, 255, 222, 0.8);
+}
+.cancellation-note-inline.is-partial {
+  background: rgba(255, 200, 75, 0.05);
+  border-left: 3px solid rgba(255, 200, 75, 0.35);
+  color: rgba(255, 200, 75, 0.8);
+}
+
+@media (max-width: 640px) {
+  .fmp-cancel-equation { gap: 3px; }
+  .cancel-eq-term { min-width: 64px; padding: 5px 7px; }
+  .cancel-eq-value { font-size: 0.78rem; }
+  .cancel-eq-label { font-size: 0.55rem; white-space: normal; }
+}
+/* ─── end FMP Cancellation Strip ──────────────────────────────────────────── */
 
 .figure-card {
   border: 1px solid var(--line);
@@ -862,11 +994,10 @@ h3 { font-size: 1.02rem; }
 
 @media (max-width: 900px) {
   .app-shell { padding: 12px; }
-  .topbar,
-  .chart-headline,
-  .panel-header,
-   .hour-topline,
-   .chart-story-banner { flex-direction: column; align-items: flex-start; }
+   .topbar,
+   .chart-headline,
+   .panel-header,
+    .hour-topline { flex-direction: column; align-items: flex-start; }
   .brand-block { align-items: flex-start; }
   .brand-logo { width: 72px; }
   .cancellation-figures,
@@ -874,13 +1005,11 @@ h3 { font-size: 1.02rem; }
    .bars-grid,
    .settlement-grid,
    .formula-grid,
-   .controls-grid,
-   .chart-tariff-band-row { grid-template-columns: 1fr; }
+   .controls-grid { grid-template-columns: 1fr; }
   .payment-equation-head,
   .equation-footer { flex-direction: column; align-items: flex-start; }
   .summary-pills { justify-content: flex-start; }
   .chart-headline { gap: 10px; }
-   .chart-story-pills { justify-content: flex-start; }
   .summary-pill { padding: 0.32rem 0.6rem; font-size: 0.72rem; }
   .scenario-tabs { gap: 6px; }
   .scenario-tab,
@@ -909,5 +1038,72 @@ h3 { font-size: 1.02rem; }
     height: min(52vh, 320px);
     min-height: 260px;
     padding: 8px;
+  }
+
+  /* Topbar: stack brand block and actions vertically */
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+  .topbar-actions { width: 100%; justify-content: flex-start; }
+  .brand-logo { width: 56px; }
+  /* Suppress hero subtitle on very small screens to save vertical space */
+  .hero-copy { display: none; }
+
+  /* Walkthrough head: two columns — badge + title, hour badge goes to second row */
+  .walkthrough-head {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+  }
+  .walkthrough-hour {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  /* Mermaid: reduce zoom further so diagram fits without horizontal scroll */
+  .mermaid { zoom: 0.58; }
+
+  /* FMP cancellation strip: let chips shrink freely, allow label wrapping */
+  .fmp-cancel-strip { padding: 10px; }
+  .cancel-eq-term { min-width: 0; flex: 1 1 auto; }
+  .cancel-eq-label { white-space: normal; }
+
+  /* Comparison cards: tighten padding to reduce stacked height */
+  .comparison-card { padding: 9px 10px; }
+  .comparison-grid { gap: 7px; }
+
+  /* Equation formula: allow breaking long monospace strings */
+  .equation-formula { word-break: break-all; }
+
+  /* Settlement grid: single column already, tighten internal padding */
+  .settlement-card { padding: 10px; }
+}
+
+/* Extra-small phones (≤390px) */
+@media (max-width: 390px) {
+  /* Shrink h1 so long title doesn't overflow */
+  h1 { font-size: 1.05rem; }
+
+  /* Reduce app shell padding to maximise content width */
+  .app-shell { padding: 8px; }
+
+  /* Buttons a touch smaller */
+  .scenario-tab,
+  .toggle-button,
+  .ghost-button { padding: 0.38rem 0.6rem; font-size: 0.72rem; }
+
+  /* Comparison cards: absolute minimum padding */
+  .comparison-card { padding: 7px 8px; }
+
+  /* FMP equation chips: even smaller font on very narrow screens */
+  .cancel-eq-value { font-size: 0.72rem; }
+  .cancel-eq-label { font-size: 0.52rem; }
+
+  /* Chart wrap: cap height a bit tighter on small phones */
+  .chart-wrap {
+    height: min(48vh, 290px);
+    min-height: 240px;
   }
 }

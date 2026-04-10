@@ -1,13 +1,5 @@
 import { formatMoney, formatNumber } from './formatters'
 
-const tariffWindows = [
-  { label: 'Off-peak', time: '22:00 - 04:00', tone: 'offpeak' },
-  { label: 'Standard', time: '04:00 - 09:30', tone: 'standard' },
-  { label: 'Peak', time: '09:30 - 11:30', tone: 'peak' },
-  { label: 'Standard', time: '11:30 - 17:00', tone: 'standard' },
-  { label: 'Peak', time: '17:00 - 20:00', tone: 'peak' },
-  { label: 'Standard', time: '20:00 - 22:00', tone: 'standard' },
-]
 
 function metricCard(label, value, detail, tone = 'default') {
   return `
@@ -74,6 +66,47 @@ function paymentEquation(label, rate, quantityText, amount, formula, tone = 'def
   `
 }
 
+const ROLE_META = {
+  shown:  { cls: 'cancel-term-shown',  sign: '+', title: 'FMP appears here — it will cancel' },
+  cancel: { cls: 'cancel-term-cancel', sign: '',  title: 'FMP cancels against the developer swap' },
+  strike: { cls: 'cancel-term-strike', sign: '+', title: 'Strike price retained' },
+  charge: { cls: 'cancel-term-charge', sign: '+', title: 'DPPA system charge' },
+  loss:   { cls: 'cancel-term-loss',   sign: '+', title: 'Loss adjustment: tiny residual from grid losses' },
+  retail: { cls: 'cancel-term-retail', sign: '+', title: 'Shortfall kWh still bought at retail tariff' },
+}
+
+function fmpCancelStrip(steps, resultValue, currency) {
+  const terms = steps.map((step) => {
+    const meta = ROLE_META[step.role] || ROLE_META.loss
+    const valueStr = formatMoney(Math.abs(step.value), { currency, precise: true, perKwh: true })
+    const sign = step.role === 'cancel' ? '−' : (meta.sign || '+')
+    return `
+      <span class="cancel-eq-term ${meta.cls}" title="${meta.title}">
+        <span class="cancel-eq-sign">${sign}</span>
+        <span class="cancel-eq-value">${valueStr}</span>
+        <span class="cancel-eq-label">${step.label}</span>
+      </span>
+    `
+  }).join('<span class="cancel-eq-separator"></span>')
+
+  return `
+    <div class="fmp-cancel-strip">
+      <div class="fmp-cancel-header">
+        <span class="fmp-cancel-title">FMP cancellation — per kWh on factory load</span>
+        <span class="fmp-cancel-hint">Drag the FMP slider below to watch the amber terms offset each other in real time</span>
+      </div>
+      <div class="fmp-cancel-equation">
+        ${terms}
+        <span class="cancel-eq-separator cancel-eq-equals">=</span>
+        <span class="cancel-eq-term cancel-term-result">
+          <span class="cancel-eq-value">${formatMoney(resultValue, { currency, precise: true, perKwh: true })}</span>
+          <span class="cancel-eq-label">net cost / kWh</span>
+        </span>
+      </div>
+    </div>
+  `
+}
+
 function walkthroughCaseCard(item, currency) {
   return `
     <article class="walkthrough-card ${item.tone} is-selected">
@@ -136,7 +169,6 @@ export function renderAppShell(root, scenarios, settlementModes) {
             <div class="scenario-tabs" id="scenarioTabs">
               ${scenarios.map((scenario) => `<button class="scenario-tab" data-scenario="${scenario.id}">${scenario.label}</button>`).join('')}
             </div>
-            <div class="chart-story-overlay" id="chartStoryOverlay"></div>
             <div class="chart-wrap profile-wrap">
               <canvas id="profileChart" aria-label="Load and generation chart"></canvas>
             </div>
@@ -276,31 +308,6 @@ export function renderAppShell(root, scenarios, settlementModes) {
   `
 }
 
-export function renderChartStoryOverlay(container, inputs, selectedHour) {
-  container.innerHTML = `
-    <div class="chart-story-banner">
-      <div>
-        <p class="eyebrow">Tariff walk-through on the chart</p>
-        <h3>DPPA strike ${formatMoney(inputs.strikePrice, { currency: inputs.currency, precise: true, perKwh: true })}</h3>
-      </div>
-      <div class="chart-story-pills">
-        ${compactPill('Spot / FMP', formatMoney(inputs.marketPrice, { currency: inputs.currency, precise: true, perKwh: true }), 'evn')}
-        ${compactPill('Retail basis', formatMoney(inputs.retailTariff, { currency: inputs.currency, precise: true, perKwh: true }), 'warning')}
-        ${compactPill('Selected hour', `${String(selectedHour).padStart(2, '0')}:00`, 'result')}
-      </div>
-    </div>
-    <div class="chart-tariff-band-row">
-      ${tariffWindows.map((window) => `
-        <div class="chart-tariff-band ${window.tone}">
-          <span>${window.label}</span>
-          <strong>${window.time}</strong>
-        </div>
-      `).join('')}
-    </div>
-    <p class="chart-story-note">A simplified tariff frame sits on top of the graph: familiar time bands for the CFO, but the math still uses the existing weighted retail default so the cancellation story stays clean.</p>
-  `
-}
-
 export function renderWalkthroughCases(container, selectedCase, currency) {
   container.innerHTML = selectedCase
     ? walkthroughCaseCard(selectedCase, currency)
@@ -375,13 +382,19 @@ export function renderFormulas(result, warningText, currency) {
 }
 
 export function renderBauComparison(container, result, currency) {
-  container.innerHTML = [
+  const cards = [
     comparisonCard('BAU without DPPA', formatMoney(result.bauCost, { currency }), `${formatNumber(result.load)} kWh x ${formatMoney(result.retailTariff, { currency, precise: true, perKwh: true })}`, 'warning'),
     comparisonCard('DPPA payment', formatMoney(result.dppaCost, { currency }), `${formatMoney(result.evnTotal, { currency })} to EVN and ${formatMoney(result.developerTotal, { currency, signed: true })} to developer`, 'result'),
     comparisonCard('Savings vs BAU', formatMoney(result.savingsVsBau, { currency, signed: true }), result.savingsVsBau >= 0 ? 'Positive means DPPA is cheaper than BAU in this hour' : 'Negative means DPPA is more expensive than BAU in this hour', result.savingsVsBau >= 0 ? 'result' : 'developer'),
     comparisonCard('BAU unit cost', formatMoney(result.bauUnitCost, { currency, precise: true, perKwh: true }), 'factory retail tariff for this hour', 'warning'),
     comparisonCard('DPPA unit cost', formatMoney(result.dppaUnitCost, { currency, precise: true, perKwh: true }), 'all-in DPPA payment divided by selected-hour load', 'result'),
   ].join('')
+
+  const strip = result.fmpCancellationSteps
+    ? fmpCancelStrip(result.fmpCancellationSteps, result.dppaUnitCost, currency)
+    : ''
+
+  container.innerHTML = `<div class="comparison-grid">${cards}</div>${strip}`
 }
 
 export function renderSelectedHour(container, interval, narrative, currency, detailView, inputs) {
@@ -458,6 +471,21 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
   const cancellationRate = interval.load > 0 ? Math.min(interval.matched, interval.contractQuantity) / interval.load * inputs.marketPrice : 0
   const retainedEnergySliceRate = cancellationRate + developerUnitCost + (interval.load > 0 ? interval.evnDppa / interval.load : 0) + (interval.load > 0 ? (interval.evnMarket - interval.matched * inputs.marketPrice) / interval.load : 0)
 
+  // Build fmpCancellationSteps locally so the strip renders without needing buildFormulaBreakdown
+  const alignedVol = Math.min(interval.matched, interval.contractQuantity)
+  const evnLossCharge = interval.evnMarket - interval.matched * inputs.marketPrice
+  const fmpSteps = [
+    { label: 'FMP × matched', termVolume: interval.matched, termRate: inputs.marketPrice, value: interval.load > 0 ? interval.matched / interval.load * inputs.marketPrice : 0, role: 'shown' },
+    { label: '− FMP × aligned', termVolume: alignedVol, termRate: inputs.marketPrice, value: interval.load > 0 ? -(alignedVol / interval.load * inputs.marketPrice) : 0, role: 'cancel' },
+    { label: 'Strike × contract', termVolume: interval.contractQuantity, termRate: inputs.strikePrice, value: interval.load > 0 ? interval.contractQuantity / interval.load * inputs.strikePrice : 0, role: 'strike' },
+    { label: 'DPPA charge', termVolume: interval.matched, termRate: inputs.dppaCharge, value: interval.load > 0 ? interval.evnDppa / interval.load : 0, role: 'charge' },
+    { label: 'Loss adj.', termVolume: null, termRate: null, value: interval.load > 0 ? evnLossCharge / interval.load : 0, role: 'loss' },
+    ...(interval.shortfall > 0 ? [{ label: 'Shortfall retail', termVolume: interval.shortfall, termRate: inputs.retailTariff, value: interval.load > 0 ? interval.evnRetail / interval.load : 0, role: 'retail' }] : []),
+  ]
+
+  const dppaUnitCost = interval.load > 0 ? interval.total / interval.load : 0
+  const cleanCancellation = interval.matched > 0 && interval.contractQuantity === interval.matched
+
   container.innerHTML = `
     <div class="settlement-grid">
       <div class="formula-detail-card evn-detail payment-panel">
@@ -506,15 +534,6 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
             'developer',
           )}
         </div>
-        <div class="cancellation-highlight">
-          <span class="metric-label">Cancellation shown in red</span>
-          <p class="cancellation-formula">
-            Spot market reference <span class="cancel-term">${formatMoney(cancellationRate, { currency, precise: true, perKwh: true })}</span>
-            + cancellation via developer swap <span class="cancel-term">${formatMoney(developerUnitCost, { currency, precise: true, perKwh: true, signed: true })}</span>
-            = net retained energy slice ${formatMoney(retainedEnergySliceRate, { currency, precise: true, perKwh: true })}
-          </p>
-          <p class="cancellation-note">The spot market price is visible first, then the equal-and-opposite developer swap shows why that market reference does not remain as a separate net cost on aligned volume.</p>
-        </div>
         <div class="payment-total-card developer-tone">
           <span class="metric-label">Developer total</span>
           <strong>${formatMoney(developerUnitCost, { currency, precise: true, perKwh: true, signed: true })}</strong>
@@ -522,6 +541,13 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
         </div>
       </div>
     </div>
+    ${fmpCancelStrip(fmpSteps, dppaUnitCost, currency)}
+    <p class="cancellation-note-inline ${cleanCancellation ? 'is-clean' : 'is-partial'}">
+      ${cleanCancellation
+        ? `Clean cancellation: matched (${formatNumber(interval.matched)} kWh) equals contracted (${formatNumber(interval.contractQuantity)} kWh), so the amber FMP terms above are exactly equal and opposite — they zero out, leaving only Strike + DPPA charge + loss adj.`
+        : `Partial cancellation: matched = ${formatNumber(interval.matched)} kWh but contracted = ${formatNumber(interval.contractQuantity)} kWh. The FMP terms only cancel on the aligned ${formatNumber(alignedVol)} kWh — the difference stays as uncancelled exposure.`
+      }
+    </p>
   `
 }
 

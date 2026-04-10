@@ -2,10 +2,10 @@
 import { describe, expect, it } from 'vitest'
 import { defaultInputs, scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios'
 import { buildSelectedWalkthroughCase, calculateSettlement, buildFormulaBreakdown, buildSelectedIntervalNarrative } from './settlement'
-import { renderAppShell, renderChartStoryOverlay, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderWalkthroughCases } from './ui'
+import { renderAppShell, renderFormulas, renderSelectedHour, renderSelectedHourDetails, renderWalkthroughCases } from './ui'
 
 describe('storytelling shell', () => {
-  it('integrates the simplified tariff walk-through inside the chart panel and keeps walkthrough cases as the next section', () => {
+  it('renders chart canvas and walkthrough cases section with correct DOM order', () => {
     document.body.innerHTML = '<div id="app"></div>'
 
     renderAppShell(
@@ -14,10 +14,12 @@ describe('storytelling shell', () => {
       settlementModes,
     )
 
-    expect(document.querySelector('#chartStoryOverlay')).not.toBeNull()
+    // Tariff overlay is now drawn on canvas by a Chart.js plugin — no HTML overlay element.
+    expect(document.querySelector('#profileChart')).not.toBeNull()
     expect(document.querySelector('#walkthroughCases')).not.toBeNull()
     expect(document.querySelector('#app').textContent).toContain('Load-vs-generation cases')
-    expect(document.querySelector('.chart-panel #chartStoryOverlay')).not.toBeNull()
+    // Chart canvas must be inside .chart-wrap
+    expect(document.querySelector('.chart-wrap #profileChart')).not.toBeNull()
     expect(document.querySelector('.focus-column > .chart-panel + .walkthrough-panel')).not.toBeNull()
     expect(document.querySelector('.story-grid + .lower-grid')).not.toBeNull()
   })
@@ -64,12 +66,11 @@ describe('selected-hour layout', () => {
     expect(document.querySelector('#selectedHourPanel').textContent).toContain('DPPA total this hour')
     expect(document.querySelector('#selectedHourDetailsPanel .settlement-grid')).not.toBeNull()
     expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('Payment to EVN per kWh of factory load')
-    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('Cancellation shown in red')
+    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('FMP cancellation')
   })
 
-  it('renders only the selected-hour load-vs-gen case card using the existing pricing defaults', () => {
+  it('renders only the selected-hour load-vs-gen case card', () => {
     document.body.innerHTML = `
-      <div id="chartStoryOverlay"></div>
       <div id="walkthroughCases"></div>
     `
 
@@ -82,12 +83,8 @@ describe('selected-hour layout', () => {
     const settlement = calculateSettlement(inputs)
     const selectedCase = buildSelectedWalkthroughCase(inputs, settlement.intervals[1])
 
-    renderChartStoryOverlay(document.querySelector('#chartStoryOverlay'), inputs, 1)
     renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND')
 
-    expect(document.querySelector('#chartStoryOverlay').textContent).toContain('DPPA strike')
-    expect(document.querySelector('#chartStoryOverlay').textContent).toContain('Off-peak')
-    expect(document.querySelector('#chartStoryOverlay').textContent).toContain('Selected hour')
     expect(document.querySelector('#walkthroughCases').textContent).toContain('Load = Gen')
     expect(document.querySelector('#walkthroughCases').textContent).toContain('Total (No-DPPA)')
     expect(document.querySelectorAll('#walkthroughCases .walkthrough-card')).toHaveLength(1)
@@ -141,8 +138,8 @@ describe('selected-hour layout', () => {
 
     expect(document.querySelector('#selectedHourPanel').textContent).toContain('Spot market reference')
     expect(document.querySelector('#selectedHourPanel').textContent).toContain('Cancellation via developer swap')
-    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('Spot market reference')
-    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('net retained energy slice')
+    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('FMP × matched')
+    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('− FMP × aligned')
     expect(document.querySelector('#cancellationResult').textContent).toContain('spot market price is shown first')
   })
 })

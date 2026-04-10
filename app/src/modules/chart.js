@@ -1,25 +1,280 @@
 import Chart from 'chart.js/auto'
+import { formatMoney } from './formatters'
 
 let profileChart
 
 const neonGrid = 'rgba(160, 183, 217, 0.12)'
 const tickColor = '#bcd5ff'
 
+// Tariff time-band definitions matching the reference screenshot.
+// startHour/endHour map to the 0-23 hour axis.
+const TARIFF_BANDS = [
+  { label: 'Off-peak',  time: '10 pm – 4 am',     startHour: 0,  endHour: 4,  fill: 'rgba(71,215,255,0.06)',   lineColor: 'rgba(71,215,255,0.40)',  textColor: '#47d7ff' },
+  { label: 'Standard',  time: '4 am – 9:30 am',    startHour: 4,  endHour: 9,  fill: 'rgba(255,216,79,0.05)',    lineColor: 'rgba(255,216,79,0.40)',   textColor: '#ffd84f' },
+  { label: 'Peak',      time: '9:30 am – 11:30 am', startHour: 9,  endHour: 11, fill: 'rgba(255,104,216,0.07)',   lineColor: 'rgba(255,104,216,0.45)',  textColor: '#ff68d8' },
+  { label: 'Standard',  time: '11:30 am – 5 pm',   startHour: 11, endHour: 17, fill: 'rgba(255,216,79,0.05)',    lineColor: 'rgba(255,216,79,0.40)',   textColor: '#ffd84f' },
+  { label: 'Peak',      time: '5 pm – 8 pm',        startHour: 17, endHour: 20, fill: 'rgba(255,104,216,0.07)',   lineColor: 'rgba(255,104,216,0.45)',  textColor: '#ff68d8' },
+  { label: 'Standard',  time: '8 pm – 10 pm',       startHour: 20, endHour: 22, fill: 'rgba(255,216,79,0.05)',    lineColor: 'rgba(255,216,79,0.40)',   textColor: '#ffd84f' },
+  { label: 'Off-peak',  time: '10 pm – 12 am',      startHour: 22, endHour: 24, fill: 'rgba(71,215,255,0.06)',   lineColor: 'rgba(71,215,255,0.40)',  textColor: '#47d7ff' },
+]
+
+const CALLOUT_COLORS = {
+  shortfall: { bg: 'rgba(155,20,24,0.93)',   border: 'rgba(215,55,55,0.9)',   text: '#fff' },
+  balanced:  { bg: 'rgba(12,78,158,0.93)',   border: 'rgba(55,135,220,0.9)',  text: '#fff' },
+  excess:    { bg: 'rgba(8,106,152,0.93)',   border: 'rgba(55,175,220,0.9)',  text: '#fff' },
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+  ctx.lineTo(x + r, y + h)
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
+  ctx.closePath()
+}
+
+function buildCallouts(intervals, inputs, currency) {
+  if (!intervals || !intervals.length) return []
+
+  function bestHour(key) {
+    const pool = intervals.filter(i => i.classification?.key === key)
+    const src = pool.length ? pool : intervals
+    if (key === 'shortfall') return src.reduce((a, b) => (b.load - b.generation > a.load - a.generation ? b : a))
+    if (key === 'excess')    return src.reduce((a, b) => (b.generation - b.load > a.generation - a.load ? b : a))
+    return src.reduce((a, b) => (Math.abs(b.load - b.generation) < Math.abs(a.load - a.generation) ? b : a))
+  }
+
+  const fmt = (v) => formatMoney(v, { currency, signed: false })
+
+  return ['shortfall', 'balanced', 'excess'].map((type) => {
+    const iv = bestHour(type)
+    const cfdRate = inputs.strikePrice - inputs.marketPrice
+    const cfdAmount = iv.contractQuantity * cfdRate
+    const volLabel = type === 'shortfall'
+      ? `Under supply: ${(iv.shortfall / 1000).toFixed(0)} MWh`
+      : `Over supply: ${(iv.excess / 1000).toFixed(0)} MWh`
+
+    return {
+      hour: iv.hour,
+      type,
+      lines: [
+        volLabel,
+        `CfD = ${Math.round(cfdRate)}x${(iv.contractQuantity/1000).toFixed(0)}kWh = ${fmt(cfdAmount)}`,
+        `EVN = ${fmt(iv.evnTotal)}`,
+        `Total (DPPA) = ${fmt(iv.total)}`,
+        `Total (No-DPPA) = ${fmt(iv.baseline)}`,
+        `Savings (DPPA) = ${formatMoney(iv.baseline - iv.total, { currency, signed: true })}`,
+      ],
+      // Compact version used on narrow canvases (< 320px wide)
+      linesCompact: [
+        volLabel,
+        `CfD = ${fmt(cfdAmount)}`,
+        `EVN = ${fmt(iv.evnTotal)}`,
+        `DPPA = ${fmt(iv.total)}`,
+        `BAU = ${fmt(iv.baseline)}`,
+        `Saving = ${formatMoney(iv.baseline - iv.total, { currency, signed: true })}`,
+      ],
+    }
+  })
+}
+
+function makeTariffPlugin(getState) {
+  return {
+    id: 'tariffOverlay',
+
+    beforeDatasetsDraw(chart) {
+      const { ctx } = chart
+      const area = chart.chartArea
+      if (!area) return
+      const totalHours = 24
+      const w = area.right - area.left
+
+      for (const band of TARIFF_BANDS) {
+        const x0 = area.left + (band.startHour / totalHours) * w
+        const x1 = area.left + (band.endHour   / totalHours) * w
+        ctx.save()
+        ctx.fillStyle = band.fill
+        ctx.fillRect(x0, area.top, x1 - x0, area.bottom - area.top)
+        ctx.restore()
+      }
+    },
+
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart
+      const area = chart.chartArea
+      if (!area) return
+
+      const totalHours = 24
+      const w = area.right - area.left
+      const h = area.bottom - area.top
+      const state = getState()
+
+      // ── dashed vertical dividers ─────────────────────────────────────────
+      ctx.save()
+      ctx.setLineDash([5, 5])
+      ctx.lineWidth = 1
+      for (const band of TARIFF_BANDS) {
+        if (band.startHour === 0) continue
+        const x = area.left + (band.startHour / totalHours) * w
+        ctx.strokeStyle = band.lineColor
+        ctx.beginPath()
+        ctx.moveTo(x, area.top)
+        ctx.lineTo(x, area.bottom)
+        ctx.stroke()
+      }
+      ctx.setLineDash([])
+      ctx.restore()
+
+      // ── band header labels ────────────────────────────────────────────────
+      // Reserve the top ~52 px of the chart area for the tariff label rows.
+      // On narrow canvases each band may be < 60 px wide — skip sub-labels
+      // that would collide; only keep the band name when space is very tight.
+      for (const band of TARIFF_BANDS) {
+        const x0 = area.left + (band.startHour / totalHours) * w
+        const x1 = area.left + (band.endHour   / totalHours) * w
+        const cx = (x0 + x1) / 2
+        const bw = x1 - x0 - 4
+        // Width thresholds: below 58 px only show the name; below 72 px skip tariff/spot rows
+        const showTime    = bw >= 72
+        const showRates   = bw >= 88 && !!state.inputs
+
+        ctx.save()
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'top'
+        ctx.beginPath()
+        ctx.rect(x0 + 2, area.top, bw, 56)
+        ctx.clip()
+
+        // Name (white bold) — scale font down proportionally on very narrow bands
+        const nameFontSize = bw < 58 ? 8 : 9.5
+        ctx.font = `bold ${nameFontSize}px "Segoe UI", sans-serif`
+        ctx.fillStyle = '#f4fbff'
+        ctx.fillText(band.label, cx, area.top + 3)
+
+        if (showTime) {
+          // Time range (band colour)
+          ctx.font = '8.5px "Segoe UI", sans-serif'
+          ctx.fillStyle = band.textColor
+          ctx.fillText(band.time, cx, area.top + 15)
+        }
+
+        if (showRates) {
+          // Tariff rate
+          ctx.font = '8px "Segoe UI", sans-serif'
+          ctx.fillStyle = band.textColor
+          ctx.fillText(`${Math.round(state.inputs.retailTariff).toLocaleString()} VND/kWh`, cx, area.top + 27)
+
+          // Spot price in cyan
+          ctx.fillStyle = '#47d7ff'
+          ctx.fillText(`Spot: ${Math.round(state.inputs.marketPrice).toLocaleString()} VND/kWh`, cx, area.top + 38)
+        }
+
+        ctx.restore()
+      }
+
+      // ── callout boxes ─────────────────────────────────────────────────────
+      const callouts = state.callouts
+      if (!callouts || !callouts.length) return
+
+      // Scale callout boxes down on narrow canvases (mobile)
+      const narrow  = w < 320
+      const lineH   = narrow ? 11 : 12.5
+      const padX    = narrow ? 5 : 8
+      const padY    = narrow ? 5 : 7
+      const radius  = 5
+      // On narrow canvases use 42% of chart width so compact lines fit
+      const boxW    = narrow ? Math.min(130, w * 0.42) : Math.min(165, w * 0.24)
+
+      callouts.forEach((callout, idx) => {
+        const hourX = area.left + ((callout.hour + 0.5) / totalHours) * w
+        const colors = CALLOUT_COLORS[callout.type] || CALLOUT_COLORS.balanced
+        // Use compact lines on narrow canvases
+        const lines  = narrow && callout.linesCompact ? callout.linesCompact : callout.lines
+        const boxH   = lines.length * lineH + padY * 2
+
+        // Vertical placement: shortfall and excess float near the top (below header),
+        // balanced floats in the lower half.
+        const headerBottom = area.top + 56
+        let boxY
+        if (callout.type === 'balanced') {
+          boxY = area.top + h * 0.54
+        } else {
+          boxY = headerBottom + 6
+        }
+
+        // Clamp horizontally inside the chart area
+        let boxX = hourX - boxW / 2
+        boxX = Math.max(area.left + 2, Math.min(boxX, area.right - boxW - 2))
+
+        // Box fill + border
+        ctx.save()
+        roundRect(ctx, boxX, boxY, boxW, boxH, radius)
+        ctx.fillStyle = colors.bg
+        ctx.fill()
+        ctx.strokeStyle = colors.border
+        ctx.lineWidth = 1.4
+        ctx.stroke()
+
+        // Text lines
+        ctx.font = `${narrow ? 8 : 9.5}px "Segoe UI", sans-serif`
+        ctx.fillStyle = colors.text
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'top'
+        lines.forEach((line, li) => {
+          ctx.fillText(line, boxX + padX, boxY + padY + li * lineH, boxW - padX * 2)
+        })
+        ctx.restore()
+
+        // Numbered badge
+        const badgeR = 9
+        const badgeCX = boxX + badgeR + 4
+        const badgeCY = boxY - badgeR - 1
+
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(badgeCX, badgeCY, badgeR, 0, Math.PI * 2)
+        ctx.fillStyle = colors.border
+        ctx.fill()
+        ctx.font = 'bold 10px "Segoe UI", sans-serif'
+        ctx.fillStyle = '#fff'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(String(idx + 1), badgeCX, badgeCY)
+        ctx.restore()
+
+        // Dashed connector from badge bottom to hourX at mid-chart
+        const connectorY = callout.type === 'balanced' ? boxY - 4 : boxY + boxH + 4
+        const anchorY    = callout.type === 'balanced' ? area.top + h * 0.38 : area.top + h * 0.52
+
+        ctx.save()
+        ctx.setLineDash([3, 4])
+        ctx.strokeStyle = colors.border
+        ctx.lineWidth = 1
+        ctx.beginPath()
+        ctx.moveTo(badgeCX, callout.type === 'balanced' ? badgeCY - badgeR : badgeCY + badgeR)
+        ctx.lineTo(hourX, anchorY)
+        ctx.stroke()
+        ctx.setLineDash([])
+        ctx.restore()
+      })
+    },
+  }
+}
+
 function baseOptions() {
   return {
     responsive: true,
     maintainAspectRatio: false,
-    animation: {
-      duration: 350,
-    },
+    animation: { duration: 350 },
+    layout: { padding: { top: 8 } },
     plugins: {
       legend: {
-        labels: {
-          color: tickColor,
-          usePointStyle: true,
-          boxWidth: 10,
-          boxHeight: 10,
-        },
+        labels: { color: tickColor, usePointStyle: true, boxWidth: 10, boxHeight: 10 },
       },
       tooltip: {
         backgroundColor: 'rgba(9, 14, 31, 0.92)',
@@ -30,66 +285,68 @@ function baseOptions() {
       },
     },
     scales: {
-      x: {
-        grid: { color: neonGrid },
-        ticks: { color: tickColor },
-      },
-      y: {
-        grid: { color: neonGrid },
-        ticks: { color: tickColor },
-      },
+      x: { grid: { color: neonGrid }, ticks: { color: tickColor } },
+      y: { grid: { color: neonGrid }, ticks: { color: tickColor } },
     },
   }
 }
 
-export function renderProfileChart(canvas, labels, intervals, selectedHour, onSelect) {
-  const data = {
-    labels,
-    datasets: [
+export function renderProfileChart(canvas, labels, intervals, selectedHour, onSelect, inputs) {
+  const currency = inputs?.currency ?? 'VND'
+
+  // Mutable state bag read by the plugin on every draw
+  const state = {
+    inputs,
+    callouts: buildCallouts(intervals, inputs, currency),
+  }
+
+  function buildDatasets(ivs, selHour) {
+    return [
       {
         label: 'Factory load',
-        data: intervals.map((item) => item.load),
+        data: ivs.map(i => i.load),
         borderColor: '#47d7ff',
-        backgroundColor: 'rgba(71, 215, 255, 0.14)',
+        backgroundColor: 'rgba(71,215,255,0.14)',
         fill: true,
         tension: 0.35,
         borderWidth: 3,
-        pointRadius: intervals.map((_, index) => (index === selectedHour ? 5 : 1.5)),
-        pointHoverRadius: intervals.map((_, index) => (index === selectedHour ? 7 : 4)),
-        pointBackgroundColor: intervals.map((_, index) => (index === selectedHour ? '#c9f7ff' : '#47d7ff')),
+        pointRadius: ivs.map((_, idx) => idx === selHour ? 5 : 1.5),
+        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? 7 : 4),
+        pointBackgroundColor: ivs.map((_, idx) => idx === selHour ? '#c9f7ff' : '#47d7ff'),
       },
       {
         label: 'Solar generation',
-        data: intervals.map((item) => item.generation),
+        data: ivs.map(i => i.generation),
         borderColor: '#ffd84f',
-        backgroundColor: 'rgba(255, 216, 79, 0.14)',
+        backgroundColor: 'rgba(255,216,79,0.14)',
         fill: true,
         tension: 0.35,
         borderWidth: 3,
-        pointRadius: intervals.map((_, index) => (index === selectedHour ? 5 : 1.5)),
-        pointHoverRadius: intervals.map((_, index) => (index === selectedHour ? 7 : 4)),
-        pointBackgroundColor: intervals.map((_, index) => (index === selectedHour ? '#fff1b5' : '#ffd84f')),
+        pointRadius: ivs.map((_, idx) => idx === selHour ? 5 : 1.5),
+        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? 7 : 4),
+        pointBackgroundColor: ivs.map((_, idx) => idx === selHour ? '#fff1b5' : '#ffd84f'),
       },
       {
         label: 'Matched volume',
-        data: intervals.map((item) => item.matched),
+        data: ivs.map(i => i.matched),
         borderColor: '#f5fbff',
-        backgroundColor: 'rgba(245, 251, 255, 0.16)',
+        backgroundColor: 'rgba(245,251,255,0.16)',
         fill: true,
         tension: 0.25,
         borderWidth: 2,
         pointRadius: 0,
       },
-    ],
+    ]
   }
 
   if (profileChart) {
-    profileChart.data = data
+    state.inputs = inputs
+    state.callouts = buildCallouts(intervals, inputs, currency)
+    profileChart.data.datasets = buildDatasets(intervals, selectedHour)
+    profileChart.data.labels = labels
     profileChart.options.onClick = (event) => {
-      const points = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
-      if (points.length) {
-        onSelect(points[0].index)
-      }
+      const pts = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
+      if (pts.length) onSelect(pts[0].index)
     }
     profileChart.update('none')
     return profileChart
@@ -97,16 +354,15 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
 
   profileChart = new Chart(canvas, {
     type: 'line',
-    data,
+    data: { labels, datasets: buildDatasets(intervals, selectedHour) },
     options: {
       ...baseOptions(),
       onClick: (event) => {
-        const points = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
-        if (points.length) {
-          onSelect(points[0].index)
-        }
+        const pts = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
+        if (pts.length) onSelect(pts[0].index)
       },
     },
+    plugins: [makeTariffPlugin(() => state)],
   })
 
   return profileChart

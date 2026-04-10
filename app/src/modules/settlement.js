@@ -250,6 +250,56 @@ export function buildFormulaBreakdown(inputs, interval) {
   const cancellationRecoveredUnit = interval.matched > 0 ? Math.min(interval.matched, interval.contractQuantity) / interval.load * inputs.marketPrice : 0
   const uncancelledContractUnit = interval.load > 0 ? uncancelledContractVolume / interval.load * (inputs.strikePrice - inputs.marketPrice) : 0
 
+  // Five-term cancellation algebra strip for the CFO visualisation.
+  // role: 'shown' = amber (FMP appears), 'cancel' = red strikethrough (FMP cancels),
+  //       'strike' = blue (strike price retained), 'charge' = cyan (DPPA charge),
+  //       'loss' = grey (loss adjustment), 'retail' = yellow (shortfall retail)
+  const alignedVol = Math.min(interval.matched, interval.contractQuantity)
+  const fmpCancellationSteps = [
+    {
+      label: 'FMP × matched',
+      termVolume: interval.matched,
+      termRate: inputs.marketPrice,
+      value: interval.load > 0 ? interval.matched / interval.load * inputs.marketPrice : 0,
+      role: 'shown',
+    },
+    {
+      label: '− FMP × aligned',
+      termVolume: alignedVol,
+      termRate: inputs.marketPrice,
+      value: interval.load > 0 ? -(alignedVol / interval.load * inputs.marketPrice) : 0,
+      role: 'cancel',
+    },
+    {
+      label: 'Strike × contract',
+      termVolume: interval.contractQuantity,
+      termRate: inputs.strikePrice,
+      value: interval.load > 0 ? interval.contractQuantity / interval.load * inputs.strikePrice : 0,
+      role: 'strike',
+    },
+    {
+      label: 'DPPA charge',
+      termVolume: interval.matched,
+      termRate: inputs.dppaCharge,
+      value: interval.load > 0 ? interval.evnDppa / interval.load : 0,
+      role: 'charge',
+    },
+    {
+      label: 'Loss adj.',
+      termVolume: null,
+      termRate: null,
+      value: interval.load > 0 ? evnLossCharge / interval.load : 0,
+      role: 'loss',
+    },
+    ...(interval.shortfall > 0 ? [{
+      label: 'Shortfall retail',
+      termVolume: interval.shortfall,
+      termRate: inputs.retailTariff,
+      value: interval.load > 0 ? interval.evnRetail / interval.load : 0,
+      role: 'retail',
+    }] : []),
+  ]
+
   return {
     hour: interval.hour,
     load: interval.load,
@@ -287,6 +337,7 @@ export function buildFormulaBreakdown(inputs, interval) {
     cancellationSwapUnit,
     cancellationRecoveredUnit,
     uncancelledContractUnit,
+    fmpCancellationSteps,
     evnTotal: interval.evnTotal,
     developerTotal: interval.developer,
     dppaCost,
