@@ -58,11 +58,11 @@
 ## Desktop Balance + Net Cancellation Formula
 
 ### Plan
-- [ ] Make the chart panel visibly larger than the load-vs-generation panel on desktop while keeping the existing mobile collapse.
-- [ ] Add failing UI tests for the explicit Net cancellation formula and EVN/developer ownership labels in the FMP cancellation strip.
-- [ ] Expand the walkthrough Net section so it shows the full EVN-vs-developer cancellation algebra, including the developer `- FMP x aligned` term highlighted in red.
-- [ ] Add EVN / Developer ownership to the corresponding FMP cancellation chips and tighten any overlapping text in the walkthrough panel.
-- [ ] Re-run `npm test`, review desktop layout in the browser, fix any overlap issues found, then `npm run build` and redeploy to Firebase Hosting.
+- [x] Make the chart panel visibly larger than the load-vs-generation panel on desktop while keeping the existing mobile collapse.
+- [x] Add failing UI tests for the explicit Net cancellation formula and EVN/developer ownership labels in the FMP cancellation strip.
+- [x] Expand the walkthrough Net section so it shows the full EVN-vs-developer cancellation algebra, including the developer `- FMP x aligned` term highlighted in red.
+- [x] Add EVN / Developer ownership to the corresponding FMP cancellation chips and tighten any overlapping text in the walkthrough panel.
+- [x] Re-run `npm test`, review desktop layout in the browser, fix any overlap issues found, then `npm run build` and redeploy to Firebase Hosting.
 
 ## Desktop Ratio + Overlap Review Round
 
@@ -84,10 +84,10 @@
 ## Remove Cancellation Tab + Keep Mermaid
 
 ### Plan
-- [ ] Remove the end-of-page cancellation effect panel while keeping a Mermaid flow panel in the same general area above controls.
-- [ ] Remove the weighted EVN tariff slider from controls and clean up now-unused retail-tariff input wiring.
-- [ ] Update UI tests to match the new shell and Mermaid-only behavior, then run `npm test -- --run`.
-- [ ] Review desktop and mobile browser views, fix any layout/readability issues found, then run `npm run build` and deploy to Firebase Hosting.
+- [x] Remove the end-of-page cancellation effect panel while keeping a Mermaid flow panel in the same general area above controls.
+- [x] Remove the weighted EVN tariff slider from controls and clean up now-unused retail-tariff input wiring.
+- [x] Update UI tests to match the new shell and Mermaid-only behavior, then run `npm test -- --run`.
+- [x] Review desktop and mobile browser views, fix any layout/readability issues found, then run `npm run build` and deploy to Firebase Hosting.
 
 ## Mobile Layout Polish Round
 
@@ -186,3 +186,22 @@
 - Implemented responsive polish for Mermaid readability: `app/src/style.css` now enables horizontal pan at `.mermaid-card`, increases mobile Mermaid zoom, and sets a minimum width for the diagram at narrow breakpoints.
 - Verification passed: `npm test -- --run` (16/16), `npm run build` succeeded, and `firebase deploy --only hosting --project dppa-case` succeeded.
 - Live site updated at https://dppa-case.web.app
+
+## Codebase Cleanup + Daily Totals Panel
+
+### Plan
+- [x] Remove 5 dead exports from `ui.js`: `renderVolumeSummary`, `renderMetrics`, `renderBauComparison`, `renderSelectedHour`, `setActiveDetailView`
+- [x] Remove `buildSelectedIntervalNarrative` from `settlement.js` (exported but never imported)
+- [x] Add `profiles.test.js` with direct coverage for `scaleProfile`, `deriveVolumes`, `sumVolume`, and `buildFmpCurve` shape/scaling
+- [x] Replace empty `#volumeSummary` div with `#dailyTotals`; add `renderDailyTotals` to `ui.js` surfacing engine-computed totals (matched kWh, shortfall, excess, daily cost, blended price, savings vs BAU, to EVN, to developer)
+- [x] Wire `renderDailyTotals` in `main.js` after chart render
+- [x] Tick off previously-completed but unchecked plan sections in `activeContext.md`
+- [x] `npm test -- --run` — all tests pass
+- [x] `npm run build` — clean
+- [x] `firebase deploy --only hosting --project dppa-case` — deployed
+
+### Review / Results
+- Dead code removed: `ui.js` shrank by ~150 lines; `settlement.js` shrank by ~13 lines
+- New test file `profiles.test.js`: 10 tests covering all pure functions in `profiles.js` and `buildFmpCurve`
+- Daily totals strip now visible in the chart panel headline on every scenario/currency change
+- All tests pass, build clean, live at https://dppa-case.web.app

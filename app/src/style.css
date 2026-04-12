@@ -263,6 +263,15 @@ h3 { font-size: 1.02rem; }
   justify-content: flex-end;
 }
 
+/* Daily totals strip — inherits pill layout, allow wrapping on narrow widths */
+.daily-totals-grid {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 .summary-pill {
   display: inline-flex;
   align-items: center;

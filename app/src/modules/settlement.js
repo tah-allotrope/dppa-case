@@ -378,16 +378,3 @@ export function buildFormulaBreakdown(inputs, interval) {
   }
 }
 
-export function buildSelectedIntervalNarrative(interval, inputs) {
-  const base = interval.classification.key === 'shortfall'
-    ? `At ${String(interval.hour).padStart(2, '0')}:00, the factory still buys the unmatched load from EVN at the weighted 22 kV to below 110 kV retail tariff.`
-    : interval.classification.key === 'excess'
-      ? `At ${String(interval.hour).padStart(2, '0')}:00, solar is above load, so the commercial question is whether contracted volume stays disciplined enough for clean cancellation.`
-      : `At ${String(interval.hour).padStart(2, '0')}:00, load and solar are aligned, so this is the clearest hour to compare BAU payment against DPPA payment.`
-
-  if (interval.contractQuantity > interval.matched) {
-    return `${base} Developer settlement is based on more energy than matched consumption, so the market-linked cancellation only works on the matched slice.`
-  }
-
-  return `${base} Contract quantity tracks matched consumption here, so the market-linked terms mostly cancel back toward strike price plus DPPA charge and the loss adjustment.`
-}

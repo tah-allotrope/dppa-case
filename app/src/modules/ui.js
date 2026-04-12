@@ -226,7 +226,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
                   <p class="eyebrow">Profiles</p>
                   <h2>Load vs solar overlap</h2>
                 </div>
-                <div class="summary-pills" id="volumeSummary"></div>
+                <div class="summary-pills" id="dailyTotals"></div>
               </div>
               <div class="scenario-tabs" id="scenarioTabs">
                 ${scenarios.map((scenario) => `<button class="scenario-tab" data-scenario="${scenario.id}">${scenario.label}</button>`).join('')}
@@ -336,23 +336,26 @@ export function renderWalkthroughCases(container, selectedCase, currency, formul
   container.innerHTML = walkthroughCaseCard(selectedCase, currency) + strip
 }
 
-export function renderVolumeSummary(container, totals) {
-  container.innerHTML = [
-    compactPill('Matched', `${formatNumber(totals.matchedVolume)} kWh`, 'result'),
-    compactPill('Shortfall', `${formatNumber(totals.loadTotal - totals.matchedVolume)} kWh`, 'warning'),
-    compactPill('Excess', `${formatNumber(Math.max(totals.generationTotal - totals.matchedVolume, 0))} kWh`, 'accent'),
-  ].join('')
-}
 
-export function renderMetrics(container, totals, currency) {
-  container.innerHTML = [
-    metricCard('Total buyer cost', formatMoney(totals.totalCost, { currency }), 'All-in daily cost for the selected scenario.', 'result'),
-    metricCard('Matched kWh price', formatMoney(totals.matchedPrice, { currency, precise: true, perKwh: true }), 'Best lens for the cancellation story.', 'result'),
-    metricCard('Blended average', formatMoney(totals.blendedPrice, { currency, precise: true, perKwh: true }), 'Includes unmatched retail energy.', 'default'),
-    metricCard('Payment to EVN', formatMoney(totals.evnTotal, { currency }), 'Market-linked energy, DPPA charge, and retail shortfall.', 'evn'),
-    metricCard('Payment to developer', formatMoney(totals.developerTotal, { currency, signed: true }), 'CfD settlement against strike vs market.', 'developer'),
-    metricCard('Savings vs baseline', formatMoney(totals.savings, { currency, signed: true }), `Baseline ${formatMoney(totals.noDppaBlended, { currency, precise: true, perKwh: true })}.`, totals.savings >= 0 ? 'success' : 'warning'),
-  ].join('')
+
+export function renderDailyTotals(container, totals, currency) {
+  const fmt = (v, opts = {}) => formatMoney(v, { currency, ...opts })
+  const fmtN = (v) => formatNumber(v)
+  const savingsTone = totals.savings >= 0 ? 'result' : 'developer'
+  const blendedTone = totals.blendedPrice <= totals.noDppaBlended ? 'result' : 'warning'
+
+  container.innerHTML = `
+    <div class="daily-totals-grid">
+      ${compactPill('Matched', `${fmtN(totals.matchedVolume)} kWh`, 'result')}
+      ${compactPill('Shortfall', `${fmtN(totals.loadTotal - totals.matchedVolume)} kWh`, 'warning')}
+      ${compactPill('Excess', `${fmtN(Math.max(totals.generationTotal - totals.matchedVolume, 0))} kWh`, 'accent')}
+      ${compactPill('Daily cost', fmt(totals.totalCost), 'default')}
+      ${compactPill('Blended', fmt(totals.blendedPrice, { precise: true, perKwh: true }), blendedTone)}
+      ${compactPill('Savings vs BAU', fmt(totals.savings, { signed: true }), savingsTone)}
+      ${compactPill('To EVN', fmt(totals.evnTotal), 'default')}
+      ${compactPill('To developer', fmt(totals.developerTotal, { signed: true }), 'developer')}
+    </div>
+  `
 }
 
 export function renderFormulas(result, warningText, currency) {
@@ -367,89 +370,6 @@ export function renderFormulas(result, warningText, currency) {
   document.querySelector('#mermaidInlineNote').textContent = `${note}${warningSuffix}`
 }
 
-export function renderBauComparison(container, result, currency) {
-  const cards = [
-    comparisonCard('BAU without DPPA', formatMoney(result.bauCost, { currency }), `${formatNumber(result.load)} kWh x ${formatMoney(result.retailTariff, { currency, precise: true, perKwh: true })}`, 'warning'),
-    comparisonCard('DPPA payment', formatMoney(result.dppaCost, { currency }), `${formatMoney(result.evnTotal, { currency })} to EVN and ${formatMoney(result.developerTotal, { currency, signed: true })} to developer`, 'result'),
-    comparisonCard('Savings vs BAU', formatMoney(result.savingsVsBau, { currency, signed: true }), result.savingsVsBau >= 0 ? 'Positive means DPPA is cheaper than BAU in this hour' : 'Negative means DPPA is more expensive than BAU in this hour', result.savingsVsBau >= 0 ? 'result' : 'developer'),
-    comparisonCard('BAU unit cost', formatMoney(result.bauUnitCost, { currency, precise: true, perKwh: true }), 'factory retail tariff for this hour', 'warning'),
-    comparisonCard('DPPA unit cost', formatMoney(result.dppaUnitCost, { currency, precise: true, perKwh: true }), 'all-in DPPA payment divided by selected-hour load', 'result'),
-  ].join('')
-
-  const strip = result.fmpCancellationSteps
-    ? fmpCancelStrip(result.fmpCancellationSteps, result.dppaUnitCost, currency)
-    : ''
-
-  container.innerHTML = `<div class="comparison-grid">${cards}</div>${strip}`
-}
-
-export function renderSelectedHour(container, interval, narrative, currency, detailView, inputs) {
-  const showFlow = detailView === 'flow'
-  const bauCost = interval.baseline
-  const dppaCost = interval.total
-  const savingsVsBau = bauCost - dppaCost
-  const evnUnitCost = interval.load > 0 ? interval.evnTotal / interval.load : 0
-  const developerUnitCost = interval.load > 0 ? interval.developer / interval.load : 0
-  const totalUnitCost = interval.load > 0 ? dppaCost / interval.load : 0
-  const spotMarketReferenceRate = interval.load > 0 ? interval.matched / interval.load * inputs.marketPrice : 0
-  const cancellationViaSwapRate = interval.load > 0 ? -(Math.min(interval.matched, interval.contractQuantity) / interval.load * inputs.marketPrice) : 0
-  const retainedEnergySliceRate = spotMarketReferenceRate + cancellationViaSwapRate + (interval.load > 0 ? interval.contractQuantity / interval.load * inputs.strikePrice : 0) + (interval.load > 0 ? interval.matched / interval.load * inputs.dppaCharge : 0) + (interval.load > 0 ? (interval.evnMarket - interval.matched * inputs.marketPrice) / interval.load : 0)
-
-  container.innerHTML = `
-    <div class="hour-topline">
-      <div>
-        <span class="hour-chip">${String(interval.hour).padStart(2, '0')}:00 - ${String((interval.hour + 1) % 24).padStart(2, '0')}:00</span>
-        <h3 class="hour-title">${interval.classification.label}</h3>
-      </div>
-      <div class="state-chip state-${interval.classification.key}">${interval.classification.stateText}</div>
-    </div>
-    <p class="hour-copy">${narrative}</p>
-
-    <div class="hour-stats">
-      ${compactPill('Load', `${formatNumber(interval.load)} kWh`, 'default')}
-      ${compactPill('Solar', `${formatNumber(interval.generation)} kWh`, 'accent')}
-      ${compactPill('Contract', `${formatNumber(interval.contractQuantity)} kWh`, interval.contractQuantity === interval.matched ? 'result' : 'warning')}
-      ${compactPill('Total', `${formatMoney(dppaCost, { currency })}`, 'result')}
-    </div>
-
-    <div class="hour-outcomes ${showFlow ? '' : 'is-hidden'}">
-      ${flowCard('BAU without DPPA', formatMoney(inputs.retailTariff, { currency, precise: true, perKwh: true }), `${formatNumber(interval.load)} kWh x ${formatMoney(inputs.retailTariff, { currency, precise: true, perKwh: true })} = ${formatMoney(bauCost, { currency })}`, 'warning')}
-      ${flowCard('Spot market reference', formatMoney(spotMarketReferenceRate, { currency, precise: true, perKwh: true }), `${formatNumber(interval.matched)} matched kWh x ${formatMoney(inputs.marketPrice, { currency, precise: true, perKwh: true })}; shown first, then canceled on aligned volume`, 'evn')}
-      ${flowCard('Cancellation via developer swap', formatMoney(cancellationViaSwapRate, { currency, precise: true, perKwh: true, signed: true }), `${formatNumber(Math.min(interval.matched, interval.contractQuantity))} aligned kWh cancel the spot reference and leave strike-led economics`, 'developer')}
-      ${flowCard('Net retained energy slice', formatMoney(retainedEnergySliceRate, { currency, precise: true, perKwh: true }), 'after cancellation, what remains is strike price + DPPA charge + loss adjustment on the aligned slice', 'accent')}
-      ${flowCard('DPPA total this hour', formatMoney(totalUnitCost, { currency, precise: true, perKwh: true }), `${formatMoney(interval.evnTotal, { currency })} to EVN + ${formatMoney(interval.developer, { currency, signed: true })} to developer = ${formatMoney(dppaCost, { currency })}`, 'result')}
-      ${flowCard('Delta vs BAU', formatMoney(savingsVsBau, { currency, signed: true }), savingsVsBau >= 0 ? 'positive means DPPA is cheaper in this hour' : 'negative means DPPA is more expensive in this hour', savingsVsBau >= 0 ? 'result' : 'developer')}
-    </div>
-
-    <div class="bars-grid ${showFlow ? 'is-hidden' : ''}">
-      <div class="bars-card">
-        <p class="metric-label">DPPA payment mix this hour</p>
-        <div class="bars-stack">
-          <div class="bars-segment bars-evn" style="width:${interval.total > 0 ? (interval.evnMarket / interval.total) * 100 : 0}%"></div>
-          <div class="bars-segment bars-dppa" style="width:${interval.total > 0 ? (interval.evnDppa / interval.total) * 100 : 0}%"></div>
-          <div class="bars-segment bars-retail" style="width:${interval.total > 0 ? (interval.evnRetail / interval.total) * 100 : 0}%"></div>
-          <div class="bars-segment bars-dev" style="width:${interval.total > 0 ? (Math.abs(interval.developer) / interval.total) * 100 : 0}%"></div>
-        </div>
-        <div class="bars-legend">
-          <span>EVN market</span>
-          <span>DPPA</span>
-          <span>Retail</span>
-          <span>Developer</span>
-        </div>
-      </div>
-      <div class="bars-card">
-        <p class="metric-label">Per-kWh summary on load</p>
-        <div class="bars-values">
-          <span>EVN <strong>${formatMoney(evnUnitCost, { currency, precise: true, perKwh: true })}</strong></span>
-          <span>Developer <strong>${formatMoney(developerUnitCost, { currency, precise: true, perKwh: true, signed: true })}</strong></span>
-          <span>Total DPPA <strong>${formatMoney(totalUnitCost, { currency, precise: true, perKwh: true })}</strong></span>
-          <span>BAU retail <strong>${formatMoney(inputs.retailTariff, { currency, precise: true, perKwh: true })}</strong></span>
-          <span>Hourly total <strong>${formatMoney(dppaCost, { currency })}</strong></span>
-        </div>
-      </div>
-    </div>
-  `
-}
 
 export function renderSelectedHourDetails(container, interval, currency, inputs) {
   const evnUnitCost = interval.load > 0 ? interval.evnTotal / interval.load : 0
@@ -531,11 +451,5 @@ export function setActiveScenario(scenarioId) {
 export function setActiveCurrency(currency) {
   document.querySelectorAll('[data-currency]').forEach((button) => {
     button.classList.toggle('is-active', button.dataset.currency === currency)
-  })
-}
-
-export function setActiveDetailView(detailView) {
-  document.querySelectorAll('[data-detail-view]').forEach((button) => {
-    button.classList.toggle('is-active', button.dataset.detailView === detailView)
   })
 }
