@@ -1,52 +1,12 @@
 import { formatMoney, formatNumber } from './formatters'
 
 
-function metricCard(label, value, detail, tone = 'default') {
-  return `
-    <article class="metric-card ${tone}">
-      <p class="metric-label">${label}</p>
-      <p class="metric-value">${value}</p>
-      <p class="metric-detail">${detail}</p>
-    </article>
-  `
-}
-
 function compactPill(label, value, tone = 'default') {
   return `
     <div class="summary-pill ${tone}">
       <span>${label}</span>
       <strong>${value}</strong>
     </div>
-  `
-}
-
-function flowCard(label, value, detail, tone = 'default') {
-  return `
-    <article class="flow-card ${tone}">
-      <p class="metric-label">${label}</p>
-      <strong class="flow-value">${value}</strong>
-      <span class="flow-detail">${detail}</span>
-    </article>
-  `
-}
-
-function comparisonCard(label, value, detail, tone = 'default') {
-  return `
-    <article class="comparison-card ${tone}">
-      <p class="metric-label">${label}</p>
-      <strong class="figure-value">${value}</strong>
-      <span class="flow-detail">${detail}</span>
-    </article>
-  `
-}
-
-function figureCard(label, value, detail, tone = 'default') {
-  return `
-    <article class="figure-card ${tone}">
-      <p class="metric-label">${label}</p>
-      <strong class="figure-value">${value}</strong>
-      <span class="flow-detail">${detail}</span>
-    </article>
   `
 }
 
@@ -66,99 +26,85 @@ function paymentEquation(label, rate, quantityText, amount, formula, tone = 'def
   `
 }
 
-const ROLE_META = {
-  shown:  { cls: 'cancel-term-shown',  sign: '+', title: 'FMP appears here — it will cancel' },
-  cancel: { cls: 'cancel-term-cancel', sign: '',  title: 'FMP cancels against the developer swap' },
-  strike: { cls: 'cancel-term-strike', sign: '+', title: 'Strike price retained' },
-  charge: { cls: 'cancel-term-charge', sign: '+', title: 'DPPA system charge' },
-  loss:   { cls: 'cancel-term-loss',   sign: '+', title: 'Loss adjustment: tiny residual from grid losses' },
-  retail: { cls: 'cancel-term-retail', sign: '+', title: 'Shortfall kWh still bought at retail tariff' },
+function netTerm(text, kind = 'retained', tone = 'default') {
+  return `<span class="net-${kind}-term ${tone}">${text}</span>`
 }
 
-function fmpCancelStrip(steps, resultValue, currency) {
-  const terms = steps.map((step) => {
-    const meta = ROLE_META[step.role] || ROLE_META.loss
-    const valueStr = formatMoney(Math.abs(step.value), { currency, precise: true, perKwh: true })
-    const sign = step.role === 'cancel' ? '−' : (meta.sign || '+')
-    return `
-      <span class="cancel-eq-term ${meta.cls}" title="${meta.title}">
-        <span class="cancel-eq-owner">${step.owner || 'Net'}</span>
-        <span class="cancel-eq-sign">${sign}</span>
-        <span class="cancel-eq-value">${valueStr}</span>
-        <span class="cancel-eq-label">${step.label}</span>
-      </span>
-    `
-  }).join('<span class="cancel-eq-separator"></span>')
-
-  return `
-    <div class="fmp-cancel-strip">
-      <div class="fmp-cancel-header">
-        <span class="fmp-cancel-title">FMP cancellation — per kWh on factory load</span>
-      </div>
-      <div class="fmp-cancel-equation">
-        ${terms}
-        <span class="cancel-eq-separator cancel-eq-equals">=</span>
-        <span class="cancel-eq-term cancel-term-result">
-          <span class="cancel-eq-value">${formatMoney(resultValue, { currency, precise: true, perKwh: true })}</span>
-          <span class="cancel-eq-label">net cost / kWh</span>
-        </span>
-      </div>
-    </div>
-  `
+function joinNetTerms(terms) {
+  return terms.filter(Boolean).join('<span class="net-operator"> + </span>')
 }
 
-function walkthroughCaseCard(item, currency) {
+function buildNetEquations(item, formulas, currency) {
+  const fmt = (v) => formatMoney(v, { currency, precise: true, perKwh: true })
+  const fmtN = (v) => formatNumber(v)
+  const fmtT = (v) => formatMoney(v, { currency })
+  const kppFig = item.lossFactor != null ? item.lossFactor.toFixed(3) : '1.000'
+  const lossAmount = formulas?.evnLossCharge ?? Math.max(item.evnMarket - item.matched * item.fmp, 0)
+
+  const visibleTerms = [
+    item.matched > 0
+      ? netTerm(`FMP (${fmt(item.fmp)}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh`, 'cancelled')
+      : '',
+    item.matched > 0
+      ? netTerm(`CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`, 'retained', 'result')
+      : '',
+    Math.min(item.matched, item.contractQuantity) > 0
+      ? netTerm(`− FMP (${fmt(item.fmp)}) × ${fmtN(Math.min(item.matched, item.contractQuantity))} kWh`, 'cancelled')
+      : '',
+    item.contractQuantity > 0
+      ? netTerm(`Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`, 'retained', 'result')
+      : '',
+    item.shortfall > 0
+      ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained', 'warning')
+      : '',
+    lossAmount > 0
+      ? netTerm(`Loss adj. ${fmtT(lossAmount)}`, 'retained', 'loss')
+      : '',
+  ]
+
+  const retainedTerms = [
+    item.matched > 0
+      ? netTerm(`CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`, 'retained', 'result')
+      : '',
+    item.contractQuantity > 0
+      ? netTerm(`Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`, 'retained', 'result')
+      : '',
+    item.shortfall > 0
+      ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained', 'warning')
+      : '',
+    lossAmount > 0
+      ? netTerm(`Loss adj. ${fmtT(lossAmount)}`, 'retained', 'loss')
+      : '',
+  ]
+
+  return {
+    expanded: joinNetTerms(visibleTerms),
+    simplified: joinNetTerms(retainedTerms),
+  }
+}
+
+function walkthroughCaseCard(item, currency, formulas) {
   const fmt = (v) => formatMoney(v, { currency, precise: true, perKwh: true })
   const fmtN = (v) => formatNumber(v)
   const fmtT = (v) => formatMoney(v, { currency })
   const fmtS = (v) => formatMoney(v, { currency, signed: true })
+  const netEquations = buildNetEquations(item, formulas, currency)
 
-  // EVN formula rows — "rate (figure) × qty" style
-  // Row 0: EVN = total
-  // Row 1: = FMP(fig) × Kpp(fig) × matched + CDPPA(fig) × matched [+ Retail(fig) × shortfall]
-  // Row 2: = component + component [+ component]
   const fmpFig = fmt(item.fmp)
   const kppFig = item.lossFactor != null ? item.lossFactor.toFixed(3) : '1.000'
-  const fmpKppFig = fmt(item.marketPerMatched)
   const dppachargeFig = fmt(item.dppaCharge)
   const retailFig = fmt(item.retailTariff)
-  const fmtAbs = (v) => formatMoney(Math.abs(v), { currency })
-  const alignedQuantity = Math.min(item.matched, item.contractQuantity)
 
-  const evnRow1 = item.shortfall > 0
+  const evnFormula = item.shortfall > 0
     ? `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh + Retail (${retailFig}) × ${fmtN(item.shortfall)} kWh`
     : `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh`
 
-  const evnRow2 = item.shortfall > 0
-    ? `${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)} + ${fmtT(item.evnRetail)}`
-    : `${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)}`
-
-  // Developer rows
-  // Row 0: Developer = total (signed)
-  // Row 1: = (Strike(fig) − FMP(fig)) × qty
-  const devRow1 = `(Strike (${fmt(item.strikePrice != null ? item.strikePrice : 0)}) − FMP (${fmpFig})) × ${fmtN(item.contractQuantity)} kWh`
-  const devCancellationRow = `− FMP (${fmpFig}) × ${fmtN(alignedQuantity)} kWh + Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`
-
-  // Net row — identify FMP cancellation
-  // Net total
   const netTotal = item.evnAmount + item.cfdAmount
-  const netEvnRow = item.shortfall > 0
-    ? `EVN = FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh + Retail (${retailFig}) × ${fmtN(item.shortfall)} kWh`
-    : `EVN = FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh`
-  const netDeveloperRow = `Developer = − FMP (${fmpFig}) × ${fmtN(alignedQuantity)} kWh + Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`
-  const netFormulaRow2 = item.shortfall > 0
-    ? `EVN = ${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)} + ${fmtT(item.evnRetail)}`
-    : `EVN = ${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)}`
-  const netFormulaRow3 = `Developer = − ${fmtAbs(item.fmpCancelAmount)} + ${fmtT(item.strikeAmount)}`
-  // Per-kWh on load for the cancellation narrative
-  const fmpCancelsNote = item.matched > 0 && item.contractQuantity === item.matched
-    ? `FMP cancels on ${fmtN(item.matched)} kWh matched — market exposure collapses to Strike + CDPPA + loss adj.`
-    : `FMP cancels only on ${fmtN(Math.min(item.matched, item.contractQuantity))} kWh aligned — ${fmtN(Math.abs(item.matched - item.contractQuantity))} kWh mismatch remains exposed.`
+  const developerFormula = `− FMP (${fmpFig}) × ${fmtN(item.contractQuantity)} kWh + Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`
 
   return `
     <article class="walkthrough-card ${item.tone} is-selected">
       <div class="walkthrough-head">
-        <div class="walkthrough-step">${item.step}</div>
         <div>
           <p class="metric-label">${item.caseLabel}</p>
           <h3>${item.headline}</h3>
@@ -167,30 +113,18 @@ function walkthroughCaseCard(item, currency) {
       </div>
       <div class="walkthrough-metrics">
         ${compactPill('Load', `${fmtN(item.load)} kWh`, 'default')}
-        ${compactPill('Solar', `${fmtN(item.generation)} kWh`, 'accent')}
+        ${compactPill('Gen', `${fmtN(item.generation)} kWh`, 'accent')}
         ${compactPill('DPPA', `${fmtN(item.contractQuantity)} kWh`, item.contractQuantity === item.matched ? 'result' : 'warning')}
       </div>
       <div class="walkthrough-lines">
-        <p class="wl-eq-head">EVN = <strong>${fmtT(item.evnAmount)}</strong></p>
-        <p class="formula-indent">= ${evnRow1}</p>
-        <p class="formula-indent">= ${evnRow2}</p>
+        <p class="wl-eq-head">EVN = ${evnFormula} = <strong>${fmtT(item.evnAmount)}</strong></p>
 
-        <p class="wl-eq-head">Developer = <strong>${fmtS(item.cfdAmount)}</strong></p>
-        <p class="formula-indent">= ${devRow1}</p>
-        <p class="formula-indent formula-developer-cancel">= ${devCancellationRow}</p>
-        <p class="formula-indent">= ${fmtS(item.cfdAmount)}</p>
+        <p class="wl-eq-head">Developer = ${developerFormula} = <strong class="developer-total">${fmtS(item.cfdAmount)}</strong></p>
 
         <div class="net-row">
-          <p class="wl-eq-head net-label">Net = EVN + Developer = <strong class="net-total">${fmtT(netTotal)}</strong></p>
-          <p class="formula-indent net-formula net-owner-line">= ${netEvnRow}</p>
-          <p class="formula-indent net-formula net-owner-line net-cancel-line">+ ${netDeveloperRow}</p>
-          <p class="formula-indent net-formula">= ${netFormulaRow2}</p>
-          <p class="formula-indent net-formula net-cancel-line">+ ${netFormulaRow3}</p>
-          <p class="formula-indent net-formula">= ${fmtT(netTotal)}</p>
-          <div class="cancellation-callout">
-            <span class="cancel-icon">↯</span>
-            <span>${fmpCancelsNote}</span>
-          </div>
+          <p class="wl-eq-head net-label">Net = EVN + Developer =</p>
+          <p class="net-formula-line"><span class="net-equals">=</span>${netEquations.expanded}</p>
+          <p class="net-formula-line net-formula-simplified"><span class="net-equals">=</span>${netEquations.simplified}<span class="net-equals">=</span><strong class="net-total">${fmtT(netTotal)}</strong></p>
         </div>
       </div>
     </article>
@@ -222,12 +156,11 @@ export function renderAppShell(root, scenarios, settlementModes) {
           <div class="chart-walkthrough-row">
             <div class="panel chart-panel">
               <div class="chart-headline">
-                <div>
-                  <p class="eyebrow">Profiles</p>
-                  <h2>Load vs solar overlap</h2>
-                </div>
-                <div class="summary-pills" id="dailyTotals"></div>
+              <div>
+                <p class="eyebrow">Profiles</p>
+                <h2>Load vs solar overlap</h2>
               </div>
+            </div>
               <div class="scenario-tabs" id="scenarioTabs">
                 ${scenarios.map((scenario) => `<button class="scenario-tab" data-scenario="${scenario.id}">${scenario.label}</button>`).join('')}
               </div>
@@ -238,10 +171,10 @@ export function renderAppShell(root, scenarios, settlementModes) {
 
             <section class="panel walkthrough-panel glow-frame">
               <div class="panel-header">
-                <div>
-                  <p class="eyebrow">Load-vs-generation cases</p>
-                  <h2>Selected-hour case from the clicked graph node</h2>
-                </div>
+              <div>
+                <p class="eyebrow">Load-vs-generation cases</p>
+                <h2>Clicked-hour cancellation view</h2>
+              </div>
               </div>
               <div class="walkthrough-grid" id="walkthroughCases"></div>
             </section>
@@ -330,32 +263,7 @@ export function renderWalkthroughCases(container, selectedCase, currency, formul
     container.innerHTML = ''
     return
   }
-  const strip = formulas && formulas.fmpCancellationSteps
-    ? fmpCancelStrip(formulas.fmpCancellationSteps, formulas.dppaUnitCost, currency)
-    : ''
-  container.innerHTML = walkthroughCaseCard(selectedCase, currency) + strip
-}
-
-
-
-export function renderDailyTotals(container, totals, currency) {
-  const fmt = (v, opts = {}) => formatMoney(v, { currency, ...opts })
-  const fmtN = (v) => formatNumber(v)
-  const savingsTone = totals.savings >= 0 ? 'result' : 'developer'
-  const blendedTone = totals.blendedPrice <= totals.noDppaBlended ? 'result' : 'warning'
-
-  container.innerHTML = `
-    <div class="daily-totals-grid">
-      ${compactPill('Matched', `${fmtN(totals.matchedVolume)} kWh`, 'result')}
-      ${compactPill('Shortfall', `${fmtN(totals.loadTotal - totals.matchedVolume)} kWh`, 'warning')}
-      ${compactPill('Excess', `${fmtN(Math.max(totals.generationTotal - totals.matchedVolume, 0))} kWh`, 'accent')}
-      ${compactPill('Daily cost', fmt(totals.totalCost), 'default')}
-      ${compactPill('Blended', fmt(totals.blendedPrice, { precise: true, perKwh: true }), blendedTone)}
-      ${compactPill('Savings vs BAU', fmt(totals.savings, { signed: true }), savingsTone)}
-      ${compactPill('To EVN', fmt(totals.evnTotal), 'default')}
-      ${compactPill('To developer', fmt(totals.developerTotal, { signed: true }), 'developer')}
-    </div>
-  `
+  container.innerHTML = walkthroughCaseCard(selectedCase, currency, formulas)
 }
 
 export function renderFormulas(result, warningText, currency) {

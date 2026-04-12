@@ -217,7 +217,7 @@ h3 { font-size: 1.02rem; }
 /* chart and walkthrough panel side-by-side on desktop */
 .chart-walkthrough-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.56fr) minmax(320px, 0.64fr);
+  grid-template-columns: minmax(0, 1.6fr) minmax(380px, 0.8fr);
   gap: 14px;
   align-items: stretch;
 }
@@ -230,7 +230,7 @@ h3 { font-size: 1.02rem; }
   margin-top: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  max-height: 480px;
+  max-height: 440px;
   min-width: 0;
 }
 
@@ -261,15 +261,6 @@ h3 { font-size: 1.02rem; }
   gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
-}
-
-/* Daily totals strip — inherits pill layout, allow wrapping on narrow widths */
-.daily-totals-grid {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: center;
 }
 
 .summary-pill {
@@ -316,7 +307,7 @@ h3 { font-size: 1.02rem; }
   padding: 12px;
   background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
   display: grid;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -326,17 +317,16 @@ h3 { font-size: 1.02rem; }
 
 .walkthrough-card.is-selected {
   outline: 2px solid rgba(255,255,255,0.5);
-  transform: translateY(-2px);
+  transform: none;
 }
 
 .walkthrough-head {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 10px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
 }
 
-.walkthrough-step,
 .walkthrough-hour {
   display: inline-flex;
   align-items: center;
@@ -352,98 +342,118 @@ h3 { font-size: 1.02rem; }
 .walkthrough-metrics {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .walkthrough-lines {
   display: grid;
-  gap: 4px;
-  font-size: 0.9rem;
-  line-height: 1.35;
+  gap: 8px;
+  font-size: 0.86rem;
+  line-height: 1.5;
   min-width: 0;
 }
 
-.walkthrough-lines .formula-indent {
-  padding-left: 1.5rem;
-  color: rgba(244, 251, 255, 0.70);
+.wl-eq-head {
+  margin: 0;
   font-size: 0.85rem;
-  line-height: 1.45;
+  line-height: 1.55;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-/* equation head row: label + bold total */
-.wl-eq-head {
-  font-size: 0.9rem;
-  margin-top: 6px;
-  overflow-wrap: anywhere;
-}
 .wl-eq-head strong {
-  font-size: 0.98rem;
+  font-size: 0.95rem;
 }
 
 .walkthrough-panel h2 {
-  font-size: 1.04rem;
-  line-height: 1.08;
-  max-width: 16ch;
+  font-size: 0.94rem;
+  line-height: 1.12;
+  max-width: 13ch;
   overflow-wrap: anywhere;
 }
 
-/* Net row wrapper */
 .net-row {
-  margin-top: 10px;
+  margin-top: 2px;
   border-top: 1px solid rgba(255,255,255,0.10);
   padding-top: 8px;
   display: grid;
-  gap: 4px;
+  gap: 6px;
 }
 
-.net-label { }
+.developer-total {
+  color: #ff8e98;
+}
 
 .net-total {
   color: var(--mint);
   text-shadow: 0 0 10px rgba(154, 255, 222, 0.4);
 }
 
-.net-formula {
-  font-size: 0.77rem;
-}
-
-.net-owner-line {
-  padding-left: 0.9rem !important;
-}
-
-.net-cancel-line,
-.formula-developer-cancel {
-  color: rgba(255, 155, 155, 0.94) !important;
-  font-size: 0.8rem !important;
-}
-
-.net-cancel-line {
-  text-shadow: 0 0 10px rgba(255, 80, 80, 0.18);
-}
-
-/* Cancellation callout chip inside the walkthrough card */
-.cancellation-callout {
+.net-formula-line {
+  margin: 0;
+  color: rgba(244, 251, 255, 0.88);
+  font-size: 0.82rem;
+  line-height: 1.6;
   display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  margin-top: 7px;
-  padding: 7px 10px;
-  border-radius: 10px;
-  background: rgba(255, 80, 80, 0.10);
-  border: 1px solid rgba(255, 80, 80, 0.28);
-  font-size: 0.78rem;
-  line-height: 1.42;
-  color: rgba(255, 160, 160, 0.9);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-.cancel-icon {
-  font-size: 1rem;
-  line-height: 1;
-  color: #ff8080;
-  flex-shrink: 0;
-  margin-top: 1px;
+.net-formula-simplified {
+  color: rgba(244, 251, 255, 0.96);
+  font-weight: 600;
+}
+
+.net-cancelled-term,
+.net-retained-term {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 10px;
+  padding: 0.1rem 0.28rem;
+  min-width: 0;
+}
+
+.net-cancelled-term {
+  color: #ff8a8f;
+  font-weight: 700;
+  text-decoration-line: line-through;
+  text-decoration-color: #ff4d5f;
+  text-decoration-thickness: 2px;
+}
+
+.net-retained-term {
+  color: rgba(244, 251, 255, 0.96);
+}
+
+.net-retained-term.result {
+  color: #ff6d79;
+  font-weight: 800;
+}
+
+.net-retained-term.warning {
+  color: #ffd27a;
+  font-weight: 700;
+}
+
+.net-retained-term.loss {
+  color: rgba(207, 219, 235, 0.82);
+}
+
+.net-operator {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(244, 251, 255, 0.72);
+}
+
+.net-equals {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(244, 251, 255, 0.64);
+  font-weight: 700;
+  margin-right: 2px;
 }
 
 .walkthrough-note {
@@ -1162,6 +1172,10 @@ h3 { font-size: 1.02rem; }
     max-height: none;
     overflow-y: visible;
   }
+
+  .walkthrough-panel h2 {
+    max-width: none;
+  }
 }
 
 @media (max-width: 520px) {
@@ -1192,12 +1206,37 @@ h3 { font-size: 1.02rem; }
 
   /* Walkthrough head: two columns — badge + title, hour badge goes to second row */
   .walkthrough-head {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr;
     grid-template-rows: auto auto;
   }
   .walkthrough-hour {
     grid-column: 1 / -1;
     justify-self: start;
+  }
+
+  .walkthrough-card {
+    padding: 10px;
+    gap: 7px;
+  }
+
+  .walkthrough-metrics {
+    gap: 5px;
+  }
+
+  .walkthrough-lines {
+    gap: 7px;
+    font-size: 0.82rem;
+  }
+
+  .wl-eq-head,
+  .net-formula-line {
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+
+  .net-cancelled-term,
+  .net-retained-term {
+    padding: 0.08rem 0.22rem;
   }
 
   /* Mermaid: keep text readable with horizontal pan inside the card */

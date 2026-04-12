@@ -205,3 +205,19 @@
 - New test file `profiles.test.js`: 10 tests covering all pure functions in `profiles.js` and `buildFmpCurve`
 - Daily totals strip now visible in the chart panel headline on every scenario/currency change
 - All tests pass, build clean, live at https://dppa-case.web.app
+
+## Walkthrough Rewrite + Responsive Cleanup
+
+### Plan
+- [x] Remove the daily totals pills from the Profiles panel so the chart area stays visually clean.
+- [x] Update UI tests first for the new selected-hour walkthrough format and the removed profiles totals strip.
+- [x] Rewrite the load-vs-generation walkthrough card into a compact cancellation-first formula layout: EVN total, Developer total, then a Net line that visually strikes through the canceling FMP terms and leaves CDPPA + Strike prominent in red.
+- [x] Reduce walkthrough panel bulk on desktop and tighten mobile spacing to avoid text/box overlap.
+- [x] Verify desktop and mobile layouts in-browser, then run `npm test -- --run`, `npm run build`, and deploy to Firebase Hosting.
+
+### Review / Results
+- Removed the Profiles header totals strip entirely so the chart panel stays focused on the load-vs-solar visual.
+- Rewrote the clicked-hour walkthrough card to use a cancellation-first formula format closer to the requested CFO example: single-line EVN and Developer equations, followed by a Net section with struck-through FMP terms and retained CDPPA / Strike terms highlighted in red.
+- Tightened the walkthrough panel sizing: desktop column widened from the prior overly-narrow formula box, title copy shortened, step badge removed, and the panel now reads more like a compact explanation than a mini-dashboard.
+- Mobile browser review at `390x844` confirmed the previous overlap issue is resolved; the Net equation now wraps into readable chips instead of collapsing into overlapping inline text.
+- Desktop browser review at `1440x1200` confirmed the walkthrough panel no longer feels as clunky, though the selected-hour card remains intentionally compact to preserve chart dominance.

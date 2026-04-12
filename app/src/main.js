@@ -3,7 +3,7 @@ import mermaid from 'mermaid'
 import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve } from './data/default-scenarios'
 import { renderProfileChart } from './modules/chart'
 import { buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement } from './modules/settlement'
-import { renderAppShell, renderDailyTotals, renderFormulas, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
+import { renderAppShell, renderFormulas, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
 
 mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' })
 
@@ -49,7 +49,6 @@ function updateView() {
     state.selectedHour = hour
     updateView()
   }, inputs)
-  renderDailyTotals(document.querySelector('#dailyTotals'), settlement.totals, state.currency)
   renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedWalkthroughCase, state.currency, formulas)
   renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
   renderSelectedHourDetails(

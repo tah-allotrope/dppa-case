@@ -29,9 +29,11 @@ describe('storytelling shell', () => {
     expect(document.querySelector('.chart-walkthrough-row .walkthrough-panel')).not.toBeNull()
     expect(document.querySelector('.story-grid + .lower-grid')).not.toBeNull()
     expect(document.querySelector('#cancellationMermaid')).not.toBeNull()
+    expect(document.querySelector('#dailyTotals')).toBeNull()
     expect(document.querySelector('#app').textContent).not.toContain('Cancellation effect')
     expect(document.querySelector('#retailTariff')).toBeNull()
     expect(document.querySelector('#app').textContent).not.toContain('Weighted EVN tariff')
+    expect(document.querySelector('#app').textContent).not.toContain('Savings vs BAU')
   })
 })
 
@@ -68,8 +70,7 @@ describe('selected-hour layout', () => {
       inputs,
     )
 
-    // FMP cancel strip is embedded in the walkthrough panel
-    expect(document.querySelector('#walkthroughCases').textContent).toContain('FMP cancellation')
+    expect(document.querySelector('#walkthroughCases').textContent).toContain('Net = EVN + Developer')
     // Payment build-up is in the details panel
     expect(document.querySelector('#selectedHourDetailsPanel .settlement-grid')).not.toBeNull()
     expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('Payment to EVN per kWh of factory load')
@@ -99,7 +100,9 @@ describe('selected-hour layout', () => {
     expect(text).toContain('FMP (1,190.00 VND/kWh) × Kpp (1.027) × 4,700 kWh')
     expect(text).toContain('Developer =')
     expect(text).toContain('− FMP (1,190.00 VND/kWh) × 4,700 kWh + Strike (1,741.35 VND/kWh) × 4,700 kWh')
-    expect(text).toContain('EVN = FMP (1,190.00 VND/kWh) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh')
+    expect(text).toContain('EVN = FMP (1,190.00 VND/kWh) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh =')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-cancelled-term')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-retained-term')
     expect(document.querySelectorAll('#walkthroughCases .walkthrough-card')).toHaveLength(1)
   })
 
@@ -139,16 +142,14 @@ describe('selected-hour layout', () => {
 
     renderFormulas(breakdown, '', 'VND')
 
-    // FMP strip is in the walkthrough panel (not in the details panel)
     const text = normalizedText('#walkthroughCases')
 
-    expect(text).toContain('FMP cancellation')
     expect(normalizedText('#selectedHourDetailsPanel')).not.toContain('FMP cancellation')
-    expect(text).toContain('EVN + 1,224.00 VND/kWh FMP × matched')
-    expect(text).toContain('Developer − 1,224.00 VND/kWh − FMP × aligned')
     expect(text).toContain('EVN = FMP (1,224.00 VND/kWh) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh')
     expect(text).toContain('Developer =')
     expect(text).toContain('− FMP (1,224.00 VND/kWh) × 4,700 kWh + Strike (1,741.35 VND/kWh) × 4,700 kWh')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-cancelled-term')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-retained-term result')
     expect(document.querySelector('#cancellationMermaid').textContent).toContain('flowchart LR')
   })
 })
