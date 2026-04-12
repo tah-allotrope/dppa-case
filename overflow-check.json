@@ -1,0 +1,12 @@
+[
+  {
+    "cls": "panel walkthrough-panel glow-frame",
+    "text": "Load-vs-generation cases Selected-hour case from the clicked graph node 1 Load = Gen Balanced case 12:00 - 13:00 Load 4,",
+    "clientWidth": 318,
+    "scrollWidth": 382,
+    "clientHeight": 478,
+    "scrollHeight": 1458,
+    "overflowX": true,
+    "overflowY": true
+  }
+]

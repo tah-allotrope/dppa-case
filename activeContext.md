@@ -33,6 +33,62 @@
 - Selected-hour comparison and details were moved into the main story column ahead of the larger selected-hour panel, which tightens the mobile sequence and keeps the explanatory panels closer to the graph.
 - Verification passed again: `npm test`, `npm run build`, and `firebase deploy --only hosting --project dppa-case` all succeeded for the latest revision.
 
+## Layout + Formula Refinements
+
+### Plan
+- [x] Layout: chart and walkthrough-panel side-by-side in `.chart-walkthrough-row` (CSS grid 1.1fr / 0.9fr), collapses to 1-col at ≤900px
+- [x] EVN formula rewritten to "FMP (fig) × Kpp (fig) × qty + CDPPA (fig) × qty [+ Retail (fig) × shortfall]" with three-row expansion
+- [x] Developer formula rewritten to "(Strike (fig) − FMP (fig)) × qty" with signed total
+- [x] Net row added: "Net = EVN + Developer = total" with formula expansion and red cancellation callout chip
+- [x] `buildWalkthroughCase` in settlement.js extended with `strikePrice` and `lossFactor` fields
+- [x] Tests updated: shell test uses `.chart-walkthrough-row` selector; walkthrough test asserts `'Net = EVN + Developer'`
+- [x] `npm test -- --run` — 16/16 pass
+- [x] `npm run build` — clean
+- [x] `firebase deploy --only hosting --project dppa-case` — deployed
+
+### Review / Results
+- Chart and walkthrough panel sit side by side on desktop (≥901px); stack vertically on mobile
+- Walkthrough panel has `max-height: 480px; overflow-y: auto` to match chart panel height on desktop
+- EVN row format: `EVN = total` / `= FMP (x) × Kpp (x) × q kWh + CDPPA (x) × q kWh [+ Retail (x) × shortfall]` / `= component + component`
+- Developer row: `Developer = ±total (signed)` / `= (Strike (x) − FMP (x)) × q kWh` / `= ±total (signed)`
+- Net row: `Net = EVN + Developer = total` / `= EVN ± |developer|` / red callout identifying FMP cancellation (clean vs partial)
+- All three scenarios verified in browser: balanced, under-supply (with retail row), over-supply
+- 16 tests pass, build clean, live at https://dppa-case.web.app
+
+## Desktop Balance + Net Cancellation Formula
+
+### Plan
+- [ ] Make the chart panel visibly larger than the load-vs-generation panel on desktop while keeping the existing mobile collapse.
+- [ ] Add failing UI tests for the explicit Net cancellation formula and EVN/developer ownership labels in the FMP cancellation strip.
+- [ ] Expand the walkthrough Net section so it shows the full EVN-vs-developer cancellation algebra, including the developer `- FMP x aligned` term highlighted in red.
+- [ ] Add EVN / Developer ownership to the corresponding FMP cancellation chips and tighten any overlapping text in the walkthrough panel.
+- [ ] Re-run `npm test`, review desktop layout in the browser, fix any overlap issues found, then `npm run build` and redeploy to Firebase Hosting.
+
+## Desktop Ratio + Overlap Review Round
+
+### Plan
+- [x] Increase the desktop chart-to-walkthrough width ratio so the graph is slightly larger than the load-vs-generation tab without changing mobile stacking.
+- [x] Add failing UI tests for the expanded Net cancellation formula and EVN/Developer labels on the per-kWh FMP cancellation boxes.
+- [x] Update the walkthrough Net formula to show the full EVN FMP term canceling against the developer `- FMP x load` term, with the developer-side FMP highlighted in red.
+- [x] Label each FMP cancellation box with whether the corresponding per-kWh FMP sits under EVN or Developer, and tighten CSS to prevent text overlap.
+- [x] Run `npm test -- --run`, review the app in the browser for overlap issues, fix any issues found, then run `npm run build` and `firebase deploy --only hosting --project dppa-case`.
+
+### Review / Results
+- Desktop ratio increased to `1.56fr / 0.64fr` in `app/src/style.css`, leaving the chart visibly wider than the walkthrough panel while keeping the existing `<=900px` stack.
+- `app/src/modules/ui.js` now shows the Net section as explicit EVN and Developer ownership lines: `EVN = FMP × Kpp × load ...` and `Developer = - FMP × aligned + Strike × contract`, with the developer-side cancellation line kept red.
+- The FMP cancellation strip now renders owner badges per chip (`EVN` / `Developer`) so each per-kWh FMP box clearly states which side it belongs to.
+- Browser review at `1440px` and `1280px` found the main remaining issue was horizontal spill being reported on the scrollable walkthrough container itself; no child text nodes were still overflowing after the CSS wrap hardening. Added `overflow-x: hidden`, stronger wrapping, and a tighter heading width in `app/src/style.css`.
+- Verification passed: `npm test -- --run` = 16/16 pass, `npm run build` succeeded, and `firebase deploy --only hosting --project dppa-case` succeeded.
+- Live site updated at https://dppa-case.web.app
+
+## Remove Cancellation Tab + Keep Mermaid
+
+### Plan
+- [ ] Remove the end-of-page cancellation effect panel while keeping a Mermaid flow panel in the same general area above controls.
+- [ ] Remove the weighted EVN tariff slider from controls and clean up now-unused retail-tariff input wiring.
+- [ ] Update UI tests to match the new shell and Mermaid-only behavior, then run `npm test -- --run`.
+- [ ] Review desktop and mobile browser views, fix any layout/readability issues found, then run `npm run build` and deploy to Firebase Hosting.
+
 ## Mobile Layout Polish Round
 
 ### Plan
@@ -111,4 +167,22 @@
 - EVN and Developer formula lines now expand across three rows each, matching the reference document format: total on first line, rate × quantity breakdown on second, component totals on third
 - 16 tests pass, build clean, live at https://dppa-case.web.app
 
+## Post-deploy cleanup: remove cancellation tab + control simplification + responsive review
 
+### Plan
+- [x] Confirm and enforce that no standalone "Cancellation effect" tab/panel remains above controls while keeping the Mermaid flow panel intact.
+- [x] Remove the weighted EVN tariff slider from controls (and any associated UI wiring), preserving retail tariff only as an internal modeling assumption.
+- [x] Update/add UI tests first for shell expectations, then run `npm test -- --run`.
+- [x] Review desktop and mobile layouts in-browser for readability/overflow issues, apply minimal fixes, then run `npm run build` and redeploy to Firebase Hosting.
+
+### In-progress review notes
+- Desktop check confirms cancellation tab/panel is not present; Mermaid panel remains immediately above controls as requested.
+- Controls check confirms no weighted EVN tariff slider is present in the shell.
+- Mobile check found Mermaid flow text too small at narrow widths due to aggressive zoom reduction; adjusted Mermaid card to allow horizontal pan and increased mobile zoom for readability.
+
+### Review / Results
+- Verified shell behavior aligns with requested structure: Mermaid flow panel remains above controls, and no standalone cancellation-effect tab/panel appears.
+- Verified controls section has no weighted EVN tariff slider; retail tariff stays an internal assumption in the settlement model.
+- Implemented responsive polish for Mermaid readability: `app/src/style.css` now enables horizontal pan at `.mermaid-card`, increases mobile Mermaid zoom, and sets a minimum width for the diagram at narrow breakpoints.
+- Verification passed: `npm test -- --run` (16/16), `npm run build` succeeded, and `firebase deploy --only hosting --project dppa-case` succeeded.
+- Live site updated at https://dppa-case.web.app

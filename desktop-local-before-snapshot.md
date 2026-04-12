@@ -1,0 +1,82 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - img "Allotrope logo" [ref=e6]
+      - generic [ref=e7]:
+        - paragraph [ref=e8]: Rob — Vietnam synthetic DPPA
+        - heading "DPPA CFO visual explainer" [level=1] [ref=e9]
+        - paragraph [ref=e10]: Click any hour to compare BAU without DPPA against DPPA payment using the weighted 22 kV to below 110 kV retail tariff.
+    - generic "Currency toggle" [ref=e12]:
+      - button "VND" [ref=e13] [cursor=pointer]
+      - button "USD" [ref=e14] [cursor=pointer]
+  - main [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e20]
+          - generic [ref=e23]
+          - generic "Load and generation chart" [ref=e28]
+        - generic [ref=e29]:
+          - generic [ref=e31]
+          - generic [ref=e34]
+      - generic [ref=e106]:
+        - generic [ref=e108]:
+          - paragraph [ref=e109]: Selected hour details
+          - heading "EVN and developer payment build-up" [level=2] [ref=e110]
+        - generic [ref=e112]:
+          - generic [ref=e113]
+          - generic [ref=e144]
+  - generic [ref=e160]:
+    - generic [ref=e162]:
+      - paragraph [ref=e163]: Mermaid flow
+      - heading "Selected-hour cancellation logic flow" [level=2] [ref=e164]
+    - generic [ref=e165]:
+      - generic [ref=e166]: Mermaid logic flow
+      - document [ref=e204]:
+        - generic [ref=e212]:
+          - paragraph [ref=e219]
+          - paragraph [ref=e226]: Selected hour comparison
+          - paragraph [ref=e233]
+          - paragraph [ref=e240]: Market reference cancels
+          - paragraph [ref=e247]
+          - paragraph [ref=e254]: Keep strike + DPPA + loss
+          - paragraph [ref=e261]
+          - paragraph [ref=e268]
+    - paragraph [ref=e170]: "Clean cancellation: spot reference is shown then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment. Current setup is more expensive than the no-DPPA baseline because either strike is high, DPPA charge is large, or matched volume is too low."
+  - generic [ref=e171]:
+    - generic [ref=e172]:
+      - generic [ref=e173]:
+        - paragraph [ref=e174]: Controls
+        - heading "Pricing assumptions" [level=2] [ref=e175]
+      - button "Reset defaults" [ref=e176] [cursor=pointer]
+    - generic [ref=e177]:
+      - generic [ref=e178]:
+        - generic [ref=e179]: Developer strike price
+        - slider "Developer strike price 1,741.35 VND/kWh" [ref=e180]: "1741.35"
+        - strong [ref=e181]: 1,741.35 VND/kWh
+      - generic [ref=e182]:
+        - generic [ref=e183]: Market price / FMP
+        - slider "Market price / FMP 1,700.00 VND/kWh" [ref=e184]: "1700"
+        - strong [ref=e185]: 1,700.00 VND/kWh
+      - generic [ref=e186]:
+        - generic [ref=e187]: DPPA charge
+        - slider "DPPA charge 523.34 VND/kWh" [ref=e188]: "523"
+        - strong [ref=e189]: 523.34 VND/kWh
+      - generic [ref=e190]:
+        - generic [ref=e191]: Loss factor
+        - slider "Loss factor 1.027" [ref=e192]: "1.027"
+        - strong [ref=e193]: "1.027"
+      - generic [ref=e194]:
+        - generic [ref=e195]: Settlement quantity mode
+        - combobox "Settlement quantity mode Matched consumption only" [ref=e196]:
+          - option "Matched consumption only" [selected]
+          - option "Allocated generation"
+          - option "Generation regardless of consumption"
+          - option "Minimum of load and generation"
+        - strong [ref=e197]: Matched consumption only
+    - generic [ref=e198]:
+      - generic [ref=e199]: Hourly teaching model
+      - generic [ref=e200]: Flat rates in v1
+      - generic [ref=e201]: Internal math stays in VND
+      - generic [ref=e202]: Default strike = 95% of weighted tariff
+      - generic [ref=e203]: Click chart to inspect one hour

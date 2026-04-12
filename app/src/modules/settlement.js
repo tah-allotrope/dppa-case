@@ -205,6 +205,11 @@ function buildWalkthroughCase(inputs, interval, step = 1) {
     evnDppa: interval.evnDppa,
     evnRetail: interval.evnRetail,
     fmp: interval.fmp,
+    strikePrice: inputs.strikePrice,
+    lossFactor: inputs.lossFactor,
+    alignedQuantity: Math.min(interval.matched, interval.contractQuantity),
+    fmpCancelAmount: Math.min(interval.matched, interval.contractQuantity) * interval.fmp,
+    strikeAmount: interval.contractQuantity * inputs.strikePrice,
     marketPerMatched: interval.fmp * inputs.lossFactor,
     dppaCharge: inputs.dppaCharge,
     retailTariff: inputs.retailTariff,
@@ -273,6 +278,7 @@ export function buildFormulaBreakdown(inputs, interval) {
   const fmpCancellationSteps = [
     {
       label: 'FMP × matched',
+      owner: 'EVN',
       termVolume: interval.matched,
       termRate: fmp,
       value: interval.load > 0 ? interval.matched / interval.load * fmp : 0,
@@ -280,6 +286,7 @@ export function buildFormulaBreakdown(inputs, interval) {
     },
     {
       label: '− FMP × aligned',
+      owner: 'Developer',
       termVolume: alignedVol,
       termRate: fmp,
       value: interval.load > 0 ? -(alignedVol / interval.load * fmp) : 0,
@@ -287,6 +294,7 @@ export function buildFormulaBreakdown(inputs, interval) {
     },
     {
       label: 'Strike × contract',
+      owner: 'Developer',
       termVolume: interval.contractQuantity,
       termRate: inputs.strikePrice,
       value: interval.load > 0 ? interval.contractQuantity / interval.load * inputs.strikePrice : 0,
@@ -294,6 +302,7 @@ export function buildFormulaBreakdown(inputs, interval) {
     },
     {
       label: 'DPPA charge',
+      owner: 'EVN',
       termVolume: interval.matched,
       termRate: inputs.dppaCharge,
       value: interval.load > 0 ? interval.evnDppa / interval.load : 0,
@@ -301,6 +310,7 @@ export function buildFormulaBreakdown(inputs, interval) {
     },
     {
       label: 'Loss adj.',
+      owner: 'EVN',
       termVolume: null,
       termRate: null,
       value: interval.load > 0 ? evnLossCharge / interval.load : 0,
@@ -308,6 +318,7 @@ export function buildFormulaBreakdown(inputs, interval) {
     },
     ...(interval.shortfall > 0 ? [{
       label: 'Shortfall retail',
+      owner: 'EVN',
       termVolume: interval.shortfall,
       termRate: inputs.retailTariff,
       value: interval.load > 0 ? interval.evnRetail / interval.load : 0,

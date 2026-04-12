@@ -214,6 +214,26 @@ h3 { font-size: 1.02rem; }
   min-height: 100%;
 }
 
+/* chart and walkthrough panel side-by-side on desktop */
+.chart-walkthrough-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.56fr) minmax(320px, 0.64fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.chart-walkthrough-row .chart-panel {
+  min-height: 100%;
+}
+
+.chart-walkthrough-row .walkthrough-panel {
+  margin-top: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 480px;
+  min-width: 0;
+}
+
 .chart-panel,
 .metrics-panel,
 .details-panel,
@@ -257,7 +277,7 @@ h3 { font-size: 1.02rem; }
 
 .chart-wrap {
   position: relative;
-  height: 300px;
+  height: 344px;
   border-radius: 22px;
   border: 1px solid var(--line);
   background: linear-gradient(180deg, rgba(9, 16, 36, 0.82), rgba(7, 11, 24, 0.94));
@@ -274,9 +294,6 @@ h3 { font-size: 1.02rem; }
 }
 
 
-.walkthrough-panel {
-  margin-top: 12px;
-}
 
 .walkthrough-grid {
   display: grid;
@@ -291,6 +308,7 @@ h3 { font-size: 1.02rem; }
   background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
   display: grid;
   gap: 10px;
+  min-width: 0;
 }
 
 .walkthrough-card.warning { background: linear-gradient(180deg, rgba(133, 20, 22, 0.9), rgba(120, 18, 24, 0.82)); }
@@ -331,14 +349,92 @@ h3 { font-size: 1.02rem; }
 .walkthrough-lines {
   display: grid;
   gap: 4px;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1.35;
+  min-width: 0;
 }
 
 .walkthrough-lines .formula-indent {
   padding-left: 1.5rem;
   color: rgba(244, 251, 255, 0.70);
   font-size: 0.85rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* equation head row: label + bold total */
+.wl-eq-head {
+  font-size: 0.9rem;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+.wl-eq-head strong {
+  font-size: 0.98rem;
+}
+
+.walkthrough-panel h2 {
+  font-size: 1.04rem;
+  line-height: 1.08;
+  max-width: 16ch;
+  overflow-wrap: anywhere;
+}
+
+/* Net row wrapper */
+.net-row {
+  margin-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  padding-top: 8px;
+  display: grid;
+  gap: 4px;
+}
+
+.net-label { }
+
+.net-total {
+  color: var(--mint);
+  text-shadow: 0 0 10px rgba(154, 255, 222, 0.4);
+}
+
+.net-formula {
+  font-size: 0.77rem;
+}
+
+.net-owner-line {
+  padding-left: 0.9rem !important;
+}
+
+.net-cancel-line,
+.formula-developer-cancel {
+  color: rgba(255, 155, 155, 0.94) !important;
+  font-size: 0.8rem !important;
+}
+
+.net-cancel-line {
+  text-shadow: 0 0 10px rgba(255, 80, 80, 0.18);
+}
+
+/* Cancellation callout chip inside the walkthrough card */
+.cancellation-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 7px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(255, 80, 80, 0.10);
+  border: 1px solid rgba(255, 80, 80, 0.28);
+  font-size: 0.78rem;
+  line-height: 1.42;
+  color: rgba(255, 160, 160, 0.9);
+}
+
+.cancel-icon {
+  font-size: 1rem;
+  line-height: 1;
+  color: #ff8080;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .walkthrough-note {
@@ -504,10 +600,25 @@ h3 { font-size: 1.02rem; }
   padding: 6px 10px;
   border-radius: 9px;
   border: 1px solid transparent;
-  min-width: 80px;
+  min-width: 92px;
   text-align: center;
   cursor: default;
   transition: box-shadow 0.2s;
+}
+
+.cancel-eq-owner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.15rem;
+  padding: 0.12rem 0.42rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.82;
 }
 
 .cancel-eq-sign {
@@ -526,11 +637,13 @@ h3 { font-size: 1.02rem; }
 }
 
 .cancel-eq-label {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   opacity: 0.65;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .cancel-eq-separator {
@@ -651,6 +764,7 @@ h3 { font-size: 1.02rem; }
 @media (max-width: 640px) {
   .fmp-cancel-equation { gap: 3px; }
   .cancel-eq-term { min-width: 64px; padding: 5px 7px; }
+   .cancel-eq-owner { font-size: 0.48rem; padding: 0.08rem 0.32rem; }
   .cancel-eq-value { font-size: 0.78rem; }
   .cancel-eq-label { font-size: 0.55rem; white-space: normal; }
 }
@@ -689,6 +803,7 @@ h3 { font-size: 1.02rem; }
   border-radius: 18px;
   padding: 8px;
   background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  overflow-x: auto;
 }
 
 .mermaid {
@@ -1030,6 +1145,14 @@ h3 { font-size: 1.02rem; }
   .story-column {
     display: contents;
   }
+  /* stack chart and walkthrough vertically on tablet/mobile */
+  .chart-walkthrough-row {
+    grid-template-columns: 1fr;
+  }
+  .chart-walkthrough-row .walkthrough-panel {
+    max-height: none;
+    overflow-y: visible;
+  }
 }
 
 @media (max-width: 520px) {
@@ -1068,8 +1191,11 @@ h3 { font-size: 1.02rem; }
     justify-self: start;
   }
 
-  /* Mermaid: reduce zoom further so diagram fits without horizontal scroll */
-  .mermaid { zoom: 0.58; }
+  /* Mermaid: keep text readable with horizontal pan inside the card */
+  .mermaid {
+    zoom: 0.72;
+    min-width: 520px;
+  }
 
   /* FMP cancellation strip: let chips shrink freely, allow label wrapping */
   .fmp-cancel-strip { padding: 10px; }
@@ -1106,6 +1232,12 @@ h3 { font-size: 1.02rem; }
   /* FMP equation chips: even smaller font on very narrow screens */
   .cancel-eq-value { font-size: 0.72rem; }
   .cancel-eq-label { font-size: 0.52rem; }
+
+  /* Mermaid: preserve readability on extra-small phones */
+  .mermaid {
+    zoom: 0.66;
+    min-width: 500px;
+  }
 
   /* Chart wrap: cap height a bit tighter on small phones */
   .chart-wrap {

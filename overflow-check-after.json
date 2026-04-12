@@ -1,0 +1,9 @@
+[
+  {
+    "cls": "panel walkthrough-panel glow-frame",
+    "text": "Load-vs-generation cases Selected-hour case from the clicked graph node 1 Load = Gen Balanced case 1",
+    "clientWidth": 298,
+    "scrollWidth": 357,
+    "overflowX": true
+  }
+]

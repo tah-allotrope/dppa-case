@@ -82,6 +82,7 @@ function fmpCancelStrip(steps, resultValue, currency) {
     const sign = step.role === 'cancel' ? '−' : (meta.sign || '+')
     return `
       <span class="cancel-eq-term ${meta.cls}" title="${meta.title}">
+        <span class="cancel-eq-owner">${step.owner || 'Net'}</span>
         <span class="cancel-eq-sign">${sign}</span>
         <span class="cancel-eq-value">${valueStr}</span>
         <span class="cancel-eq-label">${step.label}</span>
@@ -110,19 +111,49 @@ function walkthroughCaseCard(item, currency) {
   const fmt = (v) => formatMoney(v, { currency, precise: true, perKwh: true })
   const fmtN = (v) => formatNumber(v)
   const fmtT = (v) => formatMoney(v, { currency })
+  const fmtS = (v) => formatMoney(v, { currency, signed: true })
 
-  // Row 1: rate labels × quantities
+  // EVN formula rows — "rate (figure) × qty" style
+  // Row 0: EVN = total
+  // Row 1: = FMP(fig) × Kpp(fig) × matched + CDPPA(fig) × matched [+ Retail(fig) × shortfall]
+  // Row 2: = component + component [+ component]
+  const fmpFig = fmt(item.fmp)
+  const kppFig = item.lossFactor != null ? item.lossFactor.toFixed(3) : '1.000'
+  const fmpKppFig = fmt(item.marketPerMatched)
+  const dppachargeFig = fmt(item.dppaCharge)
+  const retailFig = fmt(item.retailTariff)
+  const fmtAbs = (v) => formatMoney(Math.abs(v), { currency })
+  const alignedQuantity = Math.min(item.matched, item.contractQuantity)
+
   const evnRow1 = item.shortfall > 0
-    ? `FMP×Kpp (${fmt(item.marketPerMatched)}) × ${fmtN(item.matched)} kWh + CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh + Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`
-    : `FMP×Kpp (${fmt(item.marketPerMatched)}) × ${fmtN(item.matched)} kWh + CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`
+    ? `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh + Retail (${retailFig}) × ${fmtN(item.shortfall)} kWh`
+    : `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh`
 
-  // Row 2: component totals
   const evnRow2 = item.shortfall > 0
     ? `${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)} + ${fmtT(item.evnRetail)}`
     : `${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)}`
 
-  // Developer: (Strike − FMP) × contract quantity
-  const devRow1 = `(Strike − FMP) (${fmt(item.cfdUnitRate)}) × ${fmtN(item.contractQuantity)} kWh`
+  // Developer rows
+  // Row 0: Developer = total (signed)
+  // Row 1: = (Strike(fig) − FMP(fig)) × qty
+  const devRow1 = `(Strike (${fmt(item.strikePrice != null ? item.strikePrice : 0)}) − FMP (${fmpFig})) × ${fmtN(item.contractQuantity)} kWh`
+  const devCancellationRow = `− FMP (${fmpFig}) × ${fmtN(alignedQuantity)} kWh + Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`
+
+  // Net row — identify FMP cancellation
+  // Net total
+  const netTotal = item.evnAmount + item.cfdAmount
+  const netEvnRow = item.shortfall > 0
+    ? `EVN = FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh + Retail (${retailFig}) × ${fmtN(item.shortfall)} kWh`
+    : `EVN = FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh`
+  const netDeveloperRow = `Developer = − FMP (${fmpFig}) × ${fmtN(alignedQuantity)} kWh + Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`
+  const netFormulaRow2 = item.shortfall > 0
+    ? `EVN = ${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)} + ${fmtT(item.evnRetail)}`
+    : `EVN = ${fmtT(item.evnMarket)} + ${fmtT(item.evnDppa)}`
+  const netFormulaRow3 = `Developer = − ${fmtAbs(item.fmpCancelAmount)} + ${fmtT(item.strikeAmount)}`
+  // Per-kWh on load for the cancellation narrative
+  const fmpCancelsNote = item.matched > 0 && item.contractQuantity === item.matched
+    ? `FMP cancels on ${fmtN(item.matched)} kWh matched — market exposure collapses to Strike + CDPPA + loss adj.`
+    : `FMP cancels only on ${fmtN(Math.min(item.matched, item.contractQuantity))} kWh aligned — ${fmtN(Math.abs(item.matched - item.contractQuantity))} kWh mismatch remains exposed.`
 
   return `
     <article class="walkthrough-card ${item.tone} is-selected">
@@ -140,11 +171,27 @@ function walkthroughCaseCard(item, currency) {
         ${compactPill('DPPA', `${fmtN(item.contractQuantity)} kWh`, item.contractQuantity === item.matched ? 'result' : 'warning')}
       </div>
       <div class="walkthrough-lines">
-        <p>EVN = ${fmtT(item.evnAmount)}</p>
+        <p class="wl-eq-head">EVN = <strong>${fmtT(item.evnAmount)}</strong></p>
         <p class="formula-indent">= ${evnRow1}</p>
         <p class="formula-indent">= ${evnRow2}</p>
-        <p>Developer = ${fmtT(item.cfdAmount)}</p>
+
+        <p class="wl-eq-head">Developer = <strong>${fmtS(item.cfdAmount)}</strong></p>
         <p class="formula-indent">= ${devRow1}</p>
+        <p class="formula-indent formula-developer-cancel">= ${devCancellationRow}</p>
+        <p class="formula-indent">= ${fmtS(item.cfdAmount)}</p>
+
+        <div class="net-row">
+          <p class="wl-eq-head net-label">Net = EVN + Developer = <strong class="net-total">${fmtT(netTotal)}</strong></p>
+          <p class="formula-indent net-formula net-owner-line">= ${netEvnRow}</p>
+          <p class="formula-indent net-formula net-owner-line net-cancel-line">+ ${netDeveloperRow}</p>
+          <p class="formula-indent net-formula">= ${netFormulaRow2}</p>
+          <p class="formula-indent net-formula net-cancel-line">+ ${netFormulaRow3}</p>
+          <p class="formula-indent net-formula">= ${fmtT(netTotal)}</p>
+          <div class="cancellation-callout">
+            <span class="cancel-icon">↯</span>
+            <span>${fmpCancelsNote}</span>
+          </div>
+        </div>
       </div>
     </article>
   `
@@ -172,31 +219,33 @@ export function renderAppShell(root, scenarios, settlementModes) {
 
       <main class="story-grid">
         <section class="focus-column">
-          <div class="panel chart-panel">
-            <div class="chart-headline">
-              <div>
-                <p class="eyebrow">Profiles</p>
-                <h2>Load vs solar overlap</h2>
+          <div class="chart-walkthrough-row">
+            <div class="panel chart-panel">
+              <div class="chart-headline">
+                <div>
+                  <p class="eyebrow">Profiles</p>
+                  <h2>Load vs solar overlap</h2>
+                </div>
+                <div class="summary-pills" id="volumeSummary"></div>
               </div>
-              <div class="summary-pills" id="volumeSummary"></div>
+              <div class="scenario-tabs" id="scenarioTabs">
+                ${scenarios.map((scenario) => `<button class="scenario-tab" data-scenario="${scenario.id}">${scenario.label}</button>`).join('')}
+              </div>
+              <div class="chart-wrap profile-wrap">
+                <canvas id="profileChart" aria-label="Load and generation chart"></canvas>
+              </div>
             </div>
-            <div class="scenario-tabs" id="scenarioTabs">
-              ${scenarios.map((scenario) => `<button class="scenario-tab" data-scenario="${scenario.id}">${scenario.label}</button>`).join('')}
-            </div>
-            <div class="chart-wrap profile-wrap">
-              <canvas id="profileChart" aria-label="Load and generation chart"></canvas>
-            </div>
-          </div>
 
-          <section class="panel walkthrough-panel glow-frame">
-            <div class="panel-header">
-              <div>
-                <p class="eyebrow">Load-vs-generation cases</p>
-                <h2>Selected-hour case from the clicked graph node</h2>
+            <section class="panel walkthrough-panel glow-frame">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Load-vs-generation cases</p>
+                  <h2>Selected-hour case from the clicked graph node</h2>
+                </div>
               </div>
-            </div>
-            <div class="walkthrough-grid" id="walkthroughCases"></div>
-          </section>
+              <div class="walkthrough-grid" id="walkthroughCases"></div>
+            </section>
+          </div>
 
           <div class="panel details-panel stage-panel">
             <div class="panel-header">
@@ -215,31 +264,15 @@ export function renderAppShell(root, scenarios, settlementModes) {
         <div class="panel formula-panel glow-frame">
           <div class="panel-header">
             <div>
-              <p class="eyebrow">Cancellation effect</p>
-              <h2>Selected-hour formulas and cancellation diagram</h2>
-            </div>
-          </div>
-          <div class="cancellation-figures" id="cancellationFigures"></div>
-          <div class="formula-grid">
-            <div class="formula-card">
-              <p class="formula-label">Selected-hour EVN settlement</p>
-              <pre id="evnExpression"></pre>
-            </div>
-            <div class="formula-card accent-card">
-              <p class="formula-label">Selected-hour developer settlement</p>
-              <pre id="developerExpression"></pre>
-            </div>
-            <div class="formula-card result-card full-span">
-              <p class="formula-label">Selected-hour cancellation result</p>
-              <pre id="cancellationResult"></pre>
+              <p class="eyebrow">Mermaid flow</p>
+              <h2>Selected-hour cancellation logic flow</h2>
             </div>
           </div>
           <div class="mermaid-card">
             <div class="metric-label">Mermaid logic flow</div>
             <div class="mermaid" id="cancellationMermaid"></div>
           </div>
-          <ul class="explain-list" id="explainList"></ul>
-          <div class="warning-banner" id="warningBanner" hidden></div>
+          <p class="walkthrough-note" id="mermaidInlineNote"></p>
         </div>
       </section>
 
@@ -271,11 +304,6 @@ export function renderAppShell(root, scenarios, settlementModes) {
             <span>Loss factor</span>
             <input id="lossFactor" type="range" min="1" max="1.08" step="0.001" />
             <strong data-output="lossFactor"></strong>
-          </label>
-          <label class="control-card">
-            <span>Weighted EVN tariff (22 kV-<110 kV)</span>
-            <input id="retailTariff" type="range" min="1200" max="3600" step="0.01" />
-            <strong data-output="retailTariff"></strong>
           </label>
           <label class="control-card select-card">
             <span>Settlement quantity mode</span>
@@ -328,51 +356,15 @@ export function renderMetrics(container, totals, currency) {
 }
 
 export function renderFormulas(result, warningText, currency) {
-  document.querySelector('#cancellationFigures').innerHTML = [
-    figureCard('Retail tariff basis', formatMoney(result.retailTariff, { currency, precise: true, perKwh: true }), 'weighted 22 kV to below 110 kV factory tariff', 'warning'),
-    figureCard('Strike price', formatMoney(result.strikePrice, { currency, precise: true, perKwh: true }), 'defaulted at 5% below the weighted tariff basis', 'developer'),
-    figureCard('Spot market price', formatMoney(result.marketPrice, { currency, precise: true, perKwh: true }), 'shown first so the CFO can see the cancellation happen explicitly', 'evn'),
-    figureCard('Loss adjustment', formatMoney(result.lossAdjustment, { currency, precise: true, perKwh: true }), 'market x loss factor minus market', 'evn'),
-    figureCard('Cancellation shortcut', formatMoney(result.impliedCancellation, { currency, precise: true, perKwh: true }), 'strike + DPPA charge + loss adjustment on aligned volume', 'result'),
-  ].join('')
-
-  document.querySelector('#evnExpression').textContent = `EVN = (${formatNumber(result.matched)} x ${formatMoney(result.marketPrice, { currency, precise: true, perKwh: true })}) + (${formatNumber(result.matched)} x ${formatMoney(result.lossAdjustment, { currency, precise: true, perKwh: true })}) + (${formatNumber(result.matched)} x ${formatMoney(result.dppaCharge, { currency, precise: true, perKwh: true })}) + (${formatNumber(result.shortfall)} x ${formatMoney(result.retailTariff, { currency, precise: true, perKwh: true })})\n= ${formatMoney(result.evnTotal, { currency })}`
-
-  document.querySelector('#developerExpression').textContent = `Developer = ${formatNumber(result.contractQuantity)} x (${formatMoney(result.strikePrice, { currency, precise: true, perKwh: true })} - ${formatMoney(result.marketPrice, { currency, precise: true, perKwh: true })})\n= ${formatMoney(result.developerTotal, { currency, signed: true })}`
-
-  document.querySelector('#cancellationResult').textContent = result.cleanCancellation
-    ? `Clean cancellation on this hour\nThe spot market price is shown first, then canceled by the developer swap on the aligned volume.\n${formatMoney(result.spotMarketVisibleRate, { currency, precise: true, perKwh: true })} + ${formatMoney(result.cancellationViaSwapRate, { currency, precise: true, perKwh: true, signed: true })} + ${formatMoney(result.retainedStrikeRate, { currency, precise: true, perKwh: true })} + ${formatMoney(result.lossAdjustment, { currency, precise: true, perKwh: true })} + ${formatMoney(result.dppaCharge, { currency, precise: true, perKwh: true })} = ${formatMoney(result.retainedEnergyRate, { currency, precise: true, perKwh: true })}`
-    : `Partial / broken cancellation on this hour\nMatched volume = ${formatNumber(result.matched)} kWh, contracted volume = ${formatNumber(result.contractQuantity)} kWh, mismatch = ${formatNumber(Math.abs(result.mismatchVolume))} kWh. Use the actual selected-hour DPPA payment of ${formatMoney(result.dppaCost, { currency })} rather than the clean shortcut alone.`
-
   document.querySelector('#cancellationMermaid').textContent = result.cleanCancellation
     ? `flowchart LR\nA[BAU retail payment\n${formatNumber(result.load)} kWh x ${formatMoney(result.retailTariff, { currency, precise: true, perKwh: true })}\n= ${formatMoney(result.bauCost, { currency })}] --> B[Selected hour comparison]\nC[DPPA matched market\n${formatNumber(result.matched)} kWh x ${formatMoney(result.marketPrice, { currency, precise: true, perKwh: true })}] --> D[Market reference cancels]\nE[Developer CfD swap\n${formatNumber(result.contractQuantity)} kWh x ${formatMoney(result.developerSwapPerContract, { currency, precise: true, perKwh: true, signed: true })}] --> D\nD --> F[Keep strike + DPPA + loss]\nF --> G[DPPA payment\n${formatMoney(result.dppaCost, { currency })}]\nG --> B\nB --> H[Savings vs BAU\n${formatMoney(result.savingsVsBau, { currency, signed: true })}]`
     : `flowchart LR\nA[BAU retail payment\n${formatMoney(result.bauCost, { currency })}] --> B[Selected hour comparison]\nC[Matched volume\n${formatNumber(result.matched)} kWh] --> D[Cancellation only applies here]\nE[Contracted volume\n${formatNumber(result.contractQuantity)} kWh] --> D\nD --> F[Volume mismatch\n${formatNumber(Math.abs(result.mismatchVolume))} kWh]\nF --> G[Uncancelled exposure stays]\nG --> H[DPPA payment\n${formatMoney(result.dppaCost, { currency })}]\nH --> B\nB --> I[Savings vs BAU\n${formatMoney(result.savingsVsBau, { currency, signed: true })}]`
 
-  const steps = result.cleanCancellation
-    ? [
-        `BAU for this hour is ${formatMoney(result.bauCost, { currency })}, based on ${formatNumber(result.load)} kWh at the weighted retail tariff of ${formatMoney(result.retailTariff, { currency, precise: true, perKwh: true })}.`,
-        `The spot market price is shown explicitly at ${formatMoney(result.marketPrice, { currency, precise: true, perKwh: true })}, then canceled by the developer swap on the aligned volume so the CFO can see why it does not stay as a net cost.`,
-        `After that cancellation, the retained matched-kWh economics simplify toward strike price + DPPA charge + loss adjustment, or ${formatMoney(result.impliedCancellation, { currency, precise: true, perKwh: true })}.`,
-        `Selected-hour DPPA payment is ${formatMoney(result.dppaCost, { currency })}, which is ${formatMoney(result.savingsVsBau, { currency, signed: true })} versus BAU.`,
-      ]
-    : [
-        `BAU for this hour is ${formatMoney(result.bauCost, { currency })}, while DPPA payment is ${formatMoney(result.dppaCost, { currency })}.`,
-        `Developer settlement differs from matched volume by ${formatNumber(Math.abs(result.mismatchVolume))} kWh, so cancellation is only partial on this node.`,
-        `The clean shortcut is not enough here; the actual selected-hour economics are driven by the mismatch and the resulting DPPA payment of ${formatMoney(result.dppaCost, { currency })}.`,
-      ]
-
-  document.querySelector('#explainList').innerHTML = steps
-    .map((step) => `<li>${step}</li>`)
-    .join('')
-
-  const banner = document.querySelector('#warningBanner')
-  if (warningText) {
-    banner.hidden = false
-    banner.textContent = warningText
-  } else {
-    banner.hidden = true
-    banner.textContent = ''
-  }
+  const note = result.cleanCancellation
+    ? `Clean cancellation: spot reference is shown then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment.`
+    : `Partial cancellation: mismatch volume keeps some uncancelled exposure, so rely on the actual selected-hour DPPA payment.`
+  const warningSuffix = warningText ? ` ${warningText}` : ''
+  document.querySelector('#mermaidInlineNote').textContent = `${note}${warningSuffix}`
 }
 
 export function renderBauComparison(container, result, currency) {
@@ -526,7 +518,6 @@ export function updateControlOutputs(state, settlementModes, currency) {
   document.querySelector('[data-output="marketPrice"]').textContent = formatMoney(state.marketPrice, { currency, precise: true, perKwh: true })
   document.querySelector('[data-output="dppaCharge"]').textContent = formatMoney(state.dppaCharge, { currency, precise: true, perKwh: true })
   document.querySelector('[data-output="lossFactor"]').textContent = state.lossFactor.toFixed(3)
-  document.querySelector('[data-output="retailTariff"]').textContent = formatMoney(state.retailTariff, { currency, precise: true, perKwh: true })
   const activeMode = settlementModes.find((mode) => mode.value === state.settlementMode)
   document.querySelector('[data-output="settlementMode"]').textContent = activeMode ? activeMode.label : state.settlementMode
 }
