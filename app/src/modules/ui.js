@@ -26,8 +26,49 @@ function paymentEquation(label, rate, quantityText, amount, formula, tone = 'def
   `
 }
 
-function netTerm(text, kind = 'retained', tone = 'default') {
-  return `<span class="net-${kind}-term ${tone}">${text}</span>`
+const ROLE_META = {
+  shown:  { cls: 'cancel-term-shown', sign: '+', title: 'FMP appears here — it will cancel' },
+  cancel: { cls: 'cancel-term-cancel', sign: '', title: 'FMP cancels against the developer swap' },
+  strike: { cls: 'cancel-term-strike', sign: '+', title: 'Strike price retained' },
+  charge: { cls: 'cancel-term-charge', sign: '+', title: 'DPPA system charge' },
+  loss:   { cls: 'cancel-term-loss', sign: '+', title: 'Loss adjustment: tiny residual from grid losses' },
+  retail: { cls: 'cancel-term-retail', sign: '+', title: 'Shortfall kWh still bought at retail tariff' },
+}
+
+function fmpCancelStrip(steps, resultValue, currency) {
+  const terms = steps.map((step) => {
+    const meta = ROLE_META[step.role] || ROLE_META.loss
+    const valueStr = formatMoney(Math.abs(step.value), { currency, precise: true, perKwh: true })
+    const sign = step.role === 'cancel' ? '−' : (meta.sign || '+')
+    return `
+      <span class="cancel-eq-term ${meta.cls}" title="${meta.title}">
+        <span class="cancel-eq-owner">${step.owner || 'Net'}</span>
+        <span class="cancel-eq-sign">${sign}</span>
+        <span class="cancel-eq-value">${valueStr}</span>
+        <span class="cancel-eq-label">${step.label}</span>
+      </span>
+    `
+  }).join('<span class="cancel-eq-separator"></span>')
+
+  return `
+    <div class="fmp-cancel-strip">
+      <div class="fmp-cancel-header">
+        <span class="fmp-cancel-title">FMP cancellation — per kWh on factory load</span>
+      </div>
+      <div class="fmp-cancel-equation">
+        ${terms}
+        <span class="cancel-eq-separator cancel-eq-equals">=</span>
+        <span class="cancel-eq-term cancel-term-result">
+          <span class="cancel-eq-value">${formatMoney(resultValue, { currency, precise: true, perKwh: true })}</span>
+          <span class="cancel-eq-label">net cost / kWh</span>
+        </span>
+      </div>
+    </div>
+  `
+}
+
+function netTerm(text, kind = 'retained') {
+  return `<span class="net-${kind}-term default">${text}</span>`
 }
 
 function joinNetTerms(terms) {
@@ -46,34 +87,34 @@ function buildNetEquations(item, formulas, currency) {
       ? netTerm(`FMP (${fmt(item.fmp)}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh`, 'cancelled')
       : '',
     item.matched > 0
-      ? netTerm(`CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`, 'retained', 'result')
+      ? netTerm(`CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`, 'retained')
       : '',
     Math.min(item.matched, item.contractQuantity) > 0
       ? netTerm(`− FMP (${fmt(item.fmp)}) × ${fmtN(Math.min(item.matched, item.contractQuantity))} kWh`, 'cancelled')
       : '',
     item.contractQuantity > 0
-      ? netTerm(`Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`, 'retained', 'result')
+      ? netTerm(`Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`, 'retained')
       : '',
     item.shortfall > 0
-      ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained', 'warning')
+      ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained')
       : '',
     lossAmount > 0
-      ? netTerm(`Loss adj. ${fmtT(lossAmount)}`, 'retained', 'loss')
+      ? netTerm(`Loss adj. ${fmtT(lossAmount)}`, 'retained')
       : '',
   ]
 
   const retainedTerms = [
     item.matched > 0
-      ? netTerm(`CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`, 'retained', 'result')
+      ? netTerm(`CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`, 'retained')
       : '',
     item.contractQuantity > 0
-      ? netTerm(`Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`, 'retained', 'result')
+      ? netTerm(`Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`, 'retained')
       : '',
     item.shortfall > 0
-      ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained', 'warning')
+      ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained')
       : '',
     lossAmount > 0
-      ? netTerm(`Loss adj. ${fmtT(lossAmount)}`, 'retained', 'loss')
+      ? netTerm(`Loss adj. ${fmtT(lossAmount)}`, 'retained')
       : '',
   ]
 
@@ -263,25 +304,33 @@ export function renderWalkthroughCases(container, selectedCase, currency, formul
     container.innerHTML = ''
     return
   }
-  container.innerHTML = walkthroughCaseCard(selectedCase, currency, formulas)
+  const strip = formulas && formulas.fmpCancellationSteps
+    ? fmpCancelStrip(formulas.fmpCancellationSteps, formulas.dppaUnitCost, currency)
+    : ''
+  container.innerHTML = walkthroughCaseCard(selectedCase, currency, formulas) + strip
 }
 
 export function renderFormulas(result, warningText, currency) {
-  document.querySelector('#cancellationMermaid').textContent = result.cleanCancellation
+  const mermaidDefinition = result.cleanCancellation
     ? `flowchart LR\nA[BAU retail payment\n${formatNumber(result.load)} kWh x ${formatMoney(result.retailTariff, { currency, precise: true, perKwh: true })}\n= ${formatMoney(result.bauCost, { currency })}] --> B[Selected hour comparison]\nC[DPPA matched market\n${formatNumber(result.matched)} kWh x ${formatMoney(result.marketPrice, { currency, precise: true, perKwh: true })}] --> D[Market reference cancels]\nE[Developer CfD swap\n${formatNumber(result.contractQuantity)} kWh x ${formatMoney(result.developerSwapPerContract, { currency, precise: true, perKwh: true, signed: true })}] --> D\nD --> F[Keep strike + DPPA + loss]\nF --> G[DPPA payment\n${formatMoney(result.dppaCost, { currency })}]\nG --> B\nB --> H[Savings vs BAU\n${formatMoney(result.savingsVsBau, { currency, signed: true })}]`
     : `flowchart LR\nA[BAU retail payment\n${formatMoney(result.bauCost, { currency })}] --> B[Selected hour comparison]\nC[Matched volume\n${formatNumber(result.matched)} kWh] --> D[Cancellation only applies here]\nE[Contracted volume\n${formatNumber(result.contractQuantity)} kWh] --> D\nD --> F[Volume mismatch\n${formatNumber(Math.abs(result.mismatchVolume))} kWh]\nF --> G[Uncancelled exposure stays]\nG --> H[DPPA payment\n${formatMoney(result.dppaCost, { currency })}]\nH --> B\nB --> I[Savings vs BAU\n${formatMoney(result.savingsVsBau, { currency, signed: true })}]`
+
+  document.querySelector('#cancellationMermaid').textContent = mermaidDefinition
 
   const note = result.cleanCancellation
     ? `Clean cancellation: spot reference is shown then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment.`
     : `Partial cancellation: mismatch volume keeps some uncancelled exposure, so rely on the actual selected-hour DPPA payment.`
   const warningSuffix = warningText ? ` ${warningText}` : ''
   document.querySelector('#mermaidInlineNote').textContent = `${note}${warningSuffix}`
+
+  return mermaidDefinition
 }
 
 
 export function renderSelectedHourDetails(container, interval, currency, inputs) {
   const evnUnitCost = interval.load > 0 ? interval.evnTotal / interval.load : 0
   const developerUnitCost = interval.load > 0 ? interval.developer / interval.load : 0
+  const intervalFmp = interval.fmp ?? inputs.marketPrice
 
   container.innerHTML = `
     <div class="settlement-grid">
@@ -292,8 +341,8 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
             'Matched market slice',
             formatMoney(interval.load > 0 ? interval.evnMarket / interval.load : 0, { currency, precise: true, perKwh: true }),
             `${formatNumber(interval.matched)} matched kWh`,
-            formatMoney(interval.evnMarket, { currency }),
-            `${formatNumber(interval.matched)} / ${formatNumber(interval.load)} x ${formatMoney(inputs.marketPrice * inputs.lossFactor, { currency, precise: true, perKwh: true })}`,
+             formatMoney(interval.evnMarket, { currency }),
+            `${formatNumber(interval.matched)} / ${formatNumber(interval.load)} x ${formatMoney(intervalFmp * inputs.lossFactor, { currency, precise: true, perKwh: true })}`,
             'evn',
           )}
           ${paymentEquation(
@@ -325,9 +374,9 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
           ${paymentEquation(
             'CfD swap on contract quantity',
             formatMoney(developerUnitCost, { currency, precise: true, perKwh: true, signed: true }),
-            `${formatNumber(interval.contractQuantity)} contracted kWh`,
-            formatMoney(interval.developer, { currency, signed: true }),
-            `${formatNumber(interval.contractQuantity)} / ${formatNumber(interval.load)} x (${formatMoney(inputs.strikePrice, { currency, precise: true, perKwh: true })} - ${formatMoney(inputs.marketPrice, { currency, precise: true, perKwh: true })})`,
+             `${formatNumber(interval.contractQuantity)} contracted kWh`,
+             formatMoney(interval.developer, { currency, signed: true }),
+            `${formatNumber(interval.contractQuantity)} / ${formatNumber(interval.load)} x (${formatMoney(inputs.strikePrice, { currency, precise: true, perKwh: true })} - ${formatMoney(intervalFmp, { currency, precise: true, perKwh: true })})`,
             'developer',
           )}
         </div>

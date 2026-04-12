@@ -8,6 +8,7 @@ import { renderAppShell, renderFormulas, renderSelectedHourDetails, renderWalkth
 mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' })
 
 const state = { ...defaultInputs }
+let mermaidRenderToken = 0
 
 function getScenarioList() {
   return scenarioOrder.map((id) => scenarioProfiles[id])
@@ -36,7 +37,21 @@ function getWarningText(totals, scenario) {
   return ''
 }
 
-function updateView() {
+async function renderMermaidDiagram(definition) {
+  const node = document.querySelector('#cancellationMermaid')
+  if (!node || !definition) return
+
+  const token = ++mermaidRenderToken
+  const renderId = `cancellation-flow-${token}`
+  const { svg, bindFunctions } = await mermaid.render(renderId, definition)
+
+  if (token !== mermaidRenderToken) return
+
+  node.innerHTML = svg
+  bindFunctions?.(node)
+}
+
+async function updateView() {
   const inputs = buildInputs()
   const scenario = scenarioProfiles[state.scenarioId]
   const settlement = calculateSettlement(inputs)
@@ -50,7 +65,7 @@ function updateView() {
     updateView()
   }, inputs)
   renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedWalkthroughCase, state.currency, formulas)
-  renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
+  const mermaidDefinition = renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
   renderSelectedHourDetails(
     document.querySelector('#selectedHourDetailsPanel'),
     selectedInterval,
@@ -60,7 +75,7 @@ function updateView() {
   updateControlOutputs(state, settlementModes, state.currency)
   setActiveScenario(state.scenarioId)
   setActiveCurrency(state.currency)
-  mermaid.run({ nodes: [document.querySelector('#cancellationMermaid')] })
+  await renderMermaidDiagram(mermaidDefinition)
 }
 
 function syncControls() {

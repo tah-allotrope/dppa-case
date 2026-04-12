@@ -71,6 +71,7 @@ describe('selected-hour layout', () => {
     )
 
     expect(document.querySelector('#walkthroughCases').textContent).toContain('Net = EVN + Developer')
+    expect(document.querySelector('#walkthroughCases').textContent).toContain('FMP cancellation')
     // Payment build-up is in the details panel
     expect(document.querySelector('#selectedHourDetailsPanel .settlement-grid')).not.toBeNull()
     expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('Payment to EVN per kWh of factory load')
@@ -89,8 +90,9 @@ describe('selected-hour layout', () => {
 
     const settlement = calculateSettlement(inputs)
     const selectedCase = buildSelectedWalkthroughCase(inputs, settlement.intervals[1])
+    const formulas = buildFormulaBreakdown(inputs, settlement.intervals[1])
 
-    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND')
+    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', formulas)
 
     const text = normalizedText('#walkthroughCases')
 
@@ -101,8 +103,10 @@ describe('selected-hour layout', () => {
     expect(text).toContain('Developer =')
     expect(text).toContain('− FMP (1,190.00 VND/kWh) × 4,700 kWh + Strike (1,741.35 VND/kWh) × 4,700 kWh')
     expect(text).toContain('EVN = FMP (1,190.00 VND/kWh) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh =')
+    expect(text).toContain('FMP cancellation')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-cancelled-term')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-retained-term')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('cancel-term-cancel')
     expect(document.querySelectorAll('#walkthroughCases .walkthrough-card')).toHaveLength(1)
   })
 
@@ -140,7 +144,7 @@ describe('selected-hour layout', () => {
       inputs,
     )
 
-    renderFormulas(breakdown, '', 'VND')
+    const mermaidDefinition = renderFormulas(breakdown, '', 'VND')
 
     const text = normalizedText('#walkthroughCases')
 
@@ -148,8 +152,88 @@ describe('selected-hour layout', () => {
     expect(text).toContain('EVN = FMP (1,224.00 VND/kWh) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh')
     expect(text).toContain('Developer =')
     expect(text).toContain('− FMP (1,224.00 VND/kWh) × 4,700 kWh + Strike (1,741.35 VND/kWh) × 4,700 kWh')
+    expect(text).toContain('FMP cancellation')
+    expect(text).toContain('per kWh on factory load')
+    expect(text).toContain('EVN')
+    expect(text).toContain('Developer')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-cancelled-term')
-    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-retained-term result')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-retained-term default')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('cancel-term-cancel')
+    expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain('net-retained-term result">CDPPA')
+    expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain('net-retained-term warning')
+    expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain('net-retained-term accent')
+    expect(mermaidDefinition).toContain('flowchart LR')
     expect(document.querySelector('#cancellationMermaid').textContent).toContain('flowchart LR')
+  })
+
+  it('keeps the cancellation strip and neutral retained terms in a shortfall hour', () => {
+    document.body.innerHTML = '<div id="walkthroughCases"></div>'
+
+    const inputs = {
+      loadProfile: [6100],
+      generationProfile: [4200],
+      settlementMode: 'matched',
+      strikePrice: 1741.35,
+      marketPrice: 1700,
+      fmpCurve: buildFmpCurve(1700),
+      dppaCharge: 523.34,
+      lossFactor: 1.027263,
+      retailTariff: 1833,
+    }
+
+    const settlement = calculateSettlement(inputs)
+    const interval = settlement.intervals[0]
+    const breakdown = buildFormulaBreakdown(inputs, interval)
+    const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
+
+    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
+
+    const text = normalizedText('#walkthroughCases')
+    const html = document.querySelector('#walkthroughCases').innerHTML
+
+    expect(text).toContain('Load > Gen')
+    expect(text).toContain('Retail (1,833.00 VND/kWh) × 1,900 kWh')
+    expect(text).toContain('Loss adj.')
+    expect(text).toContain('FMP cancellation — per kWh on factory load')
+    expect(html).toContain('cancel-term-retail')
+    expect(html).toContain('cancel-term-loss')
+    expect(html).toContain('net-cancelled-term')
+    expect(html).toContain('net-retained-term default')
+    expect(html).not.toContain('net-retained-term result')
+    expect(html).not.toContain('net-retained-term warning')
+    expect(html).not.toContain('net-retained-term accent')
+  })
+
+  it('uses the clicked interval FMP in selected-hour detail formulas', () => {
+    document.body.innerHTML = '<div id="selectedHourDetailsPanel"></div>'
+
+    const inputs = {
+      loadProfile: [4700],
+      generationProfile: [4700],
+      settlementMode: 'matched',
+      strikePrice: 1741.35,
+      marketPrice: 1700,
+      fmpCurve: buildFmpCurve(1700),
+      dppaCharge: 523.34,
+      lossFactor: 1.027263,
+      retailTariff: 1833,
+    }
+
+    const settlement = calculateSettlement(inputs)
+    const interval = settlement.intervals[0]
+
+    renderSelectedHourDetails(
+      document.querySelector('#selectedHourDetailsPanel'),
+      interval,
+      'VND',
+      inputs,
+    )
+
+    const text = normalizedText('#selectedHourDetailsPanel')
+
+    expect(interval.fmp).toBe(1224)
+    expect(text).toContain('1,257.37 VND/kWh')
+    expect(text).toContain('(1,741.35 VND/kWh - 1,224.00 VND/kWh)')
+    expect(text).not.toContain('(1,741.35 VND/kWh - 1,700.00 VND/kWh)')
   })
 })

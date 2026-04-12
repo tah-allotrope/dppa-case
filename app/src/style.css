@@ -217,7 +217,7 @@ h3 { font-size: 1.02rem; }
 /* chart and walkthrough panel side-by-side on desktop */
 .chart-walkthrough-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(380px, 0.8fr);
+  grid-template-columns: minmax(0, 1.58fr) minmax(430px, 0.86fr);
   gap: 14px;
   align-items: stretch;
 }
@@ -230,7 +230,7 @@ h3 { font-size: 1.02rem; }
   margin-top: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  max-height: 440px;
+  max-height: 560px;
   min-width: 0;
 }
 
@@ -299,15 +299,16 @@ h3 { font-size: 1.02rem; }
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+  margin-top: 8px;
 }
 
 .walkthrough-card {
   border: 1px solid var(--line);
   border-radius: 22px;
-  padding: 12px;
+  padding: 18px 16px 16px;
   background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
   display: grid;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -323,8 +324,12 @@ h3 { font-size: 1.02rem; }
 .walkthrough-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
+  gap: 14px;
   align-items: start;
+}
+
+.walkthrough-head > div {
+  min-width: 0;
 }
 
 .walkthrough-hour {
@@ -342,12 +347,12 @@ h3 { font-size: 1.02rem; }
 .walkthrough-metrics {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .walkthrough-lines {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   font-size: 0.86rem;
   line-height: 1.5;
   min-width: 0;
@@ -366,18 +371,18 @@ h3 { font-size: 1.02rem; }
 }
 
 .walkthrough-panel h2 {
-  font-size: 0.94rem;
-  line-height: 1.12;
-  max-width: 13ch;
+  font-size: 1rem;
+  line-height: 1.22;
+  max-width: 22ch;
   overflow-wrap: anywhere;
 }
 
 .net-row {
-  margin-top: 2px;
+  margin-top: 4px;
   border-top: 1px solid rgba(255,255,255,0.10);
-  padding-top: 8px;
+  padding-top: 10px;
   display: grid;
-  gap: 6px;
+  gap: 7px;
 }
 
 .developer-total {
@@ -412,7 +417,7 @@ h3 { font-size: 1.02rem; }
   display: inline-flex;
   align-items: center;
   border-radius: 10px;
-  padding: 0.1rem 0.28rem;
+  padding: 0.05rem 0;
   min-width: 0;
 }
 
@@ -426,20 +431,6 @@ h3 { font-size: 1.02rem; }
 
 .net-retained-term {
   color: rgba(244, 251, 255, 0.96);
-}
-
-.net-retained-term.result {
-  color: #ff6d79;
-  font-weight: 800;
-}
-
-.net-retained-term.warning {
-  color: #ffd27a;
-  font-weight: 700;
-}
-
-.net-retained-term.loss {
-  color: rgba(207, 219, 235, 0.82);
 }
 
 .net-operator {
@@ -823,12 +814,14 @@ h3 { font-size: 1.02rem; }
   padding: 8px;
   background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mermaid {
   margin-top: 4px;
   overflow-x: auto;
   zoom: 0.82;
+  min-width: 640px;
 }
 
 .explain-list {
@@ -1215,12 +1208,12 @@ h3 { font-size: 1.02rem; }
   }
 
   .walkthrough-card {
-    padding: 10px;
-    gap: 7px;
+    padding: 12px;
+    gap: 8px;
   }
 
   .walkthrough-metrics {
-    gap: 5px;
+    gap: 6px;
   }
 
   .walkthrough-lines {
@@ -1236,13 +1229,13 @@ h3 { font-size: 1.02rem; }
 
   .net-cancelled-term,
   .net-retained-term {
-    padding: 0.08rem 0.22rem;
+    padding: 0;
   }
 
   /* Mermaid: keep text readable with horizontal pan inside the card */
   .mermaid {
-    zoom: 0.72;
-    min-width: 520px;
+    zoom: 0.9;
+    min-width: 700px;
   }
 
   /* FMP cancellation strip: let chips shrink freely, allow label wrapping */
@@ -1283,8 +1276,8 @@ h3 { font-size: 1.02rem; }
 
   /* Mermaid: preserve readability on extra-small phones */
   .mermaid {
-    zoom: 0.66;
-    min-width: 500px;
+    zoom: 0.84;
+    min-width: 660px;
   }
 
   /* Chart wrap: cap height a bit tighter on small phones */

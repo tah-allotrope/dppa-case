@@ -221,3 +221,22 @@
 - Tightened the walkthrough panel sizing: desktop column widened from the prior overly-narrow formula box, title copy shortened, step badge removed, and the panel now reads more like a compact explanation than a mini-dashboard.
 - Mobile browser review at `390x844` confirmed the previous overlap issue is resolved; the Net equation now wraps into readable chips instead of collapsing into overlapping inline text.
 - Desktop browser review at `1440x1200` confirmed the walkthrough panel no longer feels as clunky, though the selected-hour card remains intentionally compact to preserve chart dominance.
+
+## Walkthrough Strip Restore + Scenario QA
+
+### Plan
+- [x] Update UI tests first to lock in the restored per-kWh FMP strip, calmer Net-term coloring, and roomier walkthrough header/card spacing.
+- [x] Restore the per-kWh FMP cancellation strip in the walkthrough panel while keeping the compact inline Net equation.
+- [x] Relax the walkthrough panel header/card spacing so the outline no longer feels cramped around `Load-vs-generation cases` and the selected-case heading.
+- [x] Restrict red emphasis in the Net equation to struck-through cancelled FMP terms only; retained `CDPPA`, `Strike`, `Retail`, and `Loss adj.` terms should stay neutral.
+- [x] Verify Mermaid behavior on mobile in-browser and fix any rendering or readability regressions.
+- [x] Click through all three load-vs-generation scenarios and multiple graph points to identify formatting bugs, repeated text, or scenario-specific issues.
+- [ ] Run `npm test -- --run`, `npm run build`, deploy to Firebase Hosting, then commit and push.
+
+### Review / Results
+- Restored the per-kWh FMP cancellation strip directly below the clicked-hour walkthrough card and kept the inline Net algebra above it.
+- Walkthrough spacing was relaxed by increasing card padding and desktop panel height so the section no longer feels boxed-in around `Load-vs-generation cases`, `Clicked-hour cancellation view`, and the selected case header.
+- Red emphasis in the Net algebra is now limited to the struck-through cancelled FMP terms; retained `CDPPA`, `Strike`, `Retail`, and `Loss adj.` terms stay neutral white.
+- Browser QA found a real Mermaid interaction bug: after scenario/hour changes the diagram sometimes fell back to raw Mermaid source text instead of SVG. Fixed by switching from repeated `mermaid.run()` calls to explicit `mermaid.render()` with a render token guard in `app/src/main.js`.
+- Mobile browser review at `390x844` now shows Mermaid rendering as SVG with horizontal overflow available inside `.mermaid-card`; the remaining limitation is readability, not functional failure.
+- Full scenario click-through across all three tabs and multiple graph points confirmed the selected card updates correctly for under-supply, balanced, and over-supply hours. Expected repeated under-supply wording still appears at night because solar generation is zero in every scenario, but no scenario-specific logic bugs were found in the walkthrough or details panels.
