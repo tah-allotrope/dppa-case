@@ -580,6 +580,12 @@ h3 { font-size: 1.02rem; }
   margin-bottom: 12px;
 }
 
+.fmp-cancel-context {
+  font-size: 0.68rem;
+  color: rgba(244, 251, 255, 0.68);
+  line-height: 1.35;
+}
+
 .fmp-cancel-title {
   font-size: 0.72rem;
   font-weight: 700;

@@ -277,7 +277,7 @@ export function buildFormulaBreakdown(inputs, interval) {
   const alignedVol = Math.min(interval.matched, interval.contractQuantity)
   const fmpCancellationSteps = [
     {
-      label: 'FMP × matched',
+      label: 'FMP ref × matched/load',
       owner: 'EVN',
       termVolume: interval.matched,
       termRate: fmp,
@@ -285,7 +285,7 @@ export function buildFormulaBreakdown(inputs, interval) {
       role: 'shown',
     },
     {
-      label: '− FMP × aligned',
+      label: 'FMP ref × aligned/load',
       owner: 'Developer',
       termVolume: alignedVol,
       termRate: fmp,
@@ -293,7 +293,7 @@ export function buildFormulaBreakdown(inputs, interval) {
       role: 'cancel',
     },
     {
-      label: 'Strike × contract',
+      label: 'Strike × contract/load',
       owner: 'Developer',
       termVolume: interval.contractQuantity,
       termRate: inputs.strikePrice,
@@ -301,7 +301,7 @@ export function buildFormulaBreakdown(inputs, interval) {
       role: 'strike',
     },
     {
-      label: 'DPPA charge',
+      label: 'DPPA charge × matched/load',
       owner: 'EVN',
       termVolume: interval.matched,
       termRate: inputs.dppaCharge,
@@ -309,7 +309,7 @@ export function buildFormulaBreakdown(inputs, interval) {
       role: 'charge',
     },
     {
-      label: 'Loss adj.',
+      label: 'Loss adj. on load',
       owner: 'EVN',
       termVolume: null,
       termRate: null,
@@ -317,7 +317,7 @@ export function buildFormulaBreakdown(inputs, interval) {
       role: 'loss',
     },
     ...(interval.shortfall > 0 ? [{
-      label: 'Shortfall retail',
+      label: 'Shortfall retail/load',
       owner: 'EVN',
       termVolume: interval.shortfall,
       termRate: inputs.retailTariff,
@@ -377,4 +377,3 @@ export function buildFormulaBreakdown(inputs, interval) {
     mismatchVolume,
   }
 }
-

@@ -256,3 +256,19 @@
 - Browser QA confirmed the new strike-through treatment appears in both zero-value and non-zero matched cases.
 - The current synthetic profiles already include matched hours with `FMP < strike`; the balanced scenario at `07:00 - 08:00` shows matched volume with positive developer settlement, so no scenario-data change was needed.
 - Verified in-browser that the below-strike matched hour uses the correct positive developer formula and still shows the expected cancellation effect strip and clean-cancellation note.
+
+## Mermaid + FMP Alignment Review Round
+
+### Plan
+- [x] Update tests first for the Mermaid flow wording, stronger below-strike matched-hour visibility, and FMP-cancellation strip labels that reconcile selected graph FMP with per-load values.
+- [x] Rewrite the Mermaid clean-cancellation flow so the diagram itself explicitly shows the spot/FMP reference appearing on EVN, then canceling against the aligned developer volume.
+- [x] Adjust the default synthetic FMP curve so matched DPPA hours spend more visible time below strike while still crossing above strike later in the day.
+- [x] Tighten the FMP cancellation strip copy so each case shows the actual selected-hour FMP from the graph and explains why the displayed per-load amount can differ from the raw FMP.
+- [x] Run tests, build, deploy, then commit and sync the changes.
+
+### Review / Results
+- `app/src/modules/ui.js` now makes the Mermaid clean-cancellation flow say the spot/FMP reference is shown on EVN and then canceled on aligned volume inside the diagram itself, instead of only mentioning that in the note below.
+- `app/src/data/default-scenarios.js` now uses a 24-point synthetic FMP curve with a longer below-strike morning run, so the default matched story shows several below-strike hours before crossing above strike later in the day.
+- `app/src/modules/settlement.js` and `app/src/modules/ui.js` now label the cancellation strip as load-normalized contributions and surface the selected graph FMP explicitly, which resolves the confusion between raw graph FMP and per-kWh-on-load amounts across clean and shortfall cases.
+- `app/src/modules/ui.test.js` and `app/src/modules/profiles.test.js` were updated first and now pass against the revised behavior, including the 24-hour curve length, repeated below-strike matched hours, and the new Mermaid wording.
+- Verification passed: `npm test`, `npm run build`, and `firebase deploy --only hosting --project dppa-case` succeeded in `app/`.

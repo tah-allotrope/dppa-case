@@ -5,14 +5,11 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour)
 // The pattern mirrors Vietnamese tariff bands so CFO can see cancellation working
 // in both directions across the 24-hour settlement window.
 const FMP_SHAPE = [
-  0.72, 0.70, 0.69, 0.70, 0.74, // 00–04  off-peak: ~1200-1260
-  0.85, 0.93, 1.02, 1.10, 1.18, // 04–09  standard morning → rising through strike
-  1.32, 1.28,                    // 09–11  peak: ~2240-2375, well above strike
-  1.18, 1.14, 1.12, 1.10, 1.08, // 11–16  standard midday: moderate above strike
-  1.08,                          // 16     shoulder
-  1.38, 1.44, 1.35,              // 17–20  evening peak: highest FMP
-  1.12, 0.94,                    // 20–22  standard evening: falling back
-  0.82, 0.75,                    // 22–24  off-peak night: below strike again
+  0.70, 0.69, 0.68, 0.69, 0.72, // 00–04  off-peak: well below strike
+  0.78, 0.84, 0.88, 0.92, 0.97, // 05–09  matched hours stay below strike longer
+  1.00, 1.04, 1.08, 1.11, 1.15, // 10–14  crossing through strike into midday
+  1.18, 1.22, 1.28, 1.36, 1.42, // 15–19  afternoon to evening peak
+  1.30, 1.08, 0.92, 0.80,       // 20–23  easing back toward off-peak
 ]
 
 export function buildFmpCurve(midpoint) {

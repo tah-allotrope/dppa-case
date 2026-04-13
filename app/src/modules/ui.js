@@ -35,7 +35,7 @@ const ROLE_META = {
   retail: { cls: 'cancel-term-retail', sign: '+', title: 'Shortfall kWh still bought at retail tariff' },
 }
 
-function fmpCancelStrip(steps, resultValue, currency) {
+function fmpCancelStrip(steps, resultValue, currency, selectedFmp) {
   const terms = steps.map((step) => {
     const meta = ROLE_META[step.role] || ROLE_META.loss
     const valueStr = formatMoney(Math.abs(step.value), { currency, precise: true, perKwh: true })
@@ -55,6 +55,8 @@ function fmpCancelStrip(steps, resultValue, currency) {
     <div class="fmp-cancel-strip">
       <div class="fmp-cancel-header">
         <span class="fmp-cancel-title">FMP cancellation — per kWh on factory load</span>
+        <span class="fmp-cancel-context">Selected graph FMP: ${formatMoney(selectedFmp, { currency, precise: true, perKwh: true })}</span>
+        <span class="fmp-cancel-context">Boxes below are load-normalized contributions, so they can be smaller than the raw graph FMP.</span>
       </div>
       <div class="fmp-cancel-equation">
         ${terms}
@@ -308,20 +310,20 @@ export function renderWalkthroughCases(container, selectedCase, currency, formul
     return
   }
   const strip = formulas && formulas.fmpCancellationSteps
-    ? fmpCancelStrip(formulas.fmpCancellationSteps, formulas.dppaUnitCost, currency)
+    ? fmpCancelStrip(formulas.fmpCancellationSteps, formulas.dppaUnitCost, currency, formulas.marketPrice)
     : ''
   container.innerHTML = walkthroughCaseCard(selectedCase, currency, formulas) + strip
 }
 
 export function renderFormulas(result, warningText, currency) {
   const mermaidDefinition = result.cleanCancellation
-    ? `flowchart LR\nA[BAU retail payment\n${formatNumber(result.load)} kWh x ${formatMoney(result.retailTariff, { currency, precise: true, perKwh: true })}\n= ${formatMoney(result.bauCost, { currency })}] --> B[Selected hour comparison]\nC[DPPA matched market\n${formatNumber(result.matched)} kWh x ${formatMoney(result.marketPrice, { currency, precise: true, perKwh: true })}] --> D[Market reference cancels]\nE[Developer CfD swap\n${formatNumber(result.contractQuantity)} kWh x ${formatMoney(result.developerSwapPerContract, { currency, precise: true, perKwh: true, signed: true })}] --> D\nD --> F[Keep strike + DPPA + loss]\nF --> G[DPPA payment\n${formatMoney(result.dppaCost, { currency })}]\nG --> B\nB --> H[Savings vs BAU\n${formatMoney(result.savingsVsBau, { currency, signed: true })}]`
+    ? `flowchart LR\nA[BAU retail payment\n${formatNumber(result.load)} kWh x ${formatMoney(result.retailTariff, { currency, precise: true, perKwh: true })}\n= ${formatMoney(result.bauCost, { currency })}] --> B[Selected hour comparison]\nC[Spot reference shown on EVN\n${formatNumber(result.matched)} kWh x ${formatMoney(result.marketPrice, { currency, precise: true, perKwh: true })}] --> D[Canceled on aligned volume\n${formatNumber(result.cleanCancelledEnergy)} kWh]\nE[Developer CfD swap\n- ${formatNumber(result.cleanCancelledEnergy)} kWh x ${formatMoney(result.marketPrice, { currency, precise: true, perKwh: true })}\n+ ${formatNumber(result.contractQuantity)} kWh x ${formatMoney(result.strikePrice, { currency, precise: true, perKwh: true })}] --> D\nD --> F[Keep strike + DPPA charge + loss]\nF --> G[DPPA payment\n${formatMoney(result.dppaCost, { currency })}]\nG --> B\nB --> H[Savings vs BAU\n${formatMoney(result.savingsVsBau, { currency, signed: true })}]`
     : `flowchart LR\nA[BAU retail payment\n${formatMoney(result.bauCost, { currency })}] --> B[Selected hour comparison]\nC[Matched volume\n${formatNumber(result.matched)} kWh] --> D[Cancellation only applies here]\nE[Contracted volume\n${formatNumber(result.contractQuantity)} kWh] --> D\nD --> F[Volume mismatch\n${formatNumber(Math.abs(result.mismatchVolume))} kWh]\nF --> G[Uncancelled exposure stays]\nG --> H[DPPA payment\n${formatMoney(result.dppaCost, { currency })}]\nH --> B\nB --> I[Savings vs BAU\n${formatMoney(result.savingsVsBau, { currency, signed: true })}]`
 
   document.querySelector('#cancellationMermaid').textContent = mermaidDefinition
 
   const note = result.cleanCancellation
-    ? `Clean cancellation: spot reference is shown then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment.`
+    ? `Clean cancellation: the spot/FMP reference is shown on EVN, then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment.`
     : `Partial cancellation: mismatch volume keeps some uncancelled exposure, so rely on the actual selected-hour DPPA payment.`
   const warningSuffix = warningText ? ` ${warningText}` : ''
   document.querySelector('#mermaidInlineNote').textContent = `${note}${warningSuffix}`

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { deriveVolumes, scaleProfile, sumVolume } from './profiles'
-import { buildFmpCurve } from '../data/default-scenarios'
+import { buildFmpCurve, defaultInputs, scenarioProfiles } from '../data/default-scenarios'
+import { calculateSettlement } from './settlement'
 
 describe('scaleProfile', () => {
   it('scales each value by the given factor and rounds to integer', () => {
@@ -55,10 +56,9 @@ describe('sumVolume', () => {
 })
 
 describe('buildFmpCurve', () => {
-  it('returns one value per FMP_SHAPE entry (25 entries for 24-hour shape array)', () => {
+  it('returns one value per hour in the 24-hour shape', () => {
     const curve = buildFmpCurve(1700)
-    // FMP_SHAPE has 25 multipliers — one per shaped segment as defined in default-scenarios.js
-    expect(curve).toHaveLength(25)
+    expect(curve).toHaveLength(24)
   })
 
   it('scales proportionally: off-peak hours are well below the midpoint', () => {
@@ -90,5 +90,18 @@ describe('buildFmpCurve', () => {
     curve.forEach((val) => {
       expect(Number.isInteger(val)).toBe(true)
     })
+  })
+
+  it('keeps several matched balanced-scenario hours below strike by default', () => {
+    const inputs = {
+      ...defaultInputs,
+      loadProfile: scenarioProfiles.balanced.loadProfile,
+      generationProfile: scenarioProfiles.balanced.generationProfile,
+    }
+
+    const settlement = calculateSettlement(inputs)
+    const belowStrikeMatchedHours = settlement.intervals.filter((iv) => iv.matched > 0 && iv.fmp < inputs.strikePrice)
+
+    expect(belowStrikeMatchedHours.length).toBeGreaterThanOrEqual(4)
   })
 })
