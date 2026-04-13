@@ -681,6 +681,17 @@ h3 { font-size: 1.02rem; }
   text-shadow: 0 0 12px rgba(255, 185, 30, 0.5);
 }
 
+.cancel-term-crossed .cancel-eq-value,
+.cancel-term-crossed .cancel-eq-owner {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.cancel-term-shown.cancel-term-crossed .cancel-eq-value,
+.cancel-term-shown.cancel-term-crossed .cancel-eq-owner {
+  text-decoration-color: rgba(255, 185, 30, 0.9);
+}
+
 /* FMP cancellation term — red with strikethrough on the value */
 .cancel-term-cancel {
   background: rgba(255, 80, 80, 0.10);
@@ -690,10 +701,11 @@ h3 { font-size: 1.02rem; }
 }
 .cancel-term-cancel .cancel-eq-value {
   color: rgb(255, 110, 110);
-  text-decoration: line-through;
   text-decoration-color: rgba(255, 80, 80, 0.9);
-  text-decoration-thickness: 2px;
   text-shadow: 0 0 10px rgba(255, 60, 60, 0.4);
+}
+.cancel-term-cancel.cancel-term-crossed .cancel-eq-owner {
+  text-decoration-color: rgba(255, 80, 80, 0.9);
 }
 .cancel-term-cancel .cancel-eq-label::before {
   content: '✕ ';

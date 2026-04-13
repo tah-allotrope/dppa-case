@@ -240,3 +240,19 @@
 - Browser QA found a real Mermaid interaction bug: after scenario/hour changes the diagram sometimes fell back to raw Mermaid source text instead of SVG. Fixed by switching from repeated `mermaid.run()` calls to explicit `mermaid.render()` with a render token guard in `app/src/main.js`.
 - Mobile browser review at `390x844` now shows Mermaid rendering as SVG with horizontal overflow available inside `.mermaid-card`; the remaining limitation is readability, not functional failure.
 - Full scenario click-through across all three tabs and multiple graph points confirmed the selected card updates correctly for under-supply, balanced, and over-supply hours. Expected repeated under-supply wording still appears at night because solar generation is zero in every scenario, but no scenario-specific logic bugs were found in the walkthrough or details panels.
+
+## Formula Dedup + Below-Strike Match Check
+
+### Plan
+- [x] Update UI tests first to prevent duplicated Net formulas in zero-contract / zero-match edge cases and to require the new EVN-side strikethrough treatment in the per-kWh cancellation strip.
+- [x] Fix repeated Net lines in the load-vs-generation walkthrough so cases like pure retail fallback do not render the same retained formula twice.
+- [x] Add the requested EVN-side strikethrough emphasis inside the FMP cancellation strip across all cases, including zero-value matched slices.
+- [x] Verify whether any existing scenario contains matched hours where `FMP < strike`; if not, adjust the synthetic scenarios so at least one matched hour demonstrates below-strike settlement and cancellation behavior.
+- [ ] Run targeted browser QA across the graph and scenario tabs, then run tests, build, deploy, commit, and push.
+
+### Review / Results
+- The load-vs-generation Net section now suppresses duplicate algebra in retail-only fallback cases, so the same retained formula is not shown twice before the final total.
+- The per-kWh cancellation strip now strikes through both cancelling FMP references: the EVN-side `FMP x matched` term and the developer-side `- FMP x aligned` term.
+- Browser QA confirmed the new strike-through treatment appears in both zero-value and non-zero matched cases.
+- The current synthetic profiles already include matched hours with `FMP < strike`; the balanced scenario at `07:00 - 08:00` shows matched volume with positive developer settlement, so no scenario-data change was needed.
+- Verified in-browser that the below-strike matched hour uses the correct positive developer formula and still shows the expected cancellation effect strip and clean-cancellation note.

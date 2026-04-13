@@ -40,8 +40,9 @@ function fmpCancelStrip(steps, resultValue, currency) {
     const meta = ROLE_META[step.role] || ROLE_META.loss
     const valueStr = formatMoney(Math.abs(step.value), { currency, precise: true, perKwh: true })
     const sign = step.role === 'cancel' ? '−' : (meta.sign || '+')
+    const crossed = step.role === 'shown' || step.role === 'cancel' ? ' cancel-term-crossed' : ''
     return `
-      <span class="cancel-eq-term ${meta.cls}" title="${meta.title}">
+      <span class="cancel-eq-term ${meta.cls}${crossed}" title="${meta.title}">
         <span class="cancel-eq-owner">${step.owner || 'Net'}</span>
         <span class="cancel-eq-sign">${sign}</span>
         <span class="cancel-eq-value">${valueStr}</span>
@@ -121,6 +122,8 @@ function buildNetEquations(item, formulas, currency) {
   return {
     expanded: joinNetTerms(visibleTerms),
     simplified: joinNetTerms(retainedTerms),
+    showExpanded: visibleTerms.filter(Boolean).length > 0,
+    showSimplified: retainedTerms.filter(Boolean).length > 0 && joinNetTerms(visibleTerms) !== joinNetTerms(retainedTerms),
   }
 }
 
@@ -164,8 +167,8 @@ function walkthroughCaseCard(item, currency, formulas) {
 
         <div class="net-row">
           <p class="wl-eq-head net-label">Net = EVN + Developer =</p>
-          <p class="net-formula-line"><span class="net-equals">=</span>${netEquations.expanded}</p>
-          <p class="net-formula-line net-formula-simplified"><span class="net-equals">=</span>${netEquations.simplified}<span class="net-equals">=</span><strong class="net-total">${fmtT(netTotal)}</strong></p>
+          ${netEquations.showExpanded ? `<p class="net-formula-line"><span class="net-equals">=</span>${netEquations.expanded}${!netEquations.showSimplified ? `<span class="net-equals">=</span><strong class="net-total">${fmtT(netTotal)}</strong>` : ''}</p>` : ''}
+          ${netEquations.showSimplified ? `<p class="net-formula-line net-formula-simplified"><span class="net-equals">=</span>${netEquations.simplified}<span class="net-equals">=</span><strong class="net-total">${fmtT(netTotal)}</strong></p>` : ''}
         </div>
       </div>
     </article>

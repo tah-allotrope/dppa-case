@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
 import { buildFmpCurve, defaultInputs, scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios'
+import { formatMoney } from './formatters'
 import { buildSelectedWalkthroughCase, calculateSettlement, buildFormulaBreakdown } from './settlement'
 import { renderAppShell, renderFormulas, renderSelectedHourDetails, renderWalkthroughCases } from './ui'
 
@@ -202,6 +203,69 @@ describe('selected-hour layout', () => {
     expect(html).not.toContain('net-retained-term result')
     expect(html).not.toContain('net-retained-term warning')
     expect(html).not.toContain('net-retained-term accent')
+  })
+
+  it('avoids repeating the same retail-only net formula twice', () => {
+    document.body.innerHTML = '<div id="walkthroughCases"></div>'
+
+    const inputs = {
+      loadProfile: [2600],
+      generationProfile: [0],
+      settlementMode: 'matched',
+      strikePrice: 1741.35,
+      marketPrice: 1700,
+      fmpCurve: buildFmpCurve(1700),
+      dppaCharge: 523.34,
+      lossFactor: 1.027263,
+      retailTariff: 1833,
+    }
+
+    const settlement = calculateSettlement(inputs)
+    const interval = settlement.intervals[0]
+    const breakdown = buildFormulaBreakdown(inputs, interval)
+    const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
+
+    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
+
+    const netLines = document.querySelectorAll('#walkthroughCases .net-formula-line')
+    const text = normalizedText('#walkthroughCases')
+
+    expect(netLines).toHaveLength(1)
+    expect(text).toContain('Net = EVN + Developer = =Retail (1,833.00 VND/kWh) × 2,600 kWh=4,765,800 VND')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('cancel-term-shown cancel-term-crossed')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('cancel-term-cancel cancel-term-crossed')
+  })
+
+  it('keeps a matched below-strike hour visible in the settlement story', () => {
+    document.body.innerHTML = `
+      <div id="walkthroughCases"></div>
+      <div id="mermaidInlineNote"></div>
+      <div id="cancellationMermaid"></div>
+    `
+
+    const scenario = scenarioProfiles.balanced
+    const inputs = {
+      ...defaultInputs,
+      loadProfile: scenario.loadProfile,
+      generationProfile: scenario.generationProfile,
+    }
+
+    const settlement = calculateSettlement(inputs)
+    const interval = settlement.intervals.find((iv) => iv.matched > 0 && iv.fmp < inputs.strikePrice)
+
+    expect(interval).toBeTruthy()
+    expect(interval.developer).toBeGreaterThan(0)
+
+    const breakdown = buildFormulaBreakdown(inputs, interval)
+    const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
+    const positiveSwapRate = formatMoney(inputs.strikePrice - interval.fmp, { currency: 'VND', precise: true, perKwh: true, signed: true })
+
+    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
+    const mermaidDefinition = renderFormulas(breakdown, '', 'VND')
+
+    expect(normalizedText('#walkthroughCases')).toContain(`Strike (1,741.35 VND/kWh) × ${interval.contractQuantity.toLocaleString()} kWh`)
+    expect(normalizedText('#walkthroughCases')).toContain(formatMoney(interval.developer, { currency: 'VND', signed: true }))
+    expect(mermaidDefinition).toContain(`Developer CfD swap\n${interval.contractQuantity.toLocaleString()} kWh x ${positiveSwapRate}`)
   })
 
   it('uses the clicked interval FMP in selected-hour detail formulas', () => {
