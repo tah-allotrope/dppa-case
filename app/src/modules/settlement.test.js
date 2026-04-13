@@ -177,9 +177,16 @@ describe('calculateSettlement', () => {
     expect(selectedCase.totalNoDppa).toBe(result.intervals[2].baseline)
   })
 
-  it('keeps the default strike price at 5% below the weighted retail tariff basis', async () => {
-    const { defaultInputs } = await import('../data/default-scenarios')
+  it('keeps the default pricing basis aligned with the reviewed 2025 example deck', async () => {
+    const { defaultInputs, settlementModes } = await import('../data/default-scenarios')
 
-    expect(defaultInputs.strikePrice).toBeCloseTo(defaultInputs.retailTariff * 0.95, 2)
+    expect(defaultInputs.strikePrice).toBe(2100)
+    expect(defaultInputs.retailTariff).toBe(2100)
+    expect(defaultInputs.dppaCharge).toBe(523.34)
+    expect(settlementModes.map((mode) => mode.label)).toEqual([
+      'Matched consumption only',
+      'Demo: generation volume',
+      'Demo: contracted allocation',
+    ])
   })
 })

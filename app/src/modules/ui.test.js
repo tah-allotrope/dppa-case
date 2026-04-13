@@ -33,7 +33,10 @@ describe('storytelling shell', () => {
     expect(document.querySelector('#dailyTotals')).toBeNull()
     expect(document.querySelector('#app').textContent).not.toContain('Cancellation effect')
     expect(document.querySelector('#retailTariff')).toBeNull()
-    expect(document.querySelector('#app').textContent).not.toContain('Weighted EVN tariff')
+    expect(document.querySelector('#app').textContent).toContain('2025 teaching assumptions')
+    expect(document.querySelector('#app').textContent).toContain('Illustrative tariff blocks')
+    expect(document.querySelector('#app').textContent).toContain('Synthetic FMP curve')
+    expect(document.querySelector('#app').textContent).not.toContain('weighted 22 kV to below 110 kV retail tariff')
     expect(document.querySelector('#app').textContent).not.toContain('Savings vs BAU')
   })
 })
@@ -94,6 +97,7 @@ describe('selected-hour layout', () => {
     const formulas = buildFormulaBreakdown(inputs, settlement.intervals[1])
     const interval = settlement.intervals[1]
     const fmpText = formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })
+    const strikeText = formatMoney(inputs.strikePrice, { currency: 'VND', precise: true, perKwh: true })
 
     renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', formulas)
 
@@ -104,7 +108,7 @@ describe('selected-hour layout', () => {
     expect(text).toContain('Net = EVN + Developer')
     expect(text).toContain(`FMP (${fmpText}) × Kpp (1.027) × 4,700 kWh`)
     expect(text).toContain('Developer =')
-    expect(text).toContain(`− FMP (${fmpText}) × 4,700 kWh + Strike (1,741.35 VND/kWh) × 4,700 kWh`)
+    expect(text).toContain(`− FMP (${fmpText}) × 4,700 kWh + Strike (${strikeText}) × 4,700 kWh`)
     expect(text).toContain(`EVN = FMP (${fmpText}) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh =`)
     expect(text).toContain('FMP cancellation')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-cancelled-term')
@@ -274,11 +278,12 @@ describe('selected-hour layout', () => {
     const breakdown = buildFormulaBreakdown(inputs, interval)
     const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
     const fmpText = formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })
+    const strikeText = formatMoney(inputs.strikePrice, { currency: 'VND', precise: true, perKwh: true })
 
     renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
     const mermaidDefinition = renderFormulas(breakdown, '', 'VND')
 
-    expect(normalizedText('#walkthroughCases')).toContain(`Strike (1,741.35 VND/kWh) × ${interval.contractQuantity.toLocaleString()} kWh`)
+    expect(normalizedText('#walkthroughCases')).toContain(`Strike (${strikeText}) × ${interval.contractQuantity.toLocaleString()} kWh`)
     expect(normalizedText('#walkthroughCases')).toContain(formatMoney(interval.developer, { currency: 'VND', signed: true }))
     expect(mermaidDefinition).toContain(`Developer CfD swap\n- ${interval.contractQuantity.toLocaleString()} kWh x ${fmpText}`)
   })

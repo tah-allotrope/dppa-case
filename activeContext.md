@@ -272,3 +272,19 @@
 - `app/src/modules/settlement.js` and `app/src/modules/ui.js` now label the cancellation strip as load-normalized contributions and surface the selected graph FMP explicitly, which resolves the confusion between raw graph FMP and per-kWh-on-load amounts across clean and shortfall cases.
 - `app/src/modules/ui.test.js` and `app/src/modules/profiles.test.js` were updated first and now pass against the revised behavior, including the 24-hour curve length, repeated below-strike matched hours, and the new Mermaid wording.
 - Verification passed: `npm test`, `npm run build`, and `firebase deploy --only hosting --project dppa-case` succeeded in `app/`.
+
+## DPPA Mechanism Review Against Extracted Sources
+
+### Plan
+- [x] Lock in test coverage for the policy-alignment fixes: remove misleading weighted-tariff claims, make time-band visuals clearly illustrative, and relabel non-core settlement modes as demo assumptions.
+- [x] Update the default pricing story so the app defaults align with the reviewed 2025 example inputs more closely and no longer imply unsupported tariff mechanics.
+- [x] Tighten the chart and UI copy so readers can distinguish synthetic demo inputs from documented DPPA mechanism elements.
+- [x] Run tests, build, and redeploy if anything changes, then commit and sync only the intended files.
+
+### Review / Results
+- Reviewed `extracted/simplified_settlement.txt`, `extracted/synthetic_policy.txt`, `extracted/ecoplexus_presentation.txt`, and `reports/2026-04-07-vietnam-dppa-buyer-guide.md` against the current app.
+- The core EVN + CfD algebra was already directionally correct, but the app overstated fidelity in three places: it claimed a weighted tariff basis while defaulting to `1,833`, it presented tariff blocks as if they were calculation inputs while using a flat tariff, and it exposed unsupported settlement-mode names too authoritatively.
+- `app/src/data/default-scenarios.js` now defaults to the reviewed 2025 example pricing basis (`strikePrice = 2100`, `retailTariff = 2100`, `dppaCharge = 523.34`) and labels the FMP curve as synthetic teaching data.
+- `app/src/modules/ui.js` and `app/src/modules/chart.js` now describe the app as a 2025 teaching model with illustrative tariff blocks and synthetic FMP, rather than implying full time-of-use tariff settlement accuracy.
+- `app/src/data/default-scenarios.js` and `app/src/modules/settlement.js` now keep only the supported core matched mode plus clearly-labeled demo assumption modes, removing the redundant `minimum` option.
+- Verification passed: `npm test`, `npm run build`, and `firebase deploy --only hosting --project dppa-case` succeeded in `app/`.

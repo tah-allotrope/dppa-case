@@ -5,7 +5,9 @@ let profileChart
 const neonGrid = 'rgba(160, 183, 217, 0.12)'
 const tickColor = '#bcd5ff'
 
-// Tariff time-band definitions matching the reference screenshot.
+// Illustrative tariff-style time blocks for storytelling only.
+// They help a CFO read the day shape, but the current app still uses a flat
+// retail tariff input rather than time-of-use tariff settlement.
 // startHour/endHour map to the 0-23 hour axis.
 const TARIFF_BANDS = [
   { label: 'Off-peak',  time: '10 pm – 4 am',     startHour: 0,  endHour: 4,  fill: 'rgba(71,215,255,0.06)',   lineColor: 'rgba(71,215,255,0.40)',  textColor: '#47d7ff' },
@@ -127,10 +129,10 @@ function makeTariffPlugin(getState) {
         }
 
         if (showRates) {
-          // Tariff rate
+          // Flat retail reference shown for context only in this v1 teaching model.
           ctx.font = '8px "Segoe UI", sans-serif'
           ctx.fillStyle = band.textColor
-          ctx.fillText(`${Math.round(state.inputs.retailTariff).toLocaleString()} VND/kWh`, cx, area.top + 27)
+          ctx.fillText(`Illustrative retail: ${Math.round(state.inputs.retailTariff).toLocaleString()}`, cx, area.top + 27)
 
           // Per-band FMP: use the midpoint hour of this band to read from fmpCurve
           const midHour = Math.floor((band.startHour + band.endHour) / 2)

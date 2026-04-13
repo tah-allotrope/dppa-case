@@ -2,8 +2,8 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour)
 
 // Synthetic daily FMP shape multipliers relative to the midpoint (marketPrice).
 // Values < 1 produce hours below strike; values > 1 produce hours above strike.
-// The pattern mirrors Vietnamese tariff bands so CFO can see cancellation working
-// in both directions across the 24-hour settlement window.
+// This is demo data for teaching the cancellation effect, not a published Vietnam
+// market curve or a tariff-rule input.
 const FMP_SHAPE = [
   0.70, 0.69, 0.68, 0.69, 0.72, // 00–04  off-peak: well below strike
   0.78, 0.84, 0.88, 0.92, 0.97, // 05–09  matched hours stay below strike longer
@@ -71,12 +71,12 @@ export const scenarioOrder = ['higherLoad', 'balanced', 'higherGen']
 
 export const defaultInputs = {
   scenarioId: 'balanced',
-  strikePrice: 1741.35,
+  strikePrice: 2100,
   marketPrice: 1700,
   fmpCurve: buildFmpCurve(1700),
   dppaCharge: 523.34,
   lossFactor: 1.027263,
-  retailTariff: 1833,
+  retailTariff: 2100,
   settlementMode: 'matched',
   currency: 'VND',
   detailView: 'flow',
@@ -85,9 +85,8 @@ export const defaultInputs = {
 
 export const settlementModes = [
   { value: 'matched', label: 'Matched consumption only' },
-  { value: 'allocated', label: 'Allocated generation' },
-  { value: 'generation', label: 'Generation regardless of consumption' },
-  { value: 'minimum', label: 'Minimum of load and generation' },
+  { value: 'generation', label: 'Demo: generation volume' },
+  { value: 'allocated', label: 'Demo: contracted allocation' },
 ]
 
 export const hours = HOURS

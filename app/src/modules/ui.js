@@ -186,7 +186,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
           <div>
             <p class="eyebrow">Rob — Vietnam synthetic DPPA</p>
             <h1>DPPA CFO visual explainer</h1>
-            <p class="hero-copy">Click any hour to compare BAU without DPPA against DPPA payment using the weighted 22 kV to below 110 kV retail tariff.</p>
+            <p class="hero-copy">Click any hour to compare the 2025 teaching-model baseline against DPPA payment using documented example inputs and synthetic hourly FMP.</p>
           </div>
         </div>
         <div class="topbar-actions">
@@ -293,10 +293,11 @@ export function renderAppShell(root, scenarios, settlementModes) {
           </label>
         </div>
         <div class="assumptions-inline">
-          <span>Hourly teaching model</span>
-          <span>Flat rates in v1</span>
+          <span>2025 teaching assumptions</span>
+          <span>Flat retail tariff in v1</span>
           <span>Internal math stays in VND</span>
-          <span>Default strike = 95% of weighted tariff</span>
+          <span>Illustrative tariff blocks</span>
+          <span>Synthetic FMP curve</span>
           <span>Click chart to inspect one hour</span>
         </div>
       </section>

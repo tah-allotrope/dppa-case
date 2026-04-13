@@ -28,12 +28,10 @@ export function determineContractQuantity(volume, settlementMode) {
   switch (settlementMode) {
     case 'matched':
       return volume.matched
-    case 'allocated':
-      return Math.round(volume.generation * 0.88)
     case 'generation':
       return volume.generation
-    case 'minimum':
-      return Math.min(volume.load, volume.generation)
+    case 'allocated':
+      return Math.round(volume.generation * 0.88)
     default:
       return volume.matched
   }
