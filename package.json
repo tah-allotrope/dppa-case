@@ -1,0 +1,24 @@
+{
+  "name": "dppa-case",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build-deck.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tah-allotrope/dppa-case.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tah-allotrope/dppa-case/issues"
+  },
+  "homepage": "https://github.com/tah-allotrope/dppa-case#readme",
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

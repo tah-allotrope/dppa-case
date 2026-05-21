@@ -1,0 +1,187 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - img "Allotrope logo" [ref=e6]
+      - generic [ref=e7]:
+        - paragraph [ref=e8]: Rob — Vietnam synthetic DPPA
+        - heading "DPPA CFO visual explainer" [level=1] [ref=e9]
+        - paragraph [ref=e10]: Click any hour to compare BAU without DPPA against DPPA payment using the weighted 22 kV to below 110 kV retail tariff.
+    - generic "Currency toggle" [ref=e12]:
+      - button "VND" [ref=e13] [cursor=pointer]
+      - button "USD" [ref=e14] [cursor=pointer]
+  - main [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e20]:
+            - paragraph [ref=e21]: Profiles
+            - heading "Load vs solar overlap" [level=2] [ref=e22]
+          - generic [ref=e23]:
+            - button "Load > Gen" [ref=e24] [cursor=pointer]
+            - button "Load = Gen" [ref=e25] [cursor=pointer]
+            - button "Load < Gen" [ref=e26] [cursor=pointer]
+          - generic "Load and generation chart" [ref=e28]
+        - generic [ref=e29]:
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: Load-vs-generation cases
+            - heading "Clicked-hour cancellation view" [level=2] [ref=e33]
+          - article [ref=e35]:
+            - generic [ref=e36]:
+              - generic [ref=e37]:
+                - paragraph [ref=e38]: Load = Gen
+                - heading "Balanced case" [level=3] [ref=e39]
+              - generic [ref=e40]: 12:00 - 13:00
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - generic [ref=e43]: Load
+                - strong [ref=e44]: 4,700 kWh
+              - generic [ref=e45]:
+                - generic [ref=e46]: Gen
+                - strong [ref=e47]: 4,700 kWh
+              - generic [ref=e48]:
+                - generic [ref=e49]: DPPA
+                - strong [ref=e50]: 4,700 kWh
+            - generic [ref=e51]:
+              - paragraph [ref=e52]:
+                - text: EVN = FMP (2,006.00 VND/kWh) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh =
+                - strong [ref=e53]: 12,144,939 VND
+              - paragraph [ref=e54]:
+                - text: Developer = − FMP (2,006.00 VND/kWh) × 4,700 kWh + Strike (1,741.35 VND/kWh) × 4,700 kWh =
+                - strong [ref=e55]: "-1,243,855 VND"
+              - generic [ref=e56]:
+                - paragraph [ref=e57]: Net = EVN + Developer =
+                - paragraph [ref=e58]:
+                  - generic [ref=e59]: =
+                  - generic [ref=e60]: FMP (2,006.00 VND/kWh) × Kpp (1.027) × 4,700 kWh
+                  - generic [ref=e61]: +
+                  - generic [ref=e62]: CDPPA (523.34 VND/kWh) × 4,700 kWh
+                  - generic [ref=e63]: +
+                  - generic [ref=e64]: − FMP (2,006.00 VND/kWh) × 4,700 kWh
+                  - generic [ref=e65]: +
+                  - generic [ref=e66]: Strike (1,741.35 VND/kWh) × 4,700 kWh
+                  - generic [ref=e67]: +
+                  - generic [ref=e68]: Loss adj. 257,041 VND
+                - paragraph [ref=e69]:
+                  - generic [ref=e70]: =
+                  - generic [ref=e71]: CDPPA (523.34 VND/kWh) × 4,700 kWh
+                  - generic [ref=e72]: +
+                  - generic [ref=e73]: Strike (1,741.35 VND/kWh) × 4,700 kWh
+                  - generic [ref=e74]: +
+                  - generic [ref=e75]: Loss adj. 257,041 VND
+                  - generic [ref=e76]: =
+                  - strong [ref=e77]: 10,901,084 VND
+      - generic [ref=e78]:
+        - generic [ref=e80]:
+          - paragraph [ref=e81]: Selected hour details
+          - heading "EVN and developer payment build-up" [level=2] [ref=e82]
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - paragraph [ref=e86]: Payment to EVN per kWh of factory load
+            - generic [ref=e87]:
+              - article [ref=e88]:
+                - generic [ref=e89]:
+                  - paragraph [ref=e90]: Matched market slice
+                  - strong [ref=e91]: 2,060.69 VND/kWh
+                - paragraph [ref=e92]: 4,700 / 4,700 x 1,746.35 VND/kWh
+                - generic [ref=e93]:
+                  - generic [ref=e94]: 4,700 matched kWh
+                  - strong [ref=e95]: 9,685,241 VND
+              - article [ref=e96]:
+                - generic [ref=e97]:
+                  - paragraph [ref=e98]: DPPA network charge
+                  - strong [ref=e99]: 523.34 VND/kWh
+                - paragraph [ref=e100]: 4,700 / 4,700 x 523.34 VND/kWh
+                - generic [ref=e101]:
+                  - generic [ref=e102]: 4,700 matched kWh
+                  - strong [ref=e103]: 2,459,698 VND
+              - article [ref=e104]:
+                - generic [ref=e105]:
+                  - paragraph [ref=e106]: Shortfall retail slice
+                  - strong [ref=e107]: 0.00 VND/kWh
+                - paragraph [ref=e108]: 0 / 4,700 x 1,833.00 VND/kWh
+                - generic [ref=e109]:
+                  - generic [ref=e110]: 0 shortfall kWh
+                  - strong [ref=e111]: 0 VND
+            - generic [ref=e112]:
+              - generic [ref=e113]: EVN total
+              - strong [ref=e114]: 2,584.03 VND/kWh
+              - generic [ref=e115]: 12,144,939 VND for 4,700 kWh load
+          - generic [ref=e116]:
+            - paragraph [ref=e117]: Payment to developer per kWh of factory load
+            - article [ref=e119]:
+              - generic [ref=e120]:
+                - paragraph [ref=e121]: CfD swap on contract quantity
+                - strong [ref=e122]: "-264.65 VND/kWh"
+              - paragraph [ref=e123]: 4,700 / 4,700 x (1,741.35 VND/kWh - 1,700.00 VND/kWh)
+              - generic [ref=e124]:
+                - generic [ref=e125]: 4,700 contracted kWh
+                - strong [ref=e126]: "-1,243,855 VND"
+            - generic [ref=e127]:
+              - generic [ref=e128]: Developer total
+              - strong [ref=e129]: "-264.65 VND/kWh"
+              - generic [ref=e130]: "-1,243,855 VND for 4,700 kWh load"
+  - generic [ref=e132]:
+    - generic [ref=e134]:
+      - paragraph [ref=e135]: Mermaid flow
+      - heading "Selected-hour cancellation logic flow" [level=2] [ref=e136]
+    - generic [ref=e137]:
+      - generic [ref=e138]: Mermaid logic flow
+      - document [ref=e140]:
+        - generic [ref=e148]:
+          - paragraph [ref=e155]:
+            - text: BAU retail payment
+            - text: 4,700 kWh x 1,833.00 VND/kWh
+            - text: = 8,615,100 VND
+          - paragraph [ref=e162]: Selected hour comparison
+          - paragraph [ref=e169]:
+            - text: DPPA matched market
+            - text: 4,700 kWh x 2,006.00 VND/kWh
+          - paragraph [ref=e176]: Market reference cancels
+          - paragraph [ref=e183]:
+            - text: Developer CfD swap
+            - text: 4,700 kWh x -264.65 VND/kWh
+          - paragraph [ref=e190]: Keep strike + DPPA + loss
+          - paragraph [ref=e197]:
+            - text: DPPA payment
+            - text: 10,901,084 VND
+          - paragraph [ref=e204]:
+            - text: Savings vs BAU
+            - text: "-2,285,984 VND"
+    - paragraph [ref=e205]: "Clean cancellation: spot reference is shown then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment. Current setup is more expensive than the no-DPPA baseline because either strike is high, DPPA charge is large, or matched volume is too low."
+  - generic [ref=e206]:
+    - generic [ref=e207]:
+      - generic [ref=e208]:
+        - paragraph [ref=e209]: Controls
+        - heading "Pricing assumptions" [level=2] [ref=e210]
+      - button "Reset defaults" [ref=e211] [cursor=pointer]
+    - generic [ref=e212]:
+      - generic [ref=e213]:
+        - generic [ref=e214]: Developer strike price
+        - slider "Developer strike price 1,741.35 VND/kWh" [ref=e215]: "1741.35"
+        - strong [ref=e216]: 1,741.35 VND/kWh
+      - generic [ref=e217]:
+        - generic [ref=e218]: Market price / FMP
+        - slider "Market price / FMP 1,700.00 VND/kWh" [ref=e219]: "1700"
+        - strong [ref=e220]: 1,700.00 VND/kWh
+      - generic [ref=e221]:
+        - generic [ref=e222]: DPPA charge
+        - slider "DPPA charge 523.34 VND/kWh" [ref=e223]: "523"
+        - strong [ref=e224]: 523.34 VND/kWh
+      - generic [ref=e225]:
+        - generic [ref=e226]: Loss factor
+        - slider "Loss factor 1.027" [ref=e227]: "1.027"
+        - strong [ref=e228]: "1.027"
+      - generic [ref=e229]:
+        - generic [ref=e230]: Settlement quantity mode
+        - combobox "Settlement quantity mode Matched consumption only" [ref=e231]:
+          - option "Matched consumption only" [selected]
+          - option "Allocated generation"
+          - option "Generation regardless of consumption"
+          - option "Minimum of load and generation"
+        - strong [ref=e232]: Matched consumption only
+    - generic [ref=e233]:
+      - generic [ref=e234]: Hourly teaching model
+      - generic [ref=e235]: Flat rates in v1
+      - generic [ref=e236]: Internal math stays in VND
+      - generic [ref=e237]: Default strike = 95% of weighted tariff
+      - generic [ref=e238]: Click chart to inspect one hour
