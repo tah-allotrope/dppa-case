@@ -288,3 +288,15 @@
 - `app/src/modules/ui.js` and `app/src/modules/chart.js` now describe the app as a 2025 teaching model with illustrative tariff blocks and synthetic FMP, rather than implying full time-of-use tariff settlement accuracy.
 - `app/src/data/default-scenarios.js` and `app/src/modules/settlement.js` now keep only the supported core matched mode plus clearly-labeled demo assumption modes, removing the redundant `minimum` option.
 - Verification passed: `npm test`, `npm run build`, and `firebase deploy --only hosting --project dppa-case` succeeded in `app/`.
+
+## 2026 Ref-Style Deck Build — Completed 2026-05-28
+
+Finished `build_2026_from_ref.py` (the in-place approach: open `ref/DPPA 2025 ref.pptx`, preserve real masters/logos/backgrounds/diagrams, replace content at existing shape positions, drop rendered PNG charts into the image slots). This is the chosen path over the from-scratch `build-2026-refstyle-presentation.js` (which caused the "generated-looking" problem).
+
+- Output: `dppa-2026-factory-energy-proposal.pptx` (13 slides), assets in `deck-qa/generated-2026/`.
+- Verified by rendering every slide to PNG via LibreOffice + PyMuPDF (`deck-qa/render-2026/`).
+- Fixed three layout bugs found in render QA:
+  - Slide 6 (Diurnal Profile): 2-line headline overflowed and collided with the chart → headline 18→15pt, chart nudged to y=1.74.
+  - Slide 9 (Feasibility table): 2-line headline collided with table top → headline 18→14pt, table moved to y=1.78.
+  - Slide 12 (Negotiation): stray inherited bullet on the reused textbox → added `suppress_bullet()` (buNone) in `set_text`.
+- All shape-index targets confirmed against the live ref deck; real payment-mechanism diagram (slide 5) and section dividers preserved intact.
