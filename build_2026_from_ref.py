@@ -196,10 +196,17 @@ def add_bullets(slide, x, y, w, h, items, size=9.5, color="131314"):
 def add_stat_card(slide, x, y, w, h, value, label, accent="1B786E"):
     card = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(w), Inches(h))
     card.fill.solid()
-    card.fill.fore_color.rgb = rgb("F7F7F7")
-    card.line.color.rgb = rgb("D7E2E0")
-    add_textbox(slide, x + 0.08, y + 0.12, w - 0.16, 0.27, value, 18, True, accent, F_HEAD, PP_ALIGN.CENTER)
-    add_textbox(slide, x + 0.08, y + 0.48, w - 0.16, 0.24, label, 7.2, False, COLORS["muted"], F_BODY, PP_ALIGN.CENTER)
+    card.fill.fore_color.rgb = rgb("FBFCFC")
+    card.line.color.rgb = rgb("E2EAE9")
+    card.shadow.inherit = False
+    # thin brand top-rule
+    rule = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(w), Inches(0.045))
+    rule.fill.solid()
+    rule.fill.fore_color.rgb = rgb(accent)
+    rule.line.fill.background()
+    rule.shadow.inherit = False
+    add_textbox(slide, x + 0.08, y + 0.15, w - 0.16, 0.27, value, 18, True, accent, F_HEAD, PP_ALIGN.CENTER)
+    add_textbox(slide, x + 0.08, y + 0.5, w - 0.16, 0.24, label, 7.2, False, COLORS["muted"], F_BODY, PP_ALIGN.CENTER)
     return card
 
 
@@ -214,109 +221,165 @@ def add_picture_cover(slide, path, x, y, w, h):
 
 def make_chart(path, scenario, title=None, compact=False):
     plt.rcParams["font.family"] = "DejaVu Sans"
-    fig_w, fig_h = (9.4, 3.5) if not compact else (6.4, 1.9)
+    fig_w, fig_h = (9.4, 3.5) if not compact else (6.4, 1.95)
     fig, ax = plt.subplots(figsize=(fig_w, fig_h), dpi=220)
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
     load = scenario["load"]
     gen = scenario["gen"]
     matched = [min(a, b) for a, b in zip(load, gen)]
-    ax.fill_between(HOURS, 0, matched, color=f"#{COLORS['green']}", alpha=0.16, linewidth=0)
-    ax.plot(HOURS, load, color=f"#{COLORS['cyan']}", linewidth=2.4, label="Factory load")
-    ax.plot(HOURS, gen, color=f"#{COLORS['amber']}", linewidth=2.4, label="Solar generation")
+    tick = 8 if not compact else 6.5
+    # Matched volume is the story — fill it, label it.
+    ax.fill_between(HOURS, 0, matched, color=f"#{COLORS['green']}", alpha=0.14, linewidth=0)
+    ax.plot(HOURS, load, color=f"#{COLORS['cyan']}", linewidth=2.6, label="Factory load", solid_capstyle="round")
+    ax.plot(HOURS, gen, color=f"#{COLORS['amber']}", linewidth=2.6, label="Solar generation", solid_capstyle="round")
     ax2 = ax.twinx()
-    ax2.plot(HOURS, FMP, color=f"#{COLORS['magenta']}", linewidth=1.8, label="FMP")
+    # FMP is synthetic teaching data — render it dashed so it reads as a reference, not a measured series.
+    ax2.plot(HOURS, FMP, color=f"#{COLORS['magenta']}", linewidth=1.7, linestyle=(0, (5, 3)), label="FMP (synthetic)")
     ax.set_xlim(0, 23)
     ax.set_ylim(0, 6800)
     ax2.set_ylim(900, 2600)
     ax.set_xticks(range(0, 24, 3 if not compact else 6))
-    ax.grid(axis="y", color="#D7E2E0", linewidth=0.7)
-    ax.tick_params(axis="both", labelsize=8 if not compact else 6.5, colors="#5B646E")
-    ax2.tick_params(axis="y", labelsize=8 if not compact else 6.5, colors="#5B646E")
-    ax.set_ylabel("kWh / hour", fontsize=8 if not compact else 6.5, color="#5B646E")
-    ax2.set_ylabel("VND/kWh", fontsize=8 if not compact else 6.5, color="#5B646E")
+    ax.grid(axis="y", color="#EDF2F1", linewidth=0.8)
+    ax.set_axisbelow(True)
+    ax.tick_params(axis="both", labelsize=tick, colors="#6B7480", length=0)
+    ax2.tick_params(axis="y", labelsize=tick, colors="#A98FB6", length=0)
+    ax.set_ylabel("kWh / hour", fontsize=tick, color="#6B7480")
+    ax2.set_ylabel("VND / kWh", fontsize=tick, color="#A98FB6")
+    if not compact:
+        peak = matched.index(max(matched))
+        ax.annotate(
+            "Matched volume",
+            xy=(peak, matched[peak] * 0.5),
+            fontsize=8.5,
+            color=f"#{COLORS['green_dark']}",
+            fontweight="bold",
+            ha="center",
+            va="center",
+        )
     if title:
-        ax.set_title(title, loc="left", fontsize=11, fontweight="bold", color=f"#{COLORS['dark']}", pad=8)
+        ax.set_title(title, loc="left", fontsize=11.5, fontweight="bold", color=f"#{COLORS['dark']}", pad=10)
     lines = ax.get_lines() + ax2.get_lines()
     labels = [line.get_label() for line in lines]
-    ax.legend(lines, labels, loc="upper left", frameon=False, fontsize=8 if not compact else 6.5, ncol=3)
-    for spine in ax.spines.values():
+    ax.legend(lines, labels, loc="upper left", frameon=False, fontsize=tick, ncol=3, handlelength=1.6, columnspacing=1.2)
+    # Clean frame: drop the box, keep only soft baseline + left axis.
+    for key, spine in ax.spines.items():
+        spine.set_visible(key in ("left", "bottom"))
         spine.set_color("#D7E2E0")
     for spine in ax2.spines.values():
-        spine.set_color("#D7E2E0")
+        spine.set_visible(False)
     fig.tight_layout(pad=0.8)
     fig.savefig(path, transparent=False, bbox_inches="tight")
     plt.close(fig)
 
 
+def matched_price(key):
+    ivs = RESULTS[key]["intervals"]
+    matched_cost = sum(iv["evn_market"] + iv["evn_dppa"] + iv["developer"] for iv in ivs)
+    matched_kwh = sum(iv["matched"] for iv in ivs)
+    return matched_cost / matched_kwh if matched_kwh else 0
+
+
 def make_scenario_table(path):
+    K = ["higherLoad", "balanced", "higherGen"]
     rows = [
         ["Metric", "Load > Gen", "Load = Gen", "Load < Gen"],
-        ["Daily load kWh", fmt(RESULTS["higherLoad"]["totals"]["load"]), fmt(RESULTS["balanced"]["totals"]["load"]), fmt(RESULTS["higherGen"]["totals"]["load"])],
-        ["Matched kWh", fmt(RESULTS["higherLoad"]["totals"]["matched"]), fmt(RESULTS["balanced"]["totals"]["matched"]), fmt(RESULTS["higherGen"]["totals"]["matched"])],
-        ["Shortfall kWh", fmt(RESULTS["higherLoad"]["totals"]["shortfall"]), fmt(RESULTS["balanced"]["totals"]["shortfall"]), fmt(RESULTS["higherGen"]["totals"]["shortfall"])],
-        ["Excess kWh", fmt(RESULTS["higherLoad"]["totals"]["excess"]), fmt(RESULTS["balanced"]["totals"]["excess"]), fmt(RESULTS["higherGen"]["totals"]["excess"])],
-        ["DPPA cost VND", fmt(RESULTS["higherLoad"]["totals"]["total"]), fmt(RESULTS["balanced"]["totals"]["total"]), fmt(RESULTS["higherGen"]["totals"]["total"])],
-        ["BAU cost VND", fmt(RESULTS["higherLoad"]["totals"]["baseline"]), fmt(RESULTS["balanced"]["totals"]["baseline"]), fmt(RESULTS["higherGen"]["totals"]["baseline"])],
-        ["Savings vs BAU", fmt(RESULTS["higherLoad"]["totals"]["savings"]), fmt(RESULTS["balanced"]["totals"]["savings"]), fmt(RESULTS["higherGen"]["totals"]["savings"])],
+        ["Daily load kWh"] + [fmt(RESULTS[k]["totals"]["load"]) for k in K],
+        ["Matched kWh"] + [fmt(RESULTS[k]["totals"]["matched"]) for k in K],
+        ["Shortfall kWh"] + [fmt(RESULTS[k]["totals"]["shortfall"]) for k in K],
+        ["Excess kWh"] + [fmt(RESULTS[k]["totals"]["excess"]) for k in K],
+        ["DPPA cost VND"] + [fmt(RESULTS[k]["totals"]["total"]) for k in K],
+        ["BAU cost VND"] + [fmt(RESULTS[k]["totals"]["baseline"]) for k in K],
+        ["Savings vs BAU"] + [fmt(RESULTS[k]["totals"]["savings"]) for k in K],
+        ["Matched price VND/kWh"] + [fmt(matched_price(k)) for k in K],
+        ["Blended price VND/kWh"] + [fmt(RESULTS[k]["totals"]["blended"]) for k in K],
     ]
-    fig, ax = plt.subplots(figsize=(8.8, 3.25), dpi=220)
+    n = len(rows)
+    fig, ax = plt.subplots(figsize=(8.8, 3.6), dpi=220)
     fig.patch.set_facecolor("white")
     ax.axis("off")
-    table = ax.table(cellText=rows, cellLoc="center", loc="center", colWidths=[0.30, 0.23, 0.23, 0.24])
+    table = ax.table(cellText=rows, cellLoc="center", loc="center", colWidths=[0.31, 0.23, 0.23, 0.23])
     table.auto_set_font_size(False)
-    table.set_fontsize(8.2)
+    table.set_fontsize(8.4)
     for (r, c), cell in table.get_celld().items():
-        cell.set_edgecolor("#D7E2E0")
-        cell.set_linewidth(0.7)
-        cell.set_height(0.105)
+        cell.set_edgecolor("white")
+        cell.set_linewidth(1.0)
+        cell.set_height(0.092)
+        txt = cell.get_text()
         if r == 0:
-            cell.set_facecolor("#EAF3F1")
-            cell.get_text().set_fontweight("bold")
-            cell.get_text().set_color(f"#{COLORS['dark']}")
-        elif c == 0:
-            cell.get_text().set_ha("left")
-            cell.get_text().set_fontweight("bold")
-        if r == 7 and c > 0:
-            cell.get_text().set_color(f"#{COLORS['red']}")
-            cell.get_text().set_fontweight("bold")
+            cell.set_facecolor(f"#{COLORS['green']}")
+            txt.set_color("white")
+            txt.set_fontweight("bold")
+        else:
+            # zebra body, with the balanced column tinted to flag the best match
+            base = "#F6F9F8" if r % 2 else "#FFFFFF"
+            cell.set_facecolor("#EAF3F1" if c == 2 else base)
+            if c == 0:
+                txt.set_ha("left")
+                txt.set_fontweight("bold")
+                txt.set_color(f"#{COLORS['dark']}")
+        if r == 7 and c > 0:          # Savings vs BAU — negative, red
+            txt.set_color(f"#{COLORS['red']}")
+            txt.set_fontweight("bold")
+        if r in (8, 9) and c > 0:     # convergence rows — the positive story, teal
+            txt.set_color(f"#{COLORS['green_dark']}")
+            txt.set_fontweight("bold")
     fig.tight_layout(pad=0.3)
     fig.savefig(path, transparent=False, bbox_inches="tight")
     plt.close(fig)
 
 
+def _text_run(fig, ax, x, y, segments, size):
+    """Place a row of coloured text segments left-to-right (data coords 0..1),
+    measuring each so we can strike canceling terms with a red rule."""
+    renderer = fig.canvas.get_renderer()
+    inv = ax.transData.inverted()
+    cur = x
+    for text, color, strike, bold in segments:
+        t = ax.text(
+            cur, y, text, fontsize=size, color=color, va="center", ha="left",
+            fontweight="bold" if bold else "normal", transform=ax.transData,
+        )
+        bb = t.get_window_extent(renderer=renderer)
+        (x0, _), (x1, _) = inv.transform((bb.x0, bb.y0)), inv.transform((bb.x1, bb.y1))
+        w = x1 - x0
+        if strike:
+            ax.plot([cur + 0.002, cur + w - 0.002], [y, y], color=f"#{COLORS['red']}",
+                    linewidth=1.8, solid_capstyle="round")
+        cur += w
+    return cur
+
+
 def make_equation_card(path):
-    fig, ax = plt.subplots(figsize=(7.5, 1.55), dpi=240)
+    fig, ax = plt.subplots(figsize=(8.0, 2.05), dpi=240)
     fig.patch.set_facecolor("white")
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
     ax.axis("off")
-    ax.text(
-        0.02,
-        0.72,
-        "EVN Market + DPPA Charge + CfD",
-        fontsize=14,
-        fontweight="bold",
-        color=f"#{COLORS['dark']}",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.02,
-        0.42,
-        "= Q × FMP + Q × C_DPPA + Q × (Strike − FMP)",
-        fontsize=12.5,
-        color=f"#{COLORS['green_dark']}",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.02,
-        0.14,
-        "= Q × Strike + Q × C_DPPA   (+ loss adjustment)",
-        fontsize=12.5,
-        color=f"#{COLORS['green_dark']}",
-        transform=ax.transAxes,
-    )
-    ax.add_patch(plt.Rectangle((0, 0), 1, 1, fill=False, edgecolor=f"#{COLORS['green']}", linewidth=1.2, transform=ax.transAxes))
-    fig.tight_layout(pad=0.2)
-    fig.savefig(path, transparent=False, bbox_inches="tight")
+    dark, green, red, muted = f"#{COLORS['dark']}", f"#{COLORS['green_dark']}", f"#{COLORS['red']}", f"#{COLORS['muted']}"
+    PADX = 0.045
+    # Title
+    ax.text(PADX, 0.86, "Why FMP mostly cancels on matched kWh", fontsize=13.5,
+            fontweight="bold", color=dark, va="center", transform=ax.transData)
+    # Expanded line — the two FMP terms struck through in red.
+    _text_run(fig, ax, PADX, 0.585, [
+        ("= Q×FMP", red, True, False),
+        (" + Q×C_DPPA + Q×Strike ", dark, False, False),
+        ("− Q×FMP", red, True, False),
+    ], 13)
+    # Result — the payoff, in brand teal, bold.
+    _text_run(fig, ax, PADX, 0.345, [
+        ("= Q × Strike + Q × C_DPPA", green, False, True),
+        ("   (+ small loss adjustment)", muted, False, False),
+    ], 14)
+    # Divider + takeaway
+    ax.plot([PADX, 1 - PADX], [0.20, 0.20], color="#D7E2E0", linewidth=0.9)
+    ax.text(PADX, 0.095, "Matched energy lands at ≈ 2,670 VND/kWh — wherever FMP goes.",
+            fontsize=11, fontweight="bold", color=green, va="center", transform=ax.transData)
+    # Brand frame
+    ax.add_patch(plt.Rectangle((0.004, 0.01), 0.992, 0.98, fill=False,
+                 edgecolor=f"#{COLORS['green']}", linewidth=1.4, transform=ax.transData))
+    fig.savefig(path, transparent=False, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -333,6 +396,7 @@ def cover(slide, x, y, w, h, color="FFFFFF"):
     shape.fill.solid()
     shape.fill.fore_color.rgb = rgb(color)
     shape.line.color.rgb = rgb(color)
+    shape.shadow.inherit = False
     return shape
 
 
@@ -403,28 +467,34 @@ def main():
     )
     s.shapes[2].height = Inches(0.68)
     delete_shape(s.shapes[3])
-    cover(s, 1.14, 1.42, 6.9, 3.75)
+    # Three pricing inputs as bordered stat tiles, evenly spread across the content width.
     stats = [
-        ("2,100", "strike price Pc"),
-        ("523.34", "DPPA charge"),
-        ("1.027263", "Kpp loss factor"),
+        ("2,100", "Strike price  Pc", "VND/kWh"),
+        ("523.34", "DPPA charge  C_DPPA", "VND/kWh"),
+        ("1.027263", "Loss factor  Kpp", "dimensionless"),
     ]
-    for i, (value, label) in enumerate(stats):
-        x = 1.35 + i * 2.2
-        add_textbox(s, x, 2.05, 1.75, 0.35, value, 20, True, COLORS["green"], F_HEAD, PP_ALIGN.CENTER)
-        add_textbox(s, x, 2.45, 1.75, 0.22, label, 8.5, False, COLORS["muted"], F_BODY, PP_ALIGN.CENTER)
+    tile_w, gap = 2.5, 0.35
+    start_x = 0.95 + (8.6 - (3 * tile_w + 2 * gap)) / 2
+    for i, (value, label, unit) in enumerate(stats):
+        x = start_x + i * (tile_w + gap)
+        cover(s, x, 1.85, tile_w, 1.2, "F6F9F8")
+        rule = s.shapes.add_shape(1, Inches(x), Inches(1.85), Inches(tile_w), Inches(0.05))
+        rule.fill.solid(); rule.fill.fore_color.rgb = rgb(COLORS["green"]); rule.line.fill.background(); rule.shadow.inherit = False
+        add_textbox(s, x, 2.12, tile_w, 0.4, value, 24, True, COLORS["green"], F_HEAD, PP_ALIGN.CENTER)
+        add_textbox(s, x, 2.6, tile_w, 0.22, label, 9.5, True, COLORS["dark"], F_HEAD, PP_ALIGN.CENTER)
+        add_textbox(s, x, 2.82, tile_w, 0.2, unit, 8, False, COLORS["muted"], F_BODY, PP_ALIGN.CENTER)
     add_bullets(
         s,
-        1.35,
-        3.18,
-        6.0,
-        1.15,
+        1.3,
+        3.5,
+        7.2,
+        1.2,
         [
-            "FMP remains visible in the EVN market charge and developer CfD.",
-            "Matched kWh mostly collapse toward strike price plus DPPA charge.",
-            "Shortfall and excess volumes decide whether that clean story holds.",
+            "FMP stays visible in the EVN market charge and the developer CfD.",
+            "On matched kWh those FMP terms offset — cost collapses toward Strike + DPPA charge.",
+            "Shortfall and excess volumes are what break the clean cancellation.",
         ],
-        10,
+        10.5,
     )
 
     # Slide 5
@@ -516,17 +586,17 @@ def main():
     )
     set_text(s.shapes[2], "", 9.2, False, COLORS["text"], F_BODY)
     delete_shape(s.shapes[3])
-    add_picture_cover(s, ASSET_DIR / "cancellation_card.png", 1.25, 1.88, 6.8, 1.45)
+    add_picture_cover(s, ASSET_DIR / "cancellation_card.png", 1.25, 1.78, 6.95, 1.78)
     add_bullets(
         s,
         1.28,
-        3.7,
-        7.4,
+        3.85,
+        7.6,
         0.82,
         [
-            "Pc(i): committed strike price at cycle i.",
-            "FMP(i): hourly market reference price.",
-            "Qca(i): contract quantity; default app mode equals matched volume.",
+            "Pc(i): committed strike price at settlement cycle i.",
+            "FMP(i): hourly market reference price (synthetic in the teaching model).",
+            "Qca(i): contract quantity — default app mode equals matched volume.",
         ],
         9.2,
     )
