@@ -177,12 +177,17 @@ describe('calculateSettlement', () => {
     expect(selectedCase.totalNoDppa).toBe(result.intervals[2].baseline)
   })
 
-  it('keeps the default pricing basis aligned with the reviewed 2025 example deck', async () => {
+  it('keeps the default pricing basis aligned with verified 2026 reference values', async () => {
     const { defaultInputs, settlementModes } = await import('../data/default-scenarios')
 
-    expect(defaultInputs.strikePrice).toBe(2100)
-    expect(defaultInputs.retailTariff).toBe(2100)
+    // Strike: deck Case 6 reference offer (illustrative teaching value)
+    expect(defaultInputs.strikePrice).toBe(2000)
+    // Retail: Decision 599/QD-EVN 10 May 2025 (+4.8% to 2,204.07 VND/kWh)
+    expect(defaultInputs.retailTariff).toBe(2204)
+    // Fixed DPPA fees: 360 service + 163.3 balancing per EVN annual notice
     expect(defaultInputs.dppaCharge).toBe(523.34)
+    // Loss factor: k × K_pp = 1.026 × 1.008 = 1.0342 (Decree 57/2025)
+    expect(defaultInputs.lossFactor).toBe(1.0342)
     expect(settlementModes.map((mode) => mode.label)).toEqual([
       'Matched consumption only',
       'Demo: generation volume',

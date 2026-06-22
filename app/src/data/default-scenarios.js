@@ -71,16 +71,25 @@ export const scenarioOrder = ['higherLoad', 'balanced', 'higherGen']
 
 export const defaultInputs = {
   scenarioId: 'balanced',
-  strikePrice: 2100,
-  marketPrice: 1700,
-  fmpCurve: buildFmpCurve(1700),
+  // Strike: deck Case 6 reference offer — illustrative teaching value that shows "Year 1 ≥ BAU"
+  strikePrice: 2000,
+  // FMP: deck ~1,427 VND/kWh 2025 reference — illustrative; no NSMO/ERAV primary source yet
+  marketPrice: 1427,
+  fmpCurve: buildFmpCurve(1427),
+  // Fixed DPPA fees: 360 (service) + 163.3 (balancing) = 523.3 VND/kWh per EVN annual notice
   dppaCharge: 523.34,
-  lossFactor: 1.027263,
-  retailTariff: 2100,
+  // Loss factor: k × K_pp = 1.026 × 1.008 = 1.0342 (Decree 57/2025 reference coefficients)
+  lossFactor: 1.0342,
+  // Retail: Decision 599/QD-EVN, 10 May 2025 — +4.8% to 2,204.07 VND/kWh (excl. VAT)
+  retailTariff: 2204,
   settlementMode: 'matched',
   currency: 'VND',
   detailView: 'flow',
   selectedHour: 12,
+  // Multi-year horizon defaults (used by projectMultiYear in settlement.js)
+  evnEscalation: 0.04,      // 4%/yr EVN tariff escalation (historical trend 2015-2024)
+  strikeEscalation: 0.04,   // 4%/yr strike escalation (fixed-VND index; negotiate separately)
+  horizonYears: 20,         // default lifetime horizon in years
 }
 
 export const settlementModes = [
