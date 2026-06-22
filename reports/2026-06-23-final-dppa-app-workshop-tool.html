@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Final Report — DPPA App as Live Workshop Tool | dppa-case</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #222636; --border: #2d3148;
+    --accent: #7c6af7; --accent2: #4fc3f7; --green: #4caf82; --red: #e06c6c;
+    --amber: #f4b942; --text: #e2e4ef; --muted: #8890a8; --mono: 'JetBrains Mono', monospace;
+    --purple: #b39ddb;
+  }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; font-size: 15px; line-height: 1.7; }
+  a { color: var(--accent2); }
+  .page { max-width: 1000px; margin: 0 auto; padding: 48px 28px 100px; }
+
+  /* ── Typography ───────────────────────────────────────────── */
+  section { margin-top: 56px; }
+  h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.15; }
+  h2 { font-size: 1.2rem; font-weight: 700; color: var(--accent); margin-bottom: 18px; letter-spacing: .05em; text-transform: uppercase; }
+  h3 { font-size: 1rem; font-weight: 600; color: var(--accent2); margin: 20px 0 8px; }
+  p  { margin-bottom: 12px; }
+  ul { padding-left: 20px; margin-bottom: 12px; }
+  li { margin-bottom: 4px; }
+  strong { color: #d6d9f0; }
+  code { font-family: var(--mono); font-size: .84em; background: var(--surface2); padding: 2px 7px; border-radius: 4px; }
+  pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: .82em; line-height: 1.55; margin: 14px 0; }
+
+  /* ── Hero ─────────────────────────────────────────────────── */
+  .hero { background: linear-gradient(140deg, #12152a 0%, #1a1f3a 55%, #1e2038 100%); border: 1px solid #3a3f6b; border-radius: 16px; padding: 44px 48px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 20%, rgba(124,106,247,0.08) 0%, transparent 70%); pointer-events: none; }
+  .hero-eyebrow { font-size: .7rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .hero-title { font-size: 2.2rem; font-weight: 800; line-height: 1.15; max-width: 720px; }
+  .hero-takeaway { margin-top: 16px; font-size: 1.05rem; color: #b5bbdb; max-width: 660px; line-height: 1.6; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .hero-meta span { font-size: .8rem; color: var(--muted); }
+  .hero-meta strong { color: var(--text); }
+
+  /* ── Cards ────────────────────────────────────────────────── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 26px; margin-bottom: 16px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .stat-label { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .stat-value { font-size: 1.85rem; font-weight: 700; line-height: 1; }
+  .stat-note  { font-size: .78rem; color: var(--muted); margin-top: 5px; }
+  .green  { color: var(--green); }
+  .amber  { color: var(--amber); }
+  .red    { color: var(--red); }
+  .purple { color: var(--purple); }
+
+  /* ── Tables ───────────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .87rem; }
+  th { text-align: left; padding: 10px 14px; background: var(--surface2); color: var(--muted); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .c-green { color: var(--green); font-family: var(--mono); font-size: .85em; }
+  .c-red   { color: var(--red);   font-family: var(--mono); font-size: .85em; }
+  .c-amber { color: var(--amber); font-family: var(--mono); font-size: .85em; }
+
+  /* ── Mermaid ─────────────────────────────────────────────── */
+  .mermaid-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; max-height: 380px; }
+
+  /* ── Chart ───────────────────────────────────────────────── */
+  .chart-frame { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; height: 280px; }
+
+  /* ── Pills / Callouts ─────────────────────────────────────── */
+  .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .pill { font-size: .76rem; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+  .pill-green  { background: rgba(76,175,130,.14); border: 1px solid var(--green); color: var(--green); }
+  .pill-amber  { background: rgba(244,185,66,.12); border: 1px solid var(--amber); color: var(--amber); }
+  .pill-blue   { background: rgba(79,195,247,.12); border: 1px solid var(--accent2); color: var(--accent2); }
+  .pill-purple { background: rgba(179,157,219,.12); border: 1px solid var(--purple); color: var(--purple); }
+  .callout { border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 8px 8px 0; padding: 14px 20px; margin: 16px 0; font-size: .9rem; }
+  .callout.warn { border-color: var(--amber); }
+  .callout.ok   { border-color: var(--green); }
+
+  /* ── Phase timeline ──────────────────────────────────────── */
+  .timeline { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+  .tl-item { display: flex; gap: 20px; }
+  .tl-spine { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--green); margin-top: 5px; flex-shrink: 0; }
+  .tl-line { width: 2px; flex: 1; background: var(--border); margin-top: 4px; min-height: 24px; }
+  .tl-item:last-child .tl-line { display: none; }
+  .tl-body { padding-bottom: 24px; flex: 1; }
+  .tl-label { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+  .tl-head { font-weight: 600; color: var(--text); margin: 2px 0 6px; }
+  .tl-desc { font-size: .87rem; color: var(--muted); }
+
+  /* ── Divider ─────────────────────────────────────────────── */
+  .divider { height: 1px; background: var(--border); margin: 48px 0 0; }
+
+  /* ── Print ───────────────────────────────────────────────── */
+  @media print {
+    body { background: #fff; color: #111; font-size: 12px; }
+    .hero { background: #f3f4fb; border-color: #ccc; }
+    .hero-takeaway { color: #444; }
+    .card, .stat-card, .chart-frame, .mermaid-wrap { border-color: #ccc; background: #fafafa; break-inside: avoid; }
+    h2, h3 { color: #333; }
+    .c-green { color: #267a4a; } .c-red { color: #b92020; } .c-amber { color: #9a6600; }
+    pre, code { background: #f0f0f0; color: #111; }
+    a { color: #05a; }
+    .tl-dot { background: #267a4a; }
+  }
+  @media (max-width: 600px) {
+    .hero { padding: 28px 22px; }
+    .hero-title { font-size: 1.5rem; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════════════════════════════════════════════════
+     1. TITLE HERO
+════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <p class="hero-eyebrow">Final Report · dppa-case</p>
+  <h1 class="hero-title">DPPA Web App — Live Workshop Tool (Multi-Year + Recalibration)</h1>
+  <p class="hero-takeaway">The Vietnam virtual-DPPA calculator is now a live workshop instrument: recalibrated to verified 2026 regulatory values, extended with a multi-year escalation engine, and equipped with interactive sliders for EVN tariff escalation, strike escalation, and lifetime horizon — all rendering a cumulative BAU-vs-DPPA panel in real time.</p>
+  <div class="hero-meta">
+    <span><strong>Date</strong> 2026-06-23</span>
+    <span><strong>Project</strong> CEBA DPPA Workshop Tool</span>
+    <span><strong>Repository</strong> tah-allotrope/dppa-case</span>
+    <span><strong>Branch</strong> master</span>
+    <span><strong>Final commit</strong> c09c8fc</span>
+    <span><strong>Tests</strong> <span class="green">38 / 38 ✓</span></span>
+    <span><strong>Build</strong> <span class="green">✓ 3.41 s</span></span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     2. EXECUTIVE SUMMARY
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Executive Summary</h2>
+  <p>The app entered this plan cycle with stale, internally contradictory defaults (retail 2,100 in code vs 1,833 in docs vs the correct 2,204 in the 2025 EVN decision) and no multi-year view. Workshop facilitators had to switch between a live app showing a single synthetic day and a static 57-slide deck to make the lifetime economics argument.</p>
+  <p><strong>All four plan phases executed successfully in one session.</strong> The app now:</p>
+  <ul>
+    <li>Uses <strong>verified 2026 regulatory values</strong> across code, tests, and documentation (retail 2,204 VND/kWh from Decision 599/QD-EVN; loss factor k×K_pp = 1.0342 from Decree 57/2025; fees 523.34 VND/kWh).</li>
+    <li>Exposes a <strong><code>projectMultiYear()</code> engine</strong> that computes per-year and cumulative BAU vs DPPA costs with independent escalation rates for EVN tariffs and strike price.</li>
+    <li>Shows a <strong>live multi-year panel</strong> — three Chart.js lines (cumulative BAU, DPPA, savings), four rollup pills (Year 1, 10-yr, lifetime, crossover year), and three interactive sliders — all updating without a page reload.</li>
+    <li>Labels FMP honestly as <strong>illustrative</strong> in four places (control label, hero copy, defaults comment, and assumptions doc) since no primary NSMO/ERAV source is available.</li>
+  </ul>
+  <p><strong>Recommendation:</strong> The app is ready for live use in the CEBA 2026 workshop. The one prerequisite before removing the "illustrative" FMP label is obtaining a primary-sourced average market price from NSMO or ERAV.</p>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     3. BACKGROUND & OBJECTIVE
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Background &amp; Objective</h2>
+  <p>The CEBA Vietnam DPPA workshop uses a 57-slide deck (Modules 1–6) to walk a factory CFO audience through Vietnam's two-way Contract for Difference settlement under Decree 57/2025/ND-CP. The web app was built to animate the five-line EVN bill and the FMP cancellation effect interactively — but it had grown out of sync with verified regulatory numbers and offered only a single-day view.</p>
+  <p>The brainstorm (<code>research/2026-06-22_dppa-app-deck-consolidation-brainstorm.md</code>) identified the primary leverage: the deck's "evaluate over lifetime, not Year 1" thesis (slide 16/30 and the Case 5/6 DSCR tables) needs an interactive counterpart that lets a facilitator move an escalation slider and watch the crossover year shift in real time. A static chart on a slide cannot do this.</p>
+  <p><strong>Objective:</strong> Turn the single-day calculator into the live workshop engine — recalibrated, multi-year, and honest about data uncertainty.</p>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     4. INPUTS & SCOPE
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Inputs &amp; Scope</h2>
+
+  <div class="card-grid">
+    <div class="stat-card"><div class="stat-label">Research inputs</div><div class="stat-value purple">2</div><div class="stat-note">Vietnam DPPA 2026 brief + brainstorm</div></div>
+    <div class="stat-card"><div class="stat-label">Source files touched</div><div class="stat-value">7</div><div class="stat-note">defaults, settlement, chart, ui, main, docs ×2</div></div>
+    <div class="stat-card"><div class="stat-label">Test files updated</div><div class="stat-value">2</div><div class="stat-note">settlement.test, ui.test</div></div>
+    <div class="stat-card"><div class="stat-label">Out of scope</div><div class="stat-value amber">4</div><div class="stat-note">IRR/DSCR · BESS · TOU table · deck generation</div></div>
+  </div>
+
+  <div class="card">
+    <h3>In scope</h3>
+    <ul>
+      <li>Recalibrate all numeric defaults to verified 2026 regulatory values</li>
+      <li>Add <code>projectMultiYear()</code> pure function with unit tests</li>
+      <li>Add three interactive sliders (EVN escalation, strike escalation, horizon years) with live panel update</li>
+      <li>Label FMP "illustrative" in all user-facing surfaces</li>
+      <li>Reconcile <code>assumptions.md</code> and <code>formulas.md</code> with code</li>
+    </ul>
+    <h3>Out of scope (explicitly excluded)</h3>
+    <ul>
+      <li>Developer economics (IRR, NPV, DSCR, three-gates model)</li>
+      <li>BESS sizing or dispatch modeling</li>
+      <li>Full TOU tariff table as a live input</li>
+      <li>Seasonality or 8,760-hour annual profiles</li>
+      <li>Auto-generating the PPTX deck from the app (separate deck-consolidation plan)</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     5. ASSUMPTIONS & CONSTRAINTS
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Assumptions &amp; Constraints</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>ID</th><th>Assumption / Constraint</th><th>Confidence</th><th>Impact if wrong</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ASM-001</td>
+          <td>Annual cost = representative-day total × 365. Seasonality ignored.</td>
+          <td class="c-amber">Teaching simplification</td>
+          <td>Over/understates economics for plants with seasonal output. Acceptable for a CFO decision lens; would need full-year profiles for investment-grade analysis.</td>
+        </tr>
+        <tr>
+          <td>ASM-002</td>
+          <td>FMP is held flat across multi-year projection (no market price escalation).</td>
+          <td class="c-amber">Teaching simplification</td>
+          <td>If FMP rises with fuel prices, DPPA becomes more attractive faster than the model shows. Conservative for the buyer.</td>
+        </tr>
+        <tr>
+          <td>ASM-003</td>
+          <td>EVN retail escalation ~4%/yr (historical 2015–2024 trend).</td>
+          <td class="c-green">Verified — sourced</td>
+          <td>User-adjustable slider — participant can test 2–8% range live.</td>
+        </tr>
+        <tr>
+          <td>ASM-004</td>
+          <td>FMP = 1,427 VND/kWh (deck 2025 reference; FMP = SMP + CAN per Circular 16/2025).</td>
+          <td class="c-red">Illustrative — no primary NSMO/ERAV source</td>
+          <td>All per-kWh totals shift proportionally. Crossover year is sensitive to FMP. Priority item to resolve before investment-grade use.</td>
+        </tr>
+        <tr>
+          <td>ASM-005</td>
+          <td>DPPA fixed fees = 360 + 163.3 = 523.34 VND/kWh (EVN annual notice basis).</td>
+          <td class="c-amber">Plausible — primary notice text not retrieved</td>
+          <td>Fee total affects DPPA cost per matched kWh. Close enough for workshop teaching; should be re-sourced before next cycle.</td>
+        </tr>
+        <tr>
+          <td>CON-001</td>
+          <td>App remains a buyer teaching tool, not a legal settlement engine. Hourly intervals, not 30-minute VWEM intervals.</td>
+          <td class="c-green">Design constraint</td>
+          <td>Not applicable to change — design intent.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     6. METHODOLOGY
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Methodology</h2>
+  <p>The work followed a four-phase sequential plan where each phase produced a testable artifact before the next began. The governing constraint was "wrapper over existing engine" — <code>calculateSettlement</code> was never modified; all new capabilities compose around it.</p>
+
+  <div class="card">
+    <h3>Core algorithm — multi-year projection</h3>
+    <pre>for year n ∈ [1 .. horizonYears]:
+  retailTariff_n = retailTariff_base × (1 + evnEscalation)^(n-1)
+  strikePrice_n  = strikePrice_base  × (1 + strikeEscalation)^(n-1)
+  // FMP held flat
+  result_n     = calculateSettlement({ ...baseInputs, retailTariff_n, strikePrice_n })
+  bau_n        = result_n.totals.baselineCost × 365
+  dppa_n       = result_n.totals.totalCost    × 365
+  cumBau       += bau_n ;  cumDppa += dppa_n
+
+crossoverYear = first n where cumBau - cumDppa > 0</pre>
+    <p style="color:var(--muted);font-size:.84rem">Year 1 uses factor 1.0 — what the user sees on the sliders is Year 1 economics. Compounding starts from Year 2.</p>
+  </div>
+
+  <div class="card">
+    <h3>Key architectural decision: stable canvas pattern</h3>
+    <p><code>renderAppShell</code> creates <code>#multiYearChart</code> once in static HTML. Both the profile chart and the multi-year chart use a module-level instance check — if the chart already exists, call <code>.update('none')</code> rather than destroy-and-recreate. This keeps slider responsiveness near-instant and was the critical choice that prevented flicker on every escalation slider drag.</p>
+  </div>
+
+  <div class="card">
+    <h3>Calibration — key numeric derivations</h3>
+    <table>
+      <thead><tr><th>Parameter</th><th>Old value</th><th>New value</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>Retail tariff</td><td class="c-red">2,100 (code) / 1,833 (docs)</td><td class="c-green">2,204 VND/kWh</td><td>Decision 599/QD-EVN, 10 May 2025</td></tr>
+        <tr><td>Loss factor</td><td class="c-red">1.027263</td><td class="c-green">1.0342 (k×K_pp)</td><td>Decree 57/2025: k=1.026, K_pp=1.008</td></tr>
+        <tr><td>Strike price</td><td class="c-red">2,100 (code) / 1,741.35 (docs)</td><td class="c-green">2,000 (illustrative)</td><td>Deck Case 6 reference offer</td></tr>
+        <tr><td>Market price / FMP</td><td class="c-red">1,700</td><td class="c-amber">1,427 (illustrative)</td><td>Deck 2025 reference; no primary NSMO source</td></tr>
+        <tr><td>DPPA fees</td><td class="c-green">523.34 ✓</td><td class="c-green">523.34 ✓</td><td>Already correct; confirmed</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     7. PHASE-BY-PHASE ANALYSIS
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Phase-by-Phase Analysis</h2>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart LR
+  A[Research\n2 briefs] --> B[PHASE-01\nRecalibrate\ndefaults + docs]
+  B --> C[PHASE-02\nprojectMultiYear\nengine + tests]
+  C --> D[PHASE-03\nSliders + chart\nUI panel]
+  D --> E[PHASE-04\nFMP labels\nbuild verify]
+  B -->|c89a319| B2[35 tests ✓]
+  C -->|96687df| C2[38 tests ✓\n+3 engine tests]
+  D -->|dfee213| D2[38 tests ✓\nbuild ✓]
+  E -->|c09c8fc| E2[38 tests ✓\nbuild 3.41 s ✓]
+    </div>
+  </div>
+
+  <div class="timeline" style="margin-top:28px">
+    <div class="tl-item">
+      <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <p class="tl-label">Phase 01 · Commit c89a319</p>
+        <p class="tl-head">Recalibrate defaults + reconcile docs</p>
+        <p class="tl-desc">Fixed three conflicting numeric systems across code and docs. Discovered that <code>lossFactor: 1.027263</code> was neither k (1.026) nor K_pp (1.008) nor their product (1.0342) — an empirical scalar from a prior model iteration. Fixed to the correct Decree 57/2025 split. Also pre-wired three new state fields (<code>evnEscalation</code>, <code>strikeEscalation</code>, <code>horizonYears</code>) so Phase 03 wiring could reference them without a schema change. One test regression fixed: <code>ui.test.js</code> had two hardcoded <code>Kpp (1.027)</code> strings; refactored to dynamic <code>.toFixed(3)</code>. 5 files changed, 35 tests green.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <p class="tl-label">Phase 02 · Commit 96687df</p>
+        <p class="tl-head">Multi-year escalation engine</p>
+        <p class="tl-desc">Added <code>export function projectMultiYear(baseInputs, opts)</code> (53 lines) to <code>settlement.js</code>. Three unit tests: (1) flat escalation = 365× single-day settlement; (2) year-by-year tariff compounding; (3) crossover-year detection when EVN escalates at 6%/yr with strike fixed. All tests pass clean on first run — no iteration needed. 2 files changed, 38 tests green.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <p class="tl-label">Phase 03 · Commit dfee213</p>
+        <p class="tl-head">Multi-year UI panel + escalation controls</p>
+        <p class="tl-desc">Added <code>renderMultiYearChart</code> to <code>chart.js</code> (stable canvas pattern, in-place Chart.js update); added <code>renderMultiYearPanel</code> to <code>ui.js</code> (text-node-only updates to stable DOM elements); added 3 new sliders to the controls grid; extended <code>updateControlOutputs</code> for 3 new outputs; wired everything in <code>main.js</code> with 3 new import items, 3 slider mappings, and 2 new calls in <code>updateView()</code>. Critical constraint: the <code>.story-grid + .lower-grid</code> CSS adjacent-sibling selector required the multi-year panel be placed <em>after</em> the controls section. 3 files changed, 38 tests green, build clean.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-spine"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <p class="tl-label">Phase 04 · Commit c09c8fc</p>
+        <p class="tl-head">FMP labeling + build verification</p>
+        <p class="tl-desc">Two targeted string edits: hero copy updated to name the NSMO/ERAV gap explicitly; market-price slider label updated to "FMP (illustrative)". FMP is now labeled in four locations: hero copy, control label, <code>default-scenarios.js</code> comment, and <code>assumptions.md</code> table. Build confirmed clean at 3.41 s. 1 file changed, 38 tests green.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     8. FINDINGS & RECOMMENDATION
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Findings &amp; Recommendation</h2>
+
+  <div class="card-grid">
+    <div class="stat-card"><div class="stat-label">Calibration errors fixed</div><div class="stat-value green">3</div><div class="stat-note">retail · lossFactor · strike (all material)</div></div>
+    <div class="stat-card"><div class="stat-label">New engine tests</div><div class="stat-value green">3</div><div class="stat-note">flat, compound, crossover detection</div></div>
+    <div class="stat-card"><div class="stat-label">New UI controls</div><div class="stat-value green">3</div><div class="stat-note">live escalation + horizon sliders</div></div>
+    <div class="stat-card"><div class="stat-label">Docs reconciled</div><div class="stat-value green">2</div><div class="stat-note">assumptions.md + formulas.md</div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Workshop use recommendation</h3>
+    <p><strong>Use as live workshop tool now.</strong> The escalation sliders let a facilitator show exactly what the deck argues on slides 15–18: with EVN rising at 4%/yr and strike fixed, DPPA becomes cost-competitive at the lifetime level even when Year 1 shows a premium. Previously this required toggling to a static slide. Now it is a slider drag in the same browser tab.</p>
+    <h3>Key teaching scenario enabled by the new panel</h3>
+    <table>
+      <thead><tr><th>Slider state</th><th>Workshop message</th><th>What the panel shows</th></tr></thead>
+      <tbody>
+        <tr><td>EVN 4%, Strike 4%, 20 yr</td><td>Both rise equally — DPPA premium stays through the horizon</td><td>Cumulative savings flat; crossover &gt; 20 yr</td></tr>
+        <tr><td>EVN 6%, Strike 0%, 20 yr</td><td>"Lock your energy cost while EVN rises" — core DPPA thesis</td><td>Savings line crosses zero around Year 9–11; lifetime positive</td></tr>
+        <tr><td>EVN 4%, Strike 0%, 25 yr</td><td>Deck Case 5/6 scenario — fixed-VND strike long-term</td><td>Crossover visible; lifetime savings material</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Illustrative cumulative cost projection (default inputs + EVN 4%/yr, Strike 0%)</h3>
+    <div class="chart-frame">
+      <canvas id="findingsChart"></canvas>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     9. IMPLEMENTATION PATH
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Implementation Path</h2>
+  <div class="card">
+    <p>The implementation is complete and merged to master. Remaining steps before the next CEBA workshop cycle:</p>
+    <table>
+      <thead><tr><th>Step</th><th>Owner</th><th>Priority</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Obtain primary FMP source (NSMO/ERAV annual market price average)</td><td>Research</td><td class="c-amber">High</td><td>Feeds <code>defaultInputs.marketPrice</code>; removes "illustrative" label from hero copy and control</td></tr>
+        <tr><td>Confirm EVN annual fee notice (360 + 163.3 VND/kWh breakdown)</td><td>Research</td><td class="c-amber">Medium</td><td>Verify against EVN's 2025 announcement on the electricity-market website</td></tr>
+        <tr><td>Manual smoke test of live app with workshop facilitator</td><td>QA</td><td class="c-green">Ready now</td><td>EVN escalation + strike escalation + crossover year narrative</td></tr>
+        <tr><td>Execute deck-consolidation plan (Phase 1–4 in separate plan)</td><td>Deck author</td><td class="c-green">Independent</td><td>Reduce 6–7 deck scenarios to 3 canonical cases; update deck with new verified values</td></tr>
+        <tr><td>Raise horizon slider max to 25 yr if deck Case 5/6 DSCR tables are used</td><td>Dev</td><td>Low</td><td>One-line range change in <code>ui.js</code>; default stays at 20</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     10. RISKS / OPEN QUESTIONS
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Risks / Open Questions</h2>
+  <div class="callout warn">
+    <strong>FMP primary source unresolved.</strong> The 1,427 VND/kWh figure is the most sensitive input in the model — it moves the per-kWh DPPA cost and crossover year materially. Every participant who compares the app's output to their own electricity bill will notice if FMP is off. This should be the first priority for the next research sprint.
+  </div>
+  <div class="callout warn">
+    <strong>Representative-day × 365 understates seasonal plants.</strong> A northern Vietnam rooftop with a winter dip will overperform in the app model during low-sun months. The current teaching scope is adequate; an investment-grade version needs 8,760-hour profiles.
+  </div>
+  <div class="callout warn">
+    <strong>Two-component tariff pilot risk (Oct 2025).</strong> Vietnam's two-component pilot tariff (demand charge + energy charge) could create a double-charging risk for DPPA buyers on the retail residual slice. The current app models a flat average tariff. If the pilot expands, <code>retailTariff</code> in the shortfall calculation will need to be decomposed.
+  </div>
+  <div class="card">
+    <h3>Open Grill-Me questions from the plan</h3>
+    <table>
+      <thead><tr><th>Q</th><th>Question</th><th>Recommended default (implemented)</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Q-001</td><td>What FMP value (and source) should be the default?</td><td>1,427 VND/kWh — labeled illustrative until NSMO/ERAV supplies primary data</td><td class="c-amber">Open — primary source needed</td></tr>
+        <tr><td>Q-002</td><td>Lifetime horizon and strike escalation index defaults?</td><td>20 yr · 4%/yr fixed-VND · adjustable via slider</td><td class="c-green">Closed — implemented</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     11. APPENDICES / EVIDENCE NOTES
+════════════════════════════════════════════════════════ -->
+<section>
+  <h2>Appendices / Evidence Notes</h2>
+
+  <div class="card">
+    <h3>Commit trail</h3>
+    <table>
+      <thead><tr><th>Commit</th><th>Phase</th><th>Key artifact</th></tr></thead>
+      <tbody>
+        <tr><td><code>c89a319</code></td><td>01</td><td><code>default-scenarios.js</code> recalibrated · <code>assumptions.md</code> rewritten · 35 tests green</td></tr>
+        <tr><td><code>96687df</code></td><td>02</td><td><code>projectMultiYear()</code> exported · 3 unit tests · 38 tests green</td></tr>
+        <tr><td><code>dfee213</code></td><td>03</td><td><code>renderMultiYearChart</code> + <code>renderMultiYearPanel</code> · 3 sliders wired · build clean</td></tr>
+        <tr><td><code>c09c8fc</code></td><td>04</td><td>FMP labeled illustrative in hero + control · final build 3.41 s</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Source coverage — verified vs illustrative</h3>
+    <table>
+      <thead><tr><th>Parameter</th><th>Value</th><th>Status</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>EVN retail average</td><td>2,204.07 VND/kWh</td><td class="c-green">Verified</td><td>Decision 599/QD-EVN, 10 May 2025</td></tr>
+        <tr><td>Price factor k</td><td>1.026</td><td class="c-green">Verified</td><td>Decree 57/2025/ND-CP reference</td></tr>
+        <tr><td>Loss factor K_pp (≥22–&lt;110 kV)</td><td>1.008</td><td class="c-green">Verified</td><td>Decree 57/2025/ND-CP reference</td></tr>
+        <tr><td>Combined lossFactor (k×K_pp)</td><td>1.0342</td><td class="c-green">Derived</td><td>1.026 × 1.008, Decree 57</td></tr>
+        <tr><td>DPPA service fee (C_DPPA_đv)</td><td>360 VND/kWh</td><td class="c-amber">Plausible</td><td>EVN annual notice basis; primary text not retrieved</td></tr>
+        <tr><td>Balancing fee (P_cl)</td><td>163.3 VND/kWh</td><td class="c-amber">Plausible</td><td>EVN annual notice basis; primary text not retrieved</td></tr>
+        <tr><td>FMP / market price</td><td>1,427 VND/kWh</td><td class="c-red">Illustrative</td><td>Deck 2025 reference; FMP=SMP+CAN per Circular 16/2025; no NSMO/ERAV primary source</td></tr>
+        <tr><td>Strike price default</td><td>2,000 VND/kWh</td><td class="c-amber">Illustrative</td><td>Deck Case 6 reference offer</td></tr>
+        <tr><td>EVN escalation default</td><td>4%/yr</td><td class="c-green">Calibrated</td><td>2015–2024 historical trend (Decision 599 was +4.8%)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Five-line EVN bill identity (app engine math)</h3>
+    <pre>EVN  = Σ matched × FMP × lossFactor       (market energy, loss-adjusted)
+     + Σ matched × dppaCharge               (DPPA service + balancing fee)
+     + Σ shortfall × retailTariff            (residual retail slice)
+CfD  = Σ contractQty × (strikePrice − FMP)  (two-way: positive = buyer tops up)
+Net  = EVN + CfD
+BAU  = Σ load × retailTariff                (no-DPPA baseline)
+lossFactor = k × K_pp = 1.026 × 1.008 = 1.0342</pre>
+  </div>
+
+  <div class="card">
+    <h3>Glossary</h3>
+    <table>
+      <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>FMP</td><td>Floor Market Price — Vietnam VWEM 30-minute clearing price (SMP + CAN per Circular 16/2025)</td></tr>
+        <tr><td>CfD</td><td>Contract for Difference — two-way financial settlement between factory and developer on contracted volume</td></tr>
+        <tr><td>Virtual DPPA</td><td>Grid-connected Power Purchase Agreement; buyer and seller are at different grid points; CfD settles the price difference</td></tr>
+        <tr><td>k</td><td>Price conversion factor (generator-meter FMP → buyer-side price); 1.026 per Decree 57/2025</td></tr>
+        <tr><td>K_pp</td><td>Loss/volume conversion factor (generator kWh → buyer-credited kWh, ≥22–&lt;110 kV); 1.008 per Decree 57/2025</td></tr>
+        <tr><td>NSMO</td><td>National Power System and Market Operator — publishes SMP, CAN, and FMP data</td></tr>
+        <tr><td>ERAV</td><td>Electricity Regulatory Authority of Vietnam</td></tr>
+        <tr><td>BAU</td><td>Business As Usual — hypothetical cost if the factory stayed on EVN retail (no DPPA)</td></tr>
+        <tr><td>Crossover year</td><td>First year where cumulative DPPA cost (BAU basis) exceeds cumulative DPPA cost; the payback point</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Phase reports generated</h3>
+    <div class="pill-list">
+      <span class="pill pill-green">reports/2026-06-22-phase-01.html</span>
+      <span class="pill pill-green">reports/2026-06-23-phase-02.html</span>
+      <span class="pill pill-green">reports/2026-06-23-phase-03.html</span>
+      <span class="pill pill-green">reports/2026-06-23-phase-04.html</span>
+      <span class="pill pill-purple">reports/2026-06-23-final-dppa-app-workshop-tool.html ← this file</span>
+    </div>
+  </div>
+</section>
+
+</div><!-- /page -->
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose', flowchart: { curve: 'basis' } })
+
+  Chart.defaults.devicePixelRatio = 1
+  Chart.defaults.animation = false
+  Chart.defaults.resizeDelay = 150
+  Chart.defaults.normalized = true
+  Chart.defaults.maintainAspectRatio = false
+
+  // Illustrative 20-yr projection: EVN 4%/yr, Strike 0%, FMP flat
+  const retail = 2204, strike = 2000, dppa = 523.34, loss = 1.0342, fmp = 1427
+  const kwhDay = 5000, days = 365, n = 20
+  const cumBau = [], cumDppa = [], cumSav = [], labels = []
+  let cB = 0, cD = 0
+  for (let y = 1; y <= n; y++) {
+    const eF = (1.04) ** (y - 1)
+    const retail_y = retail * eF
+    // Strike flat (0% escalation)
+    const bau = kwhDay * retail_y * days
+    const evnMkt = kwhDay * fmp * loss
+    const evnDppaAmt = kwhDay * dppa
+    const devCfd = kwhDay * (strike - fmp)
+    const dppaTotal = (evnMkt + evnDppaAmt + devCfd) * days
+    cB += bau; cD += dppaTotal
+    cumBau.push(+(cB / 1e9).toFixed(2))
+    cumDppa.push(+(cD / 1e9).toFixed(2))
+    cumSav.push(+((cB - cD) / 1e9).toFixed(2))
+    labels.push(`Y${y}`)
+  }
+
+  const ctx = document.getElementById('findingsChart').getContext('2d')
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Cum. BAU (B VND)', data: cumBau, borderColor: '#e06c6c', backgroundColor: 'rgba(224,108,108,0.07)', tension: 0.3, pointRadius: 2, fill: false },
+        { label: 'Cum. DPPA (B VND)', data: cumDppa, borderColor: '#4fc3f7', backgroundColor: 'rgba(79,195,247,0.07)', tension: 0.3, pointRadius: 2, fill: false },
+        { label: 'Cum. savings (B VND)', data: cumSav, borderColor: '#4caf82', backgroundColor: 'rgba(76,175,130,0.15)', tension: 0.3, pointRadius: 2, fill: true },
+      ],
+    },
+    options: {
+      animation: false, resizeDelay: 150, normalized: true, maintainAspectRatio: false,
+      plugins: {
+        title: { display: true, text: 'Illustrative · EVN +4%/yr, Strike flat · 5,000 kWh/day matched · values in B VND', color: '#8890a8', font: { size: 11 } },
+        legend: { labels: { color: '#e2e4ef', font: { size: 11 } } },
+        tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${item.raw} B VND` } },
+      },
+      scales: {
+        x: { ticks: { color: '#8890a8', font: { size: 10 } }, grid: { color: '#2d3148' } },
+        y: { ticks: { color: '#8890a8', font: { size: 10 }, callback: (v) => `${v}B` }, grid: { color: '#2d3148' } },
+      },
+    },
+  })
+</script>
+</body>
+</html>
