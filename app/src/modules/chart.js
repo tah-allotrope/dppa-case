@@ -1,6 +1,7 @@
 import Chart from 'chart.js/auto'
 
 let profileChart
+let multiYearChart
 
 const neonGrid = 'rgba(160, 183, 217, 0.12)'
 const tickColor = '#bcd5ff'
@@ -289,4 +290,88 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
   })
 
   return profileChart
+}
+
+export function renderMultiYearChart(canvas, multiYear, currency) {
+  if (!canvas || !multiYear) return
+
+  const { yearlyData } = multiYear
+  const isUsd = currency === 'USD'
+  const divisor = isUsd ? 25000 * 1e6 : 1e9
+  const unitLabel = isUsd ? 'M USD' : 'B VND'
+
+  const labels = yearlyData.map((y) => `Y${y.year}`)
+  const cumBauData = yearlyData.map((y) => +(y.cumBau / divisor).toFixed(3))
+  const cumDppaData = yearlyData.map((y) => +(y.cumDppa / divisor).toFixed(3))
+  const cumSavData = yearlyData.map((y) => +(y.cumSavings / divisor).toFixed(3))
+
+  const datasets = [
+    {
+      label: `Cum. BAU (${unitLabel})`,
+      data: cumBauData,
+      borderColor: '#e06c6c',
+      backgroundColor: 'rgba(224,108,108,0.08)',
+      tension: 0.3,
+      pointRadius: 2,
+      fill: false,
+    },
+    {
+      label: `Cum. DPPA (${unitLabel})`,
+      data: cumDppaData,
+      borderColor: '#4fc3f7',
+      backgroundColor: 'rgba(79,195,247,0.08)',
+      tension: 0.3,
+      pointRadius: 2,
+      fill: false,
+    },
+    {
+      label: `Cum. savings (${unitLabel})`,
+      data: cumSavData,
+      borderColor: '#4caf82',
+      backgroundColor: 'rgba(76,175,130,0.12)',
+      tension: 0.3,
+      pointRadius: 2,
+      fill: true,
+    },
+  ]
+
+  if (multiYearChart) {
+    multiYearChart.data.labels = labels
+    multiYearChart.data.datasets = datasets
+    if (multiYearChart.options.scales.y.title) {
+      multiYearChart.options.scales.y.title.text = unitLabel
+    }
+    multiYearChart.update('none')
+    return multiYearChart
+  }
+
+  multiYearChart = new Chart(canvas, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 200 },
+      plugins: {
+        legend: { labels: { color: tickColor, usePointStyle: true, boxWidth: 10, boxHeight: 10 } },
+        tooltip: {
+          backgroundColor: 'rgba(9, 14, 31, 0.92)',
+          borderColor: 'rgba(82, 188, 255, 0.45)',
+          borderWidth: 1,
+          titleColor: '#f6fbff',
+          bodyColor: '#dcecff',
+        },
+      },
+      scales: {
+        x: { grid: { color: neonGrid }, ticks: { color: tickColor } },
+        y: {
+          grid: { color: neonGrid },
+          ticks: { color: tickColor, callback: (v) => v.toFixed(1) },
+          title: { display: true, text: unitLabel, color: tickColor, font: { size: 10 } },
+        },
+      },
+    },
+  })
+
+  return multiYearChart
 }

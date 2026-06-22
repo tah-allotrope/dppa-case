@@ -1,9 +1,9 @@
 import './style.css'
 import mermaid from 'mermaid'
 import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve } from './data/default-scenarios'
-import { renderProfileChart } from './modules/chart'
-import { buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement } from './modules/settlement'
-import { renderAppShell, renderFormulas, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
+import { renderMultiYearChart, renderProfileChart } from './modules/chart'
+import { buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement, projectMultiYear } from './modules/settlement'
+import { renderAppShell, renderFormulas, renderMultiYearPanel, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
 
 mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' })
 
@@ -75,6 +75,15 @@ async function updateView() {
   updateControlOutputs(state, settlementModes, state.currency)
   setActiveScenario(state.scenarioId)
   setActiveCurrency(state.currency)
+
+  const multiYear = projectMultiYear(inputs, {
+    years: state.horizonYears,
+    evnEscalation: state.evnEscalation,
+    strikeEscalation: state.strikeEscalation,
+  })
+  renderMultiYearPanel(multiYear, state.currency)
+  renderMultiYearChart(document.querySelector('#multiYearChart'), multiYear, state.currency)
+
   await renderMermaidDiagram(mermaidDefinition)
 }
 
@@ -85,6 +94,9 @@ function syncControls() {
     ['dppaCharge', 'dppaCharge', Number],
     ['lossFactor', 'lossFactor', Number],
     ['settlementMode', 'settlementMode', String],
+    ['evnEscalation', 'evnEscalation', Number],
+    ['strikeEscalation', 'strikeEscalation', Number],
+    ['horizonYears', 'horizonYears', Number],
   ]
 
   mappings.forEach(([id, key, transform]) => {
@@ -125,6 +137,9 @@ function syncInputsFromState() {
   document.querySelector('#dppaCharge').value = state.dppaCharge
   document.querySelector('#lossFactor').value = state.lossFactor
   document.querySelector('#settlementMode').value = state.settlementMode
+  document.querySelector('#evnEscalation').value = state.evnEscalation
+  document.querySelector('#strikeEscalation').value = state.strikeEscalation
+  document.querySelector('#horizonYears').value = state.horizonYears
 }
 
 renderAppShell(document.querySelector('#app'), getScenarioList(), settlementModes)

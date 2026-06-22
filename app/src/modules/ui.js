@@ -291,6 +291,21 @@ export function renderAppShell(root, scenarios, settlementModes) {
             </select>
             <strong data-output="settlementMode"></strong>
           </label>
+          <label class="control-card">
+            <span>EVN tariff escalation</span>
+            <input id="evnEscalation" type="range" min="0" max="0.10" step="0.005" />
+            <strong data-output="evnEscalation"></strong>
+          </label>
+          <label class="control-card">
+            <span>Strike escalation</span>
+            <input id="strikeEscalation" type="range" min="0" max="0.10" step="0.005" />
+            <strong data-output="strikeEscalation"></strong>
+          </label>
+          <label class="control-card">
+            <span>Horizon years</span>
+            <input id="horizonYears" type="range" min="5" max="25" step="1" />
+            <strong data-output="horizonYears"></strong>
+          </label>
         </div>
         <div class="assumptions-inline">
           <span>2025 teaching assumptions</span>
@@ -300,6 +315,20 @@ export function renderAppShell(root, scenarios, settlementModes) {
           <span>Synthetic FMP curve</span>
           <span>Click chart to inspect one hour</span>
         </div>
+      </section>
+
+      <section class="panel multi-year-panel bottom-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Multi-year projection</p>
+            <h2 id="multiYearTitle">20-year cumulative economics</h2>
+          </div>
+        </div>
+        <div class="multi-year-rollups" id="multiYearRollups"></div>
+        <div class="chart-wrap multi-year-chart-wrap" style="height:260px">
+          <canvas id="multiYearChart" aria-label="Multi-year cumulative cost chart"></canvas>
+        </div>
+        <div class="assumptions-inline" id="multiYearParams"></div>
       </section>
     </div>
   `
@@ -403,6 +432,40 @@ export function updateControlOutputs(state, settlementModes, currency) {
   document.querySelector('[data-output="lossFactor"]').textContent = state.lossFactor.toFixed(3)
   const activeMode = settlementModes.find((mode) => mode.value === state.settlementMode)
   document.querySelector('[data-output="settlementMode"]').textContent = activeMode ? activeMode.label : state.settlementMode
+  document.querySelector('[data-output="evnEscalation"]').textContent = `${(state.evnEscalation * 100).toFixed(1)}%/yr`
+  document.querySelector('[data-output="strikeEscalation"]').textContent = `${(state.strikeEscalation * 100).toFixed(1)}%/yr`
+  document.querySelector('[data-output="horizonYears"]').textContent = `${state.horizonYears} yr`
+}
+
+export function renderMultiYearPanel(multiYear, currency) {
+  const rollupsEl = document.querySelector('#multiYearRollups')
+  const paramsEl = document.querySelector('#multiYearParams')
+  const titleEl = document.querySelector('#multiYearTitle')
+  if (!rollupsEl || !multiYear) return
+
+  const { rollups, crossoverYear, years, evnEscalation, strikeEscalation } = multiYear
+  const fmt = (v) => formatMoney(v, { currency })
+  const fmtPct = (v) => `${(v * 100).toFixed(1)}%`
+  const savTone = (s) => s > 0 ? 'result' : s < 0 ? 'warning' : 'default'
+  const crossoverText = crossoverYear ? `Year ${crossoverYear}` : `&gt; ${years} yr`
+
+  if (titleEl) titleEl.textContent = `${years}-year cumulative economics`
+
+  rollupsEl.innerHTML = `
+    ${compactPill('Year 1 savings', fmt(rollups.year1.savings), savTone(rollups.year1.savings))}
+    ${rollups.year10 ? compactPill('10-yr cumulative', fmt(rollups.year10.savings), savTone(rollups.year10.savings)) : ''}
+    ${compactPill(`${years}-yr lifetime`, fmt(rollups.lifetime.savings), savTone(rollups.lifetime.savings))}
+    ${compactPill('Crossover', crossoverText, crossoverYear ? 'accent' : 'default')}
+  `
+
+  if (paramsEl) {
+    paramsEl.innerHTML = `
+      <span>EVN ${fmtPct(evnEscalation)}/yr</span>
+      <span>Strike ${fmtPct(strikeEscalation)}/yr</span>
+      <span>FMP flat</span>
+      <span>Rep. day × 365</span>
+    `
+  }
 }
 
 export function setActiveScenario(scenarioId) {
