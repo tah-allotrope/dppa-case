@@ -236,6 +236,63 @@ export function buildWalkthroughCases(inputs, intervals) {
     .filter(Boolean)
 }
 
+export function projectMultiYear(baseInputs, opts = {}) {
+  const years = opts.years ?? baseInputs.horizonYears ?? 20
+  const evnEscalation = opts.evnEscalation ?? baseInputs.evnEscalation ?? 0.04
+  const strikeEscalation = opts.strikeEscalation ?? baseInputs.strikeEscalation ?? 0.04
+
+  const yearlyData = []
+  let cumBau = 0
+  let cumDppa = 0
+
+  for (let n = 1; n <= years; n++) {
+    const evnFactor = (1 + evnEscalation) ** (n - 1)
+    const strikeFactor = (1 + strikeEscalation) ** (n - 1)
+    const yearInputs = {
+      ...baseInputs,
+      retailTariff: baseInputs.retailTariff * evnFactor,
+      strikePrice: baseInputs.strikePrice * strikeFactor,
+    }
+    const result = calculateSettlement(yearInputs)
+    const annualBau = result.totals.baselineCost * 365
+    const annualDppa = result.totals.totalCost * 365
+    cumBau += annualBau
+    cumDppa += annualDppa
+    yearlyData.push({
+      year: n,
+      bau: annualBau,
+      dppa: annualDppa,
+      savings: annualBau - annualDppa,
+      cumBau,
+      cumDppa,
+      cumSavings: cumBau - cumDppa,
+      retailTariff: yearInputs.retailTariff,
+      strikePrice: yearInputs.strikePrice,
+    })
+  }
+
+  const crossoverIdx = yearlyData.findIndex((y) => y.cumSavings > 0)
+
+  return {
+    yearlyData,
+    rollups: {
+      year1: { bau: yearlyData[0].bau, dppa: yearlyData[0].dppa, savings: yearlyData[0].savings },
+      year10: years >= 10
+        ? { bau: yearlyData[9].cumBau, dppa: yearlyData[9].cumDppa, savings: yearlyData[9].cumSavings }
+        : null,
+      lifetime: {
+        bau: yearlyData[years - 1].cumBau,
+        dppa: yearlyData[years - 1].cumDppa,
+        savings: yearlyData[years - 1].cumSavings,
+      },
+    },
+    crossoverYear: crossoverIdx === -1 ? null : crossoverIdx + 1,
+    years,
+    evnEscalation,
+    strikeEscalation,
+  }
+}
+
 export function buildFormulaBreakdown(inputs, interval) {
   const fmp = interval.fmp ?? inputs.marketPrice
   const lossAdjustment = fmp * inputs.lossFactor - fmp

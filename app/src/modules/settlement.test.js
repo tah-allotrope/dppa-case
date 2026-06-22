@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildFormulaBreakdown, buildSelectedWalkthroughCase, buildWalkthroughCases, calculateSettlement, classifyInterval } from './settlement'
+import { buildFormulaBreakdown, buildSelectedWalkthroughCase, buildWalkthroughCases, calculateSettlement, classifyInterval, projectMultiYear } from './settlement'
 
 describe('calculateSettlement', () => {
   it('reproduces the simple matched case from the report logic', () => {
@@ -175,6 +175,85 @@ describe('calculateSettlement', () => {
     expect(selectedCase.headline).toContain('Over-supply')
     expect(selectedCase.hour).toBe(2)
     expect(selectedCase.totalNoDppa).toBe(result.intervals[2].baseline)
+  })
+
+  it('projectMultiYear with zero escalation equals 365 × single-day settlement', () => {
+    const inputs = {
+      loadProfile: [5000],
+      generationProfile: [5000],
+      settlementMode: 'matched',
+      strikePrice: 2000,
+      marketPrice: 1427,
+      dppaCharge: 523.34,
+      lossFactor: 1.0342,
+      retailTariff: 2204,
+    }
+    const singleDay = calculateSettlement(inputs)
+    const result = projectMultiYear(inputs, { years: 5, evnEscalation: 0, strikeEscalation: 0 })
+
+    // Each year should equal 365 × single day, and cumulative should compound cleanly
+    expect(result.yearlyData[0].bau).toBeCloseTo(singleDay.totals.baselineCost * 365, 0)
+    expect(result.yearlyData[0].dppa).toBeCloseTo(singleDay.totals.totalCost * 365, 0)
+    expect(result.yearlyData[4].cumBau).toBeCloseTo(singleDay.totals.baselineCost * 365 * 5, 0)
+    expect(result.yearlyData[4].cumDppa).toBeCloseTo(singleDay.totals.totalCost * 365 * 5, 0)
+    expect(result.years).toBe(5)
+    expect(result.evnEscalation).toBe(0)
+    expect(result.strikeEscalation).toBe(0)
+  })
+
+  it('projectMultiYear compounds retailTariff and strikePrice correctly by year', () => {
+    const inputs = {
+      loadProfile: [5000],
+      generationProfile: [5000],
+      settlementMode: 'matched',
+      strikePrice: 2000,
+      marketPrice: 1427,
+      dppaCharge: 523.34,
+      lossFactor: 1.0342,
+      retailTariff: 2204,
+    }
+    const result = projectMultiYear(inputs, { years: 3, evnEscalation: 0.04, strikeEscalation: 0.04 })
+
+    // Year 1: factor = 1.0^0 = 1, so no change
+    expect(result.yearlyData[0].retailTariff).toBeCloseTo(2204, 4)
+    expect(result.yearlyData[0].strikePrice).toBeCloseTo(2000, 4)
+    // Year 2: factor = 1.04^1
+    expect(result.yearlyData[1].retailTariff).toBeCloseTo(2204 * 1.04, 4)
+    expect(result.yearlyData[1].strikePrice).toBeCloseTo(2000 * 1.04, 4)
+    // Year 3: factor = 1.04^2
+    expect(result.yearlyData[2].retailTariff).toBeCloseTo(2204 * 1.04 ** 2, 4)
+    expect(result.yearlyData[2].strikePrice).toBeCloseTo(2000 * 1.04 ** 2, 4)
+    // Rollup structures present
+    expect(result.rollups.year1).toBeDefined()
+    expect(result.rollups.year10).toBeNull()
+    expect(result.rollups.lifetime.savings).toBeCloseTo(result.yearlyData[2].cumSavings, 0)
+  })
+
+  it('projectMultiYear detects crossover year when cumulative savings first turns positive', () => {
+    // BAU rises faster than DPPA cost when EVN escalation > strike escalation
+    // Strike held flat (0%) means DPPA cost compounds slower → crossover eventually
+    const inputs = {
+      loadProfile: [5000],
+      generationProfile: [5000],
+      settlementMode: 'matched',
+      strikePrice: 2000,
+      marketPrice: 1427,
+      dppaCharge: 523.34,
+      lossFactor: 1.0342,
+      retailTariff: 2204,
+    }
+    const result = projectMultiYear(inputs, { years: 20, evnEscalation: 0.06, strikeEscalation: 0 })
+
+    // With 6% EVN escalation and 0% strike escalation BAU compound costs must
+    // eventually overtake the fixed DPPA cost — crossover must exist
+    expect(result.crossoverYear).not.toBeNull()
+    expect(result.crossoverYear).toBeGreaterThan(0)
+    expect(result.crossoverYear).toBeLessThanOrEqual(20)
+    // cumSavings at crossoverYear - 1 should be ≤ 0, at crossoverYear > 0
+    if (result.crossoverYear > 1) {
+      expect(result.yearlyData[result.crossoverYear - 2].cumSavings).toBeLessThanOrEqual(0)
+    }
+    expect(result.yearlyData[result.crossoverYear - 1].cumSavings).toBeGreaterThan(0)
   })
 
   it('keeps the default pricing basis aligned with verified 2026 reference values', async () => {
