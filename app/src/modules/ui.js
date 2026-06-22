@@ -186,7 +186,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
           <div>
             <p class="eyebrow">Rob — Vietnam synthetic DPPA</p>
             <h1>DPPA CFO visual explainer</h1>
-            <p class="hero-copy">Click any hour to compare the 2025 teaching-model baseline against DPPA payment using documented example inputs and synthetic hourly FMP.</p>
+            <p class="hero-copy">Click any hour to compare the 2025 teaching-model baseline against DPPA payment using documented example inputs and an illustrative FMP curve (no primary NSMO/ERAV source available).</p>
           </div>
         </div>
         <div class="topbar-actions">
@@ -270,7 +270,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
             <strong data-output="strikePrice"></strong>
           </label>
           <label class="control-card">
-            <span>Market price / FMP</span>
+            <span>Market price / FMP (illustrative)</span>
             <input id="marketPrice" type="range" min="900" max="2600" step="10" />
             <strong data-output="marketPrice"></strong>
           </label>
