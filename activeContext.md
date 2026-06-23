@@ -320,3 +320,24 @@ Closed 5 gaps from `reports/2026-05-22-workshop-readiness-gap-analysis.md`: GAP-
 - Reports: `reports/2026-06-23-sprint-1-phase-{01,02,03,04}.md` + `reports/2026-06-23-sprint-1-completion.md`
 - Commits pushed: `0d0ef1f` (phase 01), `9500110` (phase 02), `2c75536` (phase 03), `c63b36c` (phase 04), plus report commits
 
+## Sprint 2: Mobile Optimization & Bundle Performance — Completed 2026-06-23
+
+Closed 3 gaps from `reports/2026-05-22-workshop-readiness-gap-analysis.md`: GAP-02 (bundle size 3.1 MB), GAP-03 (chart tap targets 1.5px), GAP-04 (mermaid mobile horizontal scroll). Plan: `plans/sprint-2-mobile-optimization.md`.
+
+### Plan
+- [x] PHASE-01: Replace Mermaid with HTML/CSS flow diagram (new `flow-diagram.js` module); remove mermaid import + initialize + renderMermaidDiagram; uninstall `mermaid` (129 packages removed); update tests to assert on HTML output
+- [x] PHASE-02: Increase chart pointRadius (1.5→4 base, 5→8 selected, mobile-aware via matchMedia); add chart-tap-hint subtitle; add prev/next hour nav row with HH:00 label
+- [x] PHASE-03: Create `vite.config.js` with `chunkSizeWarningLimit: 300`; rename legacy `#cancellationMermaid` → `#cancellationFlow`; mobile viewport verification at 375/390/412 px
+
+### Review / Results
+- Bundle dropped 92%: 3.1 MB → 245 KB (gzip 80.7 KB)
+- node_modules: 215 → 86 packages (60% fewer)
+- Build time: 3.4s → 0.8-1.1s
+- dist files: 95 → 3 (97% fewer)
+- Zero mermaid/cytoscape/katex/dagre artifacts in dist
+- All 38 tests pass after each phase
+- Mobile (390px): flow direction = column, no horizontal scroll, hour nav works
+- Live site verified at https://dppa-case.web.app: prev/next cycles 12:00→13:00→14:00→13:00, all 4 flow rows render, 0 console errors
+- Reports: `reports/2026-06-23-sprint-2-phase-{01,02,03}.md` + `reports/2026-06-23-sprint-2-completion.md`
+- Commits pushed: `3f55863` (phase 01), `b3691f8` (phase 02), `2905211` (phase 03), plus report commits
+
