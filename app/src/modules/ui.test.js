@@ -143,6 +143,7 @@ describe('selected-hour layout', () => {
     const breakdown = buildFormulaBreakdown(inputs, interval)
     const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
     const fmpText = formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })
+    const strikeText = formatMoney(inputs.strikePrice, { currency: 'VND', precise: true, perKwh: true })
 
     renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
 
@@ -153,7 +154,7 @@ describe('selected-hour layout', () => {
       inputs,
     )
 
-    const mermaidDefinition = renderFormulas(breakdown, '', 'VND')
+    const flowResult = renderFormulas(breakdown, '', 'VND')
 
     const text = normalizedText('#walkthroughCases')
 
@@ -174,11 +175,14 @@ describe('selected-hour layout', () => {
     expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain('net-retained-term result">CDPPA')
     expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain('net-retained-term warning')
     expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain('net-retained-term accent')
-    expect(mermaidDefinition).toContain('flowchart LR')
-    expect(mermaidDefinition).toContain('Spot reference shown on EVN')
-    expect(mermaidDefinition).toContain('Canceled on aligned volume')
-    expect(mermaidDefinition).toContain(`- ${interval.contractQuantity.toLocaleString()} kWh x ${fmpText}`)
-    expect(document.querySelector('#cancellationMermaid').textContent).toContain('flowchart LR')
+    expect(flowResult.kind).toBe('clean')
+    expect(flowResult.flowHtml).toContain('flow-clean')
+    expect(flowResult.flowHtml).toContain('Spot reference shown on EVN')
+    expect(flowResult.flowHtml).toContain('Canceled on aligned volume')
+    expect(flowResult.flowHtml).toContain(`+ ${interval.contractQuantity.toLocaleString()} kWh × ${strikeText}`)
+    expect(flowResult.flowHtml).toContain(`− ${interval.cleanCancelledEnergy ? interval.cleanCancelledEnergy.toLocaleString() : interval.contractQuantity.toLocaleString()} kWh × ${fmpText}`)
+    expect(document.querySelector('#cancellationMermaid').innerHTML).toContain('flow-clean')
+    expect(document.querySelector('#cancellationMermaid').classList.contains('cancellation-flow')).toBe(true)
   })
 
   it('keeps the cancellation strip and neutral retained terms in a shortfall hour', () => {
@@ -282,11 +286,12 @@ describe('selected-hour layout', () => {
     const strikeText = formatMoney(inputs.strikePrice, { currency: 'VND', precise: true, perKwh: true })
 
     renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
-    const mermaidDefinition = renderFormulas(breakdown, '', 'VND')
+    const flowResult = renderFormulas(breakdown, '', 'VND')
 
     expect(normalizedText('#walkthroughCases')).toContain(`Strike (${strikeText}) × ${interval.contractQuantity.toLocaleString()} kWh`)
     expect(normalizedText('#walkthroughCases')).toContain(formatMoney(interval.developer, { currency: 'VND', signed: true }))
-    expect(mermaidDefinition).toContain(`Developer CfD swap\n- ${interval.contractQuantity.toLocaleString()} kWh x ${fmpText}`)
+    expect(flowResult.flowHtml).toContain('Developer CfD swap')
+    expect(flowResult.flowHtml).toContain(`− ${interval.contractQuantity.toLocaleString()} kWh × ${fmpText}`)
   })
 
   it('uses the clicked interval FMP in selected-hour detail formulas', () => {

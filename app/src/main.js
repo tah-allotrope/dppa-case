@@ -1,11 +1,8 @@
 import './style.css'
-import mermaid from 'mermaid'
 import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve } from './data/default-scenarios'
 import { renderMultiYearChart, renderProfileChart } from './modules/chart'
 import { buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement, projectMultiYear } from './modules/settlement'
 import { renderAppShell, renderFormulas, renderMultiYearPanel, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
-
-mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' })
 
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Unhandled promise rejection:', event.reason)
@@ -13,11 +10,10 @@ window.addEventListener('unhandledrejection', (event) => {
 })
 
 const state = { ...defaultInputs }
-let mermaidRenderToken = 0
 
-function showMermaidFallback(node) {
+function showCancellationFlowFallback(node) {
   if (!node) return
-  node.innerHTML = '<p class="mermaid-fallback">Diagram updating…</p>'
+  node.innerHTML = '<p class="cancellation-flow-fallback">Flow diagram updating…</p>'
 }
 
 function getScenarioList() {
@@ -47,27 +43,6 @@ function getWarningText(totals, scenario) {
   return ''
 }
 
-async function renderMermaidDiagram(definition) {
-  const node = document.querySelector('#cancellationMermaid')
-  if (!node || !definition) return
-
-  const token = ++mermaidRenderToken
-  const renderId = `cancellation-flow-${token}`
-  try {
-    const { svg, bindFunctions } = await mermaid.render(renderId, definition)
-
-    if (token !== mermaidRenderToken) return
-
-    node.innerHTML = svg
-    bindFunctions?.(node)
-  } catch (error) {
-    console.error('Mermaid render failed:', error)
-    if (token === mermaidRenderToken) {
-      showMermaidFallback(node)
-    }
-  }
-}
-
 async function updateView() {
   const inputs = buildInputs()
   const scenario = scenarioProfiles[state.scenarioId]
@@ -86,7 +61,13 @@ async function updateView() {
     console.error('Profile chart render failed:', error)
   }
   renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedWalkthroughCase, state.currency, formulas)
-  const mermaidDefinition = renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
+  try {
+    renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
+  } catch (error) {
+    console.error('Cancellation flow render failed:', error)
+    const node = document.querySelector('#cancellationMermaid')
+    showCancellationFlowFallback(node)
+  }
   renderSelectedHourDetails(
     document.querySelector('#selectedHourDetailsPanel'),
     selectedInterval,
@@ -107,14 +88,6 @@ async function updateView() {
     renderMultiYearChart(document.querySelector('#multiYearChart'), multiYear, state.currency)
   } catch (error) {
     console.error('Multi-year chart render failed:', error)
-  }
-
-  try {
-    await renderMermaidDiagram(mermaidDefinition)
-  } catch (error) {
-    console.error('Mermaid diagram update failed:', error)
-    const node = document.querySelector('#cancellationMermaid')
-    showMermaidFallback(node)
   }
 }
 

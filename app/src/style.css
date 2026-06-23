@@ -852,24 +852,96 @@ h3 { font-size: 1.02rem; }
   color: #f6fbff;
 }
 
-.mermaid-card {
+.cancellation-flow-card {
   margin-top: 8px;
   border: 1px solid var(--line);
   border-radius: 18px;
-  padding: 8px;
+  padding: 12px 14px;
   background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
 }
 
-.mermaid {
-  margin-top: 4px;
-  overflow-x: auto;
-  zoom: 0.82;
-  min-width: 640px;
+.cancellation-flow {
+  margin-top: 8px;
+  display: block;
+  width: 100%;
 }
 
-.mermaid-fallback {
+.flow-diagram {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 6px;
+  align-items: stretch;
+}
+
+.flow-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.flow-node {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(154, 255, 222, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 0.74rem;
+  line-height: 1.25;
+}
+
+.flow-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted, #8b97a8);
+}
+
+.flow-value {
+  font-size: 0.78rem;
+  color: #f6fbff;
+  word-break: break-word;
+}
+
+.flow-total {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #9affe0;
+  margin-top: 2px;
+}
+
+.flow-arrow {
+  font-size: 0.9rem;
+  color: rgba(71, 215, 255, 0.7);
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 0 2px;
+}
+
+.flow-node-bau { border-color: rgba(63, 184, 255, 0.32); background: rgba(63, 184, 255, 0.08); }
+.flow-node-evn { border-color: rgba(71, 215, 255, 0.32); background: rgba(71, 215, 255, 0.08); }
+.flow-node-cancel { border-color: rgba(255, 216, 79, 0.45); background: rgba(255, 216, 79, 0.08); }
+.flow-node-developer { border-color: rgba(255, 104, 216, 0.32); background: rgba(255, 104, 216, 0.08); }
+.flow-node-keep { border-color: rgba(154, 255, 222, 0.32); background: rgba(154, 255, 222, 0.08); }
+.flow-node-dppa { border-color: rgba(255, 216, 79, 0.45); background: rgba(255, 216, 79, 0.10); }
+.flow-node-compare { border-color: rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.04); }
+.flow-node-savings { border-color: rgba(154, 255, 222, 0.45); background: rgba(154, 255, 222, 0.10); }
+.flow-node-contract { border-color: rgba(255, 104, 216, 0.32); background: rgba(255, 104, 216, 0.08); }
+.flow-node-mismatch { border-color: rgba(255, 90, 95, 0.45); background: rgba(255, 90, 95, 0.10); }
+.flow-node-exposure { border-color: rgba(255, 90, 95, 0.32); background: rgba(255, 90, 95, 0.06); }
+
+.cancellation-flow-fallback {
   font-style: italic;
   text-align: center;
   color: var(--muted, #8b97a8);
@@ -1286,11 +1358,11 @@ h3 { font-size: 1.02rem; }
     padding: 0;
   }
 
-  /* Mermaid: keep text readable with horizontal pan inside the card */
-  .mermaid {
-    zoom: 0.9;
-    min-width: 700px;
-  }
+  /* Cancellation flow: stack rows vertically on small screens, no horizontal pan */
+  .cancellation-flow-card { padding: 10px; }
+  .flow-row { flex-direction: column; align-items: stretch; }
+  .flow-arrow { transform: rotate(90deg); align-self: center; }
+  .flow-node { font-size: 0.7rem; }
 
   /* FMP cancellation strip: let chips shrink freely, allow label wrapping */
   .fmp-cancel-strip { padding: 10px; }
@@ -1328,11 +1400,11 @@ h3 { font-size: 1.02rem; }
   .cancel-eq-value { font-size: 0.72rem; }
   .cancel-eq-label { font-size: 0.52rem; }
 
-  /* Mermaid: preserve readability on extra-small phones */
-  .mermaid {
-    zoom: 0.84;
-    min-width: 660px;
-  }
+  /* Cancellation flow: tighter font and padding on extra-small phones */
+  .cancellation-flow-card { padding: 8px; }
+  .flow-node { font-size: 0.66rem; padding: 6px 8px; }
+  .flow-value { font-size: 0.72rem; }
+  .flow-total { font-size: 0.78rem; }
 
   /* Chart wrap: cap height a bit tighter on small phones */
   .chart-wrap {
