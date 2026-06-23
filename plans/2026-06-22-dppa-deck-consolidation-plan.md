@@ -1,12 +1,22 @@
 ---
 title: "CEBA DPPA 2026 Deck — Scenario Consolidation to 3 Canonical Cases"
 date: "2026-06-22"
-status: "draft"
+status: "complete"
 request: "Based on brainstorm dppa-app-deck-consolidation: consolidate the deck's 6-7 scenarios into 3 canonical cases using the web app's model"
 plan_type: "multi-phase"
 research_inputs:
   - "research/2026-06-22_dppa-app-deck-consolidation-brainstorm.md"
   - "research/2026-06-22_vietnam-dppa-2026.md"
+completed: "2026-06-23"
+reports:
+  - "reports/2026-06-23-deck-consolidation-phase-01.md"
+  - "reports/2026-06-23-deck-consolidation-phase-02.md"
+  - "reports/2026-06-23-deck-consolidation-phase-03.md"
+  - "reports/2026-06-23-deck-consolidation-phase-04.md"
+  - "reports/2026-06-23-deck-consolidation-completion.md"
+known_limitations:
+  - "PNG export blocked: no PowerPoint / LibreOffice on this machine. Text-level QA fallback in deck-qa/qa-slide-titles.txt. Visual review must be done by a human with PowerPoint or LibreOffice."
+  - "Two-component retail tariff caveat not added to case slides (niche policy detail; Circular 16/2025 cited on slide 34 is the higher-priority policy refresh)"
 ---
 
 # Plan: CEBA DPPA 2026 Deck — Scenario Consolidation to 3 Canonical Cases

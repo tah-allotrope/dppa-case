@@ -320,6 +320,31 @@ Closed 5 gaps from `reports/2026-05-22-workshop-readiness-gap-analysis.md`: GAP-
 - Reports: `reports/2026-06-23-sprint-1-phase-{01,02,03,04}.md` + `reports/2026-06-23-sprint-1-completion.md`
 - Commits pushed: `0d0ef1f` (phase 01), `9500110` (phase 02), `2c75536` (phase 03), `c63b36c` (phase 04), plus report commits
 
+## Deck Consolidation (CEBA DPPA 2026) — Completed 2026-06-23
+
+Consolidated the deck's redundant worked scenarios (Case Studies 5 & 6 + workshop Scenarios 1–5) into 3 canonical teaching cases (matched / shortfall / excess) that mirror the web app, plus 2 compact callouts (netting + financing) and 7 policy/agenda refreshes. Plan: `plans/2026-06-22-dppa-deck-consolidation-plan.md`.
+
+### Plan
+- [x] PHASE-01: Inventory + mapping spec (`deck-qa/consolidation-map.md`)
+- [x] PHASE-02: Build 3 canonical case slides using python-pptx (`build_canonical_cases.py`)
+- [x] PHASE-03: Add multi-party netting callout + financing summary (`build_callouts.py`)
+- [x] PHASE-04: Policy refresh + agenda renumbering (`build_policy_refresh.py`)
+
+### Review / Results
+- Deck: 57 → 45 slides (-12 slides, +5 new = -7 net)
+- 5 new slides: 3 canonical cases (matched/shortfall/excess), 1 financing summary, 1 netting callout
+- 13 redundant slides removed: 4 Cases 5/6 detail, 8 Scenarios 1+3, 5 Scenarios 4+5
+- All slides use verified 2026 numbers (retail 2,204 / fees 523.3 / loss 1.0342 / strike 2,000 / FMP 1,427 illustrative)
+- Same factory frame as the app: 4,200-6,200 kWh/h, so deck and live tool show identical numbers
+- Policy refresh: Circular 16/2025 cited on slide 34, Samsung SEVT ↔ TTC Duc Hue 2 first-DPPA cited on slides 40 and 42
+- Module 5 divider renamed "Case Studies 5 & 6" → "Three Canonical Cases"
+- Interactive Exercise renamed "DPPA Scenario Analysis" → "Apply the 3 Canonical Cases"
+- Backup preserved: `ceba/CEBA DPPA 2026.backup-2026-06-23.pptx`
+- python-pptx loads deck cleanly, slide count = 45
+- **Known limitation:** PNG export (TASK-04-03) blocked because no PowerPoint / LibreOffice on this machine. Text-level QA fallback in `deck-qa/qa-slide-titles.txt`; visual review remains a manual step.
+- Reports: `reports/2026-06-23-deck-consolidation-phase-{01,02,03,04}.md` + `reports/2026-06-23-deck-consolidation-completion.md`
+- Commits pushed: `afe0a06` (phase 01), `75580ee` (phase 02), `cf213a7` (phase 03), `a248c63` (phase 04), plus report commits
+
 ## Sprint 2: Mobile Optimization & Bundle Performance — Completed 2026-06-23
 
 Closed 3 gaps from `reports/2026-05-22-workshop-readiness-gap-analysis.md`: GAP-02 (bundle size 3.1 MB), GAP-03 (chart tap targets 1.5px), GAP-04 (mermaid mobile horizontal scroll). Plan: `plans/sprint-2-mobile-optimization.md`.
