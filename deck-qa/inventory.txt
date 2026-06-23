@@ -1,0 +1,389 @@
+﻿
+=== ceba\CEBA DPPA 2026.pptx ===
+Slides: 57
+
+Slide 1:
+  - Session 5.2: Off-Site Solutions Deep Dive
+VietnamΓÇÖs DPPA 
+Pricing Considerations
+
+Slide 2:
+  - About the Speaker
+  - Cong is a renewable energy professional with over a decade of experience. Prior to joining Allotrope, Cong cultivated ex
+  - Cong Nguyen
+Allotrope Partners
+Vietnam Clean Energy Manager
+
+Slide 3:
+  - Follow the Money: From your EVN Bill to a Bankable DPPA
+  - By the end of this session you will be able:
+  - 1.  Breakdown a virtual DPPA monthly settlement into its five components and compare it to your EVN bill
+2.  Explain how
+  - Scope: Virtual DPPA  (grid CfD) only.
+  - Session Roadmap
+
+Slide 4:
+  - Module 1:
+The Baseline: What You Pay EVN Today
+
+Slide 5:
+  - Sunday rule: no peak period on Sundays (all hours normal).
+  - Why this matters for DPPA
+  - Every DPPA offer is judged against this bill: ΓÇ£business-as-usualΓÇ¥ (BAU)
+Peak hours cost 3.4x off-peak: your load shape d
+  - The savings benchmark
+  - BAU = your current EVN bill escalated ~4%/yr (historical trend 2015-2024)
+A DPPA is evaluated on cumulative cost vs BAU 
+  - (USD/kWh approx. 2025)
+
+Slide 6:
+  - Module 2:
+Virtual DPPA Money Flow: The Five-Line Bill
+
+Slide 7:
+  - RE GENERATOR
+sells 100% of output
+to the spot market
+  - VWEM SPOT MARKET
+pays generator FMP
+per kWh generated
+  - EVN
+meters, wheels, & bills
+the DPPA customer
+  - YOUR FACTORY
+pays EVN the DPPA bill;
+settles CfD with generator
+  - energy -> market (FMP)
+  - DPPA bill (5 lines)
+  - CfD settlement (two-way)
+  - Physical electrons flow through the national grid as usual and the DPPA is a financial overlay
+The generator's revenue =
+
+Slide 8:
+  - RE GENERATOR
+sells 100% of output
+to the spot market
+  - VWEM SPOT MARKET
+pays generator FMP
+per kWh generated
+  - EVN
+meters, wheels, & bills
+the DPPA customer
+  - YOUR FACTORY
+pays EVN the DPPA bill;
+settles CfD with generator
+  - energy -> market (FMP)
+  - DPPA bill (5 lines)
+  - CfD settlement (two-way)
+  - Physical electrons flow through the national grid as usual and the DPPA is a financial overlay
+The generator's revenue =
+
+Slide 9:
+  - Lines 1-4 are billed by EVN. Line 5 settles bilaterally with the generator under CfD contract.
+Q_Khc = the renewable vol
+
+Slide 10:
+  - Q_adj = Q_meter / K_pp        delivered volume at your meter
+Q_Khc = min(Load, Q_adj)      settled volume (lines 1-3)
+Q_
+  - Grid losses are reflected through coordinated volume and price conversions: K_pp converts generator-meter output into b
+  - Which volume? You settle only on what you actually consume
+
+Slide 11:
+  - Scenario
+  - A 50 MW solar plant contracts its full output to one industrial customer
+Consumption exactly equals delivered RE volume 
+  - Source: EAVCED public training
+
+Slide 12:
+  - Effective cost = 11,186,097,600 / 6,000,000 = ~1,864 VND/kWh for fully renewable supply (versus ~2,204┬áVND avg retail in
+
+Slide 13:
+  - Virtual DPPA is rarely a Day-1 discount. Its value comes from price certainty versus EVN escalation, being able to cover
+  - The 523 VND/kWh of fixed fees applies to every matched kWh, regardless of your strike
+They are set by regulation, not ne
+
+Slide 14:
+  - Module 3:
+CfD Mechanics: What Drives Your Quoted Price
+
+Slide 15:
+  - CfD cash flow = (Strike - FMP) x Q_CfD
+  - Net effect: the renewable energy cost is locked near the strike (+ fees), whatever the market does
+2025 reference: FMP a
+
+Slide 16:
+  - Strike escalation (e.g., 4%/yr)
+  - Escalating strikes improve the seller's and lender's lifetime economics...
+...but do nothing for the Year 1 cost and com
+  - What Year 1 usually looks like
+  - In most realistic structures, Year 1 DPPA cost is at or above BAU
+Savings build as EVN tariffs escalate (~4%/yr) against
+  - Internal Budget Question to Consider: Can we accept a modest Year 1 premium to cap 15~25 year exposure?
+
+Slide 17:
+  - Solar generation peaks  midday, but the factory runs its own shape. The overlapΓÇöhour by hour - is what matters most.
+  - Ask every developer for an hourly (8760 hour) matching analysis against your meter data, not an annual percentage
+Batter
+
+Slide 18:
+  - Module 4:
+Developer Economics and the Three Gates
+
+Slide 19:
+  - Revenue =
+
+ Q_meter x FMP	spot sales (volatile)	+ 
+ (Strike - FMP) x Q_CfD  	
+CfD with your factory (stabiliser)
+  - The CfD converts volatile spot revenue into a near-fixed price on matched volume
+Your strike IS the developer's bankable
+
+Slide 20:
+  - DSCR = 					, computed for every year of the loan
+One CAPEX heavy year ( e.g., a battery replacement) can sink the whol
+  - A strike below the developer's bankability floor does not mean a cheap deal; 
+it means no project.
+  - THREE GATES
+  - Debt Service
+  - Cash available for Debt service
+
+Slide 21:
+  - The above terms are key components of the tariff and are included even when they are absent from the term sheet
+These ra
+
+Slide 22:
+  - Module 5:
+Case Studies 5 & 6
+
+Slide 23:
+  - YesterdayΓÇÖs On-Site Session: Cases 1-4 explored rooftop solar + BESS behind the meter. 
+Today: The same southern Vietnam
+
+Slide 24:
+  - At strike 2,000 the buyer pays ~9% MORE than BAU on every horizon
+The oversized battery adds a ~$1.2M replacement around
+  - Lesson 1: An oversized battery cannot carry its own replacement cost through the tariff; everyone loses.
+  - BATTERY EATS THE DEAL
+  - Module 5 - Case Study
+Case Study 5: Solar + Large BESS
+
+Slide 25:
+  - Lean sizing: seller and lender are now comfortable - returns strong, DSCR 1.50x
+But at strike 2,000 VND/kWh the buyer is
+  - Lesson 2: Right-sized the BESS makes the project financeable. Then, the entire negotiation is the strike price.
+  - CHALLENGING, YET BANKABLE
+  - Module 5 - Case StudyCase Study 6: Solar + Minimum BESS
+
+Slide 26:
+  - 56 scenarios analyzed: 12 strike prices ranging from  1,200-2,200 VND/kWh and 4┬ácontract volumes ranging from 70-100%. 
+
+  - The buyer turns positive just as the lender drops out: 0 of 56 scenarios pass all three gates at current market prices a
+  - Pricing alone cannot balance this deal, BUT there are ΓÇ£leversΓÇ¥ that can: lower leverage, debt sculpting, USD-denominated
+
+Slide 27:
+  - Expect low single-digit lifetime savings at best. The product you are buying is 10-25 year price certainty, meet up to 1
+
+Slide 28:
+  - Module 6:
+Key Decision Points and Wrap-up
+
+Slide 29:
+  - Items 1-4 are quantifiable before negotiation; run them against load data first.
+
+Slide 30:
+  - Know the five-line bill: 523 VND/kWh of fees and the loss factor are fixed; the strike price remains the big number open
+  - Next: Panel discussion on risk allocation and the reality of bank financing for Grid DPPA
+
+Slide 31:
+  - QR to be updated
+
+Slide 32:
+  - Leave 
+questions
+for us
+  - QR
+
+To be finalized
+
+Slide 33:
+  - Cong Nguyen
+(Speaker)
+
+Vietnam Clean Energy Manager 
+Allotrope Partners
+  - Duc Nguyen
+(Speaker)
+  - Panel Discussion
+  - Off-Site Solutions Deep-Dive: Unlocking DPPA
+
+Slide 34:
+
+Slide 35:
+  - Interactive Group Exercise
+  - Roundtable Discussions on Procurement Lessons Sharing
+(~45 minutes)
+  - Please remain at your table.
+Table facilitators will provide questions to discuss in an open dialogue format among the p
+
+Slide 36:
+  - Interactive Exercise
+  - Please remain at your table.
+Table facilitators will provide you with a resource packet containing case studies, descrip
+  - DPPA Scenario Analysis (~60 minutes)
+
+Slide 37:
+  - Based on Decree 57/2025/ND-CP, the cost calculation parameters are assumed as follows:
+  - Cost Formulas
+
+C_KH  =  	C_EVN  +  	C_CfD
+  - Note:  The plant sells all output to the spot market (receives FMP); the CfD only adjusts the price to Pc for the contra
+  - (Pc ΓêÆ FMP) * Qc
+  - =
+  - Qkhhc * FMP * k * Kpp = C_DN 
+
+Qkhhc * C_dppa_dv = C_dppa 
+
+Qkhhc * Pcl = C_cl 
+
+(QKH ΓêÆ Qkhhc) * P1 = C_bl
+  - +
+  - +
+
+Slide 38:
+  - Your manufacturing plant has a strict corporate target to reach 100% renewable energy consumption by 2030. To achieve th
+
+Slide 39:
+  - 5-Line Bill
+1. Market electricity energy cost
+CDN = 5,000,000 kWh * 1,150 VND/kWh * 1.026 * 1.008 = 5,946,696,000 VND
+
+2
+  - Difference QKH - QKHhc = 0 MWh
+  - The customer doesnΓÇÖt need additional electricity from EVN
+  - Total cost collected by EVN 
+CEVN = 5,946,696,000 + 1,800,000,000 + 816,500,000 + 0 = 8,263,196,000 VND
+
+Slide 40:
+  - 5. CfD Contract Cost
+CDN = (PC - FMP) * QC = (1,250 - 1,150) VND/kWh * 5,000,000 kWh = 500,000,000 VND
+  - Total Customer Cost (CKH )
+CKH = CEVN + CCfD = 8,263,196,000 + 500,000,000 = 8,763,196,000 VND
+  - Power Plant Revenue
+Revenue from the market
+CTTD: The plant generates the full 5,000 MWh (after loss ~5,040,000 kWh at t
+
+Slide 41:
+  - Large Customer
+  - EVN
+  - RE GENCO
+  - 8,2 billion VND = 5,9 billion VND for market electricity energy 
++ 1,8 billion VND service fee 
++ 0.8 billion VND differ
+  - 0.5 billion VND according to the CfD contract
+  - 6.2 billion VND on the spot market
+
+Slide 42:
+  - Your factory agrees to a Virtual DPPA (grid-connected) with a solar developer
+Fixed "Strike Price" of 1,800 VND/kWh. 
+Fa
+  - Questions:
+Who owes money to whom? Since you are essentially paying two bills, how does this complicate your factory's m
+
+Slide 43:
+  - 1. Market electricity energy cost 
+CDN = 8,000,000 kWh * 1,600 VND/kWh * 1.026 * 1.008 = 13,237,862,400 VND
+
+2. System s
+  - Difference QKH - QKHhc = 1000 MWh
+  - The customer must purchase additional electricity from EVN
+  - Total cost collected by EVN 
+CEVN = 13,237,862,400 + 2,880,000,000 + 1,306,400,000 + 2,204,000,000 = 19,628,262,400 VND
+
+Slide 44:
+  - 5. CfD Contract Cost
+CDN = (PC - FMP) * QC = (1,500 - 1,600) VND/kWh * 8,000,000 kWh = -800,000,000 VND
+  - Total Customer Cost (CKH )
+CKH = CEVN + CCfD = 19,628,262,400 + (-800,000,000) = 18,828,262,400 VND
+  - Power Plant Revenue
+Revenue from the market
+CTTD: The plant generates the full 8,000 MWh (after loss ~8,064,000 kWh at t
+
+Slide 45:
+  - Large Customer
+  - EVN
+  - RE GENCO
+  - 19.628 billion VND = 13.238 billion for market electricity energy 
++ 2.880 billion service fee 
++ 1.306 billion differen
+  - 0.800 billion VND according to the CfD contract
+  - 12.902 billion VND on the spot market
+
+Slide 46:
+  - The average EVN retail price is about 1,800 VND/kWh. Customer C receives 900,000 kWh of renewable electricity via DPPA (
+
+Slide 47:
+  - CALCULATIONS
+Cost paid to EVN (for 900,000 kWh of renewables + 100,000 kWh additional):
+Market electricity energy cost =
+
+Slide 48:
+  - REVENUE CALCULATIONS
+Revenue of plant X
+Market revenue:
+Plant X generates 600,000 kWh to C (~604,800 kWh at the generato
+
+Slide 49:
+  - CfD contract: 
+60 million VND
+  - CfD contract: 30 million VND
+  - 967.68 million VND
+  - 483.84 million VND
+  - Wind Plant Y
+  - Solar Plant X
+  - Customer C
+  - EVN
+
+Slide 50:
+  - Difference QKH - QKHhc = 0 MWh
+  - The customer doesnΓÇÖt need additional electricity from EVN
+  - But what happens when market price fluctuates?
+  - Case 1: Market price is higher than contract price
+  - Case 2: Market price is lower than contract price
+  - Total contract output allocated to customers exactly equals the plant's output
+
+Slide 51:
+  - Workshop Recap and Wrap Up
+
+Slide 52:
+  - DPPA represents a critical step in scaling RE procurement in Vietnam. Large energy customers, customers lacking facility
+
+Slide 53:
+  - Urgent need for action: Companies need to act quickly to implement clean energy solutions within this decade, as climate
+
+Slide 54:
+  - 01
+  - Vietnam's DPPA is a game-changer
+  - The DPPA is now available but early-stage; implementation complexity demands careful planning and local expertise
+Key ne
+  - 02
+  - Pricing complexity is real
+  - Market volatility, grid-loss adjustments, and load matching all materially affect DPPA costs. Model the full formula ΓÇö n
+  - 03
+  - Load profile determines economics
+
+Slide 55:
+  - Corporate demand for RE in Vietnam is growing: The C&I sector has the potential to send strong demand signals for access
+
+Slide 56:
+  - Confirm your clean energy objective and set actionable targetsIdentify your facilityΓÇÖs key decarbonization goals: Scope
+
+Slide 57:
+  - Please contact us with any questions:
+
+Tung Ho, 	tah@allotropepartners.com
+info@allotropepartners.com
+  - THANK YOU!
+  - Wrap Up & Survey (~5 minutes)
+  - Before departing, please help fill out the Post-Event Survey.
+  - QR to be updated
