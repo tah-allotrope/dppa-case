@@ -1,0 +1,13 @@
+﻿Slide 23: max_y=5.44 (OK)
+  vs BAU retail-only: 222,170,256 VND (2,204 VND/kWh). DPPA net 259,268,023 VND (2,572 VND/kWh) -- a 16.7% Year-1 premium.
+
+Slide 24: max_y=5.44 (OK)
+  vs BAU retail-only: 322,675,848 VND (2,204 VND/kWh blended). DPPA net 359,773,615 VND (2,457 VND/kWh blended) -- a 11.5%
+
+Slide 25: max_y=5.44 (OK)
+  vs BAU retail-only: 137,533,968 VND (2,204 VND/kWh). DPPA net 160,499,252 VND (2,572 VND/kWh) -- a 16.7% Year-1 premium.
+
+Slide 26: max_y=5.54 (OK)
+
+Slide 27: max_y=5.54 (OK)
+

@@ -121,7 +121,7 @@ def add_header(slide, eyebrow, title, *, y=0.18):
     add_text(slide, 0.4, y + 0.30, 9.2, 0.55, title, size=22, color=WHITE, bold=True)
 
 
-def add_caveat_strip(slide, *, y=5.32):
+def add_caveat_strip(slide, *, y=5.22):
     """Bottom-of-slide caveat strip (FMP illustrative, etc.)."""
     add_text(slide, 0.4, y, 9.2, 0.22,
              "FMP ~1,427 VND/kWh is illustrative (NSMO/ERAV not publicly published). "
@@ -131,41 +131,48 @@ def add_caveat_strip(slide, *, y=5.32):
 
 
 def add_case_content(slide, *, case_label, header_color, narrative, evn_lines,
-                     cfd_lines, net_line, formula_lines, comparison_line, y=1.15):
-    """Add the standard canonical-case slide body."""
+                     cfd_lines, net_line, formula_lines, comparison_line, y=0.95):
+    """Add the standard canonical-case slide body.
+
+    All y-offsets are relative to the `y` parameter.  The slide is
+    5.62" tall (widescreen 16:9 default), so every element must fit
+    above the caveat strip at y=5.22.  The comparison punchline must
+    land at or before ~5.05" to stay on-slide and leave ~0.17" gap
+    before the caveat.
+    """
     # Pill: case label
     add_filled_rect(slide, 0.4, y, 1.4, 0.32, header_color)
     add_text(slide, 0.4, y + 0.02, 1.4, 0.28, case_label, size=10, color=DARK,
              bold=True, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 
     # Narrative
-    add_text(slide, 0.4, y + 0.42, 9.2, 0.50, narrative, size=12, color=WHITE)
+    add_text(slide, 0.4, y + 0.38, 9.2, 0.42, narrative, size=11, color=WHITE)
 
-    # 5-line EVN bill (left column)
-    add_text(slide, 0.4, y + 1.05, 4.4, 0.28, "EVN bill (5-line, on matched volume)",
-             size=10, color=CYAN, bold=True)
-    add_paragraphs(slide, 0.4, y + 1.32, 4.4, 1.50, evn_lines,
-                   default_size=10, default_color=WHITE)
+    # 5-line EVN bill (left column) — compressed 4 lines + total
+    add_text(slide, 0.4, y + 0.88, 4.4, 0.24, "EVN bill (5-line, on matched volume)",
+             size=9, color=CYAN, bold=True)
+    add_paragraphs(slide, 0.4, y + 1.12, 4.4, 1.45, evn_lines,
+                   default_size=9, default_color=WHITE)
 
     # CfD (right column)
-    add_text(slide, 5.0, y + 1.05, 4.6, 0.28, "CfD settlement (factory ↔ developer)",
-             size=10, color=AMBER, bold=True)
-    add_paragraphs(slide, 5.0, y + 1.32, 4.6, 1.50, cfd_lines,
-                   default_size=10, default_color=WHITE)
+    add_text(slide, 5.0, y + 0.88, 4.6, 0.24, "CfD settlement (factory ↔ developer)",
+             size=9, color=AMBER, bold=True)
+    add_paragraphs(slide, 5.0, y + 1.12, 4.6, 1.45, cfd_lines,
+                   default_size=9, default_color=WHITE)
 
     # Net total (full width)
-    add_filled_rect(slide, 0.4, y + 2.95, 9.2, 0.45, DARK)
-    add_text(slide, 0.4, y + 2.97, 9.2, 0.42, net_line, size=14, color=MINT,
+    add_filled_rect(slide, 0.4, y + 2.68, 9.2, 0.38, DARK)
+    add_text(slide, 0.4, y + 2.69, 9.2, 0.36, net_line, size=13, color=MINT,
              bold=True, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.MIDDLE)
 
-    # Formula breakdown
-    add_text(slide, 0.4, y + 3.50, 9.2, 0.28, "Formula breakdown",
-             size=10, color=CYAN, bold=True)
-    add_paragraphs(slide, 0.4, y + 3.78, 9.2, 0.70, formula_lines,
-                   default_size=9, default_color=MUTED)
+    # Formula breakdown (2 compact lines)
+    add_text(slide, 0.4, y + 3.14, 9.2, 0.24, "Formula breakdown",
+             size=9, color=CYAN, bold=True)
+    add_paragraphs(slide, 0.4, y + 3.38, 9.2, 0.55, formula_lines,
+                   default_size=8, default_color=MUTED)
 
-    # Comparison vs BAU
-    add_text(slide, 0.4, y + 4.55, 9.2, 0.45, comparison_line, size=11, color=AMBER,
+    # Comparison vs BAU — must NOT overlap caveat (5.22–5.44)
+    add_text(slide, 0.4, y + 4.02, 9.2, 0.42, comparison_line, size=10, color=AMBER,
              bold=True)
 
 
@@ -203,30 +210,32 @@ def build_case_a_matched(prs):
     )
 
     evn_lines = [
-        {"text": f"1. Market energy: {matched_kwh:,} kWh × {FMP:,} VND/kWh × {LOSS:.4f} = {line1:,.0f} VND", "size": 9},
-        {"text": f"2. System service + DPPA fees: {matched_kwh:,} kWh × {FEES:.1f} VND/kWh = {line2:,.0f} VND", "size": 9},
-        {"text": f"3. Difference / balancing fee: bundled in line 2", "size": 9, "color": MUTED},
+        {"text": f"1. Market energy: {matched_kwh:,} kWh x {FMP:,} VND/kWh x {LOSS:.4f} = {line1:,.0f} VND", "size": 9},
+        {"text": f"2. System service + DPPA fees: {matched_kwh:,} kWh x {FEES:.1f} VND/kWh = {line2:,.0f} VND", "size": 9},
+        {"text": f"3. Balancing fee: bundled in line 2", "size": 9, "color": MUTED},
         {"text": f"4. Shortfall retail purchase: 0 kWh (no shortfall) = 0 VND", "size": 9, "color": MUTED},
         {"text": f"", "size": 6},
         {"text": f"Total EVN: {cevn:,.0f} VND", "size": 11, "bold": True, "color": CYAN},
     ]
     cfd_lines = [
-        {"text": f"5. CfD = (Strike − FMP) × Q_cfD", "size": 9, "bold": True, "color": AMBER},
-        {"text": f"     = ({STRIKE:,} − {FMP:,}) × {matched_kwh:,} kWh", "size": 9},
+        {"text": f"5. CfD = (Strike - FMP) x Q_cfD", "size": 9, "bold": True, "color": AMBER},
+        {"text": f"     = ({STRIKE:,} - {FMP:,}) x {matched_kwh:,} kWh", "size": 9},
         {"text": f"     = +{cfd:,.0f} VND  (factory pays developer)", "size": 9, "color": AMBER},
         {"text": f"", "size": 6},
-        {"text": f"FMP < Strike ⇒ developer-owes direction; here factory wins", "size": 9, "color": MUTED},
-        {"text": f"because it bought at the FMP-dominated market rate.", "size": 9, "color": MUTED},
+        {"text": f"FMP < Strike => CfD is a net cost to the factory at this strike level.", "size": 9, "color": MUTED},
     ]
+    premium_pct = abs(savings) / bau * 100
     net_line = f"Net = EVN + CfD = {cevn:,.0f} + {cfd:,.0f} = {net:,.0f} VND  ({net/matched_kwh:,.2f} VND/kWh)"
     formula_lines = [
-        {"text": f"EVN = FMP × Kpp × matched + FEES × matched = 1,427 × 1.0342 × 100,800 + 523.3 × 100,800 = {cevn:,.0f} VND", "size": 8},
-        {"text": f"CfD = (Strike − FMP) × matched = (2,000 − 1,427) × 100,800 = {cfd:,.0f} VND  (positive ⇒ factory pays developer)", "size": 8},
-        {"text": f"Net = EVN + CfD = {net:,.0f} VND  vs BAU retail = {bau:,.0f} VND  ⇒ savings = {savings:,.0f} VND ({savings/bau*100:+.1f}%)", "size": 8, "color": MINT, "bold": True},
+        {"text": f"EVN = FMP x Kpp x matched + FEES x matched = 1,427 x 1.0342 x 100,800 + 523.3 x 100,800 = {cevn:,.0f} VND", "size": 8},
+        {"text": f"CfD = (Strike - FMP) x matched = (2,000 - 1,427) x 100,800 = {cfd:,.0f} VND  (positive => factory pays developer)", "size": 8},
+        {"text": f"Net = {net:,.0f} VND  vs BAU = {bau:,.0f} VND  => Year-1 premium = {abs(savings):,.0f} VND (+{premium_pct:.1f}%). Savings build as EVN escalates ~4%/yr.", "size": 8, "color": MINT, "bold": True},
     ]
     comparison_line = (
         f"vs BAU retail-only: {bau:,.0f} VND ({bau/matched_kwh:,.0f} VND/kWh). "
-        f"DPPA {savings:+,.0f} VND  ({savings/bau*100:+.1f}%) — buyer wins because FMP < Strike."
+        f"DPPA net {net:,.0f} VND ({net/matched_kwh:,.0f} VND/kWh) -- "
+        f"a {premium_pct:.1f}% Year-1 premium. "
+        f"The payoff is price certainty over the horizon; savings build as EVN tariffs escalate (~4%/yr)."
     )
     add_case_content(slide,
                      case_label="MATCHED  (=)",
@@ -284,15 +293,19 @@ def build_case_b_shortfall(prs):
         {"text": f"CfD settles only on matched kWh — shortfall is a separate retail line.", "size": 9, "color": MUTED},
         {"text": f"Two bills: DPPA + residual retail on the gap.", "size": 9, "color": MUTED},
     ]
-    net_line = f"Net = EVN + CfD = {cevn:,.0f} + {cfd:,.0f} = {net:,.0f} VND  ({net/total_load_kwh:,.2f} VND/kWh)"
+    net_line = f"Net = EVN + CfD = {cevn:,.0f} + {cfd:,.0f} = {net:,.0f} VND  ({net/total_load_kwh:,.2f} VND/kWh blended)"
+    premium_pct = abs(savings) / bau * 100
     formula_lines = [
-        {"text": f"EVN = (FMP × Kpp + FEES) × matched + RETAIL × shortfall = (1,427 × 1.0342 + 523.3) × 100,800 + 2,204 × 45,600 = {cevn:,.0f} VND", "size": 8},
-        {"text": f"CfD = (Strike − FMP) × matched = (2,000 − 1,427) × 100,800 = {cfd:,.0f} VND", "size": 8},
-        {"text": f"Net = {net:,.0f} VND  vs BAU retail on full load = {bau:,.0f} VND  ⇒ savings = {savings:+,.0f} VND ({savings/bau*100:+.1f}%)", "size": 8, "color": MINT, "bold": True},
+        {"text": f"EVN = (FMP x Kpp + FEES) x matched + RETAIL x shortfall = (1,427 x 1.0342 + 523.3) x 100,800 + 2,204 x 45,600 = {cevn:,.0f} VND", "size": 8},
+        {"text": f"CfD = (Strike - FMP) x matched = (2,000 - 1,427) x 100,800 = {cfd:,.0f} VND", "size": 8},
+        {"text": f"Net = {net:,.0f} VND  vs BAU = {bau:,.0f} VND  => Year-1 premium = {abs(savings):,.0f} VND (+{premium_pct:.1f}%); shortfall at retail (2,204) dilutes the matched-kWh premium.", "size": 8, "color": MINT, "bold": True},
     ]
     comparison_line = (
-        f"vs BAU retail-only: {bau:,.0f} VND ({bau/total_load_kwh:,.0f} VND/kWh). "
-        f"DPPA {savings:+,.0f} VND  ({savings/bau*100:+.1f}%) — shortfall dilutes the FMP cancellation effect."
+        f"vs BAU retail-only: {bau:,.0f} VND ({bau/total_load_kwh:,.0f} VND/kWh blended). "
+        f"DPPA net {net:,.0f} VND ({net/total_load_kwh:,.0f} VND/kWh blended) -- "
+        f"a {premium_pct:.1f}% Year-1 premium. "
+        f"Blended rate is lower than Cases A/C because shortfall kWh buy at retail (2,204). "
+        f"Payoff is still price certainty; savings build as EVN escalates."
     )
     add_case_content(slide,
                      case_label="SHORTFALL  (>)",
@@ -351,15 +364,18 @@ def build_case_c_excess(prs):
         {"text": f"Excess {excess_kwh:,} kWh/day → generator spot only, no CfD.", "size": 9, "color": MUTED},
         {"text": f"Generator's spot revenue on excess: ~{excess_revenue_to_generator:,.0f} VND (not your bill).", "size": 9, "color": MUTED},
     ]
-    net_line = f"Net = EVN + CfD = {cevn:,.0f} + {cfd:,.0f} = {net:,.0f} VND  ({net/matched_kwh:,.2f} VND/kWh)"
+    net_line = f"Net = EVN + CfD = {cevn:,.0f} + {cfd:,.0f} = {net:,.0f} VND  ({net/total_load_kwh:,.2f} VND/kWh)"
+    premium_pct = abs(savings) / bau * 100
     formula_lines = [
-        {"text": f"EVN = (FMP × Kpp + FEES) × matched = (1,427 × 1.0342 + 523.3) × 62,400 = {cevn:,.0f} VND", "size": 8},
-        {"text": f"CfD = (Strike − FMP) × matched = (2,000 − 1,427) × 62,400 = {cfd:,.0f} VND  (capped at consumed volume)", "size": 8},
-        {"text": f"Net = {net:,.0f} VND  vs BAU retail on full load = {bau:,.0f} VND  ⇒ savings = {savings:+,.0f} VND ({savings/bau*100:+.1f}%)", "size": 8, "color": MINT, "bold": True},
+        {"text": f"EVN = (FMP x Kpp + FEES) x matched = (1,427 x 1.0342 + 523.3) x 62,400 = {cevn:,.0f} VND", "size": 8},
+        {"text": f"CfD = (Strike - FMP) x matched = (2,000 - 1,427) x 62,400 = {cfd:,.0f} VND  (capped at consumed volume)", "size": 8},
+        {"text": f"Net = {net:,.0f} VND  vs BAU = {bau:,.0f} VND  => Year-1 premium = {abs(savings):,.0f} VND (+{premium_pct:.1f}%). Fees only on matched kWh; CfD capped at consumed volume.", "size": 8, "color": MINT, "bold": True},
     ]
     comparison_line = (
         f"vs BAU retail-only: {bau:,.0f} VND ({bau/total_load_kwh:,.0f} VND/kWh). "
-        f"DPPA {savings:+,.0f} VND  ({savings/bau*100:+.1f}%) — best $/kWh because fixed fees only apply to matched kWh."
+        f"DPPA net {net:,.0f} VND ({net/total_load_kwh:,.0f} VND/kWh) -- "
+        f"a {premium_pct:.1f}% Year-1 premium. "
+        f"Excess generation earns developer spot only (no CfD); factory is not billed for it."
     )
     add_case_content(slide,
                      case_label="EXCESS  (<)",
