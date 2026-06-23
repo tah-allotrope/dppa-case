@@ -1,0 +1,26 @@
+﻿python : Traceback (most recent call last):
+At line:1 char:65
++ ... cation -LiteralPath "C:\Users\tukum\Downloads\dppa-case"; python -c "
++                                                               ~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "<string>", line 10, in <module>
+    print(f'  {line[:120]}')
+    ~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tukum\AppData\Local\Programs\Python\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2194' in position 26: character maps to <undefined>
+Total slides: 52
+--- Slide 38 (matched) full text ---
+  CANONICAL CASE A ╖ MATCHED (Load = Gen)
+  5-line EVN bill + CfD settlement when factory consumption exactly matches contracted solar
+  MATCHED  (=)
+  Factory: 4,200 kWh/h constant load ╫ 24 h = 100,800 kWh/day. Solar: 4,200 kWh/h peak output ╫ 24 h = 100,800 kWh/day. Ev
+  EVN bill (5-line, on matched volume)
+  1. Market energy: 100,800 kWh ╫ 1,427 VND/kWh ╫ 1.0342 = 148,760,983 VND
+  2. System service + DPPA fees: 100,800 kWh ╫ 523.3 VND/kWh = 52,748,640 VND
+  3. Difference / balancing fee: bundled in line 2
+  4. Shortfall retail purchase: 0 kWh (no shortfall) = 0 VND
+  Total EVN: 201,509,623 VND

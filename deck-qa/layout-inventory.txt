@@ -1,0 +1,82 @@
+﻿Slide width: 9144000 EMU = 10.0 in
+Slide height: 5143500 EMU = 5.625 in
+Layout 0: SECTION_HEADER
+Layout 1: TITLE_AND_BODY
+Layout 2: TITLE_AND_TWO_COLUMNS
+Layout 3: TITLE_ONLY
+Layout 4: ONE_COLUMN_TEXT
+Layout 5: MAIN_POINT
+Layout 6: SECTION_TITLE_AND_DESCRIPTION
+Layout 7: CAPTION_ONLY
+Layout 8: BIG_NUMBER
+Layout 9: BLANK
+Layout 10: 14_Custom Layout
+Layout 11: 2_Custom Layout
+Layout 12: 10_Custom Layout
+Layout 13: OBJECT
+Layout 14: Cover Slide
+Layout 15: 1_Blank Slide
+Layout 16: Divider Slide
+Layout 17: 1_Blank Slide_1
+Layout 18: Brand
+Layout 19: 3_Blank
+Layout 20: 1_Blank
+Layout 21: 2_Blank
+---
+\nSlide 11 (layout: TITLE_AND_BODY):
+  - [GROUP (6)] Google Shape;1660;p170: ''
+  - [TABLE (19)] Google Shape;1671;p170: ''
+  - [TEXT_BOX (17)] Google Shape;1672;p170: 'Scenario'
+  - [TEXT_BOX (17)] Google Shape;1673;p170: 'A 50 MW solar plant contracts its full output to one industrial customer / Consump'
+  - [PICTURE (13)] Google Shape;1674;p170: ''
+  - [PICTURE (13)] Google Shape;1675;p170: ''
+  - [TEXT_BOX (17)] Google Shape;1676;p170: 'Source: EAVCED public training'
+\nSlide 38 (layout: 2_Custom Layout):
+  - [PICTURE (13)] Google Shape;2147;p197: ''
+  - [PICTURE (13)] Google Shape;2148;p197: ''
+  - [GROUP (6)] Google Shape;2149;p197: ''
+  - [TEXT_BOX (17)] Google Shape;2160;p197: 'Your manufacturing plant has a strict corporate target to reach 100% renewable e'
+\nSlide 39 (layout: 2_Custom Layout):
+  - [GROUP (6)] Google Shape;2165;p198: ''
+  - [TEXT_BOX (17)] Google Shape;2176;p198: '5-Line Bill / 1. Market electricity energy cost / CDN = 5,000,000 kWh * 1,150 VND/kW'
+  - [PICTURE (13)] Google Shape;2177;p198: ''
+  - [PICTURE (13)] Google Shape;2178;p198: ''
+  - [TEXT_BOX (17)] Google Shape;2179;p198: 'Difference QKH - QKHhc = 0 MWh'
+  - [TEXT_BOX (17)] Google Shape;2180;p198: 'The customer doesnΓÇÖt need additional electricity from EVN'
+  - [LINE (9)] Google Shape;2181;p198: ''
+  - [AUTO_SHAPE (1)] Google Shape;2182;p198: 'Total cost collected by EVN  / CEVN = 5,946,696,000 + 1,800,000,000 + 816,500,000 '
+  - [GROUP (6)] Google Shape;2183;p198: ''
+  - [PICTURE (13)] Google Shape;2194;p198: ''
+\nSlide 42 (layout: 2_Custom Layout):
+  - [GROUP (6)] Google Shape;2260;p201: ''
+  - [TEXT_BOX (17)] Google Shape;2271;p201: 'Your factory agrees to a Virtual DPPA (grid-connected) with a solar developer / Fi'
+  - [PICTURE (13)] Google Shape;2272;p201: ''
+  - [TEXT_BOX (17)] Google Shape;2273;p201: 'Questions: / Who owes money to whom? Since you are essentially paying two bills, h'
+  - [PICTURE (13)] Google Shape;2274;p201: ''
+  - [PICTURE (13)] Google Shape;2275;p201: ''
+\nSlide 43 (layout: 2_Custom Layout):
+  - [GROUP (6)] Google Shape;2280;p202: ''
+  - [TEXT_BOX (17)] Google Shape;2291;p202: '1. Market electricity energy cost  / CDN = 8,000,000 kWh * 1,600 VND/kWh * 1.026 *'
+  - [PICTURE (13)] Google Shape;2292;p202: ''
+  - [PICTURE (13)] Google Shape;2293;p202: ''
+  - [TEXT_BOX (17)] Google Shape;2294;p202: 'Difference QKH - QKHhc = 1000 MWh'
+  - [TEXT_BOX (17)] Google Shape;2295;p202: 'The customer must purchase additional electricity from EVN'
+  - [LINE (9)] Google Shape;2296;p202: ''
+  - [AUTO_SHAPE (1)] Google Shape;2297;p202: 'Total cost collected by EVN  / CEVN = 13,237,862,400 + 2,880,000,000 + 1,306,400,0'
+  - [GROUP (6)] Google Shape;2298;p202: ''
+\nSlide 45 (layout: 2_Custom Layout):
+  - [GROUP (6)] Google Shape;2344;p204: ''
+  - [PICTURE (13)] Google Shape;2355;p204: ''
+  - [PICTURE (13)] Google Shape;2356;p204: ''
+  - [PICTURE (13)] Google Shape;2357;p204: ''
+  - [PICTURE (13)] Google Shape;2358;p204: ''
+  - [PICTURE (13)] Google Shape;2359;p204: ''
+  - [LINE (9)] Google Shape;2360;p204: ''
+  - [LINE (9)] Google Shape;2361;p204: ''
+  - [LINE (9)] Google Shape;2362;p204: ''
+  - [TEXT_BOX (17)] Google Shape;2363;p204: 'Large Customer'
+  - [TEXT_BOX (17)] Google Shape;2364;p204: 'EVN'
+  - [TEXT_BOX (17)] Google Shape;2365;p204: 'RE GENCO'
+  - [TEXT_BOX (17)] Google Shape;2366;p204: '19.628 billion VND = 13.238 billion for market electricity energy  / + 2.880 billi'
+  - [TEXT_BOX (17)] Google Shape;2367;p204: '0.800 billion VND according to the CfD contract'
+  - [TEXT_BOX (17)] Google Shape;2368;p204: '12.902 billion VND on the spot market'
