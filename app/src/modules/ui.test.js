@@ -29,7 +29,7 @@ describe('storytelling shell', () => {
     expect(document.querySelector('.chart-walkthrough-row .chart-panel')).not.toBeNull()
     expect(document.querySelector('.chart-walkthrough-row .walkthrough-panel')).not.toBeNull()
     expect(document.querySelector('.story-grid + .lower-grid')).not.toBeNull()
-    expect(document.querySelector('#cancellationMermaid')).not.toBeNull()
+    expect(document.querySelector('#cancellationFlow')).not.toBeNull()
     expect(document.querySelector('#dailyTotals')).toBeNull()
     expect(document.querySelector('#app').textContent).not.toContain('Cancellation effect')
     expect(document.querySelector('#retailTariff')).toBeNull()
@@ -122,8 +122,8 @@ describe('selected-hour layout', () => {
     document.body.innerHTML = `
       <div id="walkthroughCases"></div>
       <div id="selectedHourDetailsPanel"></div>
-      <div id="mermaidInlineNote"></div>
-      <div id="cancellationMermaid"></div>
+      <div id="cancellationFlowNote"></div>
+      <div id="cancellationFlow"></div>
     `
 
     const inputs = {
@@ -181,8 +181,8 @@ describe('selected-hour layout', () => {
     expect(flowResult.flowHtml).toContain('Canceled on aligned volume')
     expect(flowResult.flowHtml).toContain(`+ ${interval.contractQuantity.toLocaleString()} kWh × ${strikeText}`)
     expect(flowResult.flowHtml).toContain(`− ${interval.cleanCancelledEnergy ? interval.cleanCancelledEnergy.toLocaleString() : interval.contractQuantity.toLocaleString()} kWh × ${fmpText}`)
-    expect(document.querySelector('#cancellationMermaid').innerHTML).toContain('flow-clean')
-    expect(document.querySelector('#cancellationMermaid').classList.contains('cancellation-flow')).toBe(true)
+    expect(document.querySelector('#cancellationFlow').innerHTML).toContain('flow-clean')
+    expect(document.querySelector('#cancellationFlow').classList.contains('cancellation-flow')).toBe(true)
   })
 
   it('keeps the cancellation strip and neutral retained terms in a shortfall hour', () => {
@@ -261,8 +261,8 @@ describe('selected-hour layout', () => {
   it('keeps a matched below-strike hour visible in the settlement story', () => {
     document.body.innerHTML = `
       <div id="walkthroughCases"></div>
-      <div id="mermaidInlineNote"></div>
-      <div id="cancellationMermaid"></div>
+      <div id="cancellationFlowNote"></div>
+      <div id="cancellationFlow"></div>
     `
 
     const scenario = scenarioProfiles.balanced

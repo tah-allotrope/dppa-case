@@ -256,9 +256,9 @@ export function renderAppShell(root, scenarios, settlementModes) {
           </div>
           <div class="cancellation-flow-card">
             <div class="metric-label">Cancellation logic flow</div>
-            <div class="cancellation-flow" id="cancellationMermaid"></div>
+            <div class="cancellation-flow" id="cancellationFlow"></div>
           </div>
-          <p class="walkthrough-note" id="mermaidInlineNote"></p>
+          <p class="walkthrough-note" id="cancellationFlowNote"></p>
         </div>
       </section>
 
@@ -356,7 +356,7 @@ export function renderFormulas(result, warningText, currency) {
   if (!result) return null
 
   const flowHtml = renderCancellationFlow(result, currency)
-  const container = document.querySelector('#cancellationMermaid')
+  const container = document.querySelector('#cancellationFlow')
   if (container) {
     container.innerHTML = flowHtml
     container.classList.add('cancellation-flow')
@@ -366,7 +366,7 @@ export function renderFormulas(result, warningText, currency) {
     ? `Clean cancellation: the spot/FMP reference is shown on EVN, then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment.`
     : `Partial cancellation: mismatch volume keeps some uncancelled exposure, so rely on the actual selected-hour DPPA payment.`
   const warningSuffix = warningText ? ` ${warningText}` : ''
-  const noteNode = document.querySelector('#mermaidInlineNote')
+  const noteNode = document.querySelector('#cancellationFlowNote')
   if (noteNode) noteNode.textContent = `${note}${warningSuffix}`
 
   return { flowHtml, kind: result.cleanCancellation ? 'clean' : 'partial' }

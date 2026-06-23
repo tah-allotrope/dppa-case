@@ -65,7 +65,7 @@ async function updateView() {
     renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
   } catch (error) {
     console.error('Cancellation flow render failed:', error)
-    const node = document.querySelector('#cancellationMermaid')
+    const node = document.querySelector('#cancellationFlow')
     showCancellationFlowFallback(node)
   }
   renderSelectedHourDetails(
