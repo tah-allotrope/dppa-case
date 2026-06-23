@@ -214,6 +214,12 @@ export function renderAppShell(root, scenarios, settlementModes) {
               <div class="chart-wrap profile-wrap">
                 <canvas id="profileChart" aria-label="Load and generation chart"></canvas>
               </div>
+              <p class="chart-tap-hint" id="chartTapHint">Click or tap any hour to inspect</p>
+              <div class="hour-nav" id="hourNav">
+                <button class="hour-nav-btn" id="prevHour" type="button" aria-label="Previous hour">← Prev hour</button>
+                <span class="hour-nav-label" id="hourNavLabel">12:00</span>
+                <button class="hour-nav-btn" id="nextHour" type="button" aria-label="Next hour">Next hour →</button>
+              </div>
             </div>
 
             <section class="panel walkthrough-panel glow-frame">

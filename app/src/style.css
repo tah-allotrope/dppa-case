@@ -315,6 +315,61 @@ h3 { font-size: 1.02rem; }
   flex: 1;
 }
 
+.chart-tap-hint {
+  margin: 8px 2px 0;
+  font-size: 0.78rem;
+  color: var(--muted, #8b97a8);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.hour-nav {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px;
+}
+
+.hour-nav-btn {
+  flex: 0 0 auto;
+  border: 1px solid rgba(154, 255, 222, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.42rem 0.78rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+@media (hover: hover) {
+  .hour-nav-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 18px rgba(71, 215, 255, 0.14);
+  }
+}
+
+.hour-nav-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 24px rgba(71, 215, 255, 0.22);
+}
+
+.hour-nav-btn:focus-visible {
+  outline: 2px solid rgba(71, 215, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.hour-nav-label {
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #f6fbff;
+  letter-spacing: 0.04em;
+}
+
 
 
 .walkthrough-grid {

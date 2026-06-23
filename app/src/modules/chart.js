@@ -203,6 +203,17 @@ function baseOptions(inputs) {
 export function renderProfileChart(canvas, labels, intervals, selectedHour, onSelect, inputs) {
   // Mutable state bag read by the plugin on every draw
   const state = { inputs }
+  const isNarrowViewport = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia('(max-width: 520px)').matches
+    : false
+  const basePoint = isNarrowViewport ? 3 : 4
+  const selPoint = isNarrowViewport ? 6 : 8
+  const baseHover = isNarrowViewport ? 5 : 6
+  const selHover = isNarrowViewport ? 8 : 10
+  const fmpBase = isNarrowViewport ? 2 : 3
+  const fmpSel = isNarrowViewport ? 5 : 7
+  const fmpBaseHover = isNarrowViewport ? 4 : 6
+  const fmpSelHover = isNarrowViewport ? 7 : 10
 
   function buildDatasets(ivs, selHour) {
     return [
@@ -214,8 +225,8 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
         fill: true,
         tension: 0.35,
         borderWidth: 3,
-        pointRadius: ivs.map((_, idx) => idx === selHour ? 5 : 1.5),
-        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? 7 : 4),
+        pointRadius: ivs.map((_, idx) => idx === selHour ? selPoint : basePoint),
+        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? selHover : baseHover),
         pointBackgroundColor: ivs.map((_, idx) => idx === selHour ? '#c9f7ff' : '#47d7ff'),
         yAxisID: 'y',
       },
@@ -227,8 +238,8 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
         fill: true,
         tension: 0.35,
         borderWidth: 3,
-        pointRadius: ivs.map((_, idx) => idx === selHour ? 5 : 1.5),
-        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? 7 : 4),
+        pointRadius: ivs.map((_, idx) => idx === selHour ? selPoint : basePoint),
+        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? selHover : baseHover),
         pointBackgroundColor: ivs.map((_, idx) => idx === selHour ? '#fff1b5' : '#ffd84f'),
         yAxisID: 'y',
       },
@@ -252,8 +263,8 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
         tension: 0.35,
         borderWidth: 2.5,
         borderDash: [6, 4],
-        pointRadius: ivs.map((_, idx) => idx === selHour ? 4 : 1),
-        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? 6 : 3),
+        pointRadius: ivs.map((_, idx) => idx === selHour ? fmpSel : fmpBase),
+        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? fmpSelHover : fmpBaseHover),
         pointBackgroundColor: FMP_COLOR,
         yAxisID: 'yFmp',
       },

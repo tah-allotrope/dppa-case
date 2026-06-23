@@ -78,6 +78,11 @@ async function updateView() {
   setActiveScenario(state.scenarioId)
   setActiveCurrency(state.currency)
 
+  const hourLabelNode = document.querySelector('#hourNavLabel')
+  if (hourLabelNode) {
+    hourLabelNode.textContent = `${String(selectedInterval.hour).padStart(2, '0')}:00`
+  }
+
   const multiYear = projectMultiYear(inputs, {
     years: state.horizonYears,
     evnEscalation: state.evnEscalation,
@@ -131,6 +136,16 @@ function syncControls() {
   document.querySelector('#resetButton').addEventListener('click', () => {
     Object.assign(state, defaultInputs)
     syncInputsFromState()
+    updateView()
+  })
+
+  document.querySelector('#prevHour').addEventListener('click', () => {
+    state.selectedHour = (state.selectedHour - 1 + hours.length) % hours.length
+    updateView()
+  })
+
+  document.querySelector('#nextHour').addEventListener('click', () => {
+    state.selectedHour = (state.selectedHour + 1) % hours.length
     updateView()
   })
 }
