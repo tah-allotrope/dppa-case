@@ -300,3 +300,23 @@ Finished `build_2026_from_ref.py` (the in-place approach: open `ref/DPPA 2025 re
   - Slide 9 (Feasibility table): 2-line headline collided with table top → headline 18→14pt, table moved to y=1.78.
   - Slide 12 (Negotiation): stray inherited bullet on the reused textbox → added `suppress_bullet()` (buNone) in `set_text`.
 - All shape-index targets confirmed against the live ref deck; real payment-mechanism diagram (slide 5) and section dividers preserved intact.
+
+## Sprint 1: Workshop Demo Safety — Completed 2026-06-23
+
+Closed 5 gaps from `reports/2026-05-22-workshop-readiness-gap-analysis.md`: GAP-01 (error handling), GAP-05 (loading state), GAP-06 (meta tags), GAP-07 (touch feedback), GAP-08 (Firebase deployment). Plan: `plans/sprint-1-demo-safety.md`.
+
+### Plan
+- [x] PHASE-01: Wrap mermaid/chart renders in try/catch with token-guarded fallback; add `window.unhandledrejection` listener; add `.mermaid-fallback` CSS class
+- [x] PHASE-02: Inline loading splash with allotrope logo + pulsing text; `theme-color` meta; Open Graph tags; `apple-touch-icon`
+- [x] PHASE-03: `:active` + `:focus-visible` styles on `.toggle-button`/`.scenario-tab`/`.ghost-button`; wrap existing hover in `@media (hover: hover)`; `:active` brightness bump on `.walkthrough-card.is-selected`; `cursor: pointer` on tabs
+- [x] PHASE-04: Production build, browser-verified, deployed to https://dppa-case.web.app, recorded URL in `app/deployment.md`
+
+### Review / Results
+- All 38 tests pass after each phase; no regressions
+- Build succeeds in ~3.4s; main bundle 318 KB (gzip 107 KB); pre-existing chunk-size warnings are Sprint 2 scope
+- Live site verified via real browser: 200 OK, all meta tags present in served HTML, loading splash visible, all 3 scenario tabs interactive, zero console errors, zero JS errors
+- Touch feedback pattern established: `@media (hover: hover)` wrapping + `:active` + `:focus-visible` — repeatable for Sprint 2 mobile interactions
+- Render-function try/catch with token guard pattern documented for future async renderers
+- Reports: `reports/2026-06-23-sprint-1-phase-{01,02,03,04}.md` + `reports/2026-06-23-sprint-1-completion.md`
+- Commits pushed: `0d0ef1f` (phase 01), `9500110` (phase 02), `2c75536` (phase 03), `c63b36c` (phase 04), plus report commits
+
