@@ -3,11 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050816" />
     <meta name="description" content="Visual CFO explainer for Vietnam DPPA settlement, showing load and solar overlap with EVN and developer payment cancellation." />
+    <meta property="og:title" content="Vietnam DPPA CFO Calculator" />
+    <meta property="og:description" content="Visual explainer for Vietnam synthetic DPPA settlement — load matching, EVN payment, developer CfD, and the FMP cancellation effect." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <style>
+      html, body { margin: 0; padding: 0; background: #050816; color: #f6fbff; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      #app-loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: radial-gradient(circle at 50% 35%, rgba(71,215,255,0.08), transparent 60%), #050816; z-index: 9999; }
+      #app-loading img { width: 96px; height: 96px; border-radius: 18px; box-shadow: 0 0 28px rgba(71,215,255,0.25); }
+      #app-loading p { margin: 0; font-size: 0.95rem; letter-spacing: 0.04em; color: #8b97a8; animation: dppa-pulse 1.6s ease-in-out infinite; }
+      @keyframes dppa-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+    </style>
     <title>Vietnam DPPA Neon CFO Calculator</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="app-loading" aria-live="polite">
+        <img src="/brand/allotrope-logo.png" alt="" />
+        <p>Loading DPPA Calculator…</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
