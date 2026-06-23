@@ -1,0 +1,51 @@
+﻿\n=== Slide 2 ===
+  [0] [Google Shape;1471;p161] 'About the Speaker'
+  [1] [Google Shape;1472;p161] 'Cong is a renewable energy professional with over a decade of experience. Prior to joining Allotrope, Cong cultivated extensive clean energy technical expertise by supporting the development of solar ...'
+  [2] [Google Shape;1473;p161] 'Cong Nguyen\nAllotrope Partners\nVietnam Clean Energy Manager'
+\n=== Slide 3 ===
+  [4] [Google Shape;1497;p162] 'Follow the Money: From your EVN Bill to a Bankable DPPA'
+  [6] [Google Shape;1499;p162] 'By the end of this session you will be able:'
+  [7] [Google Shape;1500;p162] '1.  Breakdown a virtual DPPA monthly settlement into its five components and compare it to your EVN bill\n2.  Explain how the CfD strike, market price (FMP), loss factors, and grid fees set your net co...'
+  [8] [Google Shape;1501;p162] 'Scope: Virtual DPPA  (grid CfD) only.'
+  [9] [Google Shape;1502;p162] 'Session Roadmap'
+\n=== Slide 22 ===
+  [1] [Google Shape;1866;p181] 'Module 5:\nCase Studies 5 & 6'
+\n=== Slide 27 ===
+  [3] [Google Shape;2017;p189] 'Know the five-line bill: 523 VND/kWh of fees and the loss factor are fixed; the strike price remains the big number open to negotiation.\n\nEvaluated the deal on 10-year and lifetime cost vs BAU - not o...'
+  [4] [Google Shape;2018;p189] 'Next: Panel discussion on risk allocation and the reality of bank financing for Grid DPPA'
+\n=== Slide 33 ===
+  [8] [Google Shape;2114;p195] 'Interactive Exercise'
+  [9] [Google Shape;2115;p195] 'Please remain at your table.\nTable facilitators will provide you with a resource packet containing case studies, description of roles, and key questions to facilitate the activity.\nCollaborate with ot...'
+  [10] [Google Shape;2116;p195] 'DPPA Scenario Analysis (~60 minutes)'
+\n=== Slide 34 ===
+  [0] [Google Shape;2121;p196] 'Based on Decree 57/2025/ND-CP, the cost calculation parameters are assumed as follows:'
+  [3] [Google Shape;2134;p196] 'Cost Formulas\n\nC_KH  =  \tC_EVN  +  \tC_CfD'
+  [4] [Google Shape;2135;p196] 'Note:  The plant sells all output to the spot market (receives FMP); the CfD only adjusts the price to Pc for the contracted volume Qc.'
+  [5] [Google Shape;2136;p196] '(Pc ΓêÆ FMP) * Qc'
+  [6] [Google Shape;2137;p196] '='
+  [7] [Google Shape;2138;p196] 'Qkhhc * FMP * k * Kpp = C_DN \n\nQkhhc * C_dppa_dv = C_dppa \n\nQkhhc * Pcl = C_cl \n\n(QKH ΓêÆ Qkhhc) * P1 = C_bl'
+  [8] [Google Shape;2139;p196] '+'
+  [9] [Google Shape;2140;p196] '+'
+  [10] [Google Shape;2141;p196] '+'
+  [11] [Google Shape;2142;p196] '='
+\n=== Slide 40 ===
+  [1] [Google Shape;2535;p211] 'DPPA represents a critical step in scaling RE procurement in Vietnam. Large energy customers, customers lacking facilityΓÇÖs aligned with on-site requirements, and industrial park tenants can benefit fr...'
+\n=== Slide 42 ===
+  [4] [Google Shape;2576;p213] '01'
+  [5] [Google Shape;2577;p213] "Vietnam's DPPA is a game-changer"
+  [6] [Google Shape;2578;p213] 'The DPPA is now available but early-stage; implementation complexity demands careful planning and local expertise\nKey negotiation variables: electricity retailer, RE source type, required capacity, co...'
+  [10] [Google Shape;2582;p213] '02'
+  [11] [Google Shape;2583;p213] 'Pricing complexity is real'
+  [12] [Google Shape;2584;p213] 'Market volatility, grid-loss adjustments, and load matching all materially affect DPPA costs. Model the full formula ΓÇö not just the strike price ΓÇö before contracting.'
+  [16] [Google Shape;2588;p213] '03'
+  [17] [Google Shape;2589;p213] 'Load profile determines economics'
+  [18] [Google Shape;2590;p213] 'Load timing significantly affects economics: operations with steady daytime demand see stronger DPPA outcomes than those with evening/night-heavy profiles'
+  [22] [Google Shape;2594;p213] '04'
+  [23] [Google Shape;2595;p213] 'Corporate demand shapes the market'
+  [24] [Google Shape;2596;p213] 'C&I buyers collectively drive demand signals that influence RE accessibility, pricing trajectories, and supportive policy ΓÇö early movers carry outsized influence.'
+  [28] [Google Shape;2600;p213] '05'
+  [29] [Google Shape;2601;p213] 'GHG measurement is the foundation'
+  [30] [Google Shape;2602;p213] "Credible Scope 1, 2, and 3 measurement is a prerequisite for effective decarbonization action and meeting Vietnam's emerging regulatory requirements."
+  [34] [Google Shape;2606;p213] '06'
+  [35] [Google Shape;2607;p213] 'Act now ΓÇö the window is open'
+  [36] [Google Shape;2608;p213] 'Regulatory requirements are tightening and market structures are maturing. Companies that engage early will gain first-mover advantage as DPPA scales.'
