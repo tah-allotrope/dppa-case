@@ -842,6 +842,15 @@ h3 { font-size: 1.02rem; }
   min-width: 640px;
 }
 
+.mermaid-fallback {
+  font-style: italic;
+  text-align: center;
+  color: var(--muted, #8b97a8);
+  padding: 24px 12px;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
 .explain-list {
   margin-top: 10px;
   padding-left: 1.1rem;

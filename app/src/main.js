@@ -7,8 +7,18 @@ import { renderAppShell, renderFormulas, renderMultiYearPanel, renderSelectedHou
 
 mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'dark' })
 
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled promise rejection:', event.reason)
+  event.preventDefault()
+})
+
 const state = { ...defaultInputs }
 let mermaidRenderToken = 0
+
+function showMermaidFallback(node) {
+  if (!node) return
+  node.innerHTML = '<p class="mermaid-fallback">Diagram updating…</p>'
+}
 
 function getScenarioList() {
   return scenarioOrder.map((id) => scenarioProfiles[id])
@@ -43,12 +53,19 @@ async function renderMermaidDiagram(definition) {
 
   const token = ++mermaidRenderToken
   const renderId = `cancellation-flow-${token}`
-  const { svg, bindFunctions } = await mermaid.render(renderId, definition)
+  try {
+    const { svg, bindFunctions } = await mermaid.render(renderId, definition)
 
-  if (token !== mermaidRenderToken) return
+    if (token !== mermaidRenderToken) return
 
-  node.innerHTML = svg
-  bindFunctions?.(node)
+    node.innerHTML = svg
+    bindFunctions?.(node)
+  } catch (error) {
+    console.error('Mermaid render failed:', error)
+    if (token === mermaidRenderToken) {
+      showMermaidFallback(node)
+    }
+  }
 }
 
 async function updateView() {
@@ -60,10 +77,14 @@ async function updateView() {
   const formulas = buildFormulaBreakdown(inputs, selectedInterval)
   const selectedWalkthroughCase = buildSelectedWalkthroughCase(inputs, selectedInterval)
 
-  renderProfileChart(document.querySelector('#profileChart'), hourLabels, settlement.intervals, selectedInterval.hour, (hour) => {
-    state.selectedHour = hour
-    updateView()
-  }, inputs)
+  try {
+    renderProfileChart(document.querySelector('#profileChart'), hourLabels, settlement.intervals, selectedInterval.hour, (hour) => {
+      state.selectedHour = hour
+      updateView()
+    }, inputs)
+  } catch (error) {
+    console.error('Profile chart render failed:', error)
+  }
   renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedWalkthroughCase, state.currency, formulas)
   const mermaidDefinition = renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
   renderSelectedHourDetails(
@@ -82,9 +103,19 @@ async function updateView() {
     strikeEscalation: state.strikeEscalation,
   })
   renderMultiYearPanel(multiYear, state.currency)
-  renderMultiYearChart(document.querySelector('#multiYearChart'), multiYear, state.currency)
+  try {
+    renderMultiYearChart(document.querySelector('#multiYearChart'), multiYear, state.currency)
+  } catch (error) {
+    console.error('Multi-year chart render failed:', error)
+  }
 
-  await renderMermaidDiagram(mermaidDefinition)
+  try {
+    await renderMermaidDiagram(mermaidDefinition)
+  } catch (error) {
+    console.error('Mermaid diagram update failed:', error)
+    const node = document.querySelector('#cancellationMermaid')
+    showMermaidFallback(node)
+  }
 }
 
 function syncControls() {
