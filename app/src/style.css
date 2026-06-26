@@ -1365,6 +1365,21 @@ h3 { font-size: 1.02rem; }
   font-size: 0.8rem;
 }
 
+.control-hints {
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: var(--muted, #8aa0c6);
+  line-height: 1.4;
+}
+
+.five-line-caption {
+  margin: 4px 0 10px;
+  font-size: 0.78rem;
+  color: var(--muted, #8aa0c6);
+  font-style: italic;
+  line-height: 1.4;
+}
+
 .is-hidden { display: none !important; }
 
 @media (max-width: 1280px) {

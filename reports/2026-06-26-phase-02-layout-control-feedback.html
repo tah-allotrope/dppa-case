@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 02 — Layout &amp; Control Feedback | dppa-case</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #222636; --border: #2d3148;
+    --accent: #7c6af7; --accent2: #4fc3f7; --green: #4caf82; --red: #e06c6c;
+    --amber: #f4b942; --text: #e2e4ef; --muted: #8890a8; --mono: 'JetBrains Mono', monospace;
+  }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; font-size: 15px; line-height: 1.65; }
+  .page { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+  section { margin-top: 44px; }
+  h2 { font-size: 1.2rem; font-weight: 600; color: var(--accent); margin-bottom: 14px; letter-spacing: .03em; text-transform: uppercase; }
+  h3 { font-size: 1rem; font-weight: 600; color: var(--accent2); margin: 14px 0 8px; }
+  p { margin-bottom: 10px; }
+  ul { margin: 8px 0 8px 22px; } li { margin-bottom: 5px; }
+  code { font-family: var(--mono); font-size: .85em; background: var(--surface2); padding: 2px 6px; border-radius: 4px; }
+  pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: .82em; line-height: 1.55; margin: 12px 0; }
+  .hero { background: linear-gradient(135deg, #1a1d27 0%, #1e2038 100%); border: 1px solid var(--border); border-radius: 12px; padding: 34px 38px; }
+  .hero-eyebrow { font-size: .75rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .hero-title { font-size: 1.9rem; font-weight: 700; line-height: 1.2; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 18px; }
+  .hero-meta span { font-size: .82rem; color: var(--muted); }
+  .hero-meta strong { color: var(--text); }
+  .badge { display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; background: #1e3a2a; color: var(--green); border: 1px solid var(--green); margin-left: 10px; vertical-align: middle; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: .88rem; }
+  th { text-align: left; padding: 10px 14px; background: var(--surface2); color: var(--muted); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .before { color: var(--red); font-family: var(--mono); font-size: .85em; }
+  .after  { color: var(--green); font-family: var(--mono); font-size: .85em; }
+  .mermaid-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; max-height: 380px; }
+  .mermaid-wrap svg { max-width: 100%; }
+  .empty { color: var(--muted); font-style: italic; }
+  @media print { body { background:#fff; color:#000; } .hero { background:#eee; } .mermaid-wrap { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-eyebrow">Phase Report · Workshop Chart Layout Revision</div>
+    <div class="hero-title">PHASE-02 — Layout &amp; Control Feedback <span class="badge">Complete</span></div>
+    <div class="hero-meta">
+      <span><strong>Date:</strong> 2026-06-26</span>
+      <span><strong>Project:</strong> DPPA CFO Calculator</span>
+      <span><strong>Repo:</strong> dppa-case</span>
+      <span><strong>Tests:</strong> <span class="green">43 / 43 pass</span></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>1. Phase Header</h2>
+    <p>Move the multi-year projection from the bottom of the page to a full-width section directly below
+    the daily-graph row, and make control changes legible — addressing the user's "controls don't seem
+    to update the graph" concern, which was diagnosed in the brainstorm as a visibility problem (flat
+    workshop lines + a buried multi-year chart), not a render bug.</p>
+  </section>
+
+  <section>
+    <h2>2. Input → Output Summary</h2>
+    <table>
+      <thead><tr><th>Surface</th><th>Before</th><th>After</th></tr></thead>
+      <tbody>
+        <tr><td><code>renderAppShell</code> order</td><td class="before">multi-year-panel dead last (after controls)</td><td class="after">multi-year-panel inside focus-column, right after the chart+walkthrough row</td></tr>
+        <tr><td>controls panel</td><td class="before">no guidance on what each control drives</td><td class="after"><code>.control-hints</code>: "Strike &amp; FMP reshape the daily graph; escalation &amp; horizon reshape the multi-year projection"</td></tr>
+        <tr><td>workshop bill panel</td><td class="before">no illustrative-vs-authoritative note</td><td class="after"><code>.five-line-caption</code>: chart is illustrative, the monthly 5-line bill is deck-exact</td></tr>
+        <tr><td>style.css</td><td class="before">—</td><td class="after">+ <code>.control-hints</code>, <code>.five-line-caption</code></td></tr>
+        <tr><td>ui.test.js</td><td>shell existence checks</td><td class="after">+ DOM-order asserts (multiYearChart before cancellationFlow &amp; controls) + hint text</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>3. Logic Flow</h2>
+    <div class="mermaid-wrap">
+      <pre class="mermaid">
+flowchart TB
+  subgraph After["New page order"]
+    A1[Header + currency] --> A2[Chart + walkthrough row]
+    A2 --> A3[Multi-year projection<br/>full-width]
+    A3 --> A4[Selected-hour details]
+    A4 --> A5[Cancellation flow]
+    A5 --> A6[Controls + hints]
+  end
+  C[Move escalation / horizon slider] --> A3
+  D[Move strike / FMP slider] --> A2
+      </pre>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Math / Algorithm Used</h2>
+    <p class="empty">None — this phase is a layout relocation and copy addition; no numerical logic changed.</p>
+  </section>
+
+  <section>
+    <h2>5. Tools / Formulas / Methods</h2>
+    <ul>
+      <li><strong>DOM reordering</strong> in the <code>renderAppShell</code> template literal (cut the
+      multi-year <code>&lt;section&gt;</code> from the bottom, re-insert inside <code>focus-column</code>).</li>
+      <li><strong>Vitest jsdom</strong> order assertions via <code>innerHTML.indexOf</code> comparisons.</li>
+      <li><strong>CSS</strong> — two small muted-caption rules reusing the existing variable palette.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. Results &amp; Visualizations</h2>
+    <p>The multi-year projection now sits immediately under the daily graph, so moving the escalation /
+    horizon sliders produces a visible change right in the user's eyeline. Combined with PHASE-01's
+    realistic curves (where the FMP slider now visibly reshapes a real curve), every control drives a
+    visible chart element. Test count held at 43/43 with the new order assertions added.</p>
+  </section>
+
+  <section>
+    <h2>7. Limitations / Second-Best Alternative</h2>
+    <ul>
+      <li>The relocated panel changes vertical stacking; responsive behaviour at 1280/900/520/390px is
+      verified in PHASE-03's browser smoke-check (the panel was already full-width, so reflow risk is low).</li>
+      <li><strong>Second-best:</strong> add factory-load / solar-size sliders so the load shape itself
+      responds — rejected as scope creep that would decouple the workshop chart from the deck's fixed
+      monthly volumes.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>8. Errors / Warnings / Flags Encountered</h2>
+    <p class="empty">None. The reorder preserved the template literal structure (renderAppShell-driven
+    tests pass), and no styles regressed.</p>
+  </section>
+
+  <section>
+    <h2>9. Open Questions / Next Phase Seeds</h2>
+    <ul>
+      <li><strong>PHASE-03:</strong> <code>npm run build</code>, in-browser smoke-check (curve realism,
+      FMP-vs-strike, bill totals, multi-year placement, control responsiveness across breakpoints),
+      Firebase deploy, and completion docs.</li>
+    </ul>
+  </section>
+
+</div>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+</script>
+</body>
+</html>

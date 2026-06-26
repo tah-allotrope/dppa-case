@@ -33,6 +33,12 @@ describe('storytelling shell', () => {
     expect(document.querySelector('.chart-walkthrough-row .walkthrough-panel')).not.toBeNull()
     expect(document.querySelector('.story-grid + .lower-grid')).not.toBeNull()
     expect(document.querySelector('#cancellationFlow')).not.toBeNull()
+    // Multi-year projection now sits inside the focus column, before the cancellation flow
+    expect(document.querySelector('.focus-column .multi-year-panel')).not.toBeNull()
+    const order = document.querySelector('#app').innerHTML
+    expect(order.indexOf('id="multiYearChart"')).toBeLessThan(order.indexOf('id="cancellationFlow"'))
+    expect(order.indexOf('id="multiYearChart"')).toBeLessThan(order.indexOf('class="controls-grid"'))
+    expect(document.querySelector('#app').textContent).toContain('reshape the daily graph')
     expect(document.querySelector('#dailyTotals')).toBeNull()
     expect(document.querySelector('#app').textContent).not.toContain('Cancellation effect')
     expect(document.querySelector('#retailTariff')).toBeNull()

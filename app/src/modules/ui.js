@@ -234,6 +234,20 @@ export function renderAppShell(root, scenarios, settlementModes) {
             </section>
           </div>
 
+          <section class="panel multi-year-panel bottom-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Multi-year projection</p>
+                <h2 id="multiYearTitle">20-year cumulative economics</h2>
+              </div>
+            </div>
+            <div class="multi-year-rollups" id="multiYearRollups"></div>
+            <div class="chart-wrap multi-year-chart-wrap" style="height:260px">
+              <canvas id="multiYearChart" aria-label="Multi-year cumulative cost chart"></canvas>
+            </div>
+            <div class="assumptions-inline" id="multiYearParams"></div>
+          </section>
+
           <div class="panel details-panel stage-panel">
             <div class="panel-header">
               <div>
@@ -315,6 +329,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
             <strong data-output="horizonYears"></strong>
           </label>
         </div>
+        <p class="control-hints">Strike &amp; FMP reshape the daily graph; escalation &amp; horizon reshape the multi-year projection above.</p>
         <div class="assumptions-inline">
           <span>2025 teaching assumptions</span>
           <span>Flat retail tariff in v1</span>
@@ -323,20 +338,6 @@ export function renderAppShell(root, scenarios, settlementModes) {
           <span>Synthetic FMP curve</span>
           <span>Click chart to inspect one hour</span>
         </div>
-      </section>
-
-      <section class="panel multi-year-panel bottom-panel">
-        <div class="panel-header">
-          <div>
-            <p class="eyebrow">Multi-year projection</p>
-            <h2 id="multiYearTitle">20-year cumulative economics</h2>
-          </div>
-        </div>
-        <div class="multi-year-rollups" id="multiYearRollups"></div>
-        <div class="chart-wrap multi-year-chart-wrap" style="height:260px">
-          <canvas id="multiYearChart" aria-label="Multi-year cumulative cost chart"></canvas>
-        </div>
-        <div class="assumptions-inline" id="multiYearParams"></div>
       </section>
     </div>
   `
@@ -367,6 +368,7 @@ export function renderFiveLineBill(container, bill, currency, scenario) {
         </div>
         <span>${fmtN(bill.volumes.contracted)} contracted kWh</span>
       </div>
+      <p class="five-line-caption">The graph above is an illustrative daily shape; this monthly 5-line bill is the deck-exact settlement.</p>
       <div class="five-line-table">
         ${lines.map(([idx, label, value]) => `
           <div class="five-line-row">
