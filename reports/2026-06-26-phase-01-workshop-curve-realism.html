@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 01 — Workshop Curve Realism | dppa-case</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #222636; --border: #2d3148;
+    --accent: #7c6af7; --accent2: #4fc3f7; --green: #4caf82; --red: #e06c6c;
+    --amber: #f4b942; --text: #e2e4ef; --muted: #8890a8; --mono: 'JetBrains Mono', monospace;
+  }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; font-size: 15px; line-height: 1.65; }
+  a { color: var(--accent2); }
+  .page { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+  section { margin-top: 44px; }
+  h1 { font-size: 2rem; font-weight: 700; line-height: 1.2; }
+  h2 { font-size: 1.2rem; font-weight: 600; color: var(--accent); margin-bottom: 14px; letter-spacing: .03em; text-transform: uppercase; }
+  h3 { font-size: 1rem; font-weight: 600; color: var(--accent2); margin: 14px 0 8px; }
+  p { margin-bottom: 10px; }
+  ul { margin: 8px 0 8px 22px; } li { margin-bottom: 5px; }
+  code { font-family: var(--mono); font-size: .85em; background: var(--surface2); padding: 2px 6px; border-radius: 4px; }
+  pre { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: .82em; line-height: 1.55; margin: 12px 0; }
+  .hero { background: linear-gradient(135deg, #1a1d27 0%, #1e2038 100%); border: 1px solid var(--border); border-radius: 12px; padding: 34px 38px; }
+  .hero-eyebrow { font-size: .75rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .hero-title { font-size: 1.9rem; font-weight: 700; line-height: 1.2; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 18px; }
+  .hero-meta span { font-size: .82rem; color: var(--muted); }
+  .hero-meta strong { color: var(--text); }
+  .badge { display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; background: #1e3a2a; color: var(--green); border: 1px solid var(--green); margin-left: 10px; vertical-align: middle; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin-bottom: 14px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .stat-label { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1.1; }
+  .stat-note { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+  .green { color: var(--green); } .red { color: var(--red); } .amber { color: var(--amber); }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: .88rem; }
+  th { text-align: left; padding: 10px 14px; background: var(--surface2); color: var(--muted); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .before { color: var(--red); font-family: var(--mono); font-size: .85em; }
+  .after  { color: var(--green); font-family: var(--mono); font-size: .85em; }
+  .mermaid-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; max-height: 360px; }
+  .mermaid-wrap svg { max-width: 100%; }
+  .chart-frame { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 18px; height: 340px; }
+  .empty { color: var(--muted); font-style: italic; }
+  @media print { body { background:#fff; color:#000; } .hero { background:#eee; } .card,.chart-frame,.mermaid-wrap { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-eyebrow">Phase Report · Workshop Chart Layout Revision</div>
+    <div class="hero-title">PHASE-01 — Workshop Curve Realism <span class="badge">Complete</span></div>
+    <div class="hero-meta">
+      <span><strong>Date:</strong> 2026-06-26</span>
+      <span><strong>Project:</strong> DPPA CFO Calculator</span>
+      <span><strong>Repo:</strong> dppa-case</span>
+      <span><strong>Tests:</strong> <span class="green">43 / 43 pass</span></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>1. Phase Header</h2>
+    <p>Replace the workshop presets' dead-flat graph (load, generation, and FMP all horizontal) with
+    realistic daily curves, while keeping the deck-exact 5-line monthly bill untouched. The workshop FMP
+    line must vary across the day yet stay on the deck's side of strike — below strike for Workshop&nbsp;1
+    (matched), above strike for Workshop&nbsp;2 (shortfall) — to preserve the deck's S1-vs-S2 teaching
+    contrast.</p>
+  </section>
+
+  <section>
+    <h2>2. Input → Output Summary</h2>
+    <table>
+      <thead><tr><th>Surface</th><th>Before</th><th>After</th></tr></thead>
+      <tbody>
+        <tr><td>workshop1/2 load &amp; gen</td><td class="before">flat = monthlyVolume / 720 (e.g. 6,944 every hour)</td><td class="after">realistic load step-curve + solar bell (S1 overlap, S2 load&gt;gen)</td></tr>
+        <tr><td>workshop FMP (buildInputs)</td><td class="before">Array(24).fill(state.marketPrice) — flat line</td><td class="after">buildWorkshopFmpCurve(midpoint, strike, side) — daily curve on the correct side of strike</td></tr>
+        <tr><td>scenario data</td><td class="before">no FMP-side marker</td><td class="after">fmpSide: 'below' (S1) / 'above' (S2)</td></tr>
+        <tr><td>5-line monthly bill</td><td>deck-exact (monthlyVolumes)</td><td class="after">unchanged — still deck-exact</td></tr>
+        <tr><td>tests</td><td>41</td><td class="after">43 (+2: FMP-side &amp; non-flat profiles)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>3. Logic Flow</h2>
+    <div class="mermaid-wrap">
+      <pre class="mermaid">
+flowchart LR
+  A[Scenario tab = workshop] --> B[buildInputs]
+  B --> C{kind === 'workshop'?}
+  C -- yes --> D[buildWorkshopFmpCurve<br/>midpoint, strike, side]
+  C -- no --> E[buildFmpCurve midpoint]
+  D --> F[Daily FMP curve<br/>bounded to side of strike]
+  F --> G[Profile chart:<br/>realistic load + solar + FMP]
+  B --> H[5-line monthly bill<br/>uses monthlyVolumes only]
+  H --> I[Deck-exact totals<br/>unchanged]
+      </pre>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Math / Algorithm Used</h2>
+    <p>The constrained FMP generator centers a normalized version of the existing daily shape on the
+    market-price <code>midpoint</code> (so the slider still moves it), with amplitude bounded by the
+    midpoint↔strike gap so it cannot cross strike:</p>
+    <pre>amp     = min(midpoint × 0.15, |strike − midpoint| × 0.8)
+norm[h] = (FMP_SHAPE[h] − mean(FMP_SHAPE)) / maxDev      // ≈ [−1, +1]
+value   = midpoint + norm[h] × amp
+side 'below' → value = min(value, strike − 2%·strike)
+side 'above' → value = max(value, strike + 2%·strike)</pre>
+    <p>For the deck defaults (gap = 100), <code>amp = 80</code>, giving Workshop&nbsp;1 ≈ 1,092–1,225
+    (all &lt; strike 1,250) and Workshop&nbsp;2 ≈ 1,542–1,680 (all &gt; strike 1,500).</p>
+  </section>
+
+  <section>
+    <h2>5. Tools / Formulas / Methods</h2>
+    <ul>
+      <li><strong>Vite + Vitest</strong> — module edits and the test gate (<code>npm test -- --run</code>).</li>
+      <li><strong>solarCurve(scale, shoulder)</strong> — reused helper for realistic solar bells.</li>
+      <li><strong>buildWorkshopFmpCurve(midpoint, strike, side)</strong> — new exported generator.</li>
+      <li><strong>Decoupling principle</strong> — the chart is illustrative; the monthly 5-line bill
+      (from fixed <code>monthlyVolumes</code>) remains the authoritative deck-exact number.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. Results &amp; Visualizations</h2>
+    <p>The two workshop FMP curves now vary across the day while staying cleanly on opposite sides of
+    their strike lines — restoring the daily-shape intuition without blurring the S1-below / S2-above
+    contrast.</p>
+    <div class="chart-frame"><canvas id="fmpChart"></canvas></div>
+    <div class="card-grid" style="margin-top:14px;">
+      <div class="card"><div class="stat-label">Workshop 1 FMP range</div><div class="stat-value green">1,092–1,225</div><div class="stat-note">strike 1,250 — stays below</div></div>
+      <div class="card"><div class="stat-label">Workshop 2 FMP range</div><div class="stat-value amber">1,542–1,680</div><div class="stat-note">strike 1,500 — stays above</div></div>
+      <div class="card"><div class="stat-label">Bill totals (S1)</div><div class="stat-value">9,063,196,000</div><div class="stat-note">CKH — unchanged, deck-exact</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>7. Limitations / Second-Best Alternative</h2>
+    <ul>
+      <li>The chart is <strong>illustrative</strong>: per-hour figures do not sum exactly to the monthly
+      5-line bill (the bill is authoritative). A caption clarifying this is scheduled in PHASE-02.</li>
+      <li>If a presenter drags <code>marketPrice</code> across strike on a workshop preset, the
+      side-of-strike guarantee compresses the curve toward the margin rather than crossing — an extreme
+      manual value flattens it slightly.</li>
+      <li><strong>Second-best:</strong> vary only load/solar and keep FMP flat — rejected, as it leaves a
+      dead-flat FMP line the user explicitly disliked.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>8. Errors / Warnings / Flags Encountered</h2>
+    <p class="empty">None. The full suite stayed green (43/43); the existing <code>buildFiveLineBill</code>
+    parity totals were unaffected because the bill reads fixed monthly volumes, not the chart shape.</p>
+  </section>
+
+  <section>
+    <h2>9. Open Questions / Next Phase Seeds</h2>
+    <ul>
+      <li><strong>PHASE-02:</strong> move the multi-year projection to a full-width section directly below
+      the daily-graph row, and add the control-effect note + illustrative-vs-authoritative caption.</li>
+      <li><strong>PHASE-03:</strong> production build, in-browser smoke-check across breakpoints, deploy.</li>
+    </ul>
+  </section>
+
+</div>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  Chart.defaults.devicePixelRatio = 1; Chart.defaults.animation = false;
+  Chart.defaults.resizeDelay = 150; Chart.defaults.normalized = true; Chart.defaults.maintainAspectRatio = false;
+  const hrs = Array.from({length:24}, (_,h)=>String(h).padStart(2,'0'));
+  const w1 = [1095,1093,1092,1093,1098,1109,1120,1127,1135,1144,1150,1157,1164,1170,1177,1183,1190,1201,1216,1225,1207,1164,1135,1112];
+  const w2 = [1547,1545,1542,1545,1550,1561,1572,1579,1587,1596,1602,1609,1616,1622,1629,1635,1642,1653,1668,1680,1659,1616,1587,1564];
+  new Chart(document.getElementById('fmpChart'), {
+    type: 'line',
+    data: { labels: hrs, datasets: [
+      { label:'Workshop 1 FMP', data:w1, borderColor:'#4caf82', backgroundColor:'rgba(76,175,130,.12)', tension:.35, pointRadius:0, borderWidth:2.5 },
+      { label:'W1 strike (1,250)', data:Array(24).fill(1250), borderColor:'#4caf82', borderDash:[6,4], pointRadius:0, borderWidth:1.2 },
+      { label:'Workshop 2 FMP', data:w2, borderColor:'#f4b942', backgroundColor:'rgba(244,185,66,.12)', tension:.35, pointRadius:0, borderWidth:2.5 },
+      { label:'W2 strike (1,500)', data:Array(24).fill(1500), borderColor:'#f4b942', borderDash:[6,4], pointRadius:0, borderWidth:1.2 },
+    ]},
+    options: { animation:false, resizeDelay:150, normalized:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:'#8890a8', usePointStyle:true, boxWidth:10 } } },
+      scales:{ x:{ ticks:{ color:'#8890a8', maxTicksLimit:12 }, grid:{ color:'rgba(160,183,217,.08)' } },
+               y:{ ticks:{ color:'#8890a8' }, grid:{ color:'rgba(160,183,217,.08)' }, title:{ display:true, text:'VND/kWh', color:'#8890a8' } } } }
+  });
+</script>
+</body>
+</html>

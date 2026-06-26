@@ -16,6 +16,28 @@ export function buildFmpCurve(midpoint) {
   return FMP_SHAPE.map((mult) => Math.round(midpoint * mult))
 }
 
+// Workshop FMP curve: a lively daily shape centered on `midpoint` (so the
+// market-price slider still reshapes it) whose amplitude is bounded by the
+// midpoint↔strike gap so the curve never crosses strike while the midpoint
+// stays on the correct side. side 'below' keeps it under strike (deck S1),
+// side 'above' keeps it over strike (deck S2). This removes the dead-flat
+// workshop FMP line while preserving the S1-below / S2-above teaching contrast.
+const FMP_SHAPE_CENTER = FMP_SHAPE.reduce((sum, m) => sum + m, 0) / FMP_SHAPE.length
+const FMP_SHAPE_MAX_DEV = Math.max(...FMP_SHAPE.map((m) => Math.abs(m - FMP_SHAPE_CENTER)))
+
+export function buildWorkshopFmpCurve(midpoint, strike, side) {
+  const gap = Math.abs(strike - midpoint)
+  const amp = Math.min(midpoint * 0.15, gap * 0.8)
+  const margin = strike * 0.02
+  return FMP_SHAPE.map((m) => {
+    const norm = (m - FMP_SHAPE_CENTER) / FMP_SHAPE_MAX_DEV // ~[-1, 1]
+    let value = midpoint + norm * amp
+    if (side === 'below') value = Math.min(value, strike - margin)
+    else value = Math.max(value, strike + margin)
+    return Math.round(value)
+  })
+}
+
 function solarCurve(scale = 1, shoulder = 0.35) {
   return HOURS.map((hour) => {
     if (hour < 6 || hour > 18) return 0
@@ -75,8 +97,17 @@ export const scenarioProfiles = {
     description: 'July deck Scenario 1: contracted quantity matches factory consumption.',
     overrides: { strikePrice: 1250, marketPrice: 1150 },
     monthlyVolumes: { contracted: 5000000, total: 5000000 },
-    loadProfile: HOURS.map(() => Math.round(5000000 / 720)),
-    generationProfile: HOURS.map(() => Math.round(5000000 / 720)),
+    fmpSide: 'below',
+    // Illustrative daily shape (load≈solar overlap → matched story). The exact
+    // monthly settlement is the 5-line bill (monthlyVolumes), not this curve.
+    loadProfile: HOURS.map((hour) => {
+      if (hour < 6) return 5200
+      if (hour < 9) return 6800
+      if (hour < 16) return 8200
+      if (hour < 20) return 6800
+      return 5600
+    }),
+    generationProfile: solarCurve(8500, 0.28),
   },
   workshop2: {
     id: 'workshop2',
@@ -85,8 +116,16 @@ export const scenarioProfiles = {
     description: 'July deck Scenario 2: contracted quantity falls short of factory consumption.',
     overrides: { strikePrice: 1500, marketPrice: 1600 },
     monthlyVolumes: { contracted: 8000000, total: 9000000 },
-    loadProfile: HOURS.map(() => Math.round(9000000 / 720)),
-    generationProfile: HOURS.map(() => Math.round(8000000 / 720)),
+    fmpSide: 'above',
+    // Illustrative daily shape (load clearly above solar → shortfall story).
+    loadProfile: HOURS.map((hour) => {
+      if (hour < 6) return 10000
+      if (hour < 9) return 13000
+      if (hour < 17) return 15000
+      if (hour < 21) return 12500
+      return 10500
+    }),
+    generationProfile: solarCurve(11000, 0.25),
   },
 }
 

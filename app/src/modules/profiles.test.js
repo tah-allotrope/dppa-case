@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { deriveVolumes, scaleProfile, sumVolume } from './profiles'
-import { buildFmpCurve, defaultInputs, scenarioProfiles } from '../data/default-scenarios'
+import { buildFmpCurve, buildWorkshopFmpCurve, defaultInputs, scenarioProfiles } from '../data/default-scenarios'
 import { calculateSettlement } from './settlement'
 
 describe('scaleProfile', () => {
@@ -90,6 +90,28 @@ describe('buildFmpCurve', () => {
     curve.forEach((val) => {
       expect(Number.isInteger(val)).toBe(true)
     })
+  })
+
+  it('keeps the workshop FMP curve on the deck side of strike and non-flat', () => {
+    // Workshop 1 (deck S1): FMP varies but stays entirely below strike.
+    const s1 = buildWorkshopFmpCurve(1150, 1250, 'below')
+    expect(s1).toHaveLength(24)
+    expect(Math.max(...s1)).toBeLessThan(1250)
+    expect(Math.max(...s1)).not.toBe(Math.min(...s1))
+
+    // Workshop 2 (deck S2): FMP varies but stays entirely above strike.
+    const s2 = buildWorkshopFmpCurve(1600, 1500, 'above')
+    expect(s2).toHaveLength(24)
+    expect(Math.min(...s2)).toBeGreaterThan(1500)
+    expect(Math.max(...s2)).not.toBe(Math.min(...s2))
+  })
+
+  it('gives the workshop scenarios non-flat load and solar profiles', () => {
+    for (const id of ['workshop1', 'workshop2']) {
+      const { loadProfile, generationProfile } = scenarioProfiles[id]
+      expect(Math.max(...loadProfile)).not.toBe(Math.min(...loadProfile))
+      expect(Math.max(...generationProfile)).not.toBe(Math.min(...generationProfile))
+    }
   })
 
   it('keeps several matched balanced-scenario hours below strike by default', () => {

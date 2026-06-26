@@ -1,5 +1,5 @@
 import './style.css'
-import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve } from './data/default-scenarios'
+import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve, buildWorkshopFmpCurve } from './data/default-scenarios'
 import { renderMultiYearChart, renderProfileChart } from './modules/chart'
 import { buildFiveLineBill, buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement, projectMultiYear } from './modules/settlement'
 import { renderAppShell, renderFiveLineBill, renderFormulas, renderMultiYearPanel, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
@@ -28,7 +28,9 @@ function buildInputs() {
     ...state,
     loadProfile: scenario.loadProfile,
     generationProfile: scenario.generationProfile,
-    fmpCurve: isWorkshop ? Array(24).fill(state.marketPrice) : buildFmpCurve(state.marketPrice),
+    fmpCurve: isWorkshop
+      ? buildWorkshopFmpCurve(state.marketPrice, state.strikePrice, scenario.fmpSide)
+      : buildFmpCurve(state.marketPrice),
     monthlyVolumes: scenario.monthlyVolumes,
   }
 }
