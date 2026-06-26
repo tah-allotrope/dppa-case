@@ -1,7 +1,7 @@
 ---
 title: "Workshop Chart Realism + Layout & Control-Feedback Revision"
 date: "2026-06-26"
-status: "draft"
+status: "complete"
 request: "Revise the web app workshop scenarios: (1) replace flat workshop graph lines with realistic daily load/solar/FMP curves while keeping the 5-line monthly bill deck-exact; (2) move the multi-year projection up to directly below the daily graph; (3) make control changes visibly reflected in the charts."
 plan_type: "multi-phase"
 research_inputs:

@@ -386,3 +386,22 @@ Implemented `plans/2026-06-26-deck-app-workshop-consolidation-plan.md` with the 
 - Deploy blocked: `firebase.cmd` is not installed on PATH in this session. `app/deployment.md` records the manual deploy command.
 - Git commit/push blocked: sandbox denies `.git/index.lock` creation, so phase commits could not be made from this session.
 - Reports: `reports/2026-06-26-deck-app-consolidation-phase-01.html` through `phase-04.html`, plus `reports/2026-06-26-deck-app-consolidation-completion.md`.
+
+## Workshop Chart Realism + Layout & Control Feedback Revision — Completed 2026-06-26
+
+Implemented `plans/2026-06-26-workshop-chart-layout-revision-plan.md` to fix three workshop-app gaps the user raised after the consolidation shipped: flat workshop graph, buried multi-year projection, and controls that felt inert.
+
+### Plan
+- [x] PHASE-01: Realistic workshop load/solar curves + `buildWorkshopFmpCurve` (varies but stays on the deck side of strike); 5-line bill untouched (deck-exact).
+- [x] PHASE-02: Move multi-year projection full-width directly below the daily-graph row; add control-effect note + illustrative-vs-authoritative caption.
+- [x] PHASE-03: Verify (43 tests), build, browser smoke-check, deploy, document.
+
+### Review / Results
+- `app/src/data/default-scenarios.js`: workshop1/2 now use realistic step-function load + `solarCurve` bells (S1 overlap/matched, S2 load>gen/shortfall) and carry `fmpSide`. New exported `buildWorkshopFmpCurve(midpoint, strike, side)` centers a bounded daily curve on `marketPrice` (slider-responsive) without crossing strike: W1 ≈ 1,092–1,225 (< strike 1,250), W2 ≈ 1,542–1,680 (> strike 1,500).
+- `app/src/main.js`: workshop `buildInputs` branch calls `buildWorkshopFmpCurve`; bill still uses fixed `monthlyVolumes`.
+- `app/src/modules/ui.js` + `style.css`: multi-year panel relocated into `focus-column` right after the chart row; `.control-hints` and `.five-line-caption` added.
+- Concern #3 diagnosed (not a render bug): chart `update('none')` path is correct; flat lines + buried multi-year masked control effects. Fixed by realism + relocation; no new controls.
+- Verified: `npm test -- --run` 43/43; `npm run build` clean (250 KB / 82 KB gzip); live browser check (Workshop 2 bill CKH 18,828,262,400 with −800M CfD; balanced clears bill; multi-year in focus column; no console errors); `firebase deploy` succeeded.
+- Live: https://dppa-case.web.app
+- Reports: `reports/2026-06-26-phase-01-workshop-curve-realism.html`, `reports/2026-06-26-phase-02-layout-control-feedback.html`, `reports/2026-06-26-final-workshop-chart-layout-revision.html`.
+- Commits: `e26bf17` (phase-01), `048ce2a` (phase-02), + phase-03/final.
