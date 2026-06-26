@@ -215,6 +215,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
                 <canvas id="profileChart" aria-label="Load and generation chart"></canvas>
               </div>
               <p class="chart-tap-hint" id="chartTapHint">Click or tap any hour to inspect</p>
+              <div id="fiveLineBill"></div>
               <div class="hour-nav" id="hourNav">
                 <button class="hour-nav-btn" id="prevHour" type="button" aria-label="Previous hour">← Prev hour</button>
                 <span class="hour-nav-label" id="hourNavLabel">12:00</span>
@@ -338,6 +339,63 @@ export function renderAppShell(root, scenarios, settlementModes) {
         <div class="assumptions-inline" id="multiYearParams"></div>
       </section>
     </div>
+  `
+}
+
+export function renderFiveLineBill(container, bill, currency, scenario) {
+  if (!container) return
+  if (!bill) {
+    container.innerHTML = ''
+    return
+  }
+
+  const fmt = (value, signed = false) => formatMoney(value, { currency, signed })
+  const fmtN = (value) => formatNumber(value)
+  const lines = [
+    ['1', 'Market energy', bill.lines.marketEnergy],
+    ['2', 'DPPA system service', bill.lines.systemService],
+    ['3', 'Differential clearing', bill.lines.diffClearing],
+    ['4', 'Additional retail purchase', bill.lines.additionalPurchase],
+  ]
+
+  container.innerHTML = `
+    <section class="five-line-bill" aria-label="Monthly five-line settlement bill">
+      <div class="five-line-head">
+        <div>
+          <p class="eyebrow">Monthly settlement</p>
+          <h3>${scenario.label} deck bill</h3>
+        </div>
+        <span>${fmtN(bill.volumes.contracted)} contracted kWh</span>
+      </div>
+      <div class="five-line-table">
+        ${lines.map(([idx, label, value]) => `
+          <div class="five-line-row">
+            <span>${idx}</span>
+            <strong>${label}</strong>
+            <b>${fmt(value)}</b>
+          </div>
+        `).join('')}
+        <div class="five-line-row subtotal">
+          <span></span>
+          <strong>CEVN</strong>
+          <b>${fmt(bill.cEvn)}</b>
+        </div>
+        <div class="five-line-row cfd">
+          <span>5</span>
+          <strong>CfD settlement</strong>
+          <b>${fmt(bill.lines.cfd, true)}</b>
+        </div>
+        <div class="five-line-row total">
+          <span></span>
+          <strong>CKH net cost</strong>
+          <b>${fmt(bill.cKh)}</b>
+        </div>
+      </div>
+      <div class="plant-revenue-mirror">
+        <span>RE GENCO mirror</span>
+        <strong>${fmt(bill.plantRevenue.market)} market + ${fmt(bill.plantRevenue.cfd, true)} CfD = ${fmt(bill.plantRevenue.total)}</strong>
+      </div>
+    </section>
   `
 }
 

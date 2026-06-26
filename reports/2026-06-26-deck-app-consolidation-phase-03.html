@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deck/App Consolidation Phase 03 Report</title>
+  <style>
+    body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#f7f9fc;color:#162033;line-height:1.5}main{max-width:1040px;margin:0 auto;padding:32px 20px 56px}header,section{border-radius:8px}header{background:#10233f;color:white;padding:26px;margin-bottom:16px}section{background:white;border:1px solid #d8e0ea;padding:16px;margin-top:12px}h1{margin:0 0 8px}h2{font-size:1.05rem;margin:0 0 10px;color:#10233f}code{background:#eef3f9;padding:1px 5px;border-radius:5px}.ok{color:#147d64;font-weight:700}.warn{color:#a96f00;font-weight:700}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #d8e0ea;padding:8px;text-align:left;vertical-align:top}@media print{body{background:white}section,header{break-inside:avoid}}
+  </style>
+</head>
+<body><main>
+  <header><h1>Phase 03 - App UI Integration</h1><p>2026-06-26 - dppa-case - report-skill phase structure</p></header>
+  <section><h2>1. Phase Header</h2><p>Exposed the workshop presets in the app UI and rendered the monthly five-line bill only for those presets.</p></section>
+  <section><h2>2. Input -&gt; Output Summary</h2><table><tr><th>Input</th><th>Output</th></tr><tr><td>Workshop preset data</td><td>Scenario tabs for Workshop 1 and Workshop 2.</td></tr><tr><td>Five-line bill engine</td><td>Monthly settlement panel with RE GENCO mirror.</td></tr><tr><td>Flat FMP requirement</td><td>Flat FMP curve and chart-axis padding guard.</td></tr></table></section>
+  <section><h2>3. Logic Flow</h2><p>Tab selection -&gt; apply scenario overrides -&gt; sync controls -&gt; build flat workshop inputs -&gt; render bill or clear it for curve scenarios.</p></section>
+  <section><h2>4. Math / Algorithm Used</h2><p>The UI delegates bill math to <code>buildFiveLineBill</code> and uses display formatting only; it does not duplicate settlement formulas.</p></section>
+  <section><h2>5. Tools / Formulas / Methods</h2><p>Updated <code>main.js</code>, <code>ui.js</code>, <code>chart.js</code>, <code>style.css</code>, and <code>ui.test.js</code>.</p></section>
+  <section><h2>6. Results &amp; Visualizations</h2><p class="ok">PASS: UI tests assert workshop tabs, corrected Workshop 1 totals, RE GENCO mirror, and clearing the panel for curve scenarios.</p></section>
+  <section><h2>7. Limitations / Second-Best Alternative</h2><p>Real-browser interaction smoke remained limited by background server persistence in the sandbox; automated UI coverage and production build passed.</p></section>
+  <section><h2>8. Errors / Warnings / Flags Encountered</h2><p>No code-level UI blocker encountered.</p></section>
+  <section><h2>9. Open Questions / Next Phase Seeds</h2><p>Proceed to parity harness, build, deploy attempt, and final reporting.</p></section>
+</main></body></html>

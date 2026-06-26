@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deck/App Consolidation Phase 02 Report</title>
+  <style>
+    body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#f7f9fc;color:#162033;line-height:1.5}main{max-width:1040px;margin:0 auto;padding:32px 20px 56px}header,section{border-radius:8px}header{background:#10233f;color:white;padding:26px;margin-bottom:16px}section{background:white;border:1px solid #d8e0ea;padding:16px;margin-top:12px}h1{margin:0 0 8px}h2{font-size:1.05rem;margin:0 0 10px;color:#10233f}code{background:#eef3f9;padding:1px 5px;border-radius:5px}.ok{color:#147d64;font-weight:700}.warn{color:#a96f00;font-weight:700}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #d8e0ea;padding:8px;text-align:left;vertical-align:top}@media print{body{background:white}section,header{break-inside:avoid}}
+  </style>
+</head>
+<body><main>
+  <header><h1>Phase 02 - App Data + Engine</h1><p>2026-06-26 - dppa-case - report-skill phase structure</p></header>
+  <section><h2>1. Phase Header</h2><p>Added pure settlement logic and data needed for penny-for-penny workshop parity.</p></section>
+  <section><h2>2. Input -&gt; Output Summary</h2><table><tr><th>Input</th><th>Output</th></tr><tr><td>Existing three curve scenarios</td><td>Preserved as <code>kind: 'curve'</code>.</td></tr><tr><td>Deck scenarios</td><td>Added <code>workshop1</code> and <code>workshop2</code> presets with monthly volumes and overrides.</td></tr><tr><td>Combined DPPA fee</td><td>Split into <code>360</code> service and <code>163.3</code> clearing, with combined <code>523.3</code>.</td></tr></table></section>
+  <section><h2>3. Logic Flow</h2><p>Scenario data -&gt; constants -&gt; <code>buildFiveLineBill</code> -&gt; deck parity tests.</p></section>
+  <section><h2>4. Math / Algorithm Used</h2><p>The bill computes market energy, service fee, clearing fee, additional retail purchase, CfD, <code>CEVN</code>, <code>CKH</code>, and the Grill Me default RE GENCO mirror using Kpp-only plant volume.</p></section>
+  <section><h2>5. Tools / Formulas / Methods</h2><p>Implemented in <code>app/src/data/default-scenarios.js</code> and <code>app/src/modules/settlement.js</code>; covered by <code>settlement.test.js</code>.</p></section>
+  <section><h2>6. Results &amp; Visualizations</h2><p class="ok">PASS: Workshop 1 and Workshop 2 bill totals match corrected deck totals exactly in unit tests.</p></section>
+  <section><h2>7. Limitations / Second-Best Alternative</h2><p>The monthly bill is intentionally decoupled from the illustrative 24-hour chart profile, matching the plan's monthly-volume design.</p></section>
+  <section><h2>8. Errors / Warnings / Flags Encountered</h2><p>No engine blocker encountered. Small expected number drift from <code>523.34</code> to <code>523.3</code> is covered by tests.</p></section>
+  <section><h2>9. Open Questions / Next Phase Seeds</h2><p>No open question; proceed to UI integration.</p></section>
+</main></body></html>

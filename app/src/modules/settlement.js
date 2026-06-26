@@ -118,6 +118,48 @@ export function calculateSettlement(inputs) {
   }
 }
 
+export function buildFiveLineBill(constants, volumes) {
+  const contracted = volumes.contracted ?? 0
+  const total = volumes.total ?? contracted
+  const shortfall = Math.max(total - contracted, 0)
+  const fmp = constants.fmp ?? constants.marketPrice
+  const serviceFee = constants.serviceFee ?? constants.dppaServiceFee ?? 0
+  const clearingFee = constants.clearingFee ?? constants.dppaClearingFee ?? 0
+  const lossFactor = constants.lossFactorPrecise ?? constants.lossFactor ?? 1
+  const retailTariff = constants.retailTariff ?? 0
+  const strikePrice = constants.strikePrice ?? 0
+  const lossFactorKppOnly = constants.lossFactorKppOnly ?? 1.008
+
+  const marketEnergy = Math.round(contracted * fmp * lossFactor)
+  const systemService = Math.round(contracted * serviceFee)
+  const diffClearing = Math.round(contracted * clearingFee)
+  const additionalPurchase = Math.round(shortfall * retailTariff)
+  const cfd = Math.round(contracted * (strikePrice - fmp))
+  const cEvn = marketEnergy + systemService + diffClearing + additionalPurchase
+  const cKh = cEvn + cfd
+  const plantMarket = Math.round(contracted * lossFactorKppOnly * fmp)
+  const plantRevenue = {
+    market: plantMarket,
+    cfd,
+    total: plantMarket + cfd,
+  }
+
+  return {
+    volumes: { contracted, total, shortfall },
+    constants: { fmp, strikePrice, serviceFee, clearingFee, lossFactor, retailTariff, lossFactorKppOnly },
+    lines: {
+      marketEnergy,
+      systemService,
+      diffClearing,
+      additionalPurchase,
+      cfd,
+    },
+    cEvn,
+    cKh,
+    plantRevenue,
+  }
+}
+
 function getCasePresentation(key) {
   switch (key) {
     case 'shortfall':

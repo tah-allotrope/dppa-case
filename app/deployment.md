@@ -18,6 +18,7 @@ npx firebase deploy --only hosting --project dppa-case
 
 | Date | Commit | Description |
 |---|---|---|
+| 2026-06-26 | pending commit | July scenario-training workshop presets built and verified locally; deploy blocked in this session because `firebase` CLI is not installed on PATH |
 | 2026-06-23 | `29b91e4` | Sprint 1: Workshop Demo Safety — error handling, loading splash, touch feedback |
 
 ## CI Notes

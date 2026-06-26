@@ -323,6 +323,76 @@ h3 { font-size: 1.02rem; }
   letter-spacing: 0.02em;
 }
 
+.five-line-bill {
+  margin-top: 10px;
+  border: 1px solid rgba(154, 255, 222, 0.18);
+  border-radius: 18px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(154, 255, 222, 0.08), rgba(255, 255, 255, 0.025));
+}
+
+.five-line-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.five-line-head span,
+.plant-revenue-mirror span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.five-line-table {
+  display: grid;
+  gap: 6px;
+}
+
+.five-line-row {
+  display: grid;
+  grid-template-columns: 1.8rem minmax(0, 1fr) minmax(9rem, auto);
+  gap: 8px;
+  align-items: center;
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: rgba(5, 8, 22, 0.34);
+  font-size: 0.82rem;
+}
+
+.five-line-row span {
+  color: var(--muted);
+}
+
+.five-line-row b,
+.plant-revenue-mirror strong {
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.five-line-row.subtotal,
+.five-line-row.total {
+  border-color: rgba(154, 255, 222, 0.22);
+}
+
+.five-line-row.cfd {
+  border-color: rgba(255, 104, 216, 0.20);
+}
+
+.plant-revenue-mirror {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.82rem;
+}
+
 .hour-nav {
   margin-top: 6px;
   display: flex;
@@ -1329,6 +1399,16 @@ h3 { font-size: 1.02rem; }
   .scenario-tab,
   .toggle-button,
   .ghost-button { padding: 0.44rem 0.72rem; }
+  .five-line-head,
+  .plant-revenue-mirror { flex-direction: column; }
+  .five-line-row {
+    grid-template-columns: 1.4rem minmax(0, 1fr);
+  }
+  .five-line-row b {
+    grid-column: 2;
+    justify-self: start;
+    text-align: left;
+  }
   .chart-wrap {
     height: min(56vh, 360px);
     min-height: 280px;

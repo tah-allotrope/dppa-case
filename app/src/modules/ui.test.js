@@ -2,8 +2,8 @@
 import { describe, expect, it } from 'vitest'
 import { buildFmpCurve, defaultInputs, scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios'
 import { formatMoney } from './formatters'
-import { buildSelectedWalkthroughCase, calculateSettlement, buildFormulaBreakdown } from './settlement'
-import { renderAppShell, renderFormulas, renderSelectedHourDetails, renderWalkthroughCases } from './ui'
+import { buildFiveLineBill, buildSelectedWalkthroughCase, calculateSettlement, buildFormulaBreakdown } from './settlement'
+import { renderAppShell, renderFiveLineBill, renderFormulas, renderSelectedHourDetails, renderWalkthroughCases } from './ui'
 
 function normalizedText(selector) {
   return document.querySelector(selector).textContent.replace(/\s+/g, ' ').trim()
@@ -22,6 +22,9 @@ describe('storytelling shell', () => {
     // Tariff overlay is now drawn on canvas by a Chart.js plugin — no HTML overlay element.
     expect(document.querySelector('#profileChart')).not.toBeNull()
     expect(document.querySelector('#walkthroughCases')).not.toBeNull()
+    expect(document.querySelector('[data-scenario="workshop1"]')).not.toBeNull()
+    expect(document.querySelector('[data-scenario="workshop2"]')).not.toBeNull()
+    expect(document.querySelector('#fiveLineBill')).not.toBeNull()
     expect(document.querySelector('#app').textContent).toContain('Load-vs-generation cases')
     // Chart canvas must be inside .chart-wrap
     expect(document.querySelector('.chart-wrap #profileChart')).not.toBeNull()
@@ -38,6 +41,31 @@ describe('storytelling shell', () => {
     expect(document.querySelector('#app').textContent).toContain('Synthetic FMP curve')
     expect(document.querySelector('#app').textContent).not.toContain('weighted 22 kV to below 110 kV retail tariff')
     expect(document.querySelector('#app').textContent).not.toContain('Savings vs BAU')
+  })
+
+  it('renders workshop five-line bill totals and clears it for curve scenarios', () => {
+    document.body.innerHTML = '<div id="fiveLineBill"></div>'
+    const node = document.querySelector('#fiveLineBill')
+    const bill = buildFiveLineBill({
+      fmp: 1150,
+      strikePrice: 1250,
+      serviceFee: 360,
+      clearingFee: 163.3,
+      lossFactorPrecise: 1.026 * 1.008,
+      retailTariff: 2204,
+    }, scenarioProfiles.workshop1.monthlyVolumes)
+
+    renderFiveLineBill(node, bill, 'VND', scenarioProfiles.workshop1)
+
+    expect(normalizedText('#fiveLineBill')).toContain('Workshop 1 deck bill')
+    expect(normalizedText('#fiveLineBill')).toContain('5,946,696,000 VND')
+    expect(normalizedText('#fiveLineBill')).toContain('8,563,196,000 VND')
+    expect(normalizedText('#fiveLineBill')).toContain('9,063,196,000 VND')
+    expect(normalizedText('#fiveLineBill')).toContain('RE GENCO mirror')
+
+    renderFiveLineBill(node, null, 'VND', scenarioProfiles.balanced)
+
+    expect(node.innerHTML).toBe('')
   })
 })
 
@@ -110,7 +138,7 @@ describe('selected-hour layout', () => {
     expect(text).toContain(`FMP (${fmpText}) × Kpp (${kppText}) × 4,700 kWh`)
     expect(text).toContain('Developer =')
     expect(text).toContain(`− FMP (${fmpText}) × 4,700 kWh + Strike (${strikeText}) × 4,700 kWh`)
-    expect(text).toContain(`EVN = FMP (${fmpText}) × Kpp (${kppText}) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh =`)
+    expect(text).toContain(`EVN = FMP (${fmpText}) × Kpp (${kppText}) × 4,700 kWh + CDPPA (523.30 VND/kWh) × 4,700 kWh =`)
     expect(text).toContain('FMP cancellation')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-cancelled-term')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-retained-term')

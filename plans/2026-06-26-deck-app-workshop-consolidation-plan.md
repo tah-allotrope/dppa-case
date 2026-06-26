@@ -1,7 +1,7 @@
 ---
 title: "July 2026 Scenario-Training Deck ↔ Web App Consolidation"
 date: "2026-06-26"
-status: "draft"
+status: "complete"
 request: "Based on the brainstorm brief, create a multi-phase plan to review the new 'DPPA Presentation July 2026 Scenario Training.pptx' for errors and consolidate it with the web app for combined flip-to-flip use at the July workshop."
 plan_type: "multi-phase"
 research_inputs:

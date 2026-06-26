@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deck/App Consolidation Phase Report</title>
+  <style>
+    :root { color-scheme: light; --ink:#162033; --muted:#5d6a7c; --line:#d8e0ea; --blue:#2459a6; --green:#147d64; --amber:#a96f00; --bg:#f7f9fc; }
+    body { margin:0; font-family: "Segoe UI", Arial, sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+    main { max-width:1120px; margin:0 auto; padding:32px 20px 56px; }
+    header { background:linear-gradient(135deg,#10233f,#2459a6); color:white; padding:28px; border-radius:8px; margin-bottom:18px; }
+    h1 { margin:0 0 8px; font-size:2rem; }
+    h2 { margin:0 0 12px; font-size:1.15rem; color:#10233f; }
+    section { background:white; border:1px solid var(--line); border-radius:8px; padding:18px; margin-top:14px; }
+    .meta, .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .card { border:1px solid var(--line); border-radius:8px; padding:12px; background:#fbfdff; }
+    .label { display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+    .value { display:block; margin-top:4px; font-weight:700; }
+    table { width:100%; border-collapse:collapse; font-size:.92rem; }
+    th, td { border-bottom:1px solid var(--line); padding:9px 8px; text-align:left; vertical-align:top; }
+    th { color:var(--muted); font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; }
+    .ok { color:var(--green); font-weight:700; }
+    .warn { color:var(--amber); font-weight:700; }
+    code { background:#eef3f9; padding:1px 5px; border-radius:5px; }
+    pre { white-space:pre-wrap; background:#0f172a; color:#e5edf8; border-radius:8px; padding:14px; overflow:auto; }
+    @media (max-width:760px){ .meta,.grid{grid-template-columns:1fr;} main{padding:18px 12px 36px;} header{padding:20px;} }
+    @media print { body{background:white;} section,header{break-inside:avoid;} }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Deck/App Consolidation Phase Report</h1>
+    <p>2026-06-26 · dppa-case · Phase 04 wrap-up with report-skill structure</p>
+    <div class="meta">
+      <div><span class="label">Plan</span><span class="value">2026-06-26 deck/app workshop consolidation</span></div>
+      <div><span class="label">Result</span><span class="value">Complete locally</span></div>
+      <div><span class="label">Blocked</span><span class="value">Git push + Firebase deploy</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>1. Phase Header</h2>
+    <p>Implemented the full plan through deck correction, app parity, UI integration, and verification. The Grill Me default was applied: include a compact RE GENCO plant-revenue mirror.</p>
+  </section>
+
+  <section>
+    <h2>2. Input -> Output Summary</h2>
+    <table>
+      <tr><th>Input</th><th>Output</th></tr>
+      <tr><td>Standalone July scenario-training deck</td><td>Corrected slide 3 notation and Scenario 1 totals on slides 5-7; backup and verification dump created.</td></tr>
+      <tr><td>Existing hourly app</td><td>Added two workshop presets with flat FMP curves and monthly bill readout.</td></tr>
+      <tr><td>Brainstorm/plan parity requirements</td><td>Added JS/Python parity harnesses and Vitest assertions for both scenarios.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>3. Logic Flow</h2>
+    <pre>deck typo fixed -> text QA dump -> app bill engine -> workshop tabs -> parity harness -> tests/build -> deploy attempt</pre>
+  </section>
+
+  <section>
+    <h2>4. Math / Algorithm Used</h2>
+    <p>The monthly bill uses explicit monthly volumes, exact coefficient product <code>1.026 * 1.008 = 1.034208</code> for deck parity, and Kpp-only <code>1.008</code> for the plant mirror. The display/default rounded loss factor remains <code>1.0342</code>.</p>
+  </section>
+
+  <section>
+    <h2>5. Tools / Formulas / Methods</h2>
+    <div class="grid">
+      <div class="card"><span class="label">Deck</span><span class="value">JSZip XML correction; Python script provided but not runnable here</span></div>
+      <div class="card"><span class="label">App</span><span class="value">Vite, Vitest, Chart.js</span></div>
+      <div class="card"><span class="label">Verification</span><span class="value">Node parity harness, app tests, production build</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>6. Results &amp; Visualizations</h2>
+    <table>
+      <tr><th>Scenario</th><th>CEVN</th><th>CfD</th><th>CKH</th></tr>
+      <tr><td>Workshop 1</td><td>8,563,196,000</td><td>500,000,000</td><td>9,063,196,000</td></tr>
+      <tr><td>Workshop 2</td><td>19,628,262,400</td><td>-800,000,000</td><td>18,828,262,400</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>7. Limitations / Second-Best Alternative</h2>
+    <p>Real browser automation was blocked because Playwright CLI could not be fetched and the browser connector did not expose navigation tools. The second-best checks used parity harnesses, Vitest, production build, and a direct Vite preview HTTP 200 check when run foreground.</p>
+  </section>
+
+  <section>
+    <h2>8. Errors / Warnings / Flags Encountered</h2>
+    <table>
+      <tr><th>Flag</th><th>Outcome</th></tr>
+      <tr><td><code>py</code> and <code>python</code> unavailable</td><td>Used JSZip correction and Node parity harness; kept Python files for later use.</td></tr>
+      <tr><td><code>firebase.cmd</code> missing</td><td>Deploy blocked; manual command recorded in <code>app/deployment.md</code>.</td></tr>
+      <tr><td>Git index lock permission denied</td><td>Commit/push blocked by sandbox write restriction on <code>.git</code>.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>9. Open Questions / Next Phase Seeds</h2>
+    <p>Run Firebase deploy and commit/push outside this restricted session; optionally perform a PowerPoint visual review of the edited standalone deck.</p>
+  </section>
+</main>
+</body>
+</html>

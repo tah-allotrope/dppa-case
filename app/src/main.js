@@ -1,8 +1,8 @@
 import './style.css'
 import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve } from './data/default-scenarios'
 import { renderMultiYearChart, renderProfileChart } from './modules/chart'
-import { buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement, projectMultiYear } from './modules/settlement'
-import { renderAppShell, renderFormulas, renderMultiYearPanel, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
+import { buildFiveLineBill, buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement, projectMultiYear } from './modules/settlement'
+import { renderAppShell, renderFiveLineBill, renderFormulas, renderMultiYearPanel, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
 
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Unhandled promise rejection:', event.reason)
@@ -22,12 +22,23 @@ function getScenarioList() {
 
 function buildInputs() {
   const scenario = scenarioProfiles[state.scenarioId]
+  const isWorkshop = scenario.kind === 'workshop'
 
   return {
     ...state,
     loadProfile: scenario.loadProfile,
     generationProfile: scenario.generationProfile,
-    fmpCurve: buildFmpCurve(state.marketPrice),
+    fmpCurve: isWorkshop ? Array(24).fill(state.marketPrice) : buildFmpCurve(state.marketPrice),
+    monthlyVolumes: scenario.monthlyVolumes,
+  }
+}
+
+function applyScenarioDefaults(scenario) {
+  if (scenario.overrides) {
+    Object.assign(state, scenario.overrides)
+  } else {
+    state.strikePrice = defaultInputs.strikePrice
+    state.marketPrice = defaultInputs.marketPrice
   }
 }
 
@@ -74,6 +85,20 @@ async function updateView() {
     state.currency,
     inputs,
   )
+  if (scenario.kind === 'workshop') {
+    const bill = buildFiveLineBill({
+      fmp: state.marketPrice,
+      strikePrice: state.strikePrice,
+      serviceFee: state.dppaServiceFee,
+      clearingFee: state.dppaClearingFee,
+      lossFactorPrecise: 1.026 * 1.008,
+      lossFactor: state.lossFactor,
+      retailTariff: state.retailTariff,
+    }, scenario.monthlyVolumes)
+    renderFiveLineBill(document.querySelector('#fiveLineBill'), bill, state.currency, scenario)
+  } else {
+    renderFiveLineBill(document.querySelector('#fiveLineBill'), null, state.currency, scenario)
+  }
   updateControlOutputs(state, settlementModes, state.currency)
   setActiveScenario(state.scenarioId)
   setActiveCurrency(state.currency)
@@ -123,6 +148,8 @@ function syncControls() {
     if (!button) return
     state.scenarioId = button.dataset.scenario
     state.selectedHour = 12
+    applyScenarioDefaults(scenarioProfiles[state.scenarioId])
+    syncInputsFromState()
     updateView()
   })
 

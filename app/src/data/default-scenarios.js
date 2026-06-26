@@ -28,6 +28,7 @@ function solarCurve(scale = 1, shoulder = 0.35) {
 export const scenarioProfiles = {
   higherLoad: {
     id: 'higherLoad',
+    kind: 'curve',
     label: 'Load > Gen',
     description: 'Factory load stays above solar generation for most intervals.',
     loadProfile: HOURS.map((hour) => {
@@ -41,6 +42,7 @@ export const scenarioProfiles = {
   },
   balanced: {
     id: 'balanced',
+    kind: 'curve',
     label: 'Load = Gen',
     description: 'Solar is sized to closely track daytime demand.',
     loadProfile: HOURS.map((hour) => {
@@ -54,6 +56,7 @@ export const scenarioProfiles = {
   },
   higherGen: {
     id: 'higherGen',
+    kind: 'curve',
     label: 'Load < Gen',
     description: 'Overbuilt solar creates midday excess and highlights settlement risk.',
     loadProfile: HOURS.map((hour) => {
@@ -65,9 +68,29 @@ export const scenarioProfiles = {
     }),
     generationProfile: solarCurve(6200, 0.22),
   },
+  workshop1: {
+    id: 'workshop1',
+    kind: 'workshop',
+    label: 'Workshop 1',
+    description: 'July deck Scenario 1: contracted quantity matches factory consumption.',
+    overrides: { strikePrice: 1250, marketPrice: 1150 },
+    monthlyVolumes: { contracted: 5000000, total: 5000000 },
+    loadProfile: HOURS.map(() => Math.round(5000000 / 720)),
+    generationProfile: HOURS.map(() => Math.round(5000000 / 720)),
+  },
+  workshop2: {
+    id: 'workshop2',
+    kind: 'workshop',
+    label: 'Workshop 2',
+    description: 'July deck Scenario 2: contracted quantity falls short of factory consumption.',
+    overrides: { strikePrice: 1500, marketPrice: 1600 },
+    monthlyVolumes: { contracted: 8000000, total: 9000000 },
+    loadProfile: HOURS.map(() => Math.round(9000000 / 720)),
+    generationProfile: HOURS.map(() => Math.round(8000000 / 720)),
+  },
 }
 
-export const scenarioOrder = ['higherLoad', 'balanced', 'higherGen']
+export const scenarioOrder = ['higherLoad', 'balanced', 'higherGen', 'workshop1', 'workshop2']
 
 export const defaultInputs = {
   scenarioId: 'balanced',
@@ -77,7 +100,9 @@ export const defaultInputs = {
   marketPrice: 1427,
   fmpCurve: buildFmpCurve(1427),
   // Fixed DPPA fees: 360 (service) + 163.3 (balancing) = 523.3 VND/kWh per EVN annual notice
-  dppaCharge: 523.34,
+  dppaServiceFee: 360,
+  dppaClearingFee: 163.3,
+  dppaCharge: 523.3,
   // Loss factor: k × K_pp = 1.026 × 1.008 = 1.0342 (Decree 57/2025 reference coefficients)
   lossFactor: 1.0342,
   // Retail: Decision 599/QD-EVN, 10 May 2025 — +4.8% to 2,204.07 VND/kWh (excl. VAT)

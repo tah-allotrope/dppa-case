@@ -1,0 +1,335 @@
+--- Slide 1 ---
+Interactive 
+Group Exercise
+Roundtable Discussions on Procurement Lessons Sharing
+(~45 minutes)
+Please remain at your table.
+Table facilitators will provide questions to discuss in an open dialogue format among the participants at your table.
+Please share lessons from clean energy procurement processes that your company has conducted or challenges that have prevented clean energy action to date.
+--- Slide 2 ---
+Interactive Exercise
+Please remain at your table.
+Table facilitators will provide you with a resource packet containing case studies, description of roles, and key questions to facilitate the activity.
+Collaborate with other participants to formulate a strategy, identify key terms and questions, and engage in a simulated DPPA negotiation.
+Once the negotiation is complete, raise any remaining questions, or share challenges you experienced during the negotiation.
+DPPA Scenario Analysis (~60 minutes)
+--- Slide 3 ---
+Based on Decree
+ 
+57/2025/ND-CP
+, the cost calculation parameters are assumed as follows:
+General Assumptions & Formula
+Symbol
+Unit
+Assumed Value
+Description
+k
+1.026
+Adjustment coefficient
+CDPPA_dv
+VND/kWh
+360
+Power system service cost
+Pcl
+VND/kWh
+163.30
+Differential clearing fee
+Kpp
+1.008
+Loss conversion coefficient at 110 kV voltage level
+P1
+VND/kWh
+2,204
+Average retail electricity price
+Cost Formulas
+C_KH
+  =  	C_EVN  +  	C_CfD
+Note:  The plant sells all output to the spot market (receives FMP); the CfD only adjusts the price to Pc for the contracted volume Qc.
+(Pc − FMP) * Qc
+=
+Qkhhc * FMP * k * Kpp = 
+C_DN 
+Qkhhc * C_dppa_dv = 
+C_dppa 
+Qkhhc * Pcl = 
+C_cl
+ 
+(QKH − Qkhhc) * P1 = 
+C_bl
++
++
++
+=
+--- Slide 4 ---
+Scenario 1: The Base Case
+Your manufacturing plant has a strict corporate target to reach 100% renewable energy consumption by 2030. To achieve this, your team wants to sign a DPPA via National Grid (Virtual DPPA) with a large solar developer.
+Operational issue:
+ Your factory doesn’t buy electricity directly from EVN. Instead, you pay your monthly electricity bill to the private Industrial Park Management Board, who buys bulk power from EVN and resells it to you through their internal grid.
+Questions:
+Under Decree 57, an Electricity Buyer must consume ≥200,000 kWh/month. If the IP lumps your factory into their master EVN meter, how do you accurately track and prove your specific energy use to qualify?
+A standard Virtual PPA is a bilateral agreement (Between Buyer and Seller). However, since electricity delivery is controlled by the IP (Retailer), who actually needs to be at the negotiation table to make this work?
+What happens if the IP demands a new, non-negotiable "infrastructure fee" to facilitate this DPPA setup? How does that impact your budget forecasting and management buy-in over a typical 15-to-20-year PPA Contract Term?
+--- Slide 5 ---
+Scenario 1: The Base Case
+Consumption = DPPA Volume (1)
+5-Line Bill
+1. Market electricity energy cost
+C
+DN 
+= 5,000,000 kWh * 1,150 VND/kWh * 1.026 * 1.008 = 
+5,946,696,000 VND
+2. System service fee 
+C
+DPPA
+ 
+= 5,000,000 kWh * 360 VND/kWh = 
+1,800,000,000 VND 
+3. Difference clearing fee 
+C
+CL
+ = 5,000,000 kWh * 163.30 VND/kWh = 
+816,500,000 VND  
+4. Additional electricity purchase 
+C
+BL
+= (QKH - Qkhhc)* P1 = 0 kWh * 2,204 VND/kWh = 
+0 VND
+Difference 
+Q
+KH
+ 
+- 
+Q
+KHhc
+ = 0 MWh
+The customer doesn’t need additional electricity from EVN
+Total cost collected by EVN 
+C
+EVN
+ = 5,946,696,000 + 1,800,000,000 + 816,500,000 + 0 = 
+8,563,196,000 VND
+Solar Plant 45MW
+Large Customer
+Q_khhc = 5,000 MWh/month
+Q_KH = 5,000 MWh/month
+CfD
+QC = 5,000 MWh/month
+PC = 1,250 VND/kWh
+FMP = 1,150 VND/kWh
+--- Slide 6 ---
+Scenario 1: The Base Case
+Consumption = DPPA Volume (2)
+5. CfD Contract Cost
+C
+DN 
+= (
+PC
+ - 
+FMP
+) * 
+QC
+ = (1,250 - 1,150) VND/kWh * 5,000,000 kWh = 
+500,000,000 VND
+Total Customer Cost (
+C
+KH 
+)
+C
+KH 
+= 
+C
+EVN
+ + 
+C
+CfD
+ = 8,563,196,000 + 500,000,000 = 
+9,063,196,000 VND
+Power Plant Revenue
+Revenue from the market
+C
+TTD
+:
+ The plant generates the full 
+5,000 MWh
+ (after loss ~5,040,000 kWh at the generator)  
+C
+TTD
+= (Qm * FMP) = 5,040,000 kWh * 1,150 VND/kWh = 
+5,796,000,000 VND 
+Revenue from CfD contract 
+C
+CfD
+ = 
+QC
+ * (
+PC
+ - 
+FMP
+) = 5,000,000 kWh * (1,250 - 1,150) = 
+500,000,000 VND
+  
+Total plant revenue
+ is 5,796,000,000 + 500,000,000 = 
+6,296,000,000 VND
+Solar Plant 45MW
+Large Customer
+Q_khhc = 5,000 MWh/month
+Q_KH = 5,000 MWh/month
+CfD
+QC = 5,000 MWh/month
+PC = 1,250 VND/kWh
+FMP = 1,150 VND/kWh
+--- Slide 7 ---
+Scenario 1: The Base Case
+Consumption = DPPA Volume (3)
+Large Customer
+EVN
+RE GENCO
+8.5 billion VND = 5,9 billion VND for market electricity energy 
++ 1,8 billion VND service fee 
++ 0.8 billion VND difference fee 
++ 0 VND additional electricity purchase fee
+0.5 billion VND
+ according to the CfD contract
+5.8 billion VND 
+on the spot market
+--- Slide 8 ---
+Scenario 2: The "Duck Curve" & Price Crashes
+Your factory agrees to a 
+Virtual DPPA
+ (grid-connected) with a solar developer
+Fixed 
+"Strike Price" of 1,800 VND/kWh.
+ 
+Factory continues to pay local utility for the physical electricity you consume to keep the machines running. 
+Factory & developer settle the difference between the Strike Price & the wholesale spot market floating price (FMP) 
+Sunny month: solar energy floods 
+the national grid & the midday FMP drops to 800 VND/kWh.
+Questions:
+Who owes money to whom? Since you are essentially paying two bills, how does this complicate your factory's monthly operational costs?
+Imagine a severe heat wave causes a power shortage, and the FMP spikes to 2,500 VND/kWh. How does the VPPA financially protect your factory's budget in this situation?
+If EVN raises the DPPA fees next year, your overall energy costs go up. How do you communicate this ongoing regulatory risk to your CFO for DPPA approval?
+--- Slide 9 ---
+Scenario 3
+Actual Consumption Exceeds Contract Output (1)
+1. Market electricity energy cost 
+C
+DN 
+= 8,000,000 kWh * 1,600 VND/kWh * 1.026 * 1.008 = 
+13,237,862,400 VND
+2. System service fee 
+C
+DPPA
+ 
+= 8,000,000 kWh * 360 VND/kWh = 
+2,880,000,000 VND 
+3. Difference clearing fee 
+C
+CL
+ = 8,000,000 kWh * 163.30 VND/kWh = 
+1,306,400,000 VND  
+4. Additional electricity purchase 
+C
+BL
+= (QKH - Qkhhc)* P1 = 1,000,000 kWh * 2,204 VND/kWh = 
+2,204,000,000 VND
+  
+Difference 
+Q
+KH
+ 
+- 
+Q
+KHhc
+ = 1000 MWh
+The customer must purchase additional electricity from EVN
+Total cost collected by EVN 
+C
+EVN
+ = 13,237,862,400 + 2,880,000,000 + 1,306,400,000 + 2,204,000,000 = 
+19,628,262,400 VND
+Wind Plant 30MW
+Large Customer
+Actual Delivered Quantity = 8,000 MWh/month
+Consumption = 9,000 MWh/month
+CfD
+QC = 8,000 MWh/month
+PC = 1,500 VND/kWh
+FMP = 1,600 VND/kWh
+--- Slide 10 ---
+Scenario 3
+Actual Consumption Exceeds Contract Output (2)
+5. CfD Contract Cost
+C
+DN 
+= (
+PC
+ - 
+FMP
+) * 
+QC
+ = (1,500 - 1,600) VND/kWh * 8,000,000 kWh = -
+800,000,000 VND
+Total Customer Cost (
+C
+KH 
+)
+C
+KH 
+= 
+C
+EVN
+ + 
+C
+CfD
+ = 19,628,262,400 + (-800,000,000) = 
+18,828,262,400 VND
+Power Plant Revenue
+Revenue from the market
+C
+TTD
+:
+ The plant generates the full 
+8,000 MWh
+ (after loss ~8,064,000 kWh at the generator)  
+C
+TTD
+= 8,064,000 kWh * 1,600 VND/kWh = 
+12,902,400,000 VND 
+Revenue from CfD contract 
+C
+CfD
+ = 
+QC
+ * (
+PC
+ - 
+FMP
+) = 8,000,000 kWh * (1,500 - 1,600) = 
+-800,000,000 VND
+  
+Total plant revenue
+ is 12,902,400,000 + (-800,000,000) = 
+12,102,400,000 VND
+Wind Plant 30MW
+Large Customer
+Actual Delivered Quantity = 8,000 MWh/month
+Consumption = 9,000 MWh/month
+CfD
+QC = 8,000 MWh/month
+PC = 1,500 VND/kWh
+FMP = 1,600 VND/kWh
+--- Slide 11 ---
+Scenario 3
+Actual Consumption Exceeds Contract Output (3)
+Large Customer
+EVN
+RE GENCO
+19.628 billion VND = 13.238 billion for market electricity energy 
++ 2.880 billion service fee 
++ 1.306 billion difference fee 
++ 2.204 billion additional electricity purchase fee
+0.800 billion VND
+ according to the CfD contract
+12.902 billion VND 
+on the spot market

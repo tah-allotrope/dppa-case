@@ -156,8 +156,13 @@ function baseOptions(inputs) {
   const fmpCurve = inputs?.fmpCurve ?? []
   const fmpMin = fmpCurve.length ? Math.min(...fmpCurve) : 800
   const fmpMax = fmpCurve.length ? Math.max(...fmpCurve) : 3000
-  const yFmpMin = Math.floor(Math.min(fmpMin, strikePrice) * 0.88 / 100) * 100
-  const yFmpMax = Math.ceil(Math.max(fmpMax, strikePrice) * 1.08 / 100) * 100
+  let yFmpMin = Math.floor(Math.min(fmpMin, strikePrice) * 0.88 / 100) * 100
+  let yFmpMax = Math.ceil(Math.max(fmpMax, strikePrice) * 1.08 / 100) * 100
+  if (yFmpMin === yFmpMax) {
+    const pad = Math.max(100, Math.round(strikePrice * 0.1 / 100) * 100)
+    yFmpMin -= pad
+    yFmpMax += pad
+  }
 
   return {
     responsive: true,

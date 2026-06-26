@@ -366,3 +366,23 @@ Closed 3 gaps from `reports/2026-05-22-workshop-readiness-gap-analysis.md`: GAP-
 - Reports: `reports/2026-06-23-sprint-2-phase-{01,02,03}.md` + `reports/2026-06-23-sprint-2-completion.md`
 - Commits pushed: `3f55863` (phase 01), `b3691f8` (phase 02), `2905211` (phase 03), plus report commits
 
+## July Scenario Training Deck/App Consolidation — Completed locally 2026-06-26
+
+Implemented `plans/2026-06-26-deck-app-workshop-consolidation-plan.md` with the Grill Me default: include a compact RE GENCO plant-revenue mirror in the workshop bill panel.
+
+### Plan
+- [x] PHASE-01: Correct standalone July scenario-training deck arithmetic and notation; backup created.
+- [x] PHASE-02: Add app workshop presets, split DPPA fees, and pure five-line monthly bill engine.
+- [x] PHASE-03: Wire workshop tabs, flat FMP curves, workshop-only monthly bill panel, and flat-axis chart guard.
+- [x] PHASE-04: Add parity harnesses, run tests/build, and document deployment limitation.
+
+### Review / Results
+- Corrected deck: `ceba/DPPA Presentation July 2026 Scenario Training.pptx`; backup: `ceba/DPPA Presentation July 2026 Scenario Training.backup-2026-06-26.pptx`.
+- Text QA artifact: `deck-qa/july-deck-corrections-verify.txt` confirms slide 3 notation and slide 5/6/7 corrected figures.
+- App presets: Workshop 1 (strike 1,250 / FMP 1,150 / 5,000,000 kWh) and Workshop 2 (strike 1,500 / FMP 1,600 / 8,000,000 contracted + 1,000,000 retail shortfall).
+- Monthly bill parity uses exact coefficient product `1.026 * 1.008 = 1.034208`; the display/default rounded coefficient remains `1.0342`.
+- Verification passed: `node verify_deck_app_parity.js`, `npm.cmd test -- --run` (41 tests), and `npm.cmd run build`.
+- Browser smoke was limited: Vite preview can serve HTTP 200 when run directly, but background preview did not persist and Playwright CLI fetch was blocked by permissions/network.
+- Deploy blocked: `firebase.cmd` is not installed on PATH in this session. `app/deployment.md` records the manual deploy command.
+- Git commit/push blocked: sandbox denies `.git/index.lock` creation, so phase commits could not be made from this session.
+- Reports: `reports/2026-06-26-deck-app-consolidation-phase-01.html` through `phase-04.html`, plus `reports/2026-06-26-deck-app-consolidation-completion.md`.

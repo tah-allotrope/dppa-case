@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deck/App Consolidation Phase 01 Report</title>
+  <style>
+    body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#f7f9fc;color:#162033;line-height:1.5}main{max-width:1040px;margin:0 auto;padding:32px 20px 56px}header,section{border-radius:8px}header{background:#10233f;color:white;padding:26px;margin-bottom:16px}section{background:white;border:1px solid #d8e0ea;padding:16px;margin-top:12px}h1{margin:0 0 8px}h2{font-size:1.05rem;margin:0 0 10px;color:#10233f}code{background:#eef3f9;padding:1px 5px;border-radius:5px}.ok{color:#147d64;font-weight:700}.warn{color:#a96f00;font-weight:700}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #d8e0ea;padding:8px;text-align:left;vertical-align:top}@media print{body{background:white}section,header{break-inside:avoid}}
+  </style>
+</head>
+<body><main>
+  <header><h1>Phase 01 - Deck Arithmetic & Notation Correction</h1><p>2026-06-26 - dppa-case - report-skill phase structure</p></header>
+  <section><h2>1. Phase Header</h2><p>Corrected the July scenario-training deck while preserving it as a standalone workshop artifact.</p></section>
+  <section><h2>2. Input -&gt; Output Summary</h2><table><tr><th>Input</th><th>Output</th></tr><tr><td><code>ceba/DPPA Presentation July 2026 Scenario Training.pptx</code></td><td>Corrected slide 3 notation and Scenario 1 totals on slides 5-7.</td></tr><tr><td>Plan arithmetic findings</td><td>Backup deck, correction scripts, and text QA dump.</td></tr></table></section>
+  <section><h2>3. Logic Flow</h2><p>Backup deck -&gt; run-level text corrections -&gt; reload deck -&gt; dump slide text -&gt; inspect corrected figures.</p></section>
+  <section><h2>4. Math / Algorithm Used</h2><p>Scenario 1 EVN total corrected to <code>8,563,196,000</code>; customer net cost corrected to <code>9,063,196,000</code>; spot-market flow corrected to <code>5.8 billion</code>.</p></section>
+  <section><h2>5. Tools / Formulas / Methods</h2><p>Used the correction scripts <code>apply_deck_corrections.py</code> and <code>apply_deck_corrections.js</code>; verified via <code>deck-qa/july-deck-corrections-verify.txt</code>.</p></section>
+  <section><h2>6. Results &amp; Visualizations</h2><p class="ok">PASS: text QA confirms slide 3 values <code>1.026</code>, <code>1.008</code>, <code>163.30</code> and corrected slides 5-7 figures.</p></section>
+  <section><h2>7. Limitations / Second-Best Alternative</h2><p>Visual render QA remains unavailable because local PowerPoint/LibreOffice automation is not available in this shell.</p></section>
+  <section><h2>8. Errors / Warnings / Flags Encountered</h2><p class="warn">The plan assumed a <code>py</code> launcher, but the current PATH does not expose it. Existing artifacts were verified through text dumps and JS parity.</p></section>
+  <section><h2>9. Open Questions / Next Phase Seeds</h2><p>No open product question after applying the Grill Me default.</p></section>
+</main></body></html>

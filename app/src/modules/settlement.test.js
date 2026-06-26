@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildFormulaBreakdown, buildSelectedWalkthroughCase, buildWalkthroughCases, calculateSettlement, classifyInterval, projectMultiYear } from './settlement'
+import { buildFiveLineBill, buildFormulaBreakdown, buildSelectedWalkthroughCase, buildWalkthroughCases, calculateSettlement, classifyInterval, projectMultiYear } from './settlement'
 
 describe('calculateSettlement', () => {
   it('reproduces the simple matched case from the report logic', () => {
@@ -264,7 +264,9 @@ describe('calculateSettlement', () => {
     // Retail: Decision 599/QD-EVN 10 May 2025 (+4.8% to 2,204.07 VND/kWh)
     expect(defaultInputs.retailTariff).toBe(2204)
     // Fixed DPPA fees: 360 service + 163.3 balancing per EVN annual notice
-    expect(defaultInputs.dppaCharge).toBe(523.34)
+    expect(defaultInputs.dppaServiceFee).toBe(360)
+    expect(defaultInputs.dppaClearingFee).toBe(163.3)
+    expect(defaultInputs.dppaCharge).toBe(523.3)
     // Loss factor: k × K_pp = 1.026 × 1.008 = 1.0342 (Decree 57/2025)
     expect(defaultInputs.lossFactor).toBe(1.0342)
     expect(settlementModes.map((mode) => mode.label)).toEqual([
@@ -272,5 +274,53 @@ describe('calculateSettlement', () => {
       'Demo: generation volume',
       'Demo: contracted allocation',
     ])
+  })
+
+  it('reproduces corrected July deck Workshop 1 five-line bill', () => {
+    const bill = buildFiveLineBill({
+      fmp: 1150,
+      strikePrice: 1250,
+      serviceFee: 360,
+      clearingFee: 163.3,
+      lossFactorPrecise: 1.026 * 1.008,
+      retailTariff: 2204,
+    }, {
+      contracted: 5000000,
+      total: 5000000,
+    })
+
+    expect(bill.lines.marketEnergy).toBe(5946696000)
+    expect(bill.lines.systemService).toBe(1800000000)
+    expect(bill.lines.diffClearing).toBe(816500000)
+    expect(bill.lines.additionalPurchase).toBe(0)
+    expect(bill.cEvn).toBe(8563196000)
+    expect(bill.lines.cfd).toBe(500000000)
+    expect(bill.cKh).toBe(9063196000)
+    expect(bill.plantRevenue.market).toBe(5796000000)
+    expect(bill.plantRevenue.total).toBe(6296000000)
+  })
+
+  it('reproduces corrected July deck Workshop 2 five-line bill', () => {
+    const bill = buildFiveLineBill({
+      fmp: 1600,
+      strikePrice: 1500,
+      serviceFee: 360,
+      clearingFee: 163.3,
+      lossFactorPrecise: 1.026 * 1.008,
+      retailTariff: 2204,
+    }, {
+      contracted: 8000000,
+      total: 9000000,
+    })
+
+    expect(bill.lines.marketEnergy).toBe(13237862400)
+    expect(bill.lines.systemService).toBe(2880000000)
+    expect(bill.lines.diffClearing).toBe(1306400000)
+    expect(bill.lines.additionalPurchase).toBe(2204000000)
+    expect(bill.cEvn).toBe(19628262400)
+    expect(bill.lines.cfd).toBe(-800000000)
+    expect(bill.cKh).toBe(18828262400)
+    expect(bill.plantRevenue.market).toBe(12902400000)
+    expect(bill.plantRevenue.total).toBe(12102400000)
   })
 })
