@@ -1,0 +1,120 @@
+/* ============================================================
+   DPPA Course — shared stylesheet
+   Aesthetic mirrors ceba/CEBA DPPA 2026.pptx (Google/Material, 16:9)
+   Used by every lesson + reference doc so the course looks like one thing.
+   ============================================================ */
+:root {
+  --ink: #212121;
+  --gray: #595959;
+  --bluegray: #78909C;
+  --line: #E0E0E0;
+  --bg: #FFFFFF;
+  --panel: #FAFAFA;
+  --panel2: #EEEEEE;
+  --teal: #0097A7;       /* primary accent */
+  --teal-dk: #00727e;
+  --amber: #FFAB40;      /* secondary */
+  --blue: #4285F4;       /* secondary */
+  --lime: #EEFF41;       /* highlight, sparingly */
+  --red: #e0573e;
+  --green: #2e9e6b;
+  --sans: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  --mono: "Roboto Mono", "Consolas", monospace;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.6;
+}
+.wrap { max-width: 780px; margin: 0 auto; padding: 48px 28px 96px; }
+
+/* ---- Eyebrow / module tag (deck section style) ---- */
+.eyebrow {
+  display: inline-block; font-size: .72rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--teal);
+  border-left: 4px solid var(--amber); padding: 2px 0 2px 10px; margin-bottom: 14px;
+}
+h1 { font-size: 2.05rem; line-height: 1.15; margin: 0 0 10px; font-weight: 700; }
+h2 { font-size: 1.25rem; margin: 40px 0 12px; color: var(--teal-dk); font-weight: 700;
+     letter-spacing: .01em; }
+h3 { font-size: 1.02rem; margin: 24px 0 8px; color: var(--ink); font-weight: 700; }
+p  { margin: 0 0 14px; }
+.lead { font-size: 1.12rem; color: var(--gray); margin-bottom: 26px; }
+a { color: var(--teal-dk); text-decoration: none; border-bottom: 1px solid var(--line); }
+a:hover { border-color: var(--teal); }
+ul, ol { margin: 0 0 16px; padding-left: 22px; } li { margin-bottom: 7px; }
+small, .small { font-size: .82rem; color: var(--bluegray); }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .9em; background: var(--panel2);
+       padding: 1px 5px; border-radius: 4px; }
+
+/* ---- Cards & callouts ---- */
+.card { background: var(--panel); border: 1px solid var(--line);
+        border-radius: 10px; padding: 18px 22px; margin: 18px 0; }
+.callout { border-left: 5px solid var(--teal); background: var(--panel);
+           border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 18px 0; }
+.callout.amber { border-color: var(--amber); }
+.callout.blue  { border-color: var(--blue); }
+.callout .tag { font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+                text-transform: uppercase; color: var(--gray); display: block; margin-bottom: 4px; }
+.key { background: linear-gradient(transparent 62%, var(--lime) 62%); padding: 0 2px; }
+
+/* ---- Big-idea banner ---- */
+.bigidea { background: var(--ink); color: #fff; border-radius: 12px;
+           padding: 22px 26px; margin: 22px 0; }
+.bigidea h3 { color: var(--amber); margin: 0 0 8px; }
+.bigidea p { margin: 0; color: #f3f3f3; }
+
+/* ---- Tables ---- */
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .92rem; }
+th { text-align: left; background: var(--panel2); color: var(--gray);
+     font-size: .72rem; letter-spacing: .05em; text-transform: uppercase;
+     padding: 9px 12px; border-bottom: 2px solid var(--line); }
+td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: right; font-family: var(--mono); }
+
+/* ---- Formula chip ---- */
+.formula { font-family: var(--mono); background: var(--panel2); border: 1px solid var(--line);
+           border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: .95rem;
+           overflow-x: auto; }
+
+/* ---- "Try it in the app" link block ---- */
+.tryit { display: flex; gap: 12px; align-items: flex-start; background: #e6f5f7;
+         border: 1px solid #b8e3e8; border-radius: 10px; padding: 14px 18px; margin: 20px 0; }
+.tryit .ic { font-size: 1.3rem; line-height: 1.2; }
+.tryit b { color: var(--teal-dk); }
+
+/* ---- Quiz widget (see assets/quiz.js) ---- */
+.quiz { border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin: 20px 0; background: #fff; }
+.quiz .q { font-weight: 700; margin-bottom: 12px; }
+.quiz button.opt { display: block; width: 100%; text-align: left; font-family: var(--sans);
+  font-size: .98rem; padding: 10px 14px; margin: 8px 0; border: 1px solid var(--line);
+  background: var(--panel); border-radius: 8px; cursor: pointer; transition: all .12s; }
+.quiz button.opt:hover { border-color: var(--teal); background: #fff; }
+.quiz button.opt.correct { border-color: var(--green); background: #e7f6ee; }
+.quiz button.opt.wrong { border-color: var(--red); background: #fbece8; }
+.quiz .fb { margin-top: 10px; font-size: .9rem; min-height: 1.2em; }
+.quiz .fb.ok { color: var(--green); } .quiz .fb.no { color: var(--red); }
+
+/* ---- Footer nav ---- */
+.nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 48px;
+       padding-top: 18px; border-top: 1px solid var(--line); font-size: .9rem; }
+.ask { background: var(--panel); border: 1px dashed var(--bluegray); border-radius: 10px;
+       padding: 14px 18px; margin: 28px 0 0; font-size: .92rem; color: var(--gray); }
+
+/* ---- Progress dots (module map) ---- */
+.modmap { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 26px; }
+.modmap span { font-size: .7rem; font-weight: 700; padding: 3px 9px; border-radius: 20px;
+  background: var(--panel2); color: var(--bluegray); border: 1px solid var(--line); }
+.modmap span.now { background: var(--teal); color: #fff; border-color: var(--teal); }
+.modmap span.done { background: #e6f5f7; color: var(--teal-dk); border-color: #b8e3e8; }
+
+@media print {
+  body { font-size: 12pt; } .wrap { max-width: none; padding: 0; }
+  .tryit, .quiz, .ask, .nav { break-inside: avoid; }
+  a { color: var(--ink); border: none; }
+  .bigidea { background: #eee !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

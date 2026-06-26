@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lesson 4 — Module 4: The Three Gates</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig svg { width:100%; height:auto; display:block; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
+  .mm::before { content:"◆ "; color:var(--amber); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Module 4 · Lesson 4</div>
+  <h1>Developer Economics &amp; the Three Gates</h1>
+  <div class="modmap">
+    <span class="done">1 · Baseline ✓</span>
+    <span class="done">2 · Five-line bill ✓</span>
+    <span class="done">3 · CfD mechanics ✓</span>
+    <span class="now">4 · Three gates</span>
+    <span>5 · Canonical cases</span>
+    <span>6 · Decisions</span>
+  </div>
+  <p class="lead">Your strike isn't just <em>your</em> cost — it <em>is</em> the developer's bankable
+  revenue line. A deal only exists where three parties' tests overlap: buyer, seller, and lender.
+  Sometimes that overlap is <strong>empty</strong>.</p>
+
+  <div class="formula">Developer revenue = Q_meter × FMP &nbsp;(volatile spot)&nbsp; + &nbsp;(Strike − FMP) × Q_CfD &nbsp;(CfD stabiliser)</div>
+
+  <!-- ============ VISUAL 1: bankable revenue ============ -->
+  <h2>1 · The CfD makes revenue bankable</h2>
+  <div class="mm">A lender can't finance a volatile spot line. The CfD converts it to a near-fixed line at the strike.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 230" role="img" aria-label="Spot-only revenue is volatile; spot plus CfD is fixed">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}</style>
+      <line x1="60" y1="40" x2="60" y2="190" stroke="#E0E0E0"/>
+      <line x1="60" y1="190" x2="690" y2="190" stroke="#E0E0E0"/>
+      <text x="22" y="50" class="t s">revenue / kWh</text>
+
+      <!-- Spot only: big uncertainty whisker -->
+      <text x="200" y="210" text-anchor="middle" class="t h" fill="#4285F4">Spot only</text>
+      <line x1="200" y1="60" x2="200" y2="170" stroke="#4285F4" stroke-width="2"/>
+      <line x1="180" y1="60" x2="220" y2="60" stroke="#4285F4" stroke-width="2"/>
+      <line x1="180" y1="170" x2="220" y2="170" stroke="#4285F4" stroke-width="2"/>
+      <rect x="176" y="105" width="48" height="20" fill="#eaf1fe" stroke="#4285F4"/>
+      <text x="200" y="119" text-anchor="middle" class="t s">±volatile</text>
+
+      <!-- Spot + CfD: tight fixed bar at strike -->
+      <text x="500" y="210" text-anchor="middle" class="t h" fill="#00727e">Spot + CfD</text>
+      <rect x="470" y="112" width="60" height="58" fill="#e6f5f7" stroke="#0097A7" stroke-width="2"/>
+      <text x="500" y="146" text-anchor="middle" class="t s">≈ strike</text>
+      <line x1="60" y1="112" x2="690" y2="112" stroke="#0097A7" stroke-dasharray="6 4"/>
+      <text x="612" y="106" class="t h" fill="#00727e">bankable line</text>
+    </svg>
+    <div class="figcap">Your strike IS the developer's bankable revenue. Everything the lender checks flows from it.</div>
+  </div>
+
+  <!-- ============ VISUAL 2: the three gates (centerpiece) ============ -->
+  <h2>2 · Three gates on one strike line</h2>
+  <div class="mm">Buyer pushes the strike DOWN; seller and lender push it UP. The deal lives only in the overlap.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 280" role="img" aria-label="Three gates define a strike negotiation window that can be empty">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}
+             .ax{font-size:10px;fill:#78909C}</style>
+      <!-- axis 1200..2200 over x 80..680 -->
+      <line x1="80" y1="170" x2="680" y2="170" stroke="#212121" stroke-width="2"/>
+      <text x="80" y="190" text-anchor="middle" class="t ax">1,200</text>
+      <text x="680" y="190" text-anchor="middle" class="t ax">2,200</text>
+      <text x="380" y="210" text-anchor="middle" class="t s">strike price (VND/kWh) →</text>
+
+      <!-- seller floor @1700 -> x=380 -->
+      <line x1="380" y1="120" x2="380" y2="178" stroke="#78909C" stroke-width="2"/>
+      <text x="380" y="112" text-anchor="middle" class="t h" fill="#595959">Seller floor</text>
+      <text x="380" y="100" text-anchor="middle" class="t s">IRR ≥ 12–15%</text>
+      <!-- buyer ceiling @1850 -> x=470 -->
+      <line x1="470" y1="120" x2="470" y2="178" stroke="#FFAB40" stroke-width="2.5"/>
+      <text x="470" y="60" text-anchor="middle" class="t h" fill="#d98600">Buyer ceiling</text>
+      <text x="470" y="48" text-anchor="middle" class="t s">cost ≤ BAU</text>
+      <!-- lender floor @2000 -> x=560 -->
+      <line x1="560" y1="120" x2="560" y2="178" stroke="#e0573e" stroke-width="2.5"/>
+      <text x="560" y="112" text-anchor="middle" class="t h" fill="#e0573e">Lender floor</text>
+      <text x="560" y="100" text-anchor="middle" class="t s">DSCR ≥ 1.20x</text>
+
+      <!-- empty window between buyer ceiling (470) and lender floor (560) -->
+      <rect x="470" y="158" width="90" height="24" fill="rgba(224,87,62,0.16)" stroke="#e0573e" stroke-dasharray="4 3"/>
+      <text x="515" y="244" text-anchor="middle" class="t h" fill="#e0573e">EMPTY</text>
+      <line x1="515" y1="182" x2="515" y2="236" stroke="#e0573e" stroke-dasharray="3 3"/>
+
+      <!-- pressure arrows -->
+      <line x1="470" y1="138" x2="420" y2="138" stroke="#FFAB40" stroke-width="2" marker-end="url(#dn)"/>
+      <text x="430" y="132" class="t s" fill="#d98600">down</text>
+      <line x1="560" y1="138" x2="610" y2="138" stroke="#e0573e" stroke-width="2" marker-end="url(#up)"/>
+      <text x="600" y="132" class="t s" fill="#e0573e">up</text>
+      <defs>
+        <marker id="dn" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#FFAB40"/></marker>
+        <marker id="up" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e0573e"/></marker>
+      </defs>
+    </svg>
+    <div class="figcap">When the lender's floor sits ABOVE the buyer's ceiling, no strike satisfies all three — the window is empty.</div>
+  </div>
+
+  <table>
+    <thead><tr><th>Gate</th><th>Who</th><th>Test</th><th>Pressure on strike</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Buyer</td><td>You</td><td>Cumulative cost ≤ BAU (10-yr &amp; lifetime)</td><td>DOWN ↓</td></tr>
+      <tr><td>2 · Seller</td><td>Developer</td><td>Equity IRR ≥ 12–15%</td><td>UP ↑</td></tr>
+      <tr><td>3 · Lender</td><td>Bank</td><td>Min DSCR ≥ ~1.20x <em>every year</em></td><td>UP ↑ (hardest)</td></tr>
+    </tbody>
+  </table>
+  <div class="bigidea">
+    <h3>The one idea</h3>
+    <p>A strike below the developer's bankability floor doesn't make a cheap deal — it makes
+    <strong>no project</strong>. If the window is empty, the fix is <strong>structural</strong>
+    (leverage, debt sculpting, right-sized battery, USD terms), not just price.</p>
+  </div>
+
+  <!-- ============ VISUAL 3: DSCR by year ============ -->
+  <h2>3 · DSCR is tested every single year</h2>
+  <div class="mm">Averages don't finance a project — the worst year does. One CAPEX spike can sink it.</div>
+  <div class="formula">DSCR = cash available for debt service ÷ debt service &nbsp;&nbsp;(needed: ≥ ~1.20x every year)</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 240" role="img" aria-label="DSCR by year with a battery-replacement dip below covenant">
+      <style>.t{font-family:Arial,sans-serif}.s{font-size:10px;fill:#595959}.h{font-weight:700;font-size:11px}</style>
+      <line x1="55" y1="40" x2="55" y2="210" stroke="#E0E0E0"/>
+      <line x1="55" y1="210" x2="700" y2="210" stroke="#E0E0E0"/>
+      <text x="20" y="50" class="t s">DSCR</text>
+      <!-- covenant line 1.20x at y=97 -->
+      <line x1="55" y1="97" x2="700" y2="97" stroke="#e0573e" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text x="700" y="92" text-anchor="end" class="t h" fill="#e0573e">covenant 1.20x</text>
+      <!-- bars: years 1..10 -->
+      <!-- helper: y = 210 - dscr*94.4 -->
+      <g fill="#0097A7">
+        <rect x="70"  y="68.4"  width="40" height="141.6"/><!--1.50-->
+        <rect x="130" y="68.4"  width="40" height="141.6"/><!--1.50-->
+        <rect x="190" y="73.1"  width="40" height="136.9"/><!--1.45-->
+        <rect x="250" y="73.1"  width="40" height="136.9"/><!--1.45-->
+        <rect x="310" y="77.8"  width="40" height="132.2"/><!--1.40-->
+        <rect x="370" y="77.8"  width="40" height="132.2"/><!--1.40-->
+        <rect x="430" y="82.5"  width="40" height="127.5"/><!--1.35-->
+      </g>
+      <rect x="490" y="125.0" width="40" height="85.0" fill="#e0573e"/><!--0.90 battery-->
+      <g fill="#0097A7">
+        <rect x="550" y="82.5"  width="40" height="127.5"/><!--1.35-->
+        <rect x="610" y="87.2"  width="40" height="122.8"/><!--1.30-->
+      </g>
+      <text x="510" y="120" text-anchor="middle" class="t h" fill="#e0573e">0.90</text>
+      <text x="510" y="228" text-anchor="middle" class="t s">battery replacement (Y8)</text>
+      <text x="90" y="228" class="t s">Y1</text><text x="630" y="228" class="t s">Y10</text>
+    </svg>
+    <div class="figcap">Years 1–7, 9–10 clear 1.20x — but Y8's battery replacement drops DSCR to 0.90x and the bank says no.</div>
+  </div>
+
+  <!-- ============ VISUAL 4: capital structure ============ -->
+  <h2>4 · Where the strike floor comes from</h2>
+  <div class="mm">The bankable floor is built from the capital stack and a stack of "hidden" costs.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 120" role="img" aria-label="Capital structure 70 percent debt 30 percent equity">
+      <style>.t{font-family:Arial,sans-serif;font-size:12px;font-weight:700;fill:#fff}.lb{font-family:Arial,sans-serif;font-size:10px;fill:#595959}</style>
+      <rect x="40" y="40" width="448" height="44" fill="#0097A7"/>
+      <text x="264" y="67" text-anchor="middle" class="t">70% Debt · ~10 yr · VND ~8.5% / USD ~5%</text>
+      <rect x="488" y="40" width="192" height="44" fill="#FFAB40"/>
+      <text x="584" y="67" text-anchor="middle" class="t">30% Equity · IRR 12–15%</text>
+      <text x="40" y="104" class="t lb">CIT incentive: 4 years exempt + 9 years at half rate (improves developer economics).</text>
+    </svg>
+  </div>
+  <table>
+    <thead><tr><th>Hidden lever</th><th>Typical</th><th>Moves the bankable strike floor</th></tr></thead>
+    <tbody>
+      <tr><td>PV degradation</td><td>~0.5%/yr output decline</td><td>Matched volume shrinks; lost kWh repurchased at TOU ↑</td></tr>
+      <tr><td>Battery replacement</td><td>Big capex every 8–10 yr</td><td>Hits DSCR in that year ↑</td></tr>
+      <tr><td>CIT holiday</td><td>4 yr exempt + 9 yr half</td><td>Improves developer economics ↓</td></tr>
+      <tr><td>FX exposure</td><td>VND strike vs USD debt</td><td>Shifts risk; price it consciously ↕</td></tr>
+    </tbody>
+  </table>
+  <div class="callout amber"><span class="tag">Why this matters to you</span>
+  These rarely appear in headline term sheets, but <span class="key">each one moves the bankable strike
+  floor — and therefore your price</span>. Ask for them explicitly.</div>
+
+  <div class="tryit">
+    <div class="ic">▶</div>
+    <div>Your gate is computable: <a href="https://dppa-case.web.app">dppa-case.web.app</a> →
+    <b>20-year cumulative economics</b>. "Cumulative cost ≤ BAU" is exactly the green
+    <b>Cum. savings</b> turning positive (the <b>Crossover Year</b>) in <code>projectMultiYear()</code>.
+    The deck's 56-scenario sweep found <b>0 of 56</b> passed all three gates at current prices — the buyer
+    turned positive just as the lender dropped out (Module 5 callout).</div>
+  </div>
+
+  <!-- ============ Retrieval ============ -->
+  <h2>Check yourself</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. The hardest gate to pass is usually the ___</div>
+    <button class="opt">lender DSCR test</button>
+    <button class="opt">buyer cost test</button>
+    <button class="opt">seller IRR test</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>DSCR ≥ 1.20x must hold every single year; one CAPEX-heavy year fails it even if averages look fine.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. A strike below the bankability floor means ___</div>
+    <button class="opt">there is no project</button>
+    <button class="opt">a cheaper good deal</button>
+    <button class="opt">a higher equity win</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Below the floor the developer can't finance it, so the project doesn't happen — not a bargain, just nothing.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">3. One battery-replacement year can ___</div>
+    <button class="opt">sink the whole loan</button>
+    <button class="opt">boost the yearly DSCR</button>
+    <button class="opt">lower the buyer cost</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>A big CAPEX spike drops that year's DSCR below covenant; lenders size to the worst year, not the average.</div>
+  </div>
+
+  <h2>Read next (primary source)</h2>
+  <p>Open <a href="https://dppa-case.web.app">dppa-case.web.app</a> → 20-year projection and find the
+  strike where <strong>Cum. savings</strong> just turns positive — that's your buyer gate. Then read the
+  three-gates framing in <a href="../reports/2026-04-07-vietnam-dppa-buyer-guide.md">the buyer guide</a>.
+  Symbols: <a href="../reference/dppa-glossary.html">glossary</a>.</p>
+
+  <div class="ask">Ask me: "walk a DSCR calc for one year," "what's debt sculpting and how does it widen
+  the window?", or "why did 0 of 56 scenarios pass?"</div>
+
+  <div class="nav">
+    <a href="0003-module-3-cfd-mechanics.html">← Module 3</a>
+    <a href="0005-module-5-canonical-cases.html">Next → Module 5: The Three Canonical Cases</a>
+  </div>
+</div>
+</body>
+</html>

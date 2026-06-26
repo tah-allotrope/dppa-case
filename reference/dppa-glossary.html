@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DPPA Glossary — Reference</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<style>
+  .gl { width: 100%; }
+  .gl td:first-child { white-space: nowrap; font-family: var(--mono); font-weight: 700; color: var(--teal-dk); }
+  .gl td:nth-child(2) { color: var(--gray); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Reference · adhere to in every lesson</div>
+  <h1>DPPA Glossary</h1>
+  <p class="lead">The nomenclature of Vietnam's virtual DPPA settlement. Symbols match
+  the CEBA deck and the live engine in <code>app/src/modules/settlement.js</code>.</p>
+
+  <h2>Symbols</h2>
+  <table class="gl">
+    <thead><tr><th>Symbol</th><th>Reads as</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>FMP</td><td>full market price</td><td>Wholesale spot price the generator is paid per kWh (VWEM). <code>FMP = SMP + CAN</code>. 2025 ref ~1,427 VND/kWh — <strong>illustrative</strong> (NSMO/ERAV not public).</td></tr>
+      <tr><td>Strike / P_c</td><td>strike price</td><td>The fixed CfD reference price the factory and developer agree. The one big <strong>negotiable</strong> number.</td></tr>
+      <tr><td>k</td><td>price conversion</td><td>Converts FMP to the customer delivery point. ~1.026. A <strong>price</strong> adjustment, not a volume loss.</td></tr>
+      <tr><td>K_pp</td><td>loss factor</td><td>Voltage-level loss factor (~1.008 at 110 kV). Converts generator-meter output to buyer-credited volume.</td></tr>
+      <tr><td>k × K_pp</td><td>loss factor (combined)</td><td>= 1.026 × 1.008 = <strong>1.0342</strong>. Multiplies market energy in line 1. (App: <code>lossFactor</code>.)</td></tr>
+      <tr><td>Q_meter</td><td>metered generation</td><td>kWh measured at the generator's meter.</td></tr>
+      <tr><td>Q_adj</td><td>adjusted volume</td><td><code>= Q_meter / K_pp</code> — delivered volume credited at your meter.</td></tr>
+      <tr><td>Q_Khc</td><td>settled volume</td><td><code>= min(Load, Q_adj)</code> — the renewable volume actually received & consumed. Lines 1–3 bill on this.</td></tr>
+      <tr><td>Q_c</td><td>contracted volume</td><td>CfD contracted quantity. Above real consumption it <strong>buys nothing</strong>.</td></tr>
+      <tr><td>Q_CfD</td><td>CfD volume</td><td><code>= min(Q_c, Q_Khc)</code> — CfD settles only on received/consumed volume.</td></tr>
+      <tr><td>C_dppa_dv</td><td>DPPA service fee</td><td>Fixed 360 VND/kWh on matched volume (regulated).</td></tr>
+      <tr><td>P_cl</td><td>balancing fee</td><td>Fixed 163.3 VND/kWh on matched volume (regulated).</td></tr>
+      <tr><td>523.3</td><td>fixed fees</td><td>360 + 163.3 = <strong>523.3 VND/kWh</strong> — fixed every matched kWh, not negotiable. (App: <code>dppaCharge</code>.)</td></tr>
+      <tr><td>P1</td><td>retail tariff</td><td>EVN average retail price for residual/shortfall purchase. 2025: <strong>2,204 VND/kWh</strong>.</td></tr>
+      <tr><td>BAU</td><td>business as usual</td><td>Your current EVN bill, escalated ~4%/yr — the benchmark every DPPA is judged against.</td></tr>
+      <tr><td>DSCR</td><td>debt service coverage</td><td>Cash available for debt service ÷ debt service. Lender gate: ≥ ~1.20x <em>every</em> year.</td></tr>
+      <tr><td>TOU</td><td>time of use</td><td>Off-peak / normal / peak retail pricing. Peak ≈ 3.4× off-peak.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>The five-line bill (the spine of everything)</h2>
+  <div class="formula">
+1. Market energy   = Q_Khc × FMP × k × K_pp<br/>
+2. DPPA service fee = Q_Khc × 360<br/>
+3. Balancing fee    = Q_Khc × 163.3<br/>
+4. Residual         = (Load − Q_Khc) × P1   (retail TOU)<br/>
+&nbsp;&nbsp; C_EVN = lines 1 + 2 + 3 + 4   (billed by EVN)<br/>
+5. CfD settlement   = (Strike − FMP) × Q_CfD   (bilateral; + or −)<br/>
+&nbsp;&nbsp; C_KH  = C_EVN + C_CfD   (your total cost)
+  </div>
+  <div class="callout amber"><span class="tag">Sign convention</span>
+  CfD positive (FMP &lt; Strike) → <strong>factory pays developer</strong>.
+  CfD negative (FMP &gt; Strike) → <strong>developer pays factory</strong>.</div>
+
+  <h2>Verified 2025 number basis</h2>
+  <p class="small">From <code>app/src/data/default-scenarios.js</code> &amp; <code>deck-qa/consolidation-map.md</code>.
+  Retail 2,204 · fees 523.3 · loss 1.0342 are <strong>verified</strong>; FMP ~1,427 &amp; strike 2,000 are
+  <strong>illustrative</strong> teaching values.</p>
+
+  <div class="ask">Teacher note: ask me to expand any entry, or to add a term you hit in the slides.</div>
+  <div class="nav"><a href="../lessons/0001-module-1-evn-baseline.html">→ Lesson 1: The EVN baseline</a></div>
+</div>
+</body>
+</html>

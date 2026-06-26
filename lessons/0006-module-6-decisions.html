@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lesson 6 — Module 6: Key Decisions &amp; Wrap-up</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig svg { width:100%; height:auto; display:block; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
+  .mm::before { content:"◆ "; color:var(--amber); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Module 6 · Lesson 6 · Finale</div>
+  <h1>Key Decision Points &amp; Wrap-up</h1>
+  <div class="modmap">
+    <span class="done">1 · Baseline ✓</span>
+    <span class="done">2 · Five-line bill ✓</span>
+    <span class="done">3 · CfD mechanics ✓</span>
+    <span class="done">4 · Three gates ✓</span>
+    <span class="done">5 · Canonical cases ✓</span>
+    <span class="now">6 · Decisions</span>
+  </div>
+  <p class="lead">You now have the whole machine. This module turns it into a negotiating
+  checklist — what to fix, what to push on, and the one mental model to carry into the room.</p>
+
+  <!-- ============ VISUAL 1: course synthesis journey ============ -->
+  <h2>The whole course in one line</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 130" role="img" aria-label="The six modules as one flow">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:11px;fill:#fff}
+             .s{font-size:9px;fill:#e6f5f7}</style>
+      <g>
+        <rect x="6"   y="40" width="104" height="56" rx="8" fill="#0097A7"/>
+        <text x="58"  y="64" text-anchor="middle" class="t h">1 Baseline</text>
+        <text x="58"  y="80" text-anchor="middle" class="t s">BAU escalates</text>
+        <rect x="130" y="40" width="104" height="56" rx="8" fill="#0097A7"/>
+        <text x="182" y="64" text-anchor="middle" class="t h">2 Five lines</text>
+        <text x="182" y="80" text-anchor="middle" class="t s">the bill</text>
+        <rect x="254" y="40" width="104" height="56" rx="8" fill="#0097A7"/>
+        <text x="306" y="64" text-anchor="middle" class="t h">3 CfD</text>
+        <text x="306" y="80" text-anchor="middle" class="t s">locks the price</text>
+        <rect x="378" y="40" width="104" height="56" rx="8" fill="#0097A7"/>
+        <text x="430" y="64" text-anchor="middle" class="t h">4 Gates</text>
+        <text x="430" y="80" text-anchor="middle" class="t s">deal exists?</text>
+        <rect x="502" y="40" width="104" height="56" rx="8" fill="#0097A7"/>
+        <text x="554" y="64" text-anchor="middle" class="t h">5 Cases</text>
+        <text x="554" y="80" text-anchor="middle" class="t s">3 shapes</text>
+        <rect x="626" y="40" width="88" height="56" rx="8" fill="#FFAB40"/>
+        <text x="670" y="64" text-anchor="middle" class="t h" fill="#212121">6 Decide</text>
+        <text x="670" y="80" text-anchor="middle" class="t s" fill="#7a5200">negotiate</text>
+      </g>
+      <g stroke="#78909C" stroke-width="2">
+        <line x1="110" y1="68" x2="130" y2="68" marker-end="url(#j)"/>
+        <line x1="234" y1="68" x2="254" y2="68" marker-end="url(#j)"/>
+        <line x1="358" y1="68" x2="378" y2="68" marker-end="url(#j)"/>
+        <line x1="482" y1="68" x2="502" y2="68" marker-end="url(#j)"/>
+        <line x1="606" y1="68" x2="626" y2="68" marker-end="url(#j)"/>
+      </g>
+      <defs><marker id="j" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#78909C"/></marker></defs>
+    </svg>
+    <div class="figcap">Bill → CfD locks it → gates decide if a strike exists → three shapes show outcomes → you negotiate.</div>
+  </div>
+
+  <!-- ============ VISUAL 2: fixed vs negotiable ============ -->
+  <h2>Fixed vs negotiable — know which is which</h2>
+  <div class="mm">Don't waste breath on the fixed half. Spend it all on the negotiable half.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 240" role="img" aria-label="What is fixed by regulation versus negotiable in the deal">
+      <style>.t{font-family:Arial,sans-serif}.hd{font-weight:700;font-size:13px}.it{font-size:11px;fill:#212121}</style>
+      <!-- fixed -->
+      <rect x="20" y="20" width="330" height="200" rx="10" fill="#eeeeee" stroke="#78909C"/>
+      <text x="40" y="46" class="t hd" fill="#595959">FIXED — by regulation</text>
+      <text x="40" y="78"  class="t it">• 523 VND/kWh service + balancing fees</text>
+      <text x="40" y="106" class="t it">• Loss factor  k × K_pp = 1.0342</text>
+      <text x="40" y="134" class="t it">• Voltage eligibility (≥22 kV) &amp; which K_pp</text>
+      <text x="40" y="162" class="t it">• TOU retail rates (residual / shortfall)</text>
+      <text x="40" y="198" class="t it" fill="#595959">→ accept these; model them, don't argue them</text>
+      <!-- negotiable -->
+      <rect x="370" y="20" width="330" height="200" rx="10" fill="#e6f5f7" stroke="#0097A7" stroke-width="2"/>
+      <text x="390" y="46" class="t hd" fill="#00727e">NEGOTIABLE — the deal</text>
+      <text x="390" y="78"  class="t it">★ Strike price (the big number)</text>
+      <text x="390" y="106" class="t it">★ Escalation index (VND / CPI / USD)</text>
+      <text x="390" y="134" class="t it">★ Contract volume vs load shape</text>
+      <text x="390" y="162" class="t it">★ Tenor &amp; termination / exit</text>
+      <text x="390" y="198" class="t it" fill="#00727e">★ Risk allocation (curtailment, change-in-law)</text>
+    </svg>
+    <div class="figcap">Fees and the loss factor are set by regulation. The strike — and how it escalates — is where the money is won or lost.</div>
+  </div>
+
+  <!-- ============ VISUAL 3: the 5 decision points ============ -->
+  <h2>The 5 decisions to settle before you sign</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 290" role="img" aria-label="Five decision points with quantifiable flags">
+      <style>.t{font-family:Arial,sans-serif}.n{font-weight:700;font-size:14px;fill:#fff}
+             .d{font-weight:700;font-size:12px;fill:#212121}.c{font-size:10px;fill:#595959}
+             .bq{font-size:9px;font-weight:700;fill:#2e9e6b}.bj{font-size:9px;font-weight:700;fill:#d98600}</style>
+      <!-- 5 rows -->
+      <!-- row helper y: 20,72,124,176,228 height 46 -->
+      <g>
+        <circle cx="40" cy="43" r="16" fill="#0097A7"/><text x="40" y="48" text-anchor="middle" class="t n">1</text>
+        <text x="70" y="40" class="t d">Strike level &amp; escalation index</text>
+        <text x="70" y="56" class="t c">Fixed VND vs CPI vs USD-linked; model vs BAU over 10 yr &amp; lifetime</text>
+        <text x="690" y="46" text-anchor="end" class="t bq">✓ quantifiable</text>
+
+        <circle cx="40" cy="95" r="16" fill="#0097A7"/><text x="40" y="100" text-anchor="middle" class="t n">2</text>
+        <text x="70" y="92" class="t d">Contract volume vs load shape</text>
+        <text x="70" y="108" class="t c">8760-hour matching vs meter data; CfD caps at consumed volume</text>
+        <text x="690" y="98" text-anchor="end" class="t bq">✓ quantifiable</text>
+
+        <circle cx="40" cy="147" r="16" fill="#0097A7"/><text x="40" y="152" text-anchor="middle" class="t n">3</text>
+        <text x="70" y="144" class="t d">Tenor &amp; termination</text>
+        <text x="70" y="160" class="t c">Developer wants 15–25 yr; match to lease / order book; exit terms</text>
+        <text x="690" y="150" text-anchor="end" class="t bq">✓ quantifiable</text>
+
+        <circle cx="40" cy="199" r="16" fill="#0097A7"/><text x="40" y="204" text-anchor="middle" class="t n">4</text>
+        <text x="70" y="196" class="t d">Voltage eligibility &amp; K_pp</text>
+        <text x="70" y="212" class="t c">≥22 kV only today; which K_pp applies sets your loss adjustment</text>
+        <text x="690" y="202" text-anchor="end" class="t bq">✓ quantifiable</text>
+
+        <circle cx="40" cy="251" r="16" fill="#FFAB40"/><text x="40" y="256" text-anchor="middle" class="t n" fill="#212121">5</text>
+        <text x="70" y="248" class="t d">Risk allocation</text>
+        <text x="70" y="264" class="t c">FMP volatility, curtailment, negative-CfD months, change-in-law</text>
+        <text x="690" y="254" text-anchor="end" class="t bj">judgment call</text>
+      </g>
+    </svg>
+    <div class="figcap">Items 1–4 are quantifiable before you negotiate — run them against your load data first. Item 5 is judgment.</div>
+  </div>
+
+  <!-- ============ VISUAL 4: price anatomy capstone ============ -->
+  <h2>The one model to carry into the room</h2>
+  <div class="mm">After the CfD, your matched-kWh price is just Strike + fixed fees + a tiny loss term. The FMP washes out.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 200" role="img" aria-label="Anatomy of the net matched-kWh price">
+      <style>.t{font-family:Arial,sans-serif}.cl{font-size:11px;font-weight:700;fill:#fff}
+             .lb{font-size:11px;fill:#212121}.s{font-size:10px;fill:#595959}</style>
+      <!-- total 2572 over 640px from x=40; px/VND=0.2488 -->
+      <rect x="40"  y="60" width="498" height="48" fill="#0097A7"/>
+      <text x="289" y="89" text-anchor="middle" class="cl">Strike  2,000</text>
+      <rect x="538" y="60" width="130" height="48" fill="#78909C"/>
+      <text x="603" y="89" text-anchor="middle" class="cl">Fees 523</text>
+      <rect x="668" y="60" width="12" height="48" fill="#FFAB40"/>
+      <line x1="674" y1="60" x2="700" y2="40" stroke="#FFAB40"/>
+      <text x="700" y="36" text-anchor="end" class="t lb">loss adj ≈ 49</text>
+
+      <text x="40" y="138" class="t lb"><tspan font-weight="700">= ~2,572 VND/kWh</tspan> on matched energy. FMP (1,427) appears in line 1 and cancels in the CfD —</text>
+      <text x="40" y="156" class="t lb">only the small <tspan font-weight="700">loss term (FMP × 0.0342)</tspan> survives.</text>
+      <text x="40" y="182" class="t s">+ retail on any shortfall (line 4) · bounded below by the lender floor, above by the buyer ceiling · judged vs BAU rising ~4%/yr.</text>
+    </svg>
+    <div class="figcap">This is why the strike dominates the negotiation: fees and loss are fixed, and the volatile FMP nets out.</div>
+  </div>
+
+  <!-- ============ Takeaways ============ -->
+  <h2>The five takeaways</h2>
+  <div class="bigidea">
+    <h3>Carry these into the workshop</h3>
+    <p>1 · Know the five-line bill — 523 fees and the loss factor are fixed; the <strong>strike</strong> is the
+    big number.<br/>
+    2 · Evaluate on <strong>10-year and lifetime</strong> cost vs BAU — never Year 1 alone.<br/>
+    3 · Every deal must pass <strong>buyer, seller AND lender</strong> gates; if the window is empty, the fix
+    is <strong>structural</strong>, not price.<br/>
+    4 · Match the contract to your <strong>hourly load shape</strong>; the CfD caps at consumed volume.<br/>
+    5 · Negotiate the <strong>escalation index</strong> as hard as the starting strike.</p>
+  </div>
+
+  <div class="tryit">
+    <div class="ic">▶</div>
+    <div>Your live negotiation aid: <a href="https://dppa-case.web.app">dppa-case.web.app</a>. Swap strike
+    and FMP on the three canonical cases, read the five-line bill on the Workshop presets, and watch the
+    20-year crossover move. It runs the exact math from Modules 2–5 — bring it to the table.</div>
+  </div>
+
+  <h2>Acquire wisdom — test it in the real world</h2>
+  <p>You've got the knowledge and the skills. Wisdom comes from pressure-testing them with developers and
+  lenders. Seed a community: the <strong>CEBA / Clean Energy Buyers</strong> network and Vietnam C&amp;I
+  renewables working groups are good places to validate pricing assumptions. The deck's own next step is a
+  <strong>panel on risk allocation and the reality of bank financing</strong> — bring Module 4's questions.</p>
+
+  <!-- ============ Retrieval ============ -->
+  <h2>Final check</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. The one decision that is pure judgment, not pre-quantifiable, is ___</div>
+    <button class="opt">risk allocation terms</button>
+    <button class="opt">the strike level set</button>
+    <button class="opt">the contract volume</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Items 1–4 (strike, volume, tenor, voltage/K_pp) are quantifiable from load data; risk allocation is judgment.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. After the CfD, your matched-kWh price is dominated by ___</div>
+    <button class="opt">strike plus fixed fees</button>
+    <button class="opt">the volatile market</button>
+    <button class="opt">the yearly retail rate</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>FMP nets out in the CfD; only strike + 523 fees + a tiny loss term remain (~2,572 in the example).</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">3. If the negotiation window is empty, the fix is ___</div>
+    <button class="opt">structural, not price</button>
+    <button class="opt">a lower strike bid</button>
+    <button class="opt">more contract volume</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>An empty window means no strike satisfies all three gates; change leverage, debt sculpting, battery size, or FX terms.</div>
+  </div>
+
+  <div class="ask"><strong>Course complete.</strong> I'm still your teacher — ask me to drill any module
+  deeper, build a one-page cheat sheet, run a mock negotiation, or quiz you across all six modules (interleaved).</div>
+
+  <div class="nav">
+    <a href="0005-module-5-canonical-cases.html">← Module 5</a>
+    <a href="../reference/dppa-glossary.html">📖 Glossary</a>
+  </div>
+</div>
+</body>
+</html>

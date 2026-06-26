@@ -1,0 +1,45 @@
+# Teaching Notes & Preferences
+
+## How the user wants to be taught
+- **Distill, don't reproduce.** The deck is too wordy; each lesson = one crisp visual
+  mental model that fits in working memory and can be whiteboarded in <5 min.
+- **Module by module**, in deck order (Modules 1–6 of `ceba/CEBA DPPA 2026.pptx`).
+- **Teach using insights from THIS repo**, not just the slides. Ground every module in
+  the working artifacts already built here:
+  - **Live app** https://dppa-case.web.app — the 3 canonical cases, currency toggle,
+    multi-year crossover, and (new) Workshop 1/2 presets that mirror the July deck.
+  - **Settlement engine** `app/src/modules/settlement.js` — the exact code formulas:
+    `evnMarket = matched × fmp × lossFactor`, `evnDppa = matched × dppaCharge`,
+    `evnRetail = shortfall × retailTariff`, `developer = contractQty × (strike − fmp)`,
+    plus `buildFiveLineBill` and `projectMultiYear` (crossover year logic).
+  - **Default basis** `app/src/data/default-scenarios.js` — verified 2025 numbers:
+    retail 2,204 · fees 360+163.3=523.3 · loss k×Kpp=1.026×1.008=1.0342 · strike 2,000 ·
+    FMP ~1,427 (illustrative).
+  - **Buyer guide** `reports/2026-04-07-vietnam-dppa-buyer-guide.md`.
+  - **Consolidation learnings** `deck-qa/consolidation-map.md` — the single-source-of-truth
+    number basis and why the deck/app must agree.
+- Each lesson should tie the deck concept → the app behaviour the user can demo live.
+
+## Visual aesthetic (MUST match the deck)
+Source: theme of `ceba/CEBA DPPA 2026.pptx` (Google-Slides / Material style, 16:9).
+- **Font:** Arial / Helvetica, sans-serif.
+- **Background:** white `#FFFFFF`; panels `#FAFAFA` / `#EEEEEE`.
+- **Ink:** `#212121`; secondary gray `#595959`; blue-gray `#78909C`.
+- **Primary accent:** teal `#0097A7`.
+- **Secondary accents:** amber `#FFAB40`, blue `#4285F4`, lime highlight `#EEFF41` (sparingly).
+- **Lines/borders:** `#E0E0E0`.
+- Clean cards, generous whitespace, Tufte-ish reading width (~760px), print-friendly.
+- All generated visuals (SVG/HTML) use these tokens via `assets/course.css`.
+
+## Format preferences (from Lesson 1 feedback, 2026-06-26)
+- **More visuals.** Lead with diagrams/SVG, not prose. Aim for ≥2–3 visuals per lesson
+  (e.g. a flow/money-map, a worked-number figure, a comparison). Keep text to captions and
+  one short mental-model line per visual.
+- **Pace: one module per session.** Deliver a single module, let the user engage, then build
+  the next on their cue. Do NOT batch-generate the remaining modules.
+
+## User profile (for ZPD calibration)
+- Domain-adjacent professional (Allotrope clean-energy advisory) — knows solar/wind &
+  project development. NOT a beginner. Pitch lessons at "competent practitioner who needs
+  the DPPA-specific settlement mechanics to stick," not intro energy concepts.
+- Confirm starting level explicitly if a lesson assumes too much/little.

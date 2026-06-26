@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lesson 3 — Module 3: CfD Mechanics</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig svg { width:100%; height:auto; display:block; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
+  .mm::before { content:"◆ "; color:var(--amber); }
+  .twocol { display:grid; grid-template-columns:1fr 1fr; gap:0; }
+  @media (max-width:560px){ .twocol{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Module 3 · Lesson 3</div>
+  <h1>CfD Mechanics: What Drives Your Quoted Price</h1>
+  <div class="modmap">
+    <span class="done">1 · Baseline ✓</span>
+    <span class="done">2 · Five-line bill ✓</span>
+    <span class="now">3 · CfD mechanics</span>
+    <span>4 · Three gates</span>
+    <span>5 · Canonical cases</span>
+    <span>6 · Decisions</span>
+  </div>
+  <p class="lead">Line 5 is the whole game. The contract-for-difference swaps a volatile
+  spot price for a fixed strike — so your renewable energy cost stops bouncing and locks
+  near <strong>strike + the 523 fixed fees</strong>, whatever the market does.</p>
+
+  <div class="formula">CfD cash flow = (Strike − FMP) × Q_CfD &nbsp;&nbsp;→&nbsp;&nbsp; two-way: can be + or −</div>
+
+  <!-- ============ VISUAL 1: the price clamp ============ -->
+  <h2>1 · The CfD is a price clamp</h2>
+  <div class="mm">FMP swings hour to hour; the CfD cancels the swing and leaves you at the strike.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 300" role="img" aria-label="FMP volatility clamped to the strike by the CfD">
+      <style>
+        .t{font-family:Arial,sans-serif} .ax{stroke:#E0E0E0} .axl{font-size:11px;fill:#78909C}
+        .bd{font-size:11px;font-weight:700}
+      </style>
+      <!-- frame -->
+      <line x1="55" y1="50" x2="55" y2="250" class="ax"/>
+      <line x1="55" y1="250" x2="685" y2="250" class="ax"/>
+      <text x="20" y="60" class="t axl">VND/kWh</text>
+      <text x="640" y="268" class="t axl">time →</text>
+
+      <!-- strike line -->
+      <line x1="55" y1="150" x2="685" y2="150" stroke="#212121" stroke-width="2.5"/>
+      <text x="60" y="143" class="t bd" fill="#212121">STRIKE — locked</text>
+
+      <!-- FMP volatile line -->
+      <polyline fill="none" stroke="#4285F4" stroke-width="2.5"
+        points="55,165 110,120 160,95 210,125 260,175 310,205 360,165 410,115 460,95 510,135 560,188 610,205 660,158"/>
+      <text x="610" y="225" class="t bd" fill="#4285F4">FMP (spot)</text>
+
+      <!-- locked result line (energy settles to strike) -->
+      <polyline fill="none" stroke="#0097A7" stroke-width="2.5" stroke-dasharray="7 4"
+        points="55,150 685,150"/>
+
+      <!-- region badges -->
+      <rect x="118" y="70" width="190" height="22" rx="11" fill="#e6f5f7" stroke="#0097A7"/>
+      <text x="213" y="85" text-anchor="middle" class="t bd" fill="#00727e">FMP &gt; Strike → developer pays you</text>
+      <rect x="250" y="212" width="180" height="22" rx="11" fill="#fff3e0" stroke="#FFAB40"/>
+      <text x="340" y="227" text-anchor="middle" class="t bd" fill="#d98600">FMP &lt; Strike → you top up</text>
+    </svg>
+    <div class="figcap">The two-way payments exactly offset the FMP deviation — your energy cost flattens to the strike.</div>
+  </div>
+
+  <!-- ============ VISUAL 2: two-way directionality ============ -->
+  <h2>2 · Two-way: who pays whom</h2>
+  <div class="fig twocol">
+    <svg viewBox="0 0 360 150" role="img" aria-label="FMP below strike: factory pays developer">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}</style>
+      <text x="20" y="28" class="t h" fill="#d98600">FMP &lt; Strike  →  CfD positive</text>
+      <rect x="20" y="48" width="120" height="54" rx="9" fill="#fff3e0" stroke="#FFAB40" stroke-width="2"/>
+      <text x="80" y="80" text-anchor="middle" class="t h">Factory</text>
+      <rect x="220" y="48" width="120" height="54" rx="9" fill="#eeeeee" stroke="#78909C"/>
+      <text x="280" y="80" text-anchor="middle" class="t h">Developer</text>
+      <line x1="140" y1="75" x2="220" y2="75" stroke="#FFAB40" stroke-width="3" marker-end="url(#oa)"/>
+      <text x="180" y="124" text-anchor="middle" class="t s">tops up</text>
+      <defs><marker id="oa" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 z" fill="#FFAB40"/></marker></defs>
+    </svg>
+    <svg viewBox="0 0 360 150" role="img" aria-label="FMP above strike: developer pays factory" style="border-left:1px solid #E0E0E0">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}</style>
+      <text x="20" y="28" class="t h" fill="#00727e">FMP &gt; Strike  →  CfD negative</text>
+      <rect x="20" y="48" width="120" height="54" rx="9" fill="#eeeeee" stroke="#78909C"/>
+      <text x="80" y="80" text-anchor="middle" class="t h">Developer</text>
+      <rect x="220" y="48" width="120" height="54" rx="9" fill="#e6f5f7" stroke="#0097A7" stroke-width="2"/>
+      <text x="280" y="80" text-anchor="middle" class="t h">Factory</text>
+      <line x1="140" y1="75" x2="220" y2="75" stroke="#0097A7" stroke-width="3" marker-end="url(#ta)"/>
+      <text x="180" y="124" text-anchor="middle" class="t s">pays back</text>
+      <defs><marker id="ta" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 z" fill="#0097A7"/></marker></defs>
+    </svg>
+  </div>
+  <div class="callout"><span class="tag">Engine</span> This is one line of code:
+  <code>developer = Q_CfD × (strike − fmp)</code> in <code>settlement.js</code>. Positive = factory
+  pays; negative = factory receives. The net energy cost lands at <strong>strike + 523 fees</strong>.</div>
+
+  <!-- ============ VISUAL 3: escalation over time ============ -->
+  <h2>3 · Why Year-1 is a premium — and value still builds</h2>
+  <div class="mm">A locked strike starts above BAU, but EVN escalates ~4%/yr and overtakes it.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 300" role="img" aria-label="BAU vs DPPA cost over 20 years with crossover">
+      <style>.t{font-family:Arial,sans-serif}.axl{font-size:11px;fill:#78909C}.bd{font-size:11px;font-weight:700}</style>
+      <line x1="55" y1="40" x2="55" y2="250" stroke="#E0E0E0"/>
+      <line x1="55" y1="250" x2="685" y2="250" stroke="#E0E0E0"/>
+      <text x="20" y="50" class="t axl">cost</text>
+      <text x="60" y="268" class="t axl">Y1</text><text x="660" y="268" class="t axl">Y20</text>
+
+      <!-- savings wedge (after crossover) -->
+      <polygon points="360,150 685,70 685,118" fill="#e7f6ee" stroke="none"/>
+      <!-- BAU steep -->
+      <polyline fill="none" stroke="#e0573e" stroke-width="3" points="55,190 685,70"/>
+      <text x="600" y="64" class="t bd" fill="#e0573e">BAU (EVN ~4%/yr)</text>
+      <!-- DPPA shallower, starts above BAU -->
+      <polyline fill="none" stroke="#0097A7" stroke-width="3" points="55,170 685,118"/>
+      <text x="560" y="135" class="t bd" fill="#00727e">DPPA (strike + fees)</text>
+
+      <!-- crossover -->
+      <circle cx="360" cy="150" r="5" fill="#212121"/>
+      <text x="372" y="150" class="t bd" fill="#212121">crossover</text>
+      <!-- year-1 premium bracket -->
+      <line x1="55" y1="170" x2="55" y2="190" stroke="#FFAB40" stroke-width="4"/>
+      <text x="62" y="205" class="t bd" fill="#d98600">Year-1 premium</text>
+      <text x="470" y="100" class="t bd" fill="#2e9e6b">savings build →</text>
+    </svg>
+    <div class="figcap">Evaluate on 10-year and lifetime cumulative cost vs BAU — never on Year 1 alone.</div>
+  </div>
+  <div class="callout amber"><span class="tag">Negotiate the index, not just the number</span>
+  Strike <em>escalation</em> (fixed VND vs CPI vs USD-linked) compounds against you for 15–25 years.
+  Negotiate it <span class="key">as hard as the starting strike</span>. Higher escalation helps the
+  seller/lender's lifetime economics and does nothing for your Year 1.</div>
+
+  <!-- ============ VISUAL 4: hourly overlap ============ -->
+  <h2>4 · Overlap is everything: match the contract to your shape</h2>
+  <div class="mm">CfD only settles where load and solar overlap — hour by hour, not on annual averages.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 300" role="img" aria-label="Hourly load vs solar overlap">
+      <style>.t{font-family:Arial,sans-serif}.axl{font-size:11px;fill:#78909C}.bd{font-size:11px;font-weight:700}</style>
+      <line x1="55" y1="40" x2="55" y2="245" stroke="#E0E0E0"/>
+      <line x1="55" y1="245" x2="685" y2="245" stroke="#E0E0E0"/>
+      <text x="60" y="263" class="t axl">00:00</text><text x="350" y="263" class="t axl">12:00</text><text x="650" y="263" class="t axl">23:00</text>
+
+      <!-- solar bell -->
+      <path d="M55,245 C 200,245 250,70 370,70 C 490,70 540,245 685,245" fill="rgba(255,171,64,0.18)" stroke="#FFAB40" stroke-width="2.5"/>
+      <text x="380" y="60" text-anchor="middle" class="t bd" fill="#d98600">Solar generation</text>
+      <!-- factory load (flatter, higher evening) -->
+      <polyline fill="none" stroke="#0097A7" stroke-width="2.5"
+        points="55,170 150,165 250,150 350,150 450,150 540,130 620,135 685,160"/>
+      <text x="120" y="158" class="t bd" fill="#00727e">Factory load</text>
+
+      <!-- region labels -->
+      <text x="150" y="220" text-anchor="middle" class="t bd" fill="#595959">shortfall →retail</text>
+      <text x="370" y="120" text-anchor="middle" class="t bd" fill="#2e9e6b">matched (settles)</text>
+      <text x="380" y="92" text-anchor="middle" class="t bd" fill="#d98600">excess → spot only</text>
+      <text x="600" y="200" text-anchor="middle" class="t bd" fill="#595959">shortfall →retail</text>
+    </svg>
+    <div class="figcap">Overlap = matched kWh (settle on CfD). Solar above load = excess (generator spot only). Load above solar = shortfall (retail line 4).</div>
+  </div>
+
+  <table>
+    <thead><tr><th>If you…</th><th>Then</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>Over-contract (Q_c &gt; use)</td><td>CfD caps at consumed; excess earns nothing</td><td>Paid contract terms for volume you can't settle</td></tr>
+      <tr><td>Match to hourly overlap</td><td>Every contracted kWh settles</td><td><strong>Efficient — this is the target</strong></td></tr>
+      <tr><td>Under-contract (Q_c &lt; overlap)</td><td>More residual bought at TOU</td><td>Less certainty, smaller renewable claim</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><span class="tag">Ask every developer</span> for an <strong>8760-hour</strong>
+  matching analysis against your meter data — not an annual percentage. Batteries can shift the overlap
+  window but add CAPEX the tariff must carry (Module 4).</div>
+
+  <div class="tryit">
+    <div class="ic">▶</div>
+    <div>See the clamp live: <a href="https://dppa-case.web.app">dppa-case.web.app</a> →
+    <b>Load = Gen</b> and click hours where the FMP curve crosses the strike line — the CfD flips sign.
+    Then <b>Workshop 1</b> (FMP below strike all day → you always top up) vs <b>Workshop 2</b> (FMP above
+    strike → developer pays you). Drag the strike-escalation slider to watch the crossover year move.</div>
+  </div>
+
+  <!-- ============ Retrieval ============ -->
+  <h2>Check yourself</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. When FMP exceeds the strike, the CfD means ___</div>
+    <button class="opt">developer pays you</button>
+    <button class="opt">you pay developer</button>
+    <button class="opt">nobody pays them</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>CfD = (Strike − FMP) × Q_CfD goes negative when FMP &gt; Strike, so the generator pays the factory back.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. The CfD's core job is to ___</div>
+    <button class="opt">lock the energy price</button>
+    <button class="opt">cut the Year1 outlay</button>
+    <button class="opt">raise contract volume</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>It swaps volatile FMP for a fixed strike, removing budget volatility — value, not a Year-1 discount.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">3. The strike escalation index should be negotiated ___</div>
+    <button class="opt">as hard as strike</button>
+    <button class="opt">after the signing</button>
+    <button class="opt">only when USD lol</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Escalation compounds for 15–25 years; fixed VND vs CPI vs USD-linked changes your lifetime cost as much as the starting number.</div>
+  </div>
+
+  <h2>Read next (primary source)</h2>
+  <p>Spend 5 minutes in <a href="https://dppa-case.web.app">dppa-case.web.app</a>: click across the
+  <strong>FMP curve crossing the strike</strong> and toggle <strong>Workshop 1 vs 2</strong> to feel both
+  CfD directions; then move the escalation sliders. Background reading:
+  <a href="../reports/2026-04-07-vietnam-dppa-buyer-guide.md">the buyer guide</a>. Symbols:
+  <a href="../reference/dppa-glossary.html">glossary</a>.</p>
+
+  <div class="ask">Ask me: "prove the FMP cancels to the strike algebraically," "how does a battery move
+  the overlap?", or "model a USD-linked strike vs fixed VND over 20 years."</div>
+
+  <div class="nav">
+    <a href="0002-module-2-five-line-bill.html">← Module 2</a>
+    <a href="0004-module-4-three-gates.html">Next → Module 4: The Three Gates</a>
+  </div>
+</div>
+</body>
+</html>

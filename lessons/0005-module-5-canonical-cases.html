@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lesson 5 — Module 5: The Three Canonical Cases</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig svg { width:100%; height:auto; display:block; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
+  .mm::before { content:"◆ "; color:var(--amber); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Module 5 · Lesson 5</div>
+  <h1>The Three Canonical Cases</h1>
+  <div class="modmap">
+    <span class="done">1 · Baseline ✓</span>
+    <span class="done">2 · Five-line bill ✓</span>
+    <span class="done">3 · CfD mechanics ✓</span>
+    <span class="done">4 · Three gates ✓</span>
+    <span class="now">5 · Canonical cases</span>
+    <span>6 · Decisions</span>
+  </div>
+  <p class="lead">Every DPPA hour is one of three shapes: load = gen (matched), load &gt; gen
+  (shortfall), or load &lt; gen (excess). Same five-line math, three outcomes. This module
+  <em>is</em> the live tool you'll demo — these are its three scenarios.</p>
+
+  <!-- ============ VISUAL 1: the three shapes ============ -->
+  <h2>1 · The three shapes</h2>
+  <div class="mm">What settles, what buys retail, and what earns the generator nothing — set by the load/gen overlap.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 250" role="img" aria-label="Load vs generation for matched, shortfall, and excess cases">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px;fill:#212121}
+             .s{font-size:9.5px;fill:#595959}.u{font-size:10px;fill:#595959}</style>
+      <!-- baseline -->
+      <line x1="20" y1="200" x2="700" y2="200" stroke="#E0E0E0"/>
+
+      <!-- Case A matched: load & gen 4200 -> 103px -->
+      <text x="130" y="28" text-anchor="middle" class="t h">A · Matched (=)</text>
+      <rect x="95" y="97" width="40" height="103" fill="#0097A7"/>
+      <rect x="140" y="97" width="40" height="103" fill="#FFAB40"/>
+      <text x="115" y="216" text-anchor="middle" class="t s">load</text>
+      <text x="160" y="216" text-anchor="middle" class="t s">gen</text>
+      <text x="137" y="235" text-anchor="middle" class="t u">all matched → settles</text>
+
+      <!-- Case B shortfall: load 6100 ->150, gen 4200 ->103; shortfall slice 1900 ->47 -->
+      <text x="360" y="28" text-anchor="middle" class="t h">B · Shortfall (&gt;)</text>
+      <rect x="325" y="97" width="40" height="103" fill="#0097A7"/>
+      <rect x="325" y="50" width="40" height="47" fill="#b0bec5"/><!--shortfall top slice-->
+      <rect x="370" y="97" width="40" height="103" fill="#FFAB40"/>
+      <text x="345" y="216" text-anchor="middle" class="t s">load</text>
+      <text x="390" y="216" text-anchor="middle" class="t s">gen</text>
+      <text x="367" y="235" text-anchor="middle" class="t u">gap → retail (line 4)</text>
+
+      <!-- Case C excess: load 2600 ->64, gen 4700 ->116; excess slice 2100 ->52 -->
+      <text x="590" y="28" text-anchor="middle" class="t h">C · Excess (&lt;)</text>
+      <rect x="555" y="136" width="40" height="64" fill="#0097A7"/>
+      <rect x="600" y="136" width="40" height="64" fill="#FFAB40"/>
+      <rect x="600" y="84" width="40" height="52" fill="#ffe0b2" stroke="#FFAB40" stroke-dasharray="3 2"/><!--excess top slice-->
+      <text x="575" y="216" text-anchor="middle" class="t s">load</text>
+      <text x="620" y="216" text-anchor="middle" class="t s">gen</text>
+      <text x="597" y="235" text-anchor="middle" class="t u">excess → spot only</text>
+    </svg>
+    <div class="figcap">Teal = factory load · amber = solar · gray = shortfall (bought retail) · dashed = excess (generator spot only, no CfD).</div>
+  </div>
+
+  <!-- ============ VISUAL 2: effective rate comparison ============ -->
+  <h2>2 · What each case costs vs BAU</h2>
+  <div class="mm">All three are a Year-1 premium over retail; the payoff is certainty as EVN escalates.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 250" role="img" aria-label="Effective VND per kWh, BAU versus DPPA, for each case">
+      <style>.t{font-family:Arial,sans-serif}.s{font-size:10px;fill:#595959}.h{font-weight:700;font-size:11px}
+             .ax{font-size:10px;fill:#78909C}</style>
+      <line x1="60" y1="40" x2="60" y2="210" stroke="#E0E0E0"/>
+      <line x1="60" y1="210" x2="700" y2="210" stroke="#E0E0E0"/>
+      <text x="22" y="50" class="t s">VND/kWh</text>
+      <!-- BAU reference 2204 -> y=71 -->
+      <line x1="60" y1="71" x2="700" y2="71" stroke="#78909C" stroke-dasharray="6 4"/>
+      <text x="700" y="66" text-anchor="end" class="t h" fill="#595959">BAU 2,204</text>
+
+      <!-- groups: BAU(gray)+DPPA(teal). y_base 210; px/VND .063 -->
+      <!-- A: BAU 2204->y71 h139; DPPA 2572->y48 h162 -->
+      <rect x="120" y="71"  width="40" height="139" fill="#b0bec5"/>
+      <rect x="165" y="48"  width="40" height="162" fill="#0097A7"/>
+      <text x="185" y="42" text-anchor="middle" class="t h" fill="#d98600">+16.7%</text>
+      <text x="162" y="228" text-anchor="middle" class="t h">A · Matched</text>
+      <!-- B: DPPA 2457->y55 h155 -->
+      <rect x="320" y="71"  width="40" height="139" fill="#b0bec5"/>
+      <rect x="365" y="55"  width="40" height="155" fill="#0097A7"/>
+      <text x="385" y="49" text-anchor="middle" class="t h" fill="#d98600">+11.5%</text>
+      <text x="362" y="228" text-anchor="middle" class="t h">B · Shortfall</text>
+      <!-- C: DPPA 2572->y48 h162 -->
+      <rect x="520" y="71"  width="40" height="139" fill="#b0bec5"/>
+      <rect x="565" y="48"  width="40" height="162" fill="#0097A7"/>
+      <text x="585" y="42" text-anchor="middle" class="t h" fill="#d98600">+16.7%</text>
+      <text x="562" y="228" text-anchor="middle" class="t h">C · Excess</text>
+
+      <text x="140" y="160" class="t s" transform="rotate(-90 140 160)">BAU</text>
+      <text x="185" y="200" text-anchor="middle" class="t s" fill="#fff">DPPA</text>
+    </svg>
+    <div class="figcap">Shortfall (B) shows the lowest blended premium — its gap kWh buy at retail (2,204), diluting the matched-kWh premium.</div>
+  </div>
+
+  <!-- ============ The numbers (reference) ============ -->
+  <h2>The numbers (strike 2,000 · FMP 1,427 · fees 523.3 · loss 1.0342)</h2>
+  <table>
+    <thead><tr><th>Case</th><th>Load / Gen (kWh/h)</th><th>EVN bill (/day)</th><th>CfD (/day)</th><th>Net (/day)</th><th>Effective</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A · Matched</strong></td><td>4,200 / 4,200</td><td>201,509,623</td><td>+57,758,400</td><td>259,268,023</td><td>2,572 VND</td></tr>
+      <tr><td><strong>B · Shortfall</strong></td><td>6,100 / 4,200</td><td>302,015,215</td><td>+57,758,400</td><td>359,773,615</td><td>2,457 VND</td></tr>
+      <tr><td><strong>C · Excess</strong></td><td>2,600 / 4,700</td><td>124,744,052</td><td>+35,755,200</td><td>160,499,252</td><td>2,572 VND</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><span class="tag">Read the CfD column</span>
+  A &amp; B settle CfD on the <strong>same</strong> matched 100,800 kWh. C's CfD is smaller because it's
+  <span class="key">capped at consumed volume</span> (62,400) — the excess earns the generator spot only.</div>
+
+  <div class="tryit">
+    <div class="ic">▶</div>
+    <div>These three cases <em>are</em> the live tool: <a href="https://dppa-case.web.app">dppa-case.web.app</a>
+    → <b>Load = Gen / Load &gt; Gen / Load &lt; Gen</b> run this exact five-line math
+    (<code>calculateSettlement</code>), and the <b>Workshop 1/2</b> presets are the July deck's worked
+    bills. Swap strike and FMP live to watch the premium move.</div>
+  </div>
+
+  <!-- ============ VISUAL 3: financing callout ============ -->
+  <h2>Callout · Developer financing (the three gates, quantified)</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 170" role="img" aria-label="Zero of 56 scenarios passed; right-size the battery">
+      <style>.t{font-family:Arial,sans-serif}.big{font-size:46px;font-weight:700;fill:#e0573e}
+             .h{font-weight:700;font-size:12px;fill:#212121}.s{font-size:10px;fill:#595959}.w{font-size:11px;font-weight:700;fill:#fff}</style>
+      <text x="30" y="70" class="t big">0 / 56</text>
+      <text x="30" y="96" class="t s">scenarios passed all three gates</text>
+      <text x="30" y="112" class="t s">at current market prices —</text>
+      <text x="30" y="128" class="t s">buyer turns positive just as the lender drops out.</text>
+
+      <!-- BESS comparison -->
+      <text x="430" y="36" class="t h">Battery sizing decides bankability</text>
+      <rect x="430" y="48" width="250" height="30" fill="#e0573e"/>
+      <text x="440" y="68" class="t w">Oversized BESS: +9% vs BAU · DSCR fails</text>
+      <rect x="430" y="88" width="250" height="30" fill="#0097A7"/>
+      <text x="440" y="108" class="t w">Right-sized BESS: DSCR 1.50x · bankable</text>
+      <text x="430" y="140" class="t s">Then the whole negotiation is the strike. Levers: lower</text>
+      <text x="430" y="155" class="t s">leverage · debt sculpting · USD-denominated strike.</text>
+    </svg>
+    <div class="figcap">The ~$1.2M battery replacement is not carried by the tariff — it sinks the DSCR in the replacement year.</div>
+  </div>
+
+  <!-- ============ VISUAL 4: netting ============ -->
+  <h2>Callout · Multi-party netting</h2>
+  <div class="mm">A portfolio behaves as if each customer–developer pair settled independently. No new model.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 180" role="img" aria-label="Net CfD equals the sum of per-pair settlements">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}</style>
+      <rect x="30" y="35" width="160" height="44" rx="9" fill="#e6f5f7" stroke="#0097A7"/>
+      <text x="110" y="55" text-anchor="middle" class="t h">Solar X</text>
+      <text x="110" y="71" text-anchor="middle" class="t s">600,000 kWh · strike 1,500</text>
+      <rect x="30" y="105" width="160" height="44" rx="9" fill="#e6f5f7" stroke="#0097A7"/>
+      <text x="110" y="125" text-anchor="middle" class="t h">Wind Y</text>
+      <text x="110" y="141" text-anchor="middle" class="t s">300,000 kWh · strike 1,500</text>
+
+      <rect x="430" y="70" width="170" height="44" rx="9" fill="#fff3e0" stroke="#FFAB40" stroke-width="2"/>
+      <text x="515" y="90" text-anchor="middle" class="t h">Customer C</text>
+      <text x="515" y="106" text-anchor="middle" class="t s">net CfD = +65.7M VND</text>
+
+      <line x1="190" y1="57" x2="430" y2="86" stroke="#FFAB40" stroke-width="2" marker-end="url(#na)"/>
+      <text x="305" y="62" text-anchor="middle" class="t s">+43.8M  (1,500−1,427)×600k</text>
+      <line x1="190" y1="127" x2="430" y2="98" stroke="#FFAB40" stroke-width="2" marker-end="url(#na)"/>
+      <text x="305" y="138" text-anchor="middle" class="t s">+21.9M  (1,500−1,427)×300k</text>
+      <text x="360" y="172" text-anchor="middle" class="t h" fill="#00727e">Net CfD = Σ per-pair settlements</text>
+      <defs><marker id="na" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#FFAB40"/></marker></defs>
+    </svg>
+    <div class="figcap">Same five-line bill runs per pair, in parallel; add the per-pair settlements across the portfolio.</div>
+  </div>
+
+  <!-- ============ Retrieval ============ -->
+  <h2>Check yourself</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. In the excess case, the surplus solar earns the ___</div>
+    <button class="opt">generator spot only</button>
+    <button class="opt">factory a rebate</button>
+    <button class="opt">lender a payout</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>CfD caps at consumed volume; excess kWh are not billed to you and earn the generator spot revenue only.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. In all three cases, Year-1 DPPA cost is ___</div>
+    <button class="opt">above the BAU bill</button>
+    <button class="opt">below the BAU bill</button>
+    <button class="opt">equal to BAU now</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>At a bankable strike (2,000), every case is a Year-1 premium (+11.5% to +16.7%); value builds as EVN escalates.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">3. Multi-party netting equals the ___</div>
+    <button class="opt">sum of pair settlements</button>
+    <button class="opt">max of pair settlements</button>
+    <button class="opt">avg of pair settlements</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Net CfD = Σ per-pair (Strike − FMP) × matched. The same five-line bill runs per pair, in parallel.</div>
+  </div>
+
+  <h2>Read next (primary source)</h2>
+  <p>Best primary source here is the tool itself: <a href="https://dppa-case.web.app">dppa-case.web.app</a> —
+  click each of the three scenarios and the Workshop presets, and reconcile against the numbers table above.
+  Then skim <a href="../reports/2026-04-07-vietnam-dppa-buyer-guide.md">the buyer guide</a>. Symbols:
+  <a href="../reference/dppa-glossary.html">glossary</a>.</p>
+
+  <div class="ask">Ask me: "walk Case B line by line," "show Case C's CfD cap algebraically," or
+  "rebuild the netting example with different strikes."</div>
+
+  <div class="nav">
+    <a href="0004-module-4-three-gates.html">← Module 4</a>
+    <a href="0006-module-6-decisions.html">Next → Module 6: Key Decisions &amp; Wrap-up</a>
+  </div>
+</div>
+</body>
+</html>

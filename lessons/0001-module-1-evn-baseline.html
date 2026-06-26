@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lesson 1 — Module 1: The EVN Baseline</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Module 1 · Lesson 1</div>
+  <h1>The Baseline: What You Pay EVN Today</h1>
+  <div class="modmap">
+    <span class="now">1 · Baseline</span>
+    <span>2 · Five-line bill</span>
+    <span>3 · CfD mechanics</span>
+    <span>4 · Three gates</span>
+    <span>5 · Canonical cases</span>
+    <span>6 · Decisions</span>
+  </div>
+  <p class="lead">Before any DPPA math, you need the thing it's measured against: your EVN
+  bill. Two facts about that bill decide everything downstream — it's <strong>time-of-use</strong>,
+  and it <strong>escalates</strong>.</p>
+
+  <div class="bigidea">
+    <h3>The one idea</h3>
+    <p>A virtual DPPA is <strong>not a Year-1 discount</strong>. You're judged against a
+    BAU bill that rises ~4%/yr — so the DPPA's value is the widening gap between EVN's
+    escalating tariff and your locked-in strike, measured over 10–25 years.</p>
+  </div>
+
+  <h2>Fact 1 — Your bill is time-of-use (TOU)</h2>
+  <p>EVN charges three rate bands across the day. Peak energy costs about <span class="key">3.4× off-peak</span>.
+  So your <em>load shape</em> — when you actually run — decides what "average price" even
+  means for you. A night-shift factory and a 9-to-5 factory pay very different averages
+  for the same kWh total.</p>
+
+  <!-- TOU visual (deck aesthetic: teal / amber / ink, Arial) -->
+  <svg viewBox="0 0 720 330" role="img" aria-label="Time-of-use rate bands across a day"
+       style="width:100%;height:auto;background:#fff;border:1px solid #E0E0E0;border-radius:10px;margin:16px 0;">
+    <style>
+      .axis{stroke:#E0E0E0;stroke-width:1}
+      .lbl{font-family:Arial,sans-serif;fill:#595959;font-size:12px}
+      .val{font-family:Arial,sans-serif;fill:#212121;font-size:13px;font-weight:700}
+      .cap{font-family:Arial,sans-serif;fill:#212121;font-size:13px;font-weight:700}
+      .tk{font-family:Arial,sans-serif;fill:#78909C;font-size:10px}
+    </style>
+    <text x="28" y="30" class="cap">Relative cost of a kWh by time of day</text>
+
+    <!-- baseline -->
+    <line x1="60" y1="225" x2="690" y2="225" class="axis"/>
+    <!-- bars: heights proportional to multiplier (0.52 / 1.0 / 1.78); scale 90px = 1.0x -->
+    <!-- Off-peak 00-06 -->
+    <rect x="70" y="178.2" width="150" height="46.8" fill="#0097A7" opacity="0.85"/>
+    <text x="145" y="170" text-anchor="middle" class="val">0.52×</text>
+    <text x="145" y="245" text-anchor="middle" class="lbl">Off-peak</text>
+    <text x="145" y="262" text-anchor="middle" class="tk">00:00–06:00</text>
+    <!-- Normal 06-18 -->
+    <rect x="230" y="135" width="240" height="90" fill="#78909C" opacity="0.85"/>
+    <text x="350" y="127" text-anchor="middle" class="val">1.0×</text>
+    <text x="350" y="245" text-anchor="middle" class="lbl">Normal</text>
+    <text x="350" y="262" text-anchor="middle" class="tk">06:00–18:00</text>
+    <!-- Peak 18-23 -->
+    <rect x="480" y="64.8" width="150" height="160.2" fill="#FFAB40"/>
+    <text x="555" y="56" text-anchor="middle" class="val">1.78×</text>
+    <text x="555" y="245" text-anchor="middle" class="lbl">Peak</text>
+    <text x="555" y="262" text-anchor="middle" class="tk">18:00–23:00</text>
+
+    <!-- 3.4x annotation -->
+    <line x1="650" y1="178.2" x2="650" y2="64.8" stroke="#212121" stroke-width="1" stroke-dasharray="4 3"/>
+    <text x="662" y="125" class="val" transform="rotate(90 662 125)">Peak ≈ 3.4× off-peak</text>
+
+    <text x="28" y="300" class="tk">Sunday rule: no peak band — all hours bill as normal.</text>
+    <text x="28" y="318" class="tk">Residual load (not covered by the DPPA) keeps paying these TOU rates.</text>
+  </svg>
+
+  <h2>Fact 2 — The benchmark is a moving target</h2>
+  <p>BAU = your current EVN bill, escalated ~4%/yr (the 2015–2024 trend). That's the line
+  a DPPA must beat — not today's price, but the rising curve. Because EVN keeps climbing
+  while a DPPA strike is locked (or escalates slower), the savings <em>accumulate</em>.</p>
+
+  <div class="callout"><span class="tag">The trap to avoid</span>
+  Judging a DPPA on Year-1 price. In most realistic structures Year-1 DPPA cost is
+  <strong>at or above BAU</strong>. Evaluate on <strong>cumulative 10-year and lifetime</strong>
+  cost vs BAU.</div>
+
+  <div class="tryit">
+    <div class="ic">▶</div>
+    <div>See this exact idea move: open <a href="https://dppa-case.web.app">dppa-case.web.app</a>
+    → <b>20-year cumulative economics</b>. The red <b>Cum. BAU</b> line escalates ~4%/yr against a
+    locked strike; the green savings wedge and the <b>Crossover Year</b> badge <em>are</em> Module 1's
+    thesis. The model is <code>projectMultiYear()</code> in <code>app/src/modules/settlement.js</code>:
+    each year recomputes BAU at <code>retail × 1.04ⁿ</code> against a fixed-VND strike.</div>
+  </div>
+
+  <h2>Why this matters for the rest of the deck</h2>
+  <ul>
+    <li><strong>Residual stays on TOU.</strong> Any load the DPPA doesn't cover (shortfall)
+    is bought from EVN at retail — that's <em>line 4</em> of the five-line bill (Module 2).</li>
+    <li><strong>Load shape is king.</strong> Hour-by-hour overlap of your load and the solar
+    profile decides how much settles — the heart of Module 3 and the three canonical cases.</li>
+    <li><strong>Escalation is the value.</strong> The buyer "gate" (Module 4) is literally
+    "cumulative cost ≤ BAU over 10 yr and lifetime."</li>
+  </ul>
+
+  <!-- Retrieval practice -->
+  <h2>Check yourself</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. A DPPA's price is benchmarked against ___</div>
+    <button class="opt">your BAU bill</button>
+    <button class="opt">the spot price</button>
+    <button class="opt">the equity IRR</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>BAU = your EVN bill escalated ~4%/yr. Every offer is judged on cumulative cost vs this rising line.</div>
+  </div>
+
+  <div class="quiz" data-answer="0">
+    <div class="q">2. Peak retail energy versus off-peak is about ___</div>
+    <button class="opt">3.4x as much</button>
+    <button class="opt">1.0x as much</button>
+    <button class="opt">0.5x as much</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Peak ≈ 1.78× normal and off-peak ≈ 0.52× normal, so peak ÷ off-peak ≈ 3.4×. Your load shape sets your true average.</div>
+  </div>
+
+  <div class="quiz" data-answer="0">
+    <div class="q">3. A virtual DPPA's main long-term value comes from ___</div>
+    <button class="opt">EVN tariff escalation</button>
+    <button class="opt">a large Year1 cut</button>
+    <button class="opt">lower regulated fees</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Fees (523.3) and loss factor are fixed; Year-1 is often a premium. Value builds as EVN escalates ~4%/yr against your locked strike.</div>
+  </div>
+
+  <h2>Read next (primary source)</h2>
+  <p>Spend 5 minutes in the live tool's <strong>20-year projection</strong>
+  (<a href="https://dppa-case.web.app">dppa-case.web.app</a>) and drag the EVN-escalation slider —
+  watch the crossover year move. Then skim the framing in
+  <a href="../reports/2026-04-07-vietnam-dppa-buyer-guide.md">the buyer guide</a>. Legal grounding:
+  <strong>Decree 57/2025/ND-CP</strong> (see <a href="../RESOURCES.md">RESOURCES.md</a>).</p>
+
+  <div class="ask">I'm your teacher — ask me anything that's fuzzy. Good follow-ups here:
+  "show me the escalation crossover math," "how does the Sunday rule change a night-shift factory's average?",
+  or "why is Year-1 usually a premium?"</div>
+
+  <div class="nav">
+    <a href="../reference/dppa-glossary.html">📖 Glossary</a>
+    <a href="0002-module-2-five-line-bill.html">Next → Module 2: The Five-Line Bill</a>
+  </div>
+</div>
+</body>
+</html>
