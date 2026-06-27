@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scenario Training 2 — Shortfall</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig svg { width:100%; height:auto; display:block; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
+  .mm::before { content:"◆ "; color:var(--amber); }
+  .pgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+  @media (max-width:560px){ .pgrid{ grid-template-columns:repeat(2,1fr); } }
+  .pcard { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .pcard .k { font-family:var(--mono); font-weight:700; color:var(--teal-dk); font-size:.95rem; }
+  .pcard .v { font-size:.78rem; color:var(--gray); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Scenario Training · Exercise 2</div>
+  <h1>Scenario 2 — Shortfall (Load &gt; Gen)</h1>
+  <div class="modmap">
+    <span class="done">S1 · Matched ✓</span>
+    <span class="now">S2 · Shortfall</span>
+    <span class="done">↳ pairs with the 6-module course</span>
+  </div>
+  <p class="lead">Now the factory consumes <strong>more</strong> than it contracted, and the
+  market price rises <strong>above</strong> the strike. Two new things appear: a residual
+  retail bill, and a CfD that flows the <em>other</em> way. This is the live tool's
+  <strong>Workshop 2</strong> preset.</p>
+
+  <h2>The inputs (what changed vs Scenario 1)</h2>
+  <div class="pgrid">
+    <div class="pcard"><div class="k">Q_c = 8,000,000</div><div class="v">contracted kWh/mo</div></div>
+    <div class="pcard"><div class="k">Q_KH = 9,000,000</div><div class="v">consumed kWh/mo</div></div>
+    <div class="pcard"><div class="k">shortfall 1,000,000</div><div class="v">bought at retail</div></div>
+    <div class="pcard"><div class="k">FMP = 1,600</div><div class="v">now ABOVE strike</div></div>
+    <div class="pcard"><div class="k">Strike = 1,500</div><div class="v">P_c VND/kWh</div></div>
+    <div class="pcard"><div class="k">P1 = 2,204</div><div class="v">retail (shortfall)</div></div>
+    <div class="pcard"><div class="k">k×K_pp = 1.0342</div><div class="v">1.026 × 1.008</div></div>
+    <div class="pcard"><div class="k">fees = 523.3</div><div class="v">360 + 163.3</div></div>
+  </div>
+
+  <!-- ============ VISUAL 1: volume split ============ -->
+  <h2>1 · Split the consumption</h2>
+  <div class="mm">Consumed 9M = matched 8M (the DPPA) + shortfall 1M (plain retail). The CfD touches only the matched 8M.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 170" role="img" aria-label="Consumed volume split into matched and shortfall">
+      <style>.t{font-family:Arial,sans-serif}.cl{font-size:12px;fill:#fff;font-weight:700}
+             .lb{font-size:11px;fill:#212121}.s{font-size:10px;fill:#595959}</style>
+      <!-- total 9M over 600px from x=60; matched 8M=533, shortfall 1M=67 -->
+      <rect x="60"  y="50" width="533" height="48" fill="#0097A7"/>
+      <text x="326" y="79" text-anchor="middle" class="t cl">Matched 8,000,000 kWh</text>
+      <rect x="593" y="50" width="67" height="48" fill="#b0bec5"/>
+      <text x="626" y="120" text-anchor="middle" class="t lb">+ 1M</text>
+      <text x="326" y="120" text-anchor="middle" class="t s">→ lines 1–3 (market + fees) AND the CfD (line 5)</text>
+      <text x="626" y="136" text-anchor="middle" class="t s">retail</text>
+      <text x="626" y="150" text-anchor="middle" class="t s">line 4</text>
+      <text x="60" y="36" class="t lb"><tspan font-weight="700">Consumed Q_KH = 9,000,000 kWh</tspan></text>
+    </svg>
+    <div class="figcap">Over-consuming the contract means the gap (1M) buys at retail 2,204 — and earns no CfD.</div>
+  </div>
+
+  <!-- ============ VISUAL 2: five-line waterfall with negative CfD ============ -->
+  <h2>2 · Build the bill — and watch the CfD subtract</h2>
+  <div class="mm">FMP &gt; strike makes the CfD negative, so it REDUCES your total. The developer pays you.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 210" role="img" aria-label="Scenario 2 five-line composition with a negative CfD">
+      <style>.cl{font-family:Arial,sans-serif;font-size:11px;fill:#fff;font-weight:700}
+             .clb{font-family:Arial,sans-serif;font-size:11px;fill:#212121}.s{font-size:10px;fill:#595959}</style>
+      <!-- CEVN 19,628,262,400 over 560px from x=40; px/VND=2.853e-8 -->
+      <rect x="40"  y="56" width="378" height="46" fill="#0097A7"/>
+      <text x="229" y="84" text-anchor="middle" class="cl">1 · Market 13.24B</text>
+      <rect x="418" y="56" width="82" height="46" fill="#78909C"/>
+      <text x="459" y="84" text-anchor="middle" class="cl">2 · 2.88B</text>
+      <rect x="500" y="56" width="37" height="46" fill="#b0bec5"/>
+      <rect x="537" y="56" width="63" height="46" fill="#90a4ae"/>
+      <text x="568" y="84" text-anchor="middle" class="cl">4 · 2.20B</text>
+      <text x="518" y="120" text-anchor="middle" class="clb">3 · clearing 1.31B</text>
+      <line x1="518" y1="102" x2="518" y2="114" stroke="#b0bec5"/>
+
+      <!-- CEVN bracket -->
+      <line x1="40" y1="46" x2="600" y2="46" stroke="#00727e" stroke-width="1.5"/>
+      <text x="320" y="40" text-anchor="middle" class="clb" fill="#00727e">C_EVN = 19,628,262,400 (lines 1–4; note line 4 retail is back)</text>
+
+      <!-- negative CfD: from x=600 back 23px to 577 -->
+      <rect x="577" y="56" width="23" height="46" fill="#e0573e" opacity="0.85"/>
+      <line x1="577" y1="56" x2="577" y2="150" stroke="#e0573e" stroke-dasharray="4 3"/>
+      <text x="612" y="140" text-anchor="end" class="clb" fill="#e0573e">− CfD 0.80B (developer pays you)</text>
+
+      <text x="40" y="176" class="clb"><tspan font-weight="700">C_KH = 19,628,262,400 − 800,000,000 = 18,828,262,400 VND</tspan></text>
+      <text x="40" y="196" class="s">Blended ≈ 2,092 VND/kWh over 9,000,000 kWh. The negative CfD shaves the bill; the retail shortfall pads it.</text>
+    </svg>
+    <div class="figcap">Two differences from Scenario 1: line 4 (retail) reappears, and the CfD is negative — it subtracts.</div>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>Line</th><th>Calculation</th><th class="num">VND/month</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Market energy</td><td><code>8,000,000 × 1,600 × 1.026 × 1.008</code></td><td class="num">13,237,862,400</td></tr>
+      <tr><td>2</td><td>Service fee</td><td><code>8,000,000 × 360</code></td><td class="num">2,880,000,000</td></tr>
+      <tr><td>3</td><td>Clearing fee</td><td><code>8,000,000 × 163.30</code></td><td class="num">1,306,400,000</td></tr>
+      <tr><td>4</td><td>Additional retail</td><td><code>1,000,000 × 2,204</code></td><td class="num">2,204,000,000</td></tr>
+      <tr><td></td><td><strong>C_EVN</strong></td><td>lines 1 + 2 + 3 + 4</td><td class="num"><strong>19,628,262,400</strong></td></tr>
+      <tr><td>5</td><td>CfD</td><td><code>(1,500 − 1,600) × 8,000,000</code></td><td class="num">−800,000,000</td></tr>
+      <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="num"><strong>18,828,262,400</strong></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ VISUAL 3: three-party flow (reversed CfD) ============ -->
+  <h2>3 · The money flow — note the reversed CfD arrow</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 230" role="img" aria-label="Scenario 2 money flow with developer paying the factory">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:13px}.s{font-size:10px;fill:#595959}
+             .a{font-family:Arial,sans-serif;font-size:11px;font-weight:700}</style>
+      <rect x="40" y="90" width="180" height="64" rx="10" fill="#e6f5f7" stroke="#0097A7" stroke-width="2"/>
+      <text x="130" y="118" text-anchor="middle" class="t h">Large Customer</text>
+      <text x="130" y="137" text-anchor="middle" class="t s">(your factory)</text>
+
+      <rect x="500" y="20" width="180" height="64" rx="10" fill="#eeeeee" stroke="#78909C" stroke-width="2"/>
+      <text x="590" y="48" text-anchor="middle" class="t h">EVN</text>
+      <text x="590" y="67" text-anchor="middle" class="t s">5-line bill</text>
+
+      <rect x="500" y="150" width="180" height="64" rx="10" fill="#fff3e0" stroke="#FFAB40" stroke-width="2"/>
+      <text x="590" y="178" text-anchor="middle" class="t h">RE GENCO</text>
+      <text x="590" y="197" text-anchor="middle" class="t s">solar developer</text>
+
+      <!-- factory -> EVN 19.628B -->
+      <line x1="220" y1="110" x2="500" y2="60" stroke="#78909C" stroke-width="2.5" marker-end="url(#a1)"/>
+      <text x="360" y="78" text-anchor="middle" class="t a" fill="#595959">19.628B → EVN bill</text>
+      <!-- GENCO -> factory CfD 0.800B (REVERSED) -->
+      <line x1="500" y1="178" x2="220" y2="134" stroke="#0097A7" stroke-width="3" marker-end="url(#a2)"/>
+      <text x="360" y="172" text-anchor="middle" class="t a" fill="#00727e">0.800B → CfD (developer pays you!)</text>
+      <!-- spot -> GENCO 12.902B -->
+      <line x1="690" y1="150" x2="690" y2="84" stroke="#4285F4" stroke-width="2.5" marker-end="url(#a3)"/>
+      <text x="700" y="120" class="t a" fill="#4285F4" transform="rotate(90 700 120)">12.902B spot</text>
+      <defs>
+        <marker id="a1" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#78909C"/></marker>
+        <marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0097A7"/></marker>
+        <marker id="a3" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#4285F4"/></marker>
+      </defs>
+    </svg>
+    <div class="figcap">Generator: 12.902B spot − 0.800B CfD = 12.102B net. Factory: 19.628B EVN − 0.800B CfD = 18.828B.</div>
+  </div>
+
+  <!-- ============ VISUAL 4: CfD direction (reversed vs S1) ============ -->
+  <h2>4 · Which way does the CfD flow now?</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 130" role="img" aria-label="FMP above strike means the developer pays the factory">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}</style>
+      <line x1="60" y1="60" x2="660" y2="60" stroke="#E0E0E0" stroke-width="2"/>
+      <line x1="300" y1="40" x2="300" y2="80" stroke="#212121" stroke-width="2"/>
+      <text x="300" y="32" text-anchor="middle" class="t h">Strike 1,500</text>
+      <circle cx="440" cy="60" r="6" fill="#4285F4"/>
+      <text x="440" y="46" text-anchor="middle" class="t h" fill="#4285F4">FMP 1,600</text>
+      <path d="M440,72 Q370,100 300,72" fill="none" stroke="#0097A7" stroke-width="2.5" marker-end="url(#cf)"/>
+      <text x="370" y="118" text-anchor="middle" class="t s" fill="#00727e">gap 100 × 8,000,000 = developer pays factory 800M</text>
+      <defs><marker id="cf" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0097A7"/></marker></defs>
+    </svg>
+    <div class="figcap">FMP (1,600) above strike (1,500) → CfD negative → the developer pays the factory. This is the protection the CfD buys.</div>
+  </div>
+
+  <div class="callout"><span class="tag">Scenario 1 vs Scenario 2 — the two CfD directions</span>
+  <strong>S1:</strong> FMP &lt; strike → CfD <span class="key">+</span>, factory tops up, no shortfall.
+  <strong>S2:</strong> FMP &gt; strike → CfD <span class="key">−</span>, developer pays factory, plus a retail
+  shortfall. Together they show the CfD is a two-way hedge — and that the shortfall always falls back to retail.</div>
+
+  <div class="tryit">
+    <div class="ic">▶</div>
+    <div>This is <b>Workshop 2</b> in the live tool: <a href="https://dppa-case.web.app">dppa-case.web.app</a>
+    → Workshop 2. Its five-line bill reads C_EVN <b>19,628,262,400</b> and C_KH <b>18,828,262,400</b> with the
+    <b>−800,000,000</b> CfD — penny-for-penny with this slide. Flip deck ↔ app live.</div>
+  </div>
+
+  <!-- ============ Retrieval ============ -->
+  <h2>Check yourself</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. The 1,000,000 kWh shortfall is settled ___</div>
+    <button class="opt">at retail line four</button>
+    <button class="opt">inside the CfD line</button>
+    <button class="opt">by the spot price</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Shortfall = (Q_KH − Q_c) bought from EVN at retail (line 4). The CfD only touches the matched 8M.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. Because FMP exceeds the strike, the CfD is ___</div>
+    <button class="opt">negative — gen pays you</button>
+    <button class="opt">positive — you pay gen</button>
+    <button class="opt">at zero — nobody pays</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>(Strike − FMP) = (1,500 − 1,600) = −100, so CfD = −800M: the developer pays the factory.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">3. C_KH for Scenario 2 equals ___</div>
+    <button class="opt">18,828,262,400 VND</button>
+    <button class="opt">19,628,262,400 VND</button>
+    <button class="opt">20,428,262,400 VND</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>C_EVN 19,628,262,400 + CfD (−800,000,000) = 18,828,262,400. (19.63B is C_EVN before the CfD.)</div>
+  </div>
+
+  <h2>Read next (primary source)</h2>
+  <p>Open <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 2</strong> and read
+  the live bill against the table above; toggle to <strong>Workshop 1</strong> to feel both CfD directions.
+  Source deck: <code>ceba/DPPA Presentation July 2026 Scenario Training.pptx</code> (slides 8–11). Symbols:
+  <a href="../reference/dppa-glossary.html">glossary</a>.</p>
+
+  <div class="ask"><strong>Scenario track complete.</strong> Ask me to: build a one-page cheat sheet for both
+  scenarios, run a mock facilitation of the exercise, or quiz you across S1 + S2 + the 6 modules (interleaved).</div>
+
+  <div class="nav">
+    <a href="0007-scenario-1-matched.html">← Scenario 1</a>
+    <a href="../reference/dppa-glossary.html">📖 Glossary</a>
+  </div>
+</div>
+</body>
+</html>
