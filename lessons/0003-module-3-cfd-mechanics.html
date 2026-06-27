@@ -6,6 +6,7 @@
 <title>Lesson 3 — Module 3: CfD Mechanics</title>
 <link rel="stylesheet" href="../assets/course.css" />
 <script src="../assets/quiz.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <style>
   .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
   .fig svg { width:100%; height:auto; display:block; }
@@ -14,6 +15,8 @@
   .mm::before { content:"◆ "; color:var(--amber); }
   .twocol { display:grid; grid-template-columns:1fr 1fr; gap:0; }
   @media (max-width:560px){ .twocol{ grid-template-columns:1fr; } }
+  .chartwrap { height:380px; padding:14px 16px 6px; }
+  @media (max-width:560px){ .chartwrap{ height:320px; } }
 </style>
 </head>
 <body>
@@ -35,9 +38,17 @@
 
   <div class="formula">CfD cash flow = (Strike − FMP) × Q_CfD &nbsp;&nbsp;→&nbsp;&nbsp; two-way: can be + or −</div>
 
-  <!-- ============ VISUAL 1: the price clamp ============ -->
-  <h2>1 · The CfD is a price clamp</h2>
-  <div class="mm">FMP swings hour to hour; the CfD cancels the swing and leaves you at the strike.</div>
+  <!-- ============ VISUAL 1: consolidated app-style chart ============ -->
+  <h2>1 · One picture: the overlap and the price clamp</h2>
+  <div class="mm">The same chart the live app shows — factory load, solar, matched volume, and the FMP curve crossing the strike, all on one canvas.</div>
+  <div class="fig">
+    <div class="chartwrap"><canvas id="cfdChart" aria-label="Consolidated chart: load, solar, matched volume on the left axis; FMP and strike on the right axis"></canvas></div>
+    <div class="figcap"><strong>Left axis</strong> = kWh/h (load · solar · matched). <strong>Right axis</strong> = VND/kWh (FMP · strike).
+    Where load &amp; solar overlap = <b style="color:#2e9e6b">matched</b> (all the CfD ever settles on); solar above load = excess (generator spot only); load above solar = shortfall (retail, line 4).
+    Where the <b style="color:#d6379a">FMP</b> line sits <em>below</em> the <b style="color:#4285F4">strike</b> you top up the developer; at the evening peak FMP rises <em>above</em> strike and the developer pays you. That two-way swap is the clamp.</div>
+  </div>
+
+  <!-- (legacy standalone clamp SVG consolidated into the chart above)
   <div class="fig">
     <svg viewBox="0 0 720 300" role="img" aria-label="FMP volatility clamped to the strike by the CfD">
       <style>
@@ -71,6 +82,7 @@
     </svg>
     <div class="figcap">The two-way payments exactly offset the FMP deviation — your energy cost flattens to the strike.</div>
   </div>
+  -->
 
   <!-- ============ VISUAL 2: two-way directionality ============ -->
   <h2>2 · Two-way: who pays whom</h2>
@@ -137,32 +149,9 @@
   Negotiate it <span class="key">as hard as the starting strike</span>. Higher escalation helps the
   seller/lender's lifetime economics and does nothing for your Year 1.</div>
 
-  <!-- ============ VISUAL 4: hourly overlap ============ -->
-  <h2>4 · Overlap is everything: match the contract to your shape</h2>
-  <div class="mm">CfD only settles where load and solar overlap — hour by hour, not on annual averages.</div>
-  <div class="fig">
-    <svg viewBox="0 0 720 300" role="img" aria-label="Hourly load vs solar overlap">
-      <style>.t{font-family:Arial,sans-serif}.axl{font-size:11px;fill:#78909C}.bd{font-size:11px;font-weight:700}</style>
-      <line x1="55" y1="40" x2="55" y2="245" stroke="#E0E0E0"/>
-      <line x1="55" y1="245" x2="685" y2="245" stroke="#E0E0E0"/>
-      <text x="60" y="263" class="t axl">00:00</text><text x="350" y="263" class="t axl">12:00</text><text x="650" y="263" class="t axl">23:00</text>
-
-      <!-- solar bell -->
-      <path d="M55,245 C 200,245 250,70 370,70 C 490,70 540,245 685,245" fill="rgba(255,171,64,0.18)" stroke="#FFAB40" stroke-width="2.5"/>
-      <text x="380" y="60" text-anchor="middle" class="t bd" fill="#d98600">Solar generation</text>
-      <!-- factory load (flatter, higher evening) -->
-      <polyline fill="none" stroke="#0097A7" stroke-width="2.5"
-        points="55,170 150,165 250,150 350,150 450,150 540,130 620,135 685,160"/>
-      <text x="120" y="158" class="t bd" fill="#00727e">Factory load</text>
-
-      <!-- region labels -->
-      <text x="150" y="220" text-anchor="middle" class="t bd" fill="#595959">shortfall →retail</text>
-      <text x="370" y="120" text-anchor="middle" class="t bd" fill="#2e9e6b">matched (settles)</text>
-      <text x="380" y="92" text-anchor="middle" class="t bd" fill="#d98600">excess → spot only</text>
-      <text x="600" y="200" text-anchor="middle" class="t bd" fill="#595959">shortfall →retail</text>
-    </svg>
-    <div class="figcap">Overlap = matched kWh (settle on CfD). Solar above load = excess (generator spot only). Load above solar = shortfall (retail line 4).</div>
-  </div>
+  <!-- ============ VISUAL 4: overlap consequences (chart is in Visual 1) ============ -->
+  <h2>4 · Match the contract to your shape</h2>
+  <div class="mm">Read the matched band in the chart above — that overlap is all the CfD ever settles on.</div>
 
   <table>
     <thead><tr><th>If you…</th><th>Then</th><th>Consequence</th></tr></thead>
@@ -226,5 +215,40 @@
     <a href="0004-module-4-three-gates.html">Next → Module 4: The Three Gates</a>
   </div>
 </div>
+<script>
+  // Consolidated CfD chart — mirrors the live app's profile chart (deck palette).
+  // Illustrative balanced day: strike 2,000; FMP curve midpoint ~1,700 so it crosses strike at the evening peak.
+  (function () {
+    if (typeof Chart === 'undefined') return;
+    var labels = Array.from({length:24}, function(_,h){ return String(h).padStart(2,'0'); });
+    var load    = [3000,3000,3000,3000,3000,3000,4000,4000,4000,4700,4700,4700,4700,4700,4700,4700,3900,3900,3900,3900,3200,3200,3200,3200];
+    var solar   = [0,0,0,0,0,0,0,833,1935,2999,3887,4493,4700,4493,3887,2999,1935,833,0,0,0,0,0,0];
+    var matched = load.map(function(v,i){ return Math.min(v, solar[i]); });
+    var fmp     = [1190,1173,1156,1173,1224,1326,1428,1496,1564,1649,1700,1768,1836,1887,1955,2006,2074,2176,2312,2414,2210,1836,1564,1360];
+    var strike  = new Array(24).fill(2000);
+    var ink='#595959', grid='rgba(0,0,0,0.06)';
+    new Chart(document.getElementById('cfdChart'), {
+      type: 'line',
+      data: { labels: labels, datasets: [
+        { label:'Factory load', data:load, yAxisID:'y', borderColor:'#0097A7', backgroundColor:'rgba(0,151,167,0.10)', fill:true, tension:.35, borderWidth:2.5, pointRadius:0 },
+        { label:'Solar generation', data:solar, yAxisID:'y', borderColor:'#FFAB40', backgroundColor:'rgba(255,171,64,0.16)', fill:true, tension:.35, borderWidth:2.5, pointRadius:0 },
+        { label:'Matched volume', data:matched, yAxisID:'y', borderColor:'#2e9e6b', backgroundColor:'rgba(46,158,107,0.30)', fill:'origin', tension:.35, borderWidth:1.5, pointRadius:0 },
+        { label:'FMP (VND/kWh)', data:fmp, yAxisID:'yR', borderColor:'#d6379a', backgroundColor:'rgba(0,0,0,0)', fill:false, borderDash:[6,4], tension:.35, borderWidth:2.5, pointRadius:0 },
+        { label:'Strike (VND/kWh)', data:strike, yAxisID:'yR', borderColor:'#4285F4', backgroundColor:'rgba(0,0,0,0)', fill:false, borderDash:[4,4], borderWidth:1.6, pointRadius:0 }
+      ]},
+      options: {
+        responsive:true, maintainAspectRatio:false, animation:false,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{ legend:{ labels:{ color:ink, usePointStyle:true, boxWidth:10, font:{ size:11 } } },
+                  tooltip:{ backgroundColor:'#fff', titleColor:'#212121', bodyColor:'#212121', borderColor:'#E0E0E0', borderWidth:1 } },
+        scales:{
+          x:{ ticks:{ color:ink, maxTicksLimit:12 }, grid:{ color:grid } },
+          y:{ position:'left', beginAtZero:true, title:{ display:true, text:'kWh / h', color:ink }, ticks:{ color:ink }, grid:{ color:grid } },
+          yR:{ position:'right', title:{ display:true, text:'VND / kWh', color:'#d6379a' }, ticks:{ color:'#d6379a', callback:function(v){ return (v/1000).toFixed(1)+'k'; } }, grid:{ drawOnChartArea:false } }
+        }
+      }
+    });
+  })();
+</script>
 </body>
 </html>
