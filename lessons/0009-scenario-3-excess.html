@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scenario Training 3 — Excess / Over-generation</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig svg { width:100%; height:auto; display:block; }
+  .fig img { width:100%; height:auto; display:block; border-radius:10px; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
+  .mm::before { content:"◆ "; color:var(--amber); }
+  .pgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+  @media (max-width:560px){ .pgrid{ grid-template-columns:repeat(2,1fr); } }
+  .pcard { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .pcard .k { font-family:var(--mono); font-weight:700; color:var(--teal-dk); font-size:.95rem; }
+  .pcard .v { font-size:.78rem; color:var(--gray); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Scenario Training · Exercise 3</div>
+  <h1>Scenario 3 — Excess / Over-generation (Load &lt; Gen)</h1>
+  <div class="modmap">
+    <span class="done">S1 · Matched ✓</span>
+    <span class="done">S2 · Shortfall ✓</span>
+    <span class="now">S3 · Excess</span>
+  </div>
+  <p class="lead">The third canonical case: the solar is <strong>overbuilt</strong> (a sunny month),
+  so generation runs <strong>above</strong> the factory's consumption. Your bill looks like a matched
+  month — but the <strong>excess earns nothing</strong>. This is the live tool's <strong>Workshop 3</strong>
+  preset, and the over-contracting risk your CFO should price.</p>
+
+  <h2>The inputs (what changed vs Scenarios 1 &amp; 2)</h2>
+  <div class="pgrid">
+    <div class="pcard"><div class="k">Q_KH = 5,000,000</div><div class="v">consumed kWh/mo</div></div>
+    <div class="pcard"><div class="k">Q_khc = 5,000,000</div><div class="v">matched &amp; settled</div></div>
+    <div class="pcard"><div class="k">gen ≈ 6,500,000</div><div class="v">credited generation</div></div>
+    <div class="pcard"><div class="k">excess 1,500,000</div><div class="v">earns spot only</div></div>
+    <div class="pcard"><div class="k">FMP = 1,100</div><div class="v">sunny → below strike</div></div>
+    <div class="pcard"><div class="k">Strike = 1,250</div><div class="v">P_c VND/kWh</div></div>
+    <div class="pcard"><div class="k">k×K_pp = 1.0342</div><div class="v">1.026 × 1.008</div></div>
+    <div class="pcard"><div class="k">fees = 523.3</div><div class="v">360 + 163.3</div></div>
+  </div>
+  <div class="callout amber"><span class="tag">The setup</span>
+  Consumption is fully covered by matched RE → <span class="key">no residual EVN purchase</span>
+  (line 4 = 0), exactly like Scenario 1. The twist is on the <em>generator</em> side: 1,500,000 kWh of
+  excess generation that no CfD touches.</div>
+
+  <!-- ============ VISUAL 1: animated app-style chart ============ -->
+  <h2>1 · See it move — the sunny-day clamp</h2>
+  <div class="mm">Solar (amber) rises above factory load (teal) midday; the matched volume (green) caps at consumption.</div>
+  <div class="fig">
+    <img src="../assets/cfd-s3-en.gif" alt="Animated 24-hour Scenario 3 chart: solar above load, FMP below strike 1,250" />
+    <div class="figcap">FMP dips to ~930 at midday (solar floods the grid) — always below the 1,250 strike, so the CfD stays positive: the factory tops up the developer. The amber solar line above the teal load line is the excess.</div>
+  </div>
+
+  <!-- ============ VISUAL 2: 5-line waterfall ============ -->
+  <h2>2 · Build the five-line bill (on consumed volume)</h2>
+  <div class="mm">The bill settles only on the 5,000,000 kWh you consume. Excess generation never reaches your bill.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 200" role="img" aria-label="Composition of Scenario 3 monthly cost">
+      <style>.cl{font-family:Arial,sans-serif;font-size:11px;fill:#fff;font-weight:700}
+             .clb{font-family:Arial,sans-serif;font-size:11px;fill:#212121}.s{font-size:10px;fill:#595959}</style>
+      <!-- total CKH 9,054,644,000 over 640px from x=40; px/VND=7.069e-8 -->
+      <rect x="40"  y="46" width="402" height="46" fill="#0097A7"/>
+      <text x="241" y="74" text-anchor="middle" class="cl">1 · Market energy · 5.69B</text>
+      <rect x="442" y="46" width="127" height="46" fill="#78909C"/>
+      <text x="505" y="74" text-anchor="middle" class="cl">2 · Svc 1.80B</text>
+      <rect x="569" y="46" width="58" height="46" fill="#b0bec5"/>
+      <rect x="627" y="46" width="53" height="46" fill="#FFAB40"/>
+      <text x="598" y="110" text-anchor="middle" class="clb">3 · Clearing 0.82B</text>
+      <line x1="598" y1="92" x2="598" y2="104" stroke="#b0bec5"/>
+      <text x="678" y="124" text-anchor="end" class="clb">5 · CfD +0.75B</text>
+      <line x1="653" y1="92" x2="653" y2="118" stroke="#FFAB40"/>
+      <!-- CEVN bracket -->
+      <line x1="40" y1="36" x2="627" y2="36" stroke="#00727e" stroke-width="1.5"/>
+      <text x="333" y="30" text-anchor="middle" class="clb" fill="#00727e">C_EVN = 8,304,644,000 (lines 1–4; line 4 = 0)</text>
+
+      <text x="40" y="158" class="clb"><tspan font-weight="700">C_KH = C_EVN + CfD = 9,054,644,000 VND</tspan>  →  effective ≈ <tspan font-weight="700" fill="#0097A7">1,811 VND/kWh</tspan></text>
+      <text x="40" y="180" class="s">Effective = 9,054,644,000 ÷ 5,000,000 kWh. Structurally identical to Scenario 1 — only FMP (1,100) and the excess differ.</text>
+    </svg>
+    <div class="figcap">A matched-style bill: line 4 is zero and the CfD is a positive +slice (FMP below strike). The excess is nowhere on this bill.</div>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>Line</th><th>Calculation</th><th class="num">VND/month</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Market energy</td><td><code>5,000,000 × 1,100 × 1.026 × 1.008</code></td><td class="num">5,688,144,000</td></tr>
+      <tr><td>2</td><td>Service fee</td><td><code>5,000,000 × 360</code></td><td class="num">1,800,000,000</td></tr>
+      <tr><td>3</td><td>Clearing fee</td><td><code>5,000,000 × 163.30</code></td><td class="num">816,500,000</td></tr>
+      <tr><td>4</td><td>Additional retail</td><td><code>0 × 2,204</code></td><td class="num">0</td></tr>
+      <tr><td></td><td><strong>C_EVN</strong></td><td>lines 1 + 2 + 3 + 4</td><td class="num"><strong>8,304,644,000</strong></td></tr>
+      <tr><td>5</td><td>CfD</td><td><code>(1,250 − 1,100) × 5,000,000</code></td><td class="num">+750,000,000</td></tr>
+      <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="num"><strong>9,054,644,000</strong></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ VISUAL 3: the excess that earns nothing ============ -->
+  <h2>3 · Where the excess goes (and why it earns nothing)</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 210" role="img" aria-label="Excess generation earns spot only, no CfD">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}
+             .cl{font-size:11px;fill:#fff;font-weight:700}.clb{font-size:11px;fill:#212121}</style>
+      <!-- generation bar split: settled 5M (settles on CfD) + excess 1.5M (spot only) -->
+      <text x="40" y="34" class="t clb"><tspan font-weight="700">Credited generation ≈ 6,500,000 kWh</tspan></text>
+      <rect x="40"  y="46" width="492" height="44" fill="#2e9e6b"/>
+      <text x="286" y="74" text-anchor="middle" class="t cl">Settled 5,000,000 kWh → market + fees + CfD</text>
+      <rect x="532" y="46" width="148" height="44" fill="#b0bec5"/>
+      <text x="606" y="74" text-anchor="middle" class="t cl">Excess 1.5M</text>
+      <text x="606" y="108" text-anchor="middle" class="t s">spot only · no CfD</text>
+
+      <text x="40" y="140" class="t h">The excess at the spot price:</text>
+      <text x="40" y="162" class="t s">1,500,000 kWh × 1,100 VND/kWh (at meter ≈ 1,512,000 kWh) ≈ <tspan font-weight="700" fill="#212121">1,663,200,000 VND</tspan> to the generator — no strike uplift.</text>
+      <text x="40" y="184" class="t s">Foregone CfD uplift on the excess = (1,250 − 1,100) × 1,500,000 = <tspan font-weight="700" fill="#e0573e">225,000,000 VND</tspan> the strike never captures.</text>
+      <text x="40" y="204" class="t s">Lesson: size the contract to your <tspan font-weight="700">consumption</tspan> — over-contracting buys terms for volume that can't settle.</text>
+    </svg>
+    <div class="figcap">The CfD caps at consumed volume. Anything generated above consumption is sold at the spot price only — it earns no strike, for either side.</div>
+  </div>
+
+  <!-- ============ VISUAL 4: CfD direction ============ -->
+  <h2>4 · Which way does the CfD flow?</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 130" role="img" aria-label="FMP below strike means the factory tops up the developer">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}</style>
+      <line x1="60" y1="60" x2="660" y2="60" stroke="#E0E0E0" stroke-width="2"/>
+      <circle cx="280" cy="60" r="6" fill="#4285F4"/>
+      <text x="280" y="46" text-anchor="middle" class="t h" fill="#4285F4">FMP 1,100</text>
+      <line x1="440" y1="40" x2="440" y2="80" stroke="#212121" stroke-width="2"/>
+      <text x="440" y="32" text-anchor="middle" class="t h">Strike 1,250</text>
+      <path d="M280,72 Q360,100 440,72" fill="none" stroke="#FFAB40" stroke-width="2.5" marker-end="url(#cf)"/>
+      <text x="360" y="118" text-anchor="middle" class="t s" fill="#d98600">gap 150 × 5,000,000 = factory pays developer 750M</text>
+      <defs><marker id="cf" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#FFAB40"/></marker></defs>
+    </svg>
+    <div class="figcap">FMP (1,100) below strike (1,250) → CfD positive → the factory tops the developer up — same direction as Scenario 1, a wider gap because the sunny month softens FMP.</div>
+  </div>
+
+  <div class="callout"><span class="tag">The three canonical cases together</span>
+  <strong>S1 Matched:</strong> Q_c = Q_KH, line 4 = 0, CfD +500M.
+  <strong>S2 Shortfall:</strong> Q_c &lt; Q_KH, retail line 4 returns, CfD −800M.
+  <strong>S3 Excess:</strong> gen &gt; Q_KH, line 4 = 0 again, CfD +750M, and <span class="key">excess earns nothing</span>.
+  The volume axis (matched / short / excess) is the spine; the CfD sign just follows FMP vs strike.</div>
+
+  <div class="tryit">
+    <div class="ic">▶</div>
+    <div>This is <b>Workshop 3</b> in the live tool: <a href="https://dppa-case.web.app">dppa-case.web.app</a>
+    → Workshop 3. Its five-line bill reads C_EVN <b>8,304,644,000</b> and C_KH <b>9,054,644,000</b> with the
+    <b>+750,000,000</b> CfD — and the daily chart shows solar above load. Flip deck ↔ app live.</div>
+  </div>
+
+  <!-- ============ Retrieval ============ -->
+  <h2>Check yourself</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. The 1,500,000 kWh of excess generation earns ___</div>
+    <button class="opt">the spot price only</button>
+    <button class="opt">strike plus the fees</button>
+    <button class="opt">a retail-rate credit</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Excess above consumption settles no CfD — the generator sells it on the spot market at FMP only. The strike never touches it.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. Because consumption is fully matched, line 4 (residual) is ___</div>
+    <button class="opt">exactly zero here</button>
+    <button class="opt">the biggest line</button>
+    <button class="opt">a small credit</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>No shortfall (Q_KH − Q_khc = 0) → line 4 = 0, just like Scenario 1. The excess is on the generation side, not your bill.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">3. C_KH for Scenario 3 equals ___</div>
+    <button class="opt">9,054,644,000 VND</button>
+    <button class="opt">8,304,644,000 VND</button>
+    <button class="opt">9,063,196,000 VND</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>C_EVN 8,304,644,000 + CfD (+750,000,000) = 9,054,644,000. (8.30B is C_EVN; 9.06B is Scenario 1's C_KH.)</div>
+  </div>
+
+  <h2>Read next (primary source)</h2>
+  <p>Open <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 3</strong> and read the
+  live bill against the table above; toggle Workshop 1 ↔ 2 ↔ 3 to feel matched, shortfall, and excess in turn.
+  Numbers basis: <code>research/2026-06-29_dppa-scenario-numbers-spec.md</code>. Symbols:
+  <a href="../reference/dppa-glossary.html">glossary</a>.</p>
+
+  <div class="ask"><strong>Three canonical cases complete.</strong> Ready for the live exercise? Open the
+  <a href="0010-group-workshop.html">group workshop</a> — split into off-taker vs developer, work all three
+  scenarios by hand, then negotiate a strike.</div>
+
+  <div class="nav">
+    <a href="0008-scenario-2-shortfall.html">← Scenario 2</a>
+    <a href="0010-group-workshop.html">Next → Group Workshop</a>
+  </div>
+</div>
+</body>
+</html>

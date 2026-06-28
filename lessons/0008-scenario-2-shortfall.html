@@ -9,6 +9,7 @@
 <style>
   .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
   .fig svg { width:100%; height:auto; display:block; }
+  .fig img { width:100%; height:auto; display:block; border-radius:10px; }
   .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
   .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
   .mm::before { content:"◆ "; color:var(--amber); }
@@ -44,6 +45,13 @@
     <div class="pcard"><div class="k">P1 = 2,204</div><div class="v">retail (shortfall)</div></div>
     <div class="pcard"><div class="k">k×K_pp = 1.0342</div><div class="v">1.026 × 1.008</div></div>
     <div class="pcard"><div class="k">fees = 523.3</div><div class="v">360 + 163.3</div></div>
+  </div>
+
+  <!-- ============ Animated app-style chart ============ -->
+  <h2>See it move — the daily clamp</h2>
+  <div class="fig">
+    <img src="../assets/cfd-s2-en.gif" alt="Animated 24-hour Scenario 2 chart: load above solar, FMP above strike 1,500" />
+    <div class="figcap">Load (teal) runs above solar all day — the shortfall story; FMP (magenta) stays above the 1,500 strike → the CfD is negative and the developer pays the factory.</div>
   </div>
 
   <!-- ============ VISUAL 1: volume split ============ -->
@@ -210,12 +218,12 @@
   Source deck: <code>ceba/DPPA Presentation July 2026 Scenario Training.pptx</code> (slides 8–11). Symbols:
   <a href="../reference/dppa-glossary.html">glossary</a>.</p>
 
-  <div class="ask"><strong>Scenario track complete.</strong> Ask me to: build a one-page cheat sheet for both
-  scenarios, run a mock facilitation of the exercise, or quiz you across S1 + S2 + the 6 modules (interleaved).</div>
+  <div class="ask"><strong>Two directions down, one to go.</strong> Next: <a href="0009-scenario-3-excess.html">Scenario 3 — Excess</a>,
+  where the solar is overbuilt and the excess earns nothing. Then run the live <a href="0010-group-workshop.html">group workshop</a>.</div>
 
   <div class="nav">
     <a href="0007-scenario-1-matched.html">← Scenario 1</a>
-    <a href="../reference/dppa-glossary.html">📖 Glossary</a>
+    <a href="0009-scenario-3-excess.html">Next → Scenario 3: Excess</a>
   </div>
 </div>
 </body>

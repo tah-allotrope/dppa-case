@@ -31,6 +31,16 @@ Source: theme of `ceba/CEBA DPPA 2026.pptx` (Google-Slides / Material style, 16:
 - Clean cards, generous whitespace, Tufte-ish reading width (~760px), print-friendly.
 - All generated visuals (SVG/HTML) use these tokens via `assets/course.css`.
 
+## Group Workshop track (2026-06-29)
+- Beyond the solitary lessons, there is now a **facilitated group workshop** (lessons 0009–0011 +
+  `facilitator/dppa-workshop-facilitator-guide.md`): role-based negotiation (off-taker vs developer),
+  hand-compute-then-verify, ~90 min, en/vi/zh-cn learner artifacts.
+- **Scenario 3 = Excess / over-generation** (new): app `workshop3` preset · C_EVN 8,304,644,000 ·
+  CfD +750,000,000 · C_KH 9,054,644,000. The three canonical cases are now matched (S1) / shortfall (S2)
+  / excess (S3). Canonical numbers live in `research/2026-06-29_dppa-scenario-numbers-spec.md`.
+- Per-scenario animated charts: `assets/cfd-s{1,2,3}-{en,vi,zh-cn}.gif/.mp4`, built by `build_cfd_slide.py`
+  (now a per-scenario `SCENARIOS` dict). Regenerate with `py build_cfd_slide.py`.
+
 ## Format preferences (from Lesson 1 feedback, 2026-06-26)
 - **More visuals.** Lead with diagrams/SVG, not prose. Aim for ≥2–3 visuals per lesson
   (e.g. a flow/money-map, a worked-number figure, a comparison). Keep text to captions and

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Đào tạo Kịch bản 3 — Dư thừa / Phát điện vượt mức</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig svg { width:100%; height:auto; display:block; }
+  .fig img { width:100%; height:auto; display:block; border-radius:10px; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
+  .mm::before { content:"◆ "; color:var(--amber); }
+  .pgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+  @media (max-width:560px){ .pgrid{ grid-template-columns:repeat(2,1fr); } }
+  .pcard { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .pcard .k { font-family:var(--mono); font-weight:700; color:var(--teal-dk); font-size:.95rem; }
+  .pcard .v { font-size:.78rem; color:var(--gray); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Đào tạo theo Kịch bản · Bài tập 3</div>
+  <h1>Kịch bản 3 — Dư thừa / Phát điện vượt mức (Phụ tải &lt; Phát điện)</h1>
+  <div class="modmap">
+    <span class="done">S1 · Khớp ✓</span>
+    <span class="done">S2 · Thiếu hụt ✓</span>
+    <span class="now">S3 · Dư thừa</span>
+  </div>
+  <p class="lead">Trường hợp điển hình thứ ba: điện mặt trời được <strong>xây dựng vượt mức</strong> (một tháng nhiều nắng),
+  nên sản lượng phát <strong>cao hơn</strong> mức tiêu thụ của nhà máy. Hóa đơn của bạn trông giống một tháng khớp —
+  nhưng phần <strong>dư thừa không tạo ra giá trị nào</strong>. Đây là cấu hình <strong>Workshop 3</strong> trong công cụ
+  trực tuyến, và là rủi ro ký hợp đồng vượt mức mà CFO của bạn cần định giá.</p>
+
+  <h2>Các thông số đầu vào (thay đổi gì so với Kịch bản 1 &amp; 2)</h2>
+  <div class="pgrid">
+    <div class="pcard"><div class="k">Q_KH = 5,000,000</div><div class="v">tiêu thụ kWh/tháng</div></div>
+    <div class="pcard"><div class="k">Q_khc = 5,000,000</div><div class="v">khớp &amp; thanh toán</div></div>
+    <div class="pcard"><div class="k">phát ≈ 6,500,000</div><div class="v">sản lượng ghi nhận</div></div>
+    <div class="pcard"><div class="k">dư thừa 1,500,000</div><div class="v">chỉ bán theo giá spot</div></div>
+    <div class="pcard"><div class="k">FMP = 1,100</div><div class="v">nắng → dưới giá thực hiện</div></div>
+    <div class="pcard"><div class="k">Giá TH = 1,250</div><div class="v">P_c VND/kWh</div></div>
+    <div class="pcard"><div class="k">k×K_pp = 1.0342</div><div class="v">1.026 × 1.008</div></div>
+    <div class="pcard"><div class="k">phí = 523.3</div><div class="v">360 + 163.3</div></div>
+  </div>
+  <div class="callout amber"><span class="tag">Bối cảnh</span>
+  Mức tiêu thụ được phủ hoàn toàn bởi điện tái tạo khớp → <span class="key">không mua thêm điện từ EVN</span>
+  (dòng 4 = 0), giống hệt Kịch bản 1. Điểm khác biệt nằm ở phía <em>nhà máy điện</em>: 1,500,000 kWh dư thừa mà
+  không hợp đồng CfD nào chạm tới.</div>
+
+  <!-- ============ HÌNH ĐỘNG ============ -->
+  <h2>1 · Xem nó chuyển động — sự kẹp giá ngày nắng</h2>
+  <div class="mm">Điện mặt trời (cam) vượt lên trên phụ tải nhà máy (xanh) vào buổi trưa; sản lượng khớp (xanh lá) bị giới hạn ở mức tiêu thụ.</div>
+  <div class="fig">
+    <img src="../assets/cfd-s3-vi.gif" alt="Biểu đồ động 24 giờ Kịch bản 3: điện mặt trời trên phụ tải, FMP dưới giá thực hiện 1,250" />
+    <div class="figcap">FMP giảm xuống ~930 vào buổi trưa (điện mặt trời tràn lưới) — luôn dưới giá thực hiện 1,250, nên CfD luôn dương: nhà máy bù cho nhà phát triển. Đường mặt trời (cam) nằm trên đường phụ tải (xanh) chính là phần dư thừa.</div>
+  </div>
+
+  <!-- ============ HÌNH 2: thác 5 dòng ============ -->
+  <h2>2 · Lập hóa đơn năm dòng (trên sản lượng tiêu thụ)</h2>
+  <div class="mm">Hóa đơn chỉ thanh toán trên 5,000,000 kWh bạn tiêu thụ. Sản lượng dư thừa không bao giờ vào hóa đơn của bạn.</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 200" role="img" aria-label="Cấu thành chi phí tháng Kịch bản 3">
+      <style>.cl{font-family:Arial,sans-serif;font-size:11px;fill:#fff;font-weight:700}
+             .clb{font-family:Arial,sans-serif;font-size:11px;fill:#212121}.s{font-size:10px;fill:#595959}</style>
+      <rect x="40"  y="46" width="402" height="46" fill="#0097A7"/>
+      <text x="241" y="74" text-anchor="middle" class="cl">1 · Điện năng TT · 5.69B</text>
+      <rect x="442" y="46" width="127" height="46" fill="#78909C"/>
+      <text x="505" y="74" text-anchor="middle" class="cl">2 · DV 1.80B</text>
+      <rect x="569" y="46" width="58" height="46" fill="#b0bec5"/>
+      <rect x="627" y="46" width="53" height="46" fill="#FFAB40"/>
+      <text x="598" y="110" text-anchor="middle" class="clb">3 · Bù trừ 0.82B</text>
+      <line x1="598" y1="92" x2="598" y2="104" stroke="#b0bec5"/>
+      <text x="678" y="124" text-anchor="end" class="clb">5 · CfD +0.75B</text>
+      <line x1="653" y1="92" x2="653" y2="118" stroke="#FFAB40"/>
+      <line x1="40" y1="36" x2="627" y2="36" stroke="#00727e" stroke-width="1.5"/>
+      <text x="333" y="30" text-anchor="middle" class="clb" fill="#00727e">C_EVN = 8,304,644,000 (dòng 1–4; dòng 4 = 0)</text>
+      <text x="40" y="158" class="clb"><tspan font-weight="700">C_KH = C_EVN + CfD = 9,054,644,000 VND</tspan>  →  hiệu dụng ≈ <tspan font-weight="700" fill="#0097A7">1,811 VND/kWh</tspan></text>
+      <text x="40" y="180" class="s">Hiệu dụng = 9,054,644,000 ÷ 5,000,000 kWh. Về cấu trúc giống hệt Kịch bản 1 — chỉ FMP (1,100) và phần dư thừa là khác.</text>
+    </svg>
+    <div class="figcap">Một hóa đơn kiểu khớp: dòng 4 bằng 0 và CfD là một lát cắt dương (FMP dưới giá thực hiện). Phần dư thừa không xuất hiện trên hóa đơn này.</div>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>Dòng</th><th>Phép tính</th><th class="num">VND/tháng</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Điện năng thị trường</td><td><code>5,000,000 × 1,100 × 1.026 × 1.008</code></td><td class="num">5,688,144,000</td></tr>
+      <tr><td>2</td><td>Phí dịch vụ</td><td><code>5,000,000 × 360</code></td><td class="num">1,800,000,000</td></tr>
+      <tr><td>3</td><td>Phí bù trừ</td><td><code>5,000,000 × 163.30</code></td><td class="num">816,500,000</td></tr>
+      <tr><td>4</td><td>Mua thêm bán lẻ</td><td><code>0 × 2,204</code></td><td class="num">0</td></tr>
+      <tr><td></td><td><strong>C_EVN</strong></td><td>dòng 1 + 2 + 3 + 4</td><td class="num"><strong>8,304,644,000</strong></td></tr>
+      <tr><td>5</td><td>CfD</td><td><code>(1,250 − 1,100) × 5,000,000</code></td><td class="num">+750,000,000</td></tr>
+      <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="num"><strong>9,054,644,000</strong></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ HÌNH 3: phần dư thừa ============ -->
+  <h2>3 · Phần dư thừa đi đâu (và vì sao không tạo giá trị)</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 210" role="img" aria-label="Phần dư thừa chỉ bán theo giá spot, không CfD">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}
+             .cl{font-size:11px;fill:#fff;font-weight:700}.clb{font-size:11px;fill:#212121}</style>
+      <text x="40" y="34" class="t clb"><tspan font-weight="700">Sản lượng ghi nhận ≈ 6,500,000 kWh</tspan></text>
+      <rect x="40"  y="46" width="492" height="44" fill="#2e9e6b"/>
+      <text x="286" y="74" text-anchor="middle" class="t cl">Thanh toán 5,000,000 kWh → thị trường + phí + CfD</text>
+      <rect x="532" y="46" width="148" height="44" fill="#b0bec5"/>
+      <text x="606" y="74" text-anchor="middle" class="t cl">Dư thừa 1.5M</text>
+      <text x="606" y="108" text-anchor="middle" class="t s">chỉ spot · không CfD</text>
+      <text x="40" y="140" class="t h">Phần dư thừa theo giá spot:</text>
+      <text x="40" y="162" class="t s">1,500,000 kWh × 1,100 VND/kWh (tại đầu cực ≈ 1,512,000 kWh) ≈ <tspan font-weight="700" fill="#212121">1,663,200,000 VND</tspan> cho nhà phát triển — không có chênh lệch giá thực hiện.</text>
+      <text x="40" y="184" class="t s">Phần CfD bị bỏ lỡ trên dư thừa = (1,250 − 1,100) × 1,500,000 = <tspan font-weight="700" fill="#e0573e">225,000,000 VND</tspan> mà giá thực hiện không bao giờ thu được.</text>
+      <text x="40" y="204" class="t s">Bài học: cỡ hợp đồng theo mức <tspan font-weight="700">tiêu thụ</tspan> — ký vượt mức là mua điều khoản cho sản lượng không thể thanh toán.</text>
+    </svg>
+    <div class="figcap">CfD bị giới hạn ở sản lượng tiêu thụ. Mọi thứ phát vượt mức tiêu thụ chỉ được bán theo giá spot — không có giá thực hiện, cho cả hai bên.</div>
+  </div>
+
+  <!-- ============ HÌNH 4: hướng CfD ============ -->
+  <h2>4 · CfD chảy theo hướng nào?</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 130" role="img" aria-label="FMP dưới giá thực hiện nghĩa là nhà máy bù cho nhà phát triển">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}</style>
+      <line x1="60" y1="60" x2="660" y2="60" stroke="#E0E0E0" stroke-width="2"/>
+      <circle cx="280" cy="60" r="6" fill="#4285F4"/>
+      <text x="280" y="46" text-anchor="middle" class="t h" fill="#4285F4">FMP 1,100</text>
+      <line x1="440" y1="40" x2="440" y2="80" stroke="#212121" stroke-width="2"/>
+      <text x="440" y="32" text-anchor="middle" class="t h">Giá TH 1,250</text>
+      <path d="M280,72 Q360,100 440,72" fill="none" stroke="#FFAB40" stroke-width="2.5" marker-end="url(#cf)"/>
+      <text x="360" y="118" text-anchor="middle" class="t s" fill="#d98600">chênh 150 × 5,000,000 = nhà máy trả nhà phát triển 750M</text>
+      <defs><marker id="cf" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#FFAB40"/></marker></defs>
+    </svg>
+    <div class="figcap">FMP (1,100) dưới giá thực hiện (1,250) → CfD dương → nhà máy bù cho nhà phát triển — cùng hướng với Kịch bản 1, chênh lệch rộng hơn vì tháng nắng làm FMP mềm đi.</div>
+  </div>
+
+  <div class="callout"><span class="tag">Ba trường hợp điển hình cùng nhau</span>
+  <strong>S1 Khớp:</strong> Q_c = Q_KH, dòng 4 = 0, CfD +500M.
+  <strong>S2 Thiếu hụt:</strong> Q_c &lt; Q_KH, dòng 4 bán lẻ trở lại, CfD −800M.
+  <strong>S3 Dư thừa:</strong> phát &gt; Q_KH, dòng 4 = 0 trở lại, CfD +750M, và <span class="key">dư thừa không tạo giá trị</span>.
+  Trục sản lượng (khớp / thiếu / dư) là xương sống; dấu của CfD chỉ theo FMP so với giá thực hiện.</div>
+
+  <div class="tryit">
+    <div class="ic">▶</div>
+    <div>Đây là <b>Workshop 3</b> trong công cụ trực tuyến: <a href="https://dppa-case.web.app">dppa-case.web.app</a>
+    → Workshop 3. Hóa đơn năm dòng đọc C_EVN <b>8,304,644,000</b> và C_KH <b>9,054,644,000</b> với CfD
+    <b>+750,000,000</b> — và biểu đồ ngày cho thấy điện mặt trời trên phụ tải.</div>
+  </div>
+
+  <h2>Tự kiểm tra</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. 1,500,000 kWh phát điện dư thừa kiếm được ___</div>
+    <button class="opt">chỉ giá spot</button>
+    <button class="opt">giá thực hiện cộng phí</button>
+    <button class="opt">một khoản tín dụng bán lẻ</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Phần dư trên mức tiêu thụ không thanh toán CfD — nhà phát triển bán theo giá spot FMP. Giá thực hiện không bao giờ chạm tới nó.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. Vì tiêu thụ được khớp hoàn toàn, dòng 4 (mua thêm) là ___</div>
+    <button class="opt">đúng bằng không</button>
+    <button class="opt">dòng lớn nhất</button>
+    <button class="opt">một tín dụng nhỏ</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>Không thiếu hụt (Q_KH − Q_khc = 0) → dòng 4 = 0, giống Kịch bản 1. Phần dư ở phía phát điện, không trên hóa đơn.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">3. C_KH của Kịch bản 3 bằng ___</div>
+    <button class="opt">9,054,644,000 VND</button>
+    <button class="opt">8,304,644,000 VND</button>
+    <button class="opt">9,063,196,000 VND</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>C_EVN 8,304,644,000 + CfD (+750,000,000) = 9,054,644,000. (8.30B là C_EVN; 9.06B là C_KH của Kịch bản 1.)</div>
+  </div>
+
+  <h2>Đọc tiếp</h2>
+  <p>Mở <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 3</strong> và đọc hóa đơn trực tiếp
+  so với bảng trên; chuyển Workshop 1 ↔ 2 ↔ 3 để cảm nhận khớp, thiếu hụt và dư thừa lần lượt. Ký hiệu:
+  <a href="../reference/dppa-glossary.html">bảng thuật ngữ</a>.</p>
+
+  <div class="ask"><strong>Hoàn thành ba trường hợp điển hình.</strong> Sẵn sàng cho bài tập trực tiếp?
+  Mở <a href="0010-group-workshop-vi.html">buổi workshop nhóm</a> — chia thành bên mua vs nhà phát triển, tính tay
+  cả ba kịch bản, rồi đàm phán giá thực hiện.</div>
+
+  <div class="nav">
+    <a href="0008-scenario-2-shortfall.html">← Kịch bản 2</a>
+    <a href="0010-group-workshop-vi.html">Tiếp → Workshop nhóm</a>
+  </div>
+</div>
+</body>
+</html>

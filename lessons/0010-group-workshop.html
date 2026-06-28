@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DPPA Group Workshop — Compute, then Negotiate</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig img { width:100%; height:auto; display:block; border-radius:10px; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .roles { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0; }
+  @media (max-width:560px){ .roles{ grid-template-columns:1fr; } }
+  .role { border:1px solid var(--line); border-radius:10px; padding:16px 18px; }
+  .role.buyer { background:#fff3e0; border-color:#ffd9a8; }
+  .role.dev   { background:#e6f5f7; border-color:#b8e3e8; }
+  .role h3 { margin-top:0; }
+  .role .want { font-size:.9rem; color:var(--gray); }
+  .round { border:1px solid var(--line); border-left:5px solid var(--teal); border-radius:0 10px 10px 0;
+           padding:14px 18px; margin:18px 0; background:var(--panel); }
+  .round .rh { font-weight:700; color:var(--teal-dk); font-size:1.05rem; }
+  .round .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+                background:var(--teal); color:#fff; border-radius:20px; padding:2px 9px; margin-left:8px; }
+  .clock { font-family:var(--mono); color:var(--bluegray); font-size:.82rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Group Workshop · Facilitated · ~90 min</div>
+  <h1>DPPA Group Workshop — Compute, then Negotiate</h1>
+  <div class="modmap">
+    <span class="done">S1 · Matched ✓</span>
+    <span class="done">S2 · Shortfall ✓</span>
+    <span class="done">S3 · Excess ✓</span>
+    <span class="now">▶ Live exercise</span>
+  </div>
+  <p class="lead">You have seen the three canonical cases. Now <strong>do</strong> them. In small groups you
+  will split into the two sides of a DPPA, compute every line of the bill <strong>by hand</strong>, check
+  yourselves against the live tool, then <strong>negotiate a strike price</strong> and watch the CfD flip in
+  real time. This page is your run sheet; the numbers go on the <a href="0011-worksheets.html">worksheets</a>.</p>
+
+  <h2>How the room works</h2>
+  <p>Tables of <strong>3–5</strong>. Each table splits into two roles. You will keep the same role across all
+  three scenarios, then face a partner table for the negotiation.</p>
+  <div class="roles">
+    <div class="role buyer">
+      <h3>🏭 Off-taker (the factory)</h3>
+      <p class="want">You buy the energy. You want the lowest <strong>all-in cost vs BAU</strong>.</p>
+      <ul>
+        <li>Compute <strong>C_EVN</strong> (lines 1–4) and <strong>C_KH</strong> (after the CfD).</li>
+        <li>Track the effective VND/kWh and how it compares to retail 2,204.</li>
+        <li>Argue for a <strong>lower</strong> strike — but know the developer must stay bankable.</li>
+      </ul>
+    </div>
+    <div class="role dev">
+      <h3>☀️ Developer (the RE GENCO)</h3>
+      <p class="want">You sell the energy. You want a <strong>bankable</strong> revenue line.</p>
+      <ul>
+        <li>Compute <strong>plant revenue</strong> = spot (Q × K_pp × FMP) + CfD settlement.</li>
+        <li>Watch the CfD sign: below strike you receive a top-up; above strike you pay it out.</li>
+        <li>Argue for a <strong>higher</strong> strike — enough to clear the lender's DSCR (Module 4).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Run of show (~90 minutes)</h2>
+  <table>
+    <thead><tr><th>Time</th><th>Segment</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td class="clock">0:00–0:10</td><td><strong>Frame &amp; roles</strong></td><td>Recap the five-line bill and the CfD sign. Assign off-taker vs developer.</td></tr>
+      <tr><td class="clock">0:10–0:28</td><td><strong>Round 1 — Matched</strong></td><td>Hand-compute Scenario 1, then verify in Workshop 1.</td></tr>
+      <tr><td class="clock">0:28–0:46</td><td><strong>Round 2 — Shortfall</strong></td><td>Hand-compute Scenario 2, then verify in Workshop 2.</td></tr>
+      <tr><td class="clock">0:46–1:04</td><td><strong>Round 3 — Excess</strong></td><td>Hand-compute Scenario 3, then verify in Workshop 3.</td></tr>
+      <tr><td class="clock">1:04–1:18</td><td><strong>Negotiation</strong></td><td>Off-taker and developer agree a strike; settle the CfD live in the app.</td></tr>
+      <tr><td class="clock">1:18–1:30</td><td><strong>Debrief</strong></td><td>Compare strikes and outcomes across tables; surface the lessons.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout amber"><span class="tag">The one rule</span>
+  Compute <strong>by hand first</strong>, on the worksheet. Only open the app to <em>check</em> your answer.
+  The point is to feel each line move — not to read a number off a screen.</div>
+
+  <!-- ===================== ROUND 1 ===================== -->
+  <h2>Round 1 — Matched <span class="clock">(Q_c = Q_KH = 5,000,000 · FMP 1,150 · strike 1,250)</span></h2>
+  <div class="fig">
+    <img src="../assets/cfd-s1-en.gif" alt="Animated Scenario 1 chart" />
+    <div class="figcap">Watch hours 09–15: load and solar overlap (matched), FMP sits below the 1,250 strike all day.</div>
+  </div>
+  <div class="round">
+    <div class="rh">Your task <span class="tag">~18 min</span></div>
+    <ol>
+      <li><strong>Off-taker:</strong> fill lines 1–4 on Worksheet S1, sum to C_EVN, then add the CfD for C_KH.</li>
+      <li><strong>Developer:</strong> compute spot revenue (5,000,000 × 1.008 × 1,150) and the CfD; sum to plant revenue.</li>
+      <li>Agree which way the CfD flows and why. Note the effective VND/kWh.</li>
+      <li><strong>Verify:</strong> open <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 1</strong>. Does your C_KH match?</li>
+    </ol>
+    <p class="small">Reference walk-through if you get stuck: <a href="0007-scenario-1-matched.html">Scenario 1 lesson</a>.</p>
+  </div>
+
+  <!-- ===================== ROUND 2 ===================== -->
+  <h2>Round 2 — Shortfall <span class="clock">(Q_c 8,000,000 · Q_KH 9,000,000 · FMP 1,600 · strike 1,500)</span></h2>
+  <div class="fig">
+    <img src="../assets/cfd-s2-en.gif" alt="Animated Scenario 2 chart" />
+    <div class="figcap">Load runs above solar all day (shortfall); FMP sits above the 1,500 strike → the CfD reverses.</div>
+  </div>
+  <div class="round">
+    <div class="rh">Your task <span class="tag">~18 min</span></div>
+    <ol>
+      <li><strong>Off-taker:</strong> this time line 4 is back — 1,000,000 kWh of shortfall at retail 2,204. Build C_EVN, then <em>subtract</em> the negative CfD for C_KH.</li>
+      <li><strong>Developer:</strong> spot revenue is on 8,000,000 × 1.008 × 1,600; the CfD now <em>costs</em> you 800M. Net plant revenue?</li>
+      <li>Note the two differences vs Round 1: the retail line returns, and the CfD flips direction.</li>
+      <li><strong>Verify:</strong> Workshop 2 — C_EVN 19,628,262,400, C_KH 18,828,262,400.</li>
+    </ol>
+    <p class="small">Reference: <a href="0008-scenario-2-shortfall.html">Scenario 2 lesson</a>.</p>
+  </div>
+
+  <!-- ===================== ROUND 3 ===================== -->
+  <h2>Round 3 — Excess <span class="clock">(Q_KH 5,000,000 · gen 6,500,000 · FMP 1,100 · strike 1,250)</span></h2>
+  <div class="fig">
+    <img src="../assets/cfd-s3-en.gif" alt="Animated Scenario 3 chart" />
+    <div class="figcap">Solar rises above load midday (over-generation); the excess 1,500,000 kWh earns the developer spot only.</div>
+  </div>
+  <div class="round">
+    <div class="rh">Your task <span class="tag">~18 min</span></div>
+    <ol>
+      <li><strong>Off-taker:</strong> your bill settles only on the 5,000,000 you consume — line 4 = 0 again. Build C_EVN and C_KH.</li>
+      <li><strong>Developer:</strong> compute the spot value of the 1,500,000 kWh excess — and the CfD uplift you <em>forgo</em> on it. Who carries the over-generation risk?</li>
+      <li>Debate at the table: should the contract have been sized smaller? What term protects the over-sized side?</li>
+      <li><strong>Verify:</strong> Workshop 3 — C_EVN 8,304,644,000, C_KH 9,054,644,000.</li>
+    </ol>
+    <p class="small">Reference: <a href="0009-scenario-3-excess.html">Scenario 3 lesson</a>.</p>
+  </div>
+
+  <!-- ===================== NEGOTIATION ===================== -->
+  <h2>The negotiation <span class="clock">(~14 min)</span></h2>
+  <p>Now face a partner table. Take Scenario 1's volumes (5,000,000 kWh, FMP ~1,150) as the starting point.
+  Each side proposes a strike and defends it:</p>
+  <div class="roles">
+    <div class="role buyer">
+      <h3>🏭 Off-taker opens low</h3>
+      <p class="want">A strike near or below FMP minimises your top-ups — but no bank will finance it.</p>
+    </div>
+    <div class="role dev">
+      <h3>☀️ Developer opens high</h3>
+      <p class="want">A strike that clears your DSCR is bankable — but a buyer below BAU won't sign it.</p>
+    </div>
+  </div>
+  <div class="round">
+    <div class="rh">Settle it live</div>
+    <ol>
+      <li>Agree a candidate strike. Compute the CfD by hand: <code>(strike − 1,150) × 5,000,000</code>. Which way does it flow?</li>
+      <li>Open <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 1</strong>, then drag the <strong>strike-price slider</strong> to your number. Watch C_KH and the sign of the CfD move in real time.</li>
+      <li>Push the strike up and down. Find the point where the CfD <strong>crosses zero</strong> (strike = FMP) — and where the buyer first beats BAU on the multi-year panel.</li>
+      <li>Write your agreed strike and the resulting C_KH on the negotiation row of the <a href="0011-worksheets.html">worksheet</a>.</li>
+    </ol>
+  </div>
+
+  <!-- ===================== DEBRIEF ===================== -->
+  <h2>Debrief <span class="clock">(~12 min)</span></h2>
+  <div class="callout"><span class="tag">Compare across tables</span>
+  <ul>
+    <li>What strikes did each table land on? How wide is the spread?</li>
+    <li>Across S1/S2/S3, which line surprised you most — the retail shortfall, or the excess that earns nothing?</li>
+    <li>In which scenario did the CfD <em>protect</em> the factory, and in which did the factory <em>pay in</em>?</li>
+    <li>Whose gate was hardest to satisfy — buyer (≤ BAU), seller (IRR), or lender (DSCR)? (Module 4.)</li>
+  </ul></div>
+
+  <h2>Check your instincts</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. Raising the strike price moves the buyer's C_KH ___</div>
+    <button class="opt">up (pays developer more)</button>
+    <button class="opt">down (developer pays)</button>
+    <button class="opt">not at all, ever</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>CfD = (strike − FMP) × Q. A higher strike means a larger positive CfD (or smaller negative), so the factory pays more — C_KH rises.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. The CfD crosses zero exactly when ___</div>
+    <button class="opt">strike equals FMP</button>
+    <button class="opt">strike equals retail</button>
+    <button class="opt">matched equals load</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>CfD = (strike − FMP) × Q = 0 when strike = FMP. Below it the factory tops up; above it the developer pays.</div>
+  </div>
+
+  <h2>Materials</h2>
+  <p>Worksheets: <a href="0011-worksheets.html">printable compute grids (S1/S2/S3 + negotiation)</a> ·
+  Scenario lessons: <a href="0007-scenario-1-matched.html">S1</a> · <a href="0008-scenario-2-shortfall.html">S2</a> ·
+  <a href="0009-scenario-3-excess.html">S3</a> · Symbols: <a href="../reference/dppa-glossary.html">glossary</a> ·
+  Live tool: <a href="https://dppa-case.web.app">dppa-case.web.app</a>.</p>
+
+  <div class="ask"><strong>Facilitators:</strong> the run-of-show, answer keys, and debrief script live in the
+  facilitator kit (<code>facilitator/dppa-workshop-facilitator-guide.md</code>) — not on this learner page.</div>
+
+  <div class="nav">
+    <a href="0009-scenario-3-excess.html">← Scenario 3</a>
+    <a href="0011-worksheets.html">Worksheets →</a>
+  </div>
+</div>
+</body>
+</html>

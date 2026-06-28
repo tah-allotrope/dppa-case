@@ -405,3 +405,22 @@ Implemented `plans/2026-06-26-workshop-chart-layout-revision-plan.md` to fix thr
 - Live: https://dppa-case.web.app
 - Reports: `reports/2026-06-26-phase-01-workshop-curve-realism.html`, `reports/2026-06-26-phase-02-layout-control-feedback.html`, `reports/2026-06-26-final-workshop-chart-layout-revision.html`.
 - Commits: `e26bf17` (phase-01), `048ce2a` (phase-02), + phase-03/final.
+
+## Group-Learning Workshop Module — Completed 2026-06-29
+
+Implemented `plans/2026-06-29-dppa-scenario-group-workshop-plan.md` (full plan).
+Grill-Me defaults adopted: Q-001 extract S3 from deck → fallback excess/higherGen · Q-002 learner-facing trilingual, facilitator kit EN-only · Q-003 commit only, no Firebase deploy.
+
+### Plan
+- [x] PHASE-01: Extract Scenario 3 + lock canonical number spec (`research/2026-06-29_dppa-scenario-numbers-spec.md`). Neither deck had an S3 → S3 = excess/over-generation (deck's named third case + app `higherGen`), reconciled to settlement.js.
+- [x] PHASE-02: `workshop3` preset in `default-scenarios.js` + `scenarioOrder`; Vitest assertion (settlement) + profiles assertion. **44/44 pass.**
+- [x] PHASE-03: `build_cfd_slide.py` → `SCENARIOS` dict (consolidated + S1/S2/S3); rendered `assets/cfd-s{1,2,3}-{en,vi,zh-cn}.gif`+`.mp4` (18 assets); consolidated outputs preserved.
+- [x] PHASE-04: `lessons/0009`/`0010`/`0011` × en/vi/zh-cn (9 files) + 0007/0008 embedded charts + nav. All 11 pages 200, zero broken links.
+- [x] PHASE-05: `facilitator/dppa-workshop-facilitator-guide.md` (run-of-show, answer keys S1/S2/S3, script, debrief).
+- [x] PHASE-06: Verify + record `learning-records/0003` + NOTES update + commit/push.
+
+### Review / Results
+- **Scenario 3 (new, excess):** C_EVN 8,304,644,000 · CfD +750,000,000 · C_KH 9,054,644,000 · effective ~1,811 VND/kWh; excess 1,500,000 kWh → spot 1,663,200,000, foregone CfD 225,000,000. Reconciled to `buildFiveLineBill` and verified live in the app (Workshop 3 renders penny-for-penny).
+- **Verification:** Vitest 44/44; `npm run build` clean (250 KB / 82 KB gzip); 0 console errors; all 11 lessons 200 OK with correct lang + no broken assets/links; 3 scenario charts visually verified.
+- **Visuals:** per-scenario animated CfD charts in 3 languages with correct strike lines and callouts (S1 FMP&lt;1,250; S2 FMP&gt;1,500; S3 sunny trough &lt;1,250 with solar above load).
+- **Deploy:** intentionally NOT deployed to Firebase (Q-003 default) — committed only.

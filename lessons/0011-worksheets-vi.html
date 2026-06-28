@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phiếu bài tập DPPA — Tính bằng tay</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<style>
+  .sheet { border:1px solid var(--line); border-radius:10px; padding:18px 22px; margin:22px 0; }
+  .sheet h2 { margin-top:6px; }
+  .given { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0; }
+  @media (max-width:560px){ .given{ grid-template-columns:repeat(2,1fr); } }
+  .given div { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:7px 9px;
+               font-family:var(--mono); font-size:.84rem; color:var(--teal-dk); }
+  table.ws td.fill, table.ws td.fillb { background:#fffef2; border-bottom:1px solid var(--bluegray);
+               min-width:120px; height:30px; }
+  table.ws td.fillb { background:#fff7e6; font-weight:700; }
+  .selfcheck { font-size:.82rem; color:var(--bluegray); margin-top:10px; }
+  .printbtn { background:var(--teal); color:#fff; border:none; border-radius:8px; padding:9px 16px;
+              font-family:var(--sans); font-weight:700; cursor:pointer; font-size:.92rem; }
+  @media print {
+    .noprint { display:none !important; }
+    .sheet { break-inside:avoid; border:none; padding:0; }
+    .sheet + .sheet { break-before:page; }
+    table.ws td.fill, table.ws td.fillb { background:#fff; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow noprint">Workshop nhóm · Phiếu bài tập</div>
+  <h1>Phiếu bài tập DPPA — Tính bằng tay</h1>
+  <p class="lead noprint">Mỗi kịch bản một trang. Điền các ô tô màu bằng tay, cộng thành C_EVN và C_KH, rồi tự kiểm tra
+  trong công cụ trực tuyến. Hằng số: k×K_pp = 1.026 × 1.008 · dịch vụ 360 · bù trừ 163.30 · bán lẻ 2,204 VND/kWh.</p>
+  <p class="noprint"><button class="printbtn" onclick="window.print()">⎙ In các phiếu này</button>
+  &nbsp; Quay lại <a href="0010-group-workshop-vi.html">hướng dẫn workshop</a>.</p>
+
+  <!-- ===================== S1 ===================== -->
+  <div class="sheet">
+    <h2>Phiếu S1 — Khớp (Phụ tải = Phát điện)</h2>
+    <div class="given">
+      <div>Q_c = 5,000,000</div><div>Q_KH = 5,000,000</div><div>FMP = 1,150</div><div>Giá TH = 1,250</div>
+    </div>
+    <table class="ws">
+      <thead><tr><th>#</th><th>Dòng</th><th>Phép tính</th><th class="num">VND / tháng</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Điện năng thị trường</td><td><code>5,000,000 × 1,150 × 1.026 × 1.008</code></td><td class="fill"></td></tr>
+        <tr><td>2</td><td>Phí dịch vụ</td><td><code>5,000,000 × 360</code></td><td class="fill"></td></tr>
+        <tr><td>3</td><td>Phí bù trừ</td><td><code>5,000,000 × 163.30</code></td><td class="fill"></td></tr>
+        <tr><td>4</td><td>Mua thêm bán lẻ</td><td><code>0 × 2,204</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_EVN</strong></td><td>dòng 1 + 2 + 3 + 4</td><td class="fillb"></td></tr>
+        <tr><td>5</td><td>CfD</td><td><code>(1,250 − 1,150) × 5,000,000</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="fillb"></td></tr>
+        <tr><td></td><td>Hiệu dụng</td><td>C_KH ÷ 5,000,000</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">CfD chảy theo hướng nào? ____________________ &nbsp;·&nbsp; Tự kiểm tra: app → Workshop 1.</p>
+  </div>
+
+  <!-- ===================== S2 ===================== -->
+  <div class="sheet">
+    <h2>Phiếu S2 — Thiếu hụt (Phụ tải &gt; Phát điện)</h2>
+    <div class="given">
+      <div>Q_c = 8,000,000</div><div>Q_KH = 9,000,000</div><div>FMP = 1,600</div><div>Giá TH = 1,500</div>
+    </div>
+    <table class="ws">
+      <thead><tr><th>#</th><th>Dòng</th><th>Phép tính</th><th class="num">VND / tháng</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Điện năng thị trường</td><td><code>8,000,000 × 1,600 × 1.026 × 1.008</code></td><td class="fill"></td></tr>
+        <tr><td>2</td><td>Phí dịch vụ</td><td><code>8,000,000 × 360</code></td><td class="fill"></td></tr>
+        <tr><td>3</td><td>Phí bù trừ</td><td><code>8,000,000 × 163.30</code></td><td class="fill"></td></tr>
+        <tr><td>4</td><td>Mua thêm bán lẻ</td><td><code>1,000,000 × 2,204</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_EVN</strong></td><td>dòng 1 + 2 + 3 + 4</td><td class="fillb"></td></tr>
+        <tr><td>5</td><td>CfD</td><td><code>(1,500 − 1,600) × 8,000,000</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="fillb"></td></tr>
+        <tr><td></td><td>Hiệu dụng</td><td>C_KH ÷ 9,000,000</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">Vì sao dòng 4 trở lại, và vì sao CfD âm? ____________________ &nbsp;·&nbsp; Tự kiểm tra: app → Workshop 2.</p>
+  </div>
+
+  <!-- ===================== S3 ===================== -->
+  <div class="sheet">
+    <h2>Phiếu S3 — Dư thừa (Phụ tải &lt; Phát điện)</h2>
+    <div class="given">
+      <div>Q_KH = 5,000,000</div><div>phát ≈ 6,500,000</div><div>FMP = 1,100</div><div>Giá TH = 1,250</div>
+    </div>
+    <table class="ws">
+      <thead><tr><th>#</th><th>Dòng</th><th>Phép tính</th><th class="num">VND / tháng</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Điện năng thị trường</td><td><code>5,000,000 × 1,100 × 1.026 × 1.008</code></td><td class="fill"></td></tr>
+        <tr><td>2</td><td>Phí dịch vụ</td><td><code>5,000,000 × 360</code></td><td class="fill"></td></tr>
+        <tr><td>3</td><td>Phí bù trừ</td><td><code>5,000,000 × 163.30</code></td><td class="fill"></td></tr>
+        <tr><td>4</td><td>Mua thêm bán lẻ</td><td><code>0 × 2,204</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_EVN</strong></td><td>dòng 1 + 2 + 3 + 4</td><td class="fillb"></td></tr>
+        <tr><td>5</td><td>CfD</td><td><code>(1,250 − 1,100) × 5,000,000</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="fillb"></td></tr>
+        <tr><td></td><td>Hiệu dụng</td><td>C_KH ÷ 5,000,000</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <h3>Phần dư thừa (không tạo giá trị)</h3>
+    <table class="ws">
+      <tbody>
+        <tr><td>Sản lượng dư thừa</td><td><code>6,500,000 − 5,000,000</code></td><td class="fill"></td></tr>
+        <tr><td>Giá spot của dư thừa</td><td><code>1,500,000 × 1.008 × 1,100</code></td><td class="fill"></td></tr>
+        <tr><td>CfD bị bỏ lỡ</td><td><code>(1,250 − 1,100) × 1,500,000</code></td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">Ai gánh rủi ro phát vượt mức? ____________________ &nbsp;·&nbsp; Tự kiểm tra: app → Workshop 3.</p>
+  </div>
+
+  <!-- ===================== ĐÀM PHÁN ===================== -->
+  <div class="sheet">
+    <h2>Phiếu N — Đàm phán</h2>
+    <p class="small">Điểm khởi đầu: sản lượng Kịch bản 1 (5,000,000 kWh, FMP ≈ 1,150). Mỗi bên đề xuất một giá thực hiện, rồi thanh toán trực tiếp ở Workshop 1.</p>
+    <table class="ws">
+      <thead><tr><th>Lượt</th><th>Giá TH đề xuất (VND/kWh)</th><th>CfD = (giá TH − 1,150) × 5,000,000</th><th>Chảy về…</th></tr></thead>
+      <tbody>
+        <tr><td>Bên mua mở</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Nhà phát triển mở</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Phản hồi</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td><strong>Giá TH thống nhất</strong></td><td class="fillb"></td><td class="fillb"></td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <table class="ws">
+      <tbody>
+        <tr><td>C_KH kết quả tại giá TH thống nhất</td><td class="fillb"></td></tr>
+        <tr><td>Giá TH nơi CfD cắt qua không (= FMP)</td><td class="fill"></td></tr>
+        <tr><td>Giá TH nơi bên mua lần đầu thắng BAU (bảng nhiều năm)</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">Kéo thanh trượt giá thực hiện trong Workshop 1 để xác nhận từng dòng. Cả ba cổng (mua ≤ BAU, bán IRR, ngân hàng DSCR) có bao giờ cùng đạt không?</p>
+  </div>
+
+  <div class="nav noprint">
+    <a href="0010-group-workshop-vi.html">← Hướng dẫn workshop</a>
+    <a href="../reference/dppa-glossary.html">📖 Bảng thuật ngữ</a>
+  </div>
+</div>
+</body>
+</html>

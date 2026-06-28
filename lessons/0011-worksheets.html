@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DPPA Worksheets — Compute by Hand</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<style>
+  .sheet { border:1px solid var(--line); border-radius:10px; padding:18px 22px; margin:22px 0; }
+  .sheet h2 { margin-top:6px; }
+  .given { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0; }
+  @media (max-width:560px){ .given{ grid-template-columns:repeat(2,1fr); } }
+  .given div { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:7px 9px;
+               font-family:var(--mono); font-size:.84rem; color:var(--teal-dk); }
+  table.ws td.fill, table.ws td.fillb { background:#fffef2; border-bottom:1px solid var(--bluegray);
+               min-width:120px; height:30px; }
+  table.ws td.fillb { background:#fff7e6; font-weight:700; }
+  .selfcheck { font-size:.82rem; color:var(--bluegray); margin-top:10px; }
+  .printbtn { background:var(--teal); color:#fff; border:none; border-radius:8px; padding:9px 16px;
+              font-family:var(--sans); font-weight:700; cursor:pointer; font-size:.92rem; }
+  @media print {
+    .noprint { display:none !important; }
+    .sheet { break-inside:avoid; border:none; padding:0; }
+    .sheet + .sheet { break-before:page; }
+    table.ws td.fill, table.ws td.fillb { background:#fff; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow noprint">Group Workshop · Worksheets</div>
+  <h1>DPPA Worksheets — Compute by Hand</h1>
+  <p class="lead noprint">One page per scenario. Fill the shaded cells by hand, sum to C_EVN and C_KH, then
+  check yourself in the live tool. Constants: k×K_pp = 1.026 × 1.008 · service 360 · clearing 163.30 ·
+  retail 2,204 VND/kWh.</p>
+  <p class="noprint"><button class="printbtn" onclick="window.print()">⎙ Print these worksheets</button>
+  &nbsp; Back to the <a href="0010-group-workshop.html">workshop guide</a>.</p>
+
+  <!-- ===================== S1 ===================== -->
+  <div class="sheet">
+    <h2>Worksheet S1 — Matched (Load = Gen)</h2>
+    <div class="given">
+      <div>Q_c = 5,000,000</div><div>Q_KH = 5,000,000</div><div>FMP = 1,150</div><div>Strike = 1,250</div>
+    </div>
+    <table class="ws">
+      <thead><tr><th>#</th><th>Line</th><th>Calculation</th><th class="num">VND / month</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Market energy</td><td><code>5,000,000 × 1,150 × 1.026 × 1.008</code></td><td class="fill"></td></tr>
+        <tr><td>2</td><td>Service fee</td><td><code>5,000,000 × 360</code></td><td class="fill"></td></tr>
+        <tr><td>3</td><td>Clearing fee</td><td><code>5,000,000 × 163.30</code></td><td class="fill"></td></tr>
+        <tr><td>4</td><td>Additional retail</td><td><code>0 × 2,204</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_EVN</strong></td><td>lines 1 + 2 + 3 + 4</td><td class="fillb"></td></tr>
+        <tr><td>5</td><td>CfD</td><td><code>(1,250 − 1,150) × 5,000,000</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="fillb"></td></tr>
+        <tr><td></td><td>Effective</td><td>C_KH ÷ 5,000,000</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">Which way does the CfD flow? ____________________ &nbsp;·&nbsp; Self-check: app → Workshop 1.</p>
+  </div>
+
+  <!-- ===================== S2 ===================== -->
+  <div class="sheet">
+    <h2>Worksheet S2 — Shortfall (Load &gt; Gen)</h2>
+    <div class="given">
+      <div>Q_c = 8,000,000</div><div>Q_KH = 9,000,000</div><div>FMP = 1,600</div><div>Strike = 1,500</div>
+    </div>
+    <table class="ws">
+      <thead><tr><th>#</th><th>Line</th><th>Calculation</th><th class="num">VND / month</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Market energy</td><td><code>8,000,000 × 1,600 × 1.026 × 1.008</code></td><td class="fill"></td></tr>
+        <tr><td>2</td><td>Service fee</td><td><code>8,000,000 × 360</code></td><td class="fill"></td></tr>
+        <tr><td>3</td><td>Clearing fee</td><td><code>8,000,000 × 163.30</code></td><td class="fill"></td></tr>
+        <tr><td>4</td><td>Additional retail</td><td><code>1,000,000 × 2,204</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_EVN</strong></td><td>lines 1 + 2 + 3 + 4</td><td class="fillb"></td></tr>
+        <tr><td>5</td><td>CfD</td><td><code>(1,500 − 1,600) × 8,000,000</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="fillb"></td></tr>
+        <tr><td></td><td>Effective</td><td>C_KH ÷ 9,000,000</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">Why is line 4 back, and why is the CfD negative? ____________________ &nbsp;·&nbsp; Self-check: app → Workshop 2.</p>
+  </div>
+
+  <!-- ===================== S3 ===================== -->
+  <div class="sheet">
+    <h2>Worksheet S3 — Excess (Load &lt; Gen)</h2>
+    <div class="given">
+      <div>Q_KH = 5,000,000</div><div>gen ≈ 6,500,000</div><div>FMP = 1,100</div><div>Strike = 1,250</div>
+    </div>
+    <table class="ws">
+      <thead><tr><th>#</th><th>Line</th><th>Calculation</th><th class="num">VND / month</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Market energy</td><td><code>5,000,000 × 1,100 × 1.026 × 1.008</code></td><td class="fill"></td></tr>
+        <tr><td>2</td><td>Service fee</td><td><code>5,000,000 × 360</code></td><td class="fill"></td></tr>
+        <tr><td>3</td><td>Clearing fee</td><td><code>5,000,000 × 163.30</code></td><td class="fill"></td></tr>
+        <tr><td>4</td><td>Additional retail</td><td><code>0 × 2,204</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_EVN</strong></td><td>lines 1 + 2 + 3 + 4</td><td class="fillb"></td></tr>
+        <tr><td>5</td><td>CfD</td><td><code>(1,250 − 1,100) × 5,000,000</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="fillb"></td></tr>
+        <tr><td></td><td>Effective</td><td>C_KH ÷ 5,000,000</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <h3>The excess (settles nothing)</h3>
+    <table class="ws">
+      <tbody>
+        <tr><td>Excess volume</td><td><code>6,500,000 − 5,000,000</code></td><td class="fill"></td></tr>
+        <tr><td>Spot value of excess</td><td><code>1,500,000 × 1.008 × 1,100</code></td><td class="fill"></td></tr>
+        <tr><td>Foregone CfD uplift</td><td><code>(1,250 − 1,100) × 1,500,000</code></td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">Who carries the over-generation risk? ____________________ &nbsp;·&nbsp; Self-check: app → Workshop 3.</p>
+  </div>
+
+  <!-- ===================== NEGOTIATION ===================== -->
+  <div class="sheet">
+    <h2>Worksheet N — The Negotiation</h2>
+    <p class="small">Starting point: Scenario 1 volumes (5,000,000 kWh, FMP ≈ 1,150). Each side proposes a strike, then settle it live in Workshop 1.</p>
+    <table class="ws">
+      <thead><tr><th>Round</th><th>Proposed strike (VND/kWh)</th><th>CfD = (strike − 1,150) × 5,000,000</th><th>Flows to…</th></tr></thead>
+      <tbody>
+        <tr><td>Off-taker opens</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Developer opens</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Counter</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td><strong>Agreed strike</strong></td><td class="fillb"></td><td class="fillb"></td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <table class="ws">
+      <tbody>
+        <tr><td>Resulting C_KH at the agreed strike</td><td class="fillb"></td></tr>
+        <tr><td>Strike where the CfD crosses zero (= FMP)</td><td class="fill"></td></tr>
+        <tr><td>Strike where the buyer first beats BAU (app multi-year)</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">Drag the strike slider in Workshop 1 to confirm each row. Did all three gates (buyer ≤ BAU, seller IRR, lender DSCR) ever pass at once?</p>
+  </div>
+
+  <div class="nav noprint">
+    <a href="0010-group-workshop.html">← Workshop guide</a>
+    <a href="../reference/dppa-glossary.html">📖 Glossary</a>
+  </div>
+</div>
+</body>
+</html>

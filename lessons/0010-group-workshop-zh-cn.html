@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DPPA 小组工作坊 — 先计算，再谈判</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig img { width:100%; height:auto; display:block; border-radius:10px; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .roles { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0; }
+  @media (max-width:560px){ .roles{ grid-template-columns:1fr; } }
+  .role { border:1px solid var(--line); border-radius:10px; padding:16px 18px; }
+  .role.buyer { background:#fff3e0; border-color:#ffd9a8; }
+  .role.dev   { background:#e6f5f7; border-color:#b8e3e8; }
+  .role h3 { margin-top:0; }
+  .role .want { font-size:.9rem; color:var(--gray); }
+  .round { border:1px solid var(--line); border-left:5px solid var(--teal); border-radius:0 10px 10px 0;
+           padding:14px 18px; margin:18px 0; background:var(--panel); }
+  .round .rh { font-weight:700; color:var(--teal-dk); font-size:1.05rem; }
+  .round .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+                background:var(--teal); color:#fff; border-radius:20px; padding:2px 9px; margin-left:8px; }
+  .clock { font-family:var(--mono); color:var(--bluegray); font-size:.82rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">小组工作坊 · 有引导 · ~90 分钟</div>
+  <h1>DPPA 小组工作坊 — 先计算，再谈判</h1>
+  <div class="modmap">
+    <span class="done">S1 · 匹配 ✓</span>
+    <span class="done">S2 · 缺口 ✓</span>
+    <span class="done">S3 · 过剩 ✓</span>
+    <span class="now">▶ 现场练习</span>
+  </div>
+  <p class="lead">你已看过三个标准情形。现在<strong>动手做</strong>。在小组中，你们将分为 DPPA 的两方，
+  <strong>手算</strong>账单的每一行，用在线工具自检，然后<strong>谈判执行价</strong>并实时观看 CfD 翻转。
+  本页是你的流程单；数字写在<a href="0011-worksheets-zh-cn.html">练习表</a>上。</p>
+
+  <h2>房间如何运作</h2>
+  <p>每桌 <strong>3–5</strong> 人。每桌分为两个角色。三个情景中你保持同一角色，然后与一张对手桌进行谈判。</p>
+  <div class="roles">
+    <div class="role buyer">
+      <h3>🏭 买方（工厂）</h3>
+      <p class="want">你购买电力。你想要相对 BAU 的<strong>最低总成本</strong>。</p>
+      <ul>
+        <li>计算 <strong>C_EVN</strong>（第 1–4 行）和 <strong>C_KH</strong>（CfD 之后）。</li>
+        <li>跟踪实际 VND/kWh，并与零售价 2,204 比较。</li>
+        <li>主张<strong>更低</strong>的执行价——但要知道开发商必须满足银行可融资条件。</li>
+      </ul>
+    </div>
+    <div class="role dev">
+      <h3>☀️ 开发商（RE GENCO）</h3>
+      <p class="want">你出售电力。你想要一条<strong>可融资</strong>的收入线。</p>
+      <ul>
+        <li>计算<strong>电厂收入</strong> = 现货（Q × K_pp × FMP）+ CfD 结算。</li>
+        <li>观察 CfD 符号：低于执行价你收到补差；高于执行价你支付。</li>
+        <li>主张<strong>更高</strong>的执行价——足以通过银行的 DSCR（模块 4）。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>流程安排（~90 分钟）</h2>
+  <table>
+    <thead><tr><th>时间</th><th>环节</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td class="clock">0:00–0:10</td><td><strong>引入与分角色</strong></td><td>回顾五行账单和 CfD 符号。分配买方与开发商。</td></tr>
+      <tr><td class="clock">0:10–0:28</td><td><strong>第 1 轮 — 匹配</strong></td><td>手算情景 1，然后在 Workshop 1 核对。</td></tr>
+      <tr><td class="clock">0:28–0:46</td><td><strong>第 2 轮 — 缺口</strong></td><td>手算情景 2，然后在 Workshop 2 核对。</td></tr>
+      <tr><td class="clock">0:46–1:04</td><td><strong>第 3 轮 — 过剩</strong></td><td>手算情景 3，然后在 Workshop 3 核对。</td></tr>
+      <tr><td class="clock">1:04–1:18</td><td><strong>谈判</strong></td><td>买方与开发商商定执行价；在应用中实时结算 CfD。</td></tr>
+      <tr><td class="clock">1:18–1:30</td><td><strong>总结</strong></td><td>跨桌比较执行价与结果；提炼经验教训。</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout amber"><span class="tag">唯一规则</span>
+  先在练习表上<strong>手算</strong>。只在<em>核对</em>答案时才打开应用。
+  目的是感受每一行的变动——而不是从屏幕上读一个数字。</div>
+
+  <!-- ===================== 第 1 轮 ===================== -->
+  <h2>第 1 轮 — 匹配 <span class="clock">(Q_c = Q_KH = 5,000,000 · FMP 1,150 · 执行价 1,250)</span></h2>
+  <div class="fig">
+    <img src="../assets/cfd-s1-zh-cn.gif" alt="情景 1 动画图" />
+    <div class="figcap">观察 09–15 时：负荷与光伏重叠（匹配），FMP 全天位于 1,250 执行价之下。</div>
+  </div>
+  <div class="round">
+    <div class="rh">你的任务 <span class="tag">~18 分钟</span></div>
+    <ol>
+      <li><strong>买方：</strong>在练习表 S1 上填第 1–4 行，求和得 C_EVN，再加 CfD 得 C_KH。</li>
+      <li><strong>开发商：</strong>计算现货收入（5,000,000 × 1.008 × 1,150）和 CfD；求和得电厂收入。</li>
+      <li>商定 CfD 流向及原因。记下实际 VND/kWh。</li>
+      <li><strong>核对：</strong>打开 <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 1</strong>。你的 C_KH 是否吻合？</li>
+    </ol>
+    <p class="small">卡住了可参考：<a href="0007-scenario-1-matched.html">情景 1 课程</a>。</p>
+  </div>
+
+  <!-- ===================== 第 2 轮 ===================== -->
+  <h2>第 2 轮 — 缺口 <span class="clock">(Q_c 8,000,000 · Q_KH 9,000,000 · FMP 1,600 · 执行价 1,500)</span></h2>
+  <div class="fig">
+    <img src="../assets/cfd-s2-zh-cn.gif" alt="情景 2 动画图" />
+    <div class="figcap">负荷全天高于光伏（缺口）；FMP 位于 1,500 执行价之上 → CfD 反向。</div>
+  </div>
+  <div class="round">
+    <div class="rh">你的任务 <span class="tag">~18 分钟</span></div>
+    <ol>
+      <li><strong>买方：</strong>这次第 4 行回归——1,000,000 kWh 缺口按零售价 2,204。求 C_EVN，再<em>减去</em>负的 CfD 得 C_KH。</li>
+      <li><strong>开发商：</strong>现货收入按 8,000,000 × 1.008 × 1,600；CfD 现在<em>让你付出</em> 800M。电厂净收入是多少？</li>
+      <li>记下相对第 1 轮的两点不同：零售行回归，CfD 翻转方向。</li>
+      <li><strong>核对：</strong>Workshop 2 — C_EVN 19,628,262,400，C_KH 18,828,262,400。</li>
+    </ol>
+    <p class="small">参考：<a href="0008-scenario-2-shortfall.html">情景 2 课程</a>。</p>
+  </div>
+
+  <!-- ===================== 第 3 轮 ===================== -->
+  <h2>第 3 轮 — 过剩 <span class="clock">(Q_KH 5,000,000 · 发电 6,500,000 · FMP 1,100 · 执行价 1,250)</span></h2>
+  <div class="fig">
+    <img src="../assets/cfd-s3-zh-cn.gif" alt="情景 3 动画图" />
+    <div class="figcap">中午光伏升至负荷之上（过度发电）；1,500,000 kWh 过剩只为开发商带来现货收入。</div>
+  </div>
+  <div class="round">
+    <div class="rh">你的任务 <span class="tag">~18 分钟</span></div>
+    <ol>
+      <li><strong>买方：</strong>账单只对你消费的 5,000,000 结算——第 4 行再次为 0。求 C_EVN 和 C_KH。</li>
+      <li><strong>开发商：</strong>计算 1,500,000 kWh 过剩的现货价值——以及你在其上<em>放弃</em>的 CfD。谁承担过度发电风险？</li>
+      <li>在桌上辩论：合约规模是否本该更小？什么条款保护超额一方？</li>
+      <li><strong>核对：</strong>Workshop 3 — C_EVN 8,304,644,000，C_KH 9,054,644,000。</li>
+    </ol>
+    <p class="small">参考：<a href="0009-scenario-3-excess-zh-cn.html">情景 3 课程</a>。</p>
+  </div>
+
+  <!-- ===================== 谈判 ===================== -->
+  <h2>谈判 <span class="clock">(~14 分钟)</span></h2>
+  <p>现在与一张对手桌对阵。以情景 1 的电量（5,000,000 kWh，FMP ~1,150）为起点。
+  每一方提出一个执行价并为其辩护：</p>
+  <div class="roles">
+    <div class="role buyer">
+      <h3>🏭 买方开低</h3>
+      <p class="want">接近或低于 FMP 的执行价可最小化补差——但没有银行会融资。</p>
+    </div>
+    <div class="role dev">
+      <h3>☀️ 开发商开高</h3>
+      <p class="want">能通过 DSCR 的执行价可融资——但低于 BAU 的买方不会签字。</p>
+    </div>
+  </div>
+  <div class="round">
+    <div class="rh">现场结算</div>
+    <ol>
+      <li>商定一个候选执行价。手算 CfD：<code>(执行价 − 1,150) × 5,000,000</code>。流向哪边？</li>
+      <li>打开 <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 1</strong>，然后将<strong>执行价滑块</strong>拖到你的数字。实时观看 C_KH 和 CfD 符号变化。</li>
+      <li>把执行价上下推动。找到 CfD <strong>过零</strong>（执行价 = FMP）之处——以及买方在多年面板上首次胜过 BAU 之处。</li>
+      <li>把商定的执行价和由此得到的 C_KH 写到<a href="0011-worksheets-zh-cn.html">练习表</a>的谈判行。</li>
+    </ol>
+  </div>
+
+  <!-- ===================== 总结 ===================== -->
+  <h2>总结 <span class="clock">(~12 分钟)</span></h2>
+  <div class="callout"><span class="tag">跨桌比较</span>
+  <ul>
+    <li>各桌落在哪个执行价？分布有多宽？</li>
+    <li>在 S1/S2/S3 中，哪一行最出乎意料——零售缺口，还是不产生价值的过剩？</li>
+    <li>在哪个情景中 CfD <em>保护</em>了工厂，又在哪个情景中工厂<em>需付出</em>？</li>
+    <li>哪一道关卡最难满足——买方（≤ BAU）、卖方（IRR）、还是银行（DSCR）？（模块 4。）</li>
+  </ul></div>
+
+  <h2>检验你的直觉</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. 提高执行价会使买方的 C_KH ___</div>
+    <button class="opt">上升（向开发商付更多）</button>
+    <button class="opt">下降（开发商支付）</button>
+    <button class="opt">永远不变</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>CfD = (执行价 − FMP) × Q。执行价越高，正的 CfD 越大（或负的越小），故工厂付得越多——C_KH 上升。</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. CfD 恰好过零当 ___</div>
+    <button class="opt">执行价等于 FMP</button>
+    <button class="opt">执行价等于零售价</button>
+    <button class="opt">匹配等于负荷</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>CfD = (执行价 − FMP) × Q = 0 当执行价 = FMP。低于它工厂补差；高于它开发商支付。</div>
+  </div>
+
+  <h2>资料</h2>
+  <p>练习表：<a href="0011-worksheets-zh-cn.html">可打印计算表（S1/S2/S3 + 谈判）</a> ·
+  情景课程：<a href="0007-scenario-1-matched.html">S1</a> · <a href="0008-scenario-2-shortfall.html">S2</a> ·
+  <a href="0009-scenario-3-excess-zh-cn.html">S3</a> · 符号：<a href="../reference/dppa-glossary.html">术语表</a> ·
+  在线工具：<a href="https://dppa-case.web.app">dppa-case.web.app</a>。</p>
+
+  <div class="ask"><strong>引导者：</strong>流程安排、答案和总结脚本在引导者工具包
+  （<code>facilitator/dppa-workshop-facilitator-guide.md</code>）中——不在本学员页面上。</div>
+
+  <div class="nav">
+    <a href="0009-scenario-3-excess-zh-cn.html">← 情景 3</a>
+    <a href="0011-worksheets-zh-cn.html">练习表 →</a>
+  </div>
+</div>
+</body>
+</html>

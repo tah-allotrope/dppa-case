@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DPPA 练习表 — 手算</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<style>
+  .sheet { border:1px solid var(--line); border-radius:10px; padding:18px 22px; margin:22px 0; }
+  .sheet h2 { margin-top:6px; }
+  .given { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0; }
+  @media (max-width:560px){ .given{ grid-template-columns:repeat(2,1fr); } }
+  .given div { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:7px 9px;
+               font-family:var(--mono); font-size:.84rem; color:var(--teal-dk); }
+  table.ws td.fill, table.ws td.fillb { background:#fffef2; border-bottom:1px solid var(--bluegray);
+               min-width:120px; height:30px; }
+  table.ws td.fillb { background:#fff7e6; font-weight:700; }
+  .selfcheck { font-size:.82rem; color:var(--bluegray); margin-top:10px; }
+  .printbtn { background:var(--teal); color:#fff; border:none; border-radius:8px; padding:9px 16px;
+              font-family:var(--sans); font-weight:700; cursor:pointer; font-size:.92rem; }
+  @media print {
+    .noprint { display:none !important; }
+    .sheet { break-inside:avoid; border:none; padding:0; }
+    .sheet + .sheet { break-before:page; }
+    table.ws td.fill, table.ws td.fillb { background:#fff; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow noprint">小组工作坊 · 练习表</div>
+  <h1>DPPA 练习表 — 手算</h1>
+  <p class="lead noprint">每个情景一页。手填带底色的单元格，求和得 C_EVN 和 C_KH，然后在在线工具中自检。
+  常数：k×K_pp = 1.026 × 1.008 · 服务 360 · 结算 163.30 · 零售 2,204 VND/kWh。</p>
+  <p class="noprint"><button class="printbtn" onclick="window.print()">⎙ 打印这些练习表</button>
+  &nbsp; 返回<a href="0010-group-workshop-zh-cn.html">工作坊指南</a>。</p>
+
+  <!-- ===================== S1 ===================== -->
+  <div class="sheet">
+    <h2>练习表 S1 — 匹配（负荷 = 发电）</h2>
+    <div class="given">
+      <div>Q_c = 5,000,000</div><div>Q_KH = 5,000,000</div><div>FMP = 1,150</div><div>执行价 = 1,250</div>
+    </div>
+    <table class="ws">
+      <thead><tr><th>#</th><th>行</th><th>计算</th><th class="num">VND / 月</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>市场电能</td><td><code>5,000,000 × 1,150 × 1.026 × 1.008</code></td><td class="fill"></td></tr>
+        <tr><td>2</td><td>服务费</td><td><code>5,000,000 × 360</code></td><td class="fill"></td></tr>
+        <tr><td>3</td><td>结算费</td><td><code>5,000,000 × 163.30</code></td><td class="fill"></td></tr>
+        <tr><td>4</td><td>额外零售购电</td><td><code>0 × 2,204</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_EVN</strong></td><td>第 1 + 2 + 3 + 4 行</td><td class="fillb"></td></tr>
+        <tr><td>5</td><td>CfD</td><td><code>(1,250 − 1,150) × 5,000,000</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="fillb"></td></tr>
+        <tr><td></td><td>实际单价</td><td>C_KH ÷ 5,000,000</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">CfD 流向哪边？____________________ &nbsp;·&nbsp; 自检：应用 → Workshop 1。</p>
+  </div>
+
+  <!-- ===================== S2 ===================== -->
+  <div class="sheet">
+    <h2>练习表 S2 — 缺口（负荷 &gt; 发电）</h2>
+    <div class="given">
+      <div>Q_c = 8,000,000</div><div>Q_KH = 9,000,000</div><div>FMP = 1,600</div><div>执行价 = 1,500</div>
+    </div>
+    <table class="ws">
+      <thead><tr><th>#</th><th>行</th><th>计算</th><th class="num">VND / 月</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>市场电能</td><td><code>8,000,000 × 1,600 × 1.026 × 1.008</code></td><td class="fill"></td></tr>
+        <tr><td>2</td><td>服务费</td><td><code>8,000,000 × 360</code></td><td class="fill"></td></tr>
+        <tr><td>3</td><td>结算费</td><td><code>8,000,000 × 163.30</code></td><td class="fill"></td></tr>
+        <tr><td>4</td><td>额外零售购电</td><td><code>1,000,000 × 2,204</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_EVN</strong></td><td>第 1 + 2 + 3 + 4 行</td><td class="fillb"></td></tr>
+        <tr><td>5</td><td>CfD</td><td><code>(1,500 − 1,600) × 8,000,000</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="fillb"></td></tr>
+        <tr><td></td><td>实际单价</td><td>C_KH ÷ 9,000,000</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">为何第 4 行回归，为何 CfD 为负？____________________ &nbsp;·&nbsp; 自检：应用 → Workshop 2。</p>
+  </div>
+
+  <!-- ===================== S3 ===================== -->
+  <div class="sheet">
+    <h2>练习表 S3 — 过剩（负荷 &lt; 发电）</h2>
+    <div class="given">
+      <div>Q_KH = 5,000,000</div><div>发电 ≈ 6,500,000</div><div>FMP = 1,100</div><div>执行价 = 1,250</div>
+    </div>
+    <table class="ws">
+      <thead><tr><th>#</th><th>行</th><th>计算</th><th class="num">VND / 月</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>市场电能</td><td><code>5,000,000 × 1,100 × 1.026 × 1.008</code></td><td class="fill"></td></tr>
+        <tr><td>2</td><td>服务费</td><td><code>5,000,000 × 360</code></td><td class="fill"></td></tr>
+        <tr><td>3</td><td>结算费</td><td><code>5,000,000 × 163.30</code></td><td class="fill"></td></tr>
+        <tr><td>4</td><td>额外零售购电</td><td><code>0 × 2,204</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_EVN</strong></td><td>第 1 + 2 + 3 + 4 行</td><td class="fillb"></td></tr>
+        <tr><td>5</td><td>CfD</td><td><code>(1,250 − 1,100) × 5,000,000</code></td><td class="fill"></td></tr>
+        <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="fillb"></td></tr>
+        <tr><td></td><td>实际单价</td><td>C_KH ÷ 5,000,000</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <h3>过剩部分（不产生价值）</h3>
+    <table class="ws">
+      <tbody>
+        <tr><td>过剩电量</td><td><code>6,500,000 − 5,000,000</code></td><td class="fill"></td></tr>
+        <tr><td>过剩的现货价值</td><td><code>1,500,000 × 1.008 × 1,100</code></td><td class="fill"></td></tr>
+        <tr><td>放弃的 CfD</td><td><code>(1,250 − 1,100) × 1,500,000</code></td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">谁承担过度发电风险？____________________ &nbsp;·&nbsp; 自检：应用 → Workshop 3。</p>
+  </div>
+
+  <!-- ===================== 谈判 ===================== -->
+  <div class="sheet">
+    <h2>练习表 N — 谈判</h2>
+    <p class="small">起点：情景 1 的电量（5,000,000 kWh，FMP ≈ 1,150）。每一方提出一个执行价，然后在 Workshop 1 实时结算。</p>
+    <table class="ws">
+      <thead><tr><th>轮次</th><th>提议执行价（VND/kWh）</th><th>CfD = (执行价 − 1,150) × 5,000,000</th><th>流向…</th></tr></thead>
+      <tbody>
+        <tr><td>买方开价</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>开发商开价</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>还价</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td><strong>商定执行价</strong></td><td class="fillb"></td><td class="fillb"></td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <table class="ws">
+      <tbody>
+        <tr><td>商定执行价下的 C_KH</td><td class="fillb"></td></tr>
+        <tr><td>CfD 过零处的执行价（= FMP）</td><td class="fill"></td></tr>
+        <tr><td>买方首次胜过 BAU 处的执行价（多年面板）</td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+    <p class="selfcheck">在 Workshop 1 中拖动执行价滑块以确认每一行。三道关卡（买方 ≤ BAU、卖方 IRR、银行 DSCR）是否曾同时通过？</p>
+  </div>
+
+  <div class="nav noprint">
+    <a href="0010-group-workshop-zh-cn.html">← 工作坊指南</a>
+    <a href="../reference/dppa-glossary.html">📖 术语表</a>
+  </div>
+</div>
+</body>
+</html>

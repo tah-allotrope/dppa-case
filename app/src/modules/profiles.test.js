@@ -107,7 +107,7 @@ describe('buildFmpCurve', () => {
   })
 
   it('gives the workshop scenarios non-flat load and solar profiles', () => {
-    for (const id of ['workshop1', 'workshop2']) {
+    for (const id of ['workshop1', 'workshop2', 'workshop3']) {
       const { loadProfile, generationProfile } = scenarioProfiles[id]
       expect(Math.max(...loadProfile)).not.toBe(Math.min(...loadProfile))
       expect(Math.max(...generationProfile)).not.toBe(Math.min(...generationProfile))

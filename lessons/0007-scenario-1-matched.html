@@ -9,6 +9,7 @@
 <style>
   .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
   .fig svg { width:100%; height:auto; display:block; }
+  .fig img { width:100%; height:auto; display:block; border-radius:10px; }
   .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
   .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
   .mm::before { content:"◆ "; color:var(--amber); }
@@ -48,6 +49,13 @@
   <div class="callout amber"><span class="tag">The setup</span>
   Consumption exactly equals delivered RE volume → <span class="key">no residual EVN purchase</span>
   (line 4 = 0). Strike sits just 100 above FMP — watch what the fixed fees do.</div>
+
+  <!-- ============ Animated app-style chart ============ -->
+  <h2>See it move — the daily clamp</h2>
+  <div class="fig">
+    <img src="../assets/cfd-s1-en.gif" alt="Animated 24-hour Scenario 1 chart: load and solar overlap, FMP below strike 1,250" />
+    <div class="figcap">Load and solar overlap (matched, in green); FMP (magenta) stays below the 1,250 strike all day → the CfD is positive and the factory tops up the developer.</div>
+  </div>
 
   <!-- ============ VISUAL 1: 5-line waterfall ============ -->
   <h2>1 · Build the five-line bill</h2>

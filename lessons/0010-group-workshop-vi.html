@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Workshop nhóm DPPA — Tính toán, rồi Đàm phán</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig img { width:100%; height:auto; display:block; border-radius:10px; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .roles { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0; }
+  @media (max-width:560px){ .roles{ grid-template-columns:1fr; } }
+  .role { border:1px solid var(--line); border-radius:10px; padding:16px 18px; }
+  .role.buyer { background:#fff3e0; border-color:#ffd9a8; }
+  .role.dev   { background:#e6f5f7; border-color:#b8e3e8; }
+  .role h3 { margin-top:0; }
+  .role .want { font-size:.9rem; color:var(--gray); }
+  .round { border:1px solid var(--line); border-left:5px solid var(--teal); border-radius:0 10px 10px 0;
+           padding:14px 18px; margin:18px 0; background:var(--panel); }
+  .round .rh { font-weight:700; color:var(--teal-dk); font-size:1.05rem; }
+  .round .tag { display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+                background:var(--teal); color:#fff; border-radius:20px; padding:2px 9px; margin-left:8px; }
+  .clock { font-family:var(--mono); color:var(--bluegray); font-size:.82rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Workshop nhóm · Có điều phối · ~90 phút</div>
+  <h1>Workshop nhóm DPPA — Tính toán, rồi Đàm phán</h1>
+  <div class="modmap">
+    <span class="done">S1 · Khớp ✓</span>
+    <span class="done">S2 · Thiếu hụt ✓</span>
+    <span class="done">S3 · Dư thừa ✓</span>
+    <span class="now">▶ Bài tập trực tiếp</span>
+  </div>
+  <p class="lead">Bạn đã xem ba trường hợp điển hình. Giờ hãy <strong>làm</strong> chúng. Trong các nhóm nhỏ, bạn sẽ
+  chia thành hai bên của một DPPA, tính từng dòng hóa đơn <strong>bằng tay</strong>, tự kiểm tra với công cụ trực tuyến,
+  rồi <strong>đàm phán giá thực hiện</strong> và xem CfD đảo chiều theo thời gian thực. Trang này là kịch bản điều hành;
+  các con số ghi trên <a href="0011-worksheets-vi.html">phiếu bài tập</a>.</p>
+
+  <h2>Cách tổ chức phòng</h2>
+  <p>Bàn <strong>3–5</strong> người. Mỗi bàn chia thành hai vai. Bạn giữ cùng một vai qua cả ba kịch bản, rồi đối mặt
+  một bàn đối tác cho phần đàm phán.</p>
+  <div class="roles">
+    <div class="role buyer">
+      <h3>🏭 Bên mua (nhà máy)</h3>
+      <p class="want">Bạn mua điện. Bạn muốn <strong>tổng chi phí thấp nhất so với BAU</strong>.</p>
+      <ul>
+        <li>Tính <strong>C_EVN</strong> (dòng 1–4) và <strong>C_KH</strong> (sau CfD).</li>
+        <li>Theo dõi giá hiệu dụng VND/kWh và so với giá bán lẻ 2,204.</li>
+        <li>Đề xuất giá thực hiện <strong>thấp hơn</strong> — nhưng biết rằng nhà phát triển phải đủ điều kiện vay vốn.</li>
+      </ul>
+    </div>
+    <div class="role dev">
+      <h3>☀️ Nhà phát triển (RE GENCO)</h3>
+      <p class="want">Bạn bán điện. Bạn muốn một dòng doanh thu <strong>đủ điều kiện vay vốn</strong>.</p>
+      <ul>
+        <li>Tính <strong>doanh thu nhà máy</strong> = spot (Q × K_pp × FMP) + thanh toán CfD.</li>
+        <li>Theo dõi dấu CfD: dưới giá thực hiện bạn nhận bù; trên giá thực hiện bạn phải trả.</li>
+        <li>Đề xuất giá thực hiện <strong>cao hơn</strong> — đủ vượt DSCR của ngân hàng (Mô-đun 4).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Kịch bản điều hành (~90 phút)</h2>
+  <table>
+    <thead><tr><th>Thời gian</th><th>Phần</th><th>Diễn ra</th></tr></thead>
+    <tbody>
+      <tr><td class="clock">0:00–0:10</td><td><strong>Khung &amp; vai</strong></td><td>Ôn lại hóa đơn năm dòng và dấu CfD. Phân vai bên mua vs nhà phát triển.</td></tr>
+      <tr><td class="clock">0:10–0:28</td><td><strong>Vòng 1 — Khớp</strong></td><td>Tính tay Kịch bản 1, rồi kiểm tra ở Workshop 1.</td></tr>
+      <tr><td class="clock">0:28–0:46</td><td><strong>Vòng 2 — Thiếu hụt</strong></td><td>Tính tay Kịch bản 2, rồi kiểm tra ở Workshop 2.</td></tr>
+      <tr><td class="clock">0:46–1:04</td><td><strong>Vòng 3 — Dư thừa</strong></td><td>Tính tay Kịch bản 3, rồi kiểm tra ở Workshop 3.</td></tr>
+      <tr><td class="clock">1:04–1:18</td><td><strong>Đàm phán</strong></td><td>Bên mua và nhà phát triển thống nhất giá thực hiện; thanh toán CfD trực tiếp trong ứng dụng.</td></tr>
+      <tr><td class="clock">1:18–1:30</td><td><strong>Tổng kết</strong></td><td>So sánh giá thực hiện và kết quả giữa các bàn; rút ra bài học.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout amber"><span class="tag">Một quy tắc</span>
+  Tính <strong>bằng tay trước</strong>, trên phiếu. Chỉ mở ứng dụng để <em>kiểm tra</em> đáp án.
+  Mục đích là cảm nhận từng dòng chuyển động — không phải đọc một con số từ màn hình.</div>
+
+  <!-- ===================== VÒNG 1 ===================== -->
+  <h2>Vòng 1 — Khớp <span class="clock">(Q_c = Q_KH = 5,000,000 · FMP 1,150 · giá TH 1,250)</span></h2>
+  <div class="fig">
+    <img src="../assets/cfd-s1-vi.gif" alt="Biểu đồ động Kịch bản 1" />
+    <div class="figcap">Theo dõi giờ 09–15: phụ tải và mặt trời chồng nhau (khớp), FMP nằm dưới giá thực hiện 1,250 cả ngày.</div>
+  </div>
+  <div class="round">
+    <div class="rh">Nhiệm vụ của bạn <span class="tag">~18 phút</span></div>
+    <ol>
+      <li><strong>Bên mua:</strong> điền dòng 1–4 trên Phiếu S1, cộng thành C_EVN, rồi cộng CfD ra C_KH.</li>
+      <li><strong>Nhà phát triển:</strong> tính doanh thu spot (5,000,000 × 1.008 × 1,150) và CfD; cộng thành doanh thu nhà máy.</li>
+      <li>Thống nhất CfD chảy theo hướng nào và vì sao. Ghi giá hiệu dụng VND/kWh.</li>
+      <li><strong>Kiểm tra:</strong> mở <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 1</strong>. C_KH của bạn có khớp không?</li>
+    </ol>
+    <p class="small">Tham khảo nếu bí: <a href="0007-scenario-1-matched.html">bài học Kịch bản 1</a>.</p>
+  </div>
+
+  <!-- ===================== VÒNG 2 ===================== -->
+  <h2>Vòng 2 — Thiếu hụt <span class="clock">(Q_c 8,000,000 · Q_KH 9,000,000 · FMP 1,600 · giá TH 1,500)</span></h2>
+  <div class="fig">
+    <img src="../assets/cfd-s2-vi.gif" alt="Biểu đồ động Kịch bản 2" />
+    <div class="figcap">Phụ tải chạy trên mặt trời cả ngày (thiếu hụt); FMP nằm trên giá thực hiện 1,500 → CfD đảo chiều.</div>
+  </div>
+  <div class="round">
+    <div class="rh">Nhiệm vụ của bạn <span class="tag">~18 phút</span></div>
+    <ol>
+      <li><strong>Bên mua:</strong> lần này dòng 4 trở lại — 1,000,000 kWh thiếu hụt theo giá bán lẻ 2,204. Lập C_EVN, rồi <em>trừ</em> CfD âm ra C_KH.</li>
+      <li><strong>Nhà phát triển:</strong> doanh thu spot trên 8,000,000 × 1.008 × 1,600; CfD nay <em>tốn</em> bạn 800M. Doanh thu nhà máy ròng?</li>
+      <li>Ghi hai khác biệt so với Vòng 1: dòng bán lẻ trở lại, và CfD đảo chiều.</li>
+      <li><strong>Kiểm tra:</strong> Workshop 2 — C_EVN 19,628,262,400, C_KH 18,828,262,400.</li>
+    </ol>
+    <p class="small">Tham khảo: <a href="0008-scenario-2-shortfall.html">bài học Kịch bản 2</a>.</p>
+  </div>
+
+  <!-- ===================== VÒNG 3 ===================== -->
+  <h2>Vòng 3 — Dư thừa <span class="clock">(Q_KH 5,000,000 · phát 6,500,000 · FMP 1,100 · giá TH 1,250)</span></h2>
+  <div class="fig">
+    <img src="../assets/cfd-s3-vi.gif" alt="Biểu đồ động Kịch bản 3" />
+    <div class="figcap">Mặt trời vượt phụ tải buổi trưa (phát vượt mức); 1,500,000 kWh dư thừa chỉ mang lại giá spot cho nhà phát triển.</div>
+  </div>
+  <div class="round">
+    <div class="rh">Nhiệm vụ của bạn <span class="tag">~18 phút</span></div>
+    <ol>
+      <li><strong>Bên mua:</strong> hóa đơn chỉ thanh toán trên 5,000,000 bạn tiêu thụ — dòng 4 = 0 trở lại. Lập C_EVN và C_KH.</li>
+      <li><strong>Nhà phát triển:</strong> tính giá spot của 1,500,000 kWh dư thừa — và phần CfD bạn <em>bỏ lỡ</em> trên nó. Ai gánh rủi ro phát vượt mức?</li>
+      <li>Tranh luận tại bàn: hợp đồng có nên cỡ nhỏ hơn không? Điều khoản nào bảo vệ bên ký vượt mức?</li>
+      <li><strong>Kiểm tra:</strong> Workshop 3 — C_EVN 8,304,644,000, C_KH 9,054,644,000.</li>
+    </ol>
+    <p class="small">Tham khảo: <a href="0009-scenario-3-excess-vi.html">bài học Kịch bản 3</a>.</p>
+  </div>
+
+  <!-- ===================== ĐÀM PHÁN ===================== -->
+  <h2>Đàm phán <span class="clock">(~14 phút)</span></h2>
+  <p>Giờ đối mặt một bàn đối tác. Lấy sản lượng Kịch bản 1 (5,000,000 kWh, FMP ~1,150) làm điểm khởi đầu.
+  Mỗi bên đề xuất một giá thực hiện và bảo vệ nó:</p>
+  <div class="roles">
+    <div class="role buyer">
+      <h3>🏭 Bên mua mở thấp</h3>
+      <p class="want">Giá thực hiện gần hoặc dưới FMP giảm thiểu khoản bù — nhưng không ngân hàng nào tài trợ.</p>
+    </div>
+    <div class="role dev">
+      <h3>☀️ Nhà phát triển mở cao</h3>
+      <p class="want">Giá thực hiện vượt DSCR thì vay được — nhưng bên mua dưới BAU sẽ không ký.</p>
+    </div>
+  </div>
+  <div class="round">
+    <div class="rh">Thanh toán trực tiếp</div>
+    <ol>
+      <li>Thống nhất một giá thực hiện thử. Tính CfD bằng tay: <code>(giá TH − 1,150) × 5,000,000</code>. Chảy theo hướng nào?</li>
+      <li>Mở <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 1</strong>, rồi kéo <strong>thanh trượt giá thực hiện</strong> đến con số của bạn. Xem C_KH và dấu CfD chuyển theo thời gian thực.</li>
+      <li>Đẩy giá thực hiện lên xuống. Tìm điểm CfD <strong>cắt qua không</strong> (giá TH = FMP) — và điểm bên mua lần đầu thắng BAU trên bảng nhiều năm.</li>
+      <li>Ghi giá thực hiện đã thống nhất và C_KH kết quả vào dòng đàm phán của <a href="0011-worksheets-vi.html">phiếu bài tập</a>.</li>
+    </ol>
+  </div>
+
+  <!-- ===================== TỔNG KẾT ===================== -->
+  <h2>Tổng kết <span class="clock">(~12 phút)</span></h2>
+  <div class="callout"><span class="tag">So sánh giữa các bàn</span>
+  <ul>
+    <li>Mỗi bàn chốt giá thực hiện nào? Khoảng chênh rộng bao nhiêu?</li>
+    <li>Qua S1/S2/S3, dòng nào bất ngờ nhất — thiếu hụt bán lẻ, hay dư thừa không tạo giá trị?</li>
+    <li>Ở kịch bản nào CfD <em>bảo vệ</em> nhà máy, và ở kịch bản nào nhà máy <em>phải trả thêm</em>?</li>
+    <li>Cổng nào khó thỏa mãn nhất — bên mua (≤ BAU), bên bán (IRR), hay ngân hàng (DSCR)? (Mô-đun 4.)</li>
+  </ul></div>
+
+  <h2>Kiểm tra trực giác</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. Tăng giá thực hiện làm C_KH của bên mua ___</div>
+    <button class="opt">tăng (trả nhà phát triển nhiều hơn)</button>
+    <button class="opt">giảm (nhà phát triển trả)</button>
+    <button class="opt">không đổi, bao giờ cũng vậy</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>CfD = (giá TH − FMP) × Q. Giá thực hiện cao hơn nghĩa là CfD dương lớn hơn (hoặc âm nhỏ hơn), nên nhà máy trả nhiều hơn — C_KH tăng.</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. CfD cắt qua không đúng khi ___</div>
+    <button class="opt">giá TH bằng FMP</button>
+    <button class="opt">giá TH bằng bán lẻ</button>
+    <button class="opt">khớp bằng phụ tải</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>CfD = (giá TH − FMP) × Q = 0 khi giá TH = FMP. Dưới đó nhà máy bù; trên đó nhà phát triển trả.</div>
+  </div>
+
+  <h2>Tài liệu</h2>
+  <p>Phiếu bài tập: <a href="0011-worksheets-vi.html">lưới tính in được (S1/S2/S3 + đàm phán)</a> ·
+  Bài học kịch bản: <a href="0007-scenario-1-matched.html">S1</a> · <a href="0008-scenario-2-shortfall.html">S2</a> ·
+  <a href="0009-scenario-3-excess-vi.html">S3</a> · Ký hiệu: <a href="../reference/dppa-glossary.html">bảng thuật ngữ</a> ·
+  Công cụ trực tuyến: <a href="https://dppa-case.web.app">dppa-case.web.app</a>.</p>
+
+  <div class="ask"><strong>Người điều phối:</strong> kịch bản điều hành, đáp án, và kịch bản tổng kết nằm trong
+  bộ tài liệu điều phối (<code>facilitator/dppa-workshop-facilitator-guide.md</code>) — không trên trang học viên này.</div>
+
+  <div class="nav">
+    <a href="0009-scenario-3-excess-vi.html">← Kịch bản 3</a>
+    <a href="0011-worksheets-vi.html">Phiếu bài tập →</a>
+  </div>
+</div>
+</body>
+</html>

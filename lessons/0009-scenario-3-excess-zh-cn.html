@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>情景培训 3 — 过剩 / 过度发电</title>
+<link rel="stylesheet" href="../assets/course.css" />
+<script src="../assets/quiz.js"></script>
+<style>
+  .fig { background:#fff; border:1px solid var(--line); border-radius:10px; margin:16px 0; }
+  .fig svg { width:100%; height:auto; display:block; }
+  .fig img { width:100%; height:auto; display:block; border-radius:10px; }
+  .figcap { font-size:.82rem; color:var(--bluegray); padding:0 16px 12px; }
+  .mm { font-size:1.05rem; color:var(--ink); font-weight:700; margin:2px 0 14px; }
+  .mm::before { content:"◆ "; color:var(--amber); }
+  .pgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+  @media (max-width:560px){ .pgrid{ grid-template-columns:repeat(2,1fr); } }
+  .pcard { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .pcard .k { font-family:var(--mono); font-weight:700; color:var(--teal-dk); font-size:.95rem; }
+  .pcard .v { font-size:.78rem; color:var(--gray); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">情景培训 · 练习 3</div>
+  <h1>情景 3 — 过剩 / 过度发电（负荷 &lt; 发电）</h1>
+  <div class="modmap">
+    <span class="done">S1 · 匹配 ✓</span>
+    <span class="done">S2 · 缺口 ✓</span>
+    <span class="now">S3 · 过剩</span>
+  </div>
+  <p class="lead">第三个标准情形：光伏<strong>装机过大</strong>（一个多晴的月份），因此发电量<strong>高于</strong>工厂的用电量。
+  你的账单看起来像一个匹配的月份——但<strong>过剩部分不产生任何价值</strong>。这就是在线工具中的 <strong>Workshop 3</strong>
+  预设，也是你的 CFO 应当定价的"超额签约"风险。</p>
+
+  <h2>输入参数（相对情景 1 和 2 有何变化）</h2>
+  <div class="pgrid">
+    <div class="pcard"><div class="k">Q_KH = 5,000,000</div><div class="v">用电量 kWh/月</div></div>
+    <div class="pcard"><div class="k">Q_khc = 5,000,000</div><div class="v">匹配并结算</div></div>
+    <div class="pcard"><div class="k">发电 ≈ 6,500,000</div><div class="v">计入发电量</div></div>
+    <div class="pcard"><div class="k">过剩 1,500,000</div><div class="v">仅按现货价</div></div>
+    <div class="pcard"><div class="k">FMP = 1,100</div><div class="v">晴天 → 低于执行价</div></div>
+    <div class="pcard"><div class="k">执行价 = 1,250</div><div class="v">P_c VND/kWh</div></div>
+    <div class="pcard"><div class="k">k×K_pp = 1.0342</div><div class="v">1.026 × 1.008</div></div>
+    <div class="pcard"><div class="k">费用 = 523.3</div><div class="v">360 + 163.3</div></div>
+  </div>
+  <div class="callout amber"><span class="tag">设定</span>
+  用电量被匹配的可再生能源完全覆盖 → <span class="key">无需向 EVN 额外购电</span>（第 4 行 = 0），与情景 1 完全相同。
+  转折在<em>发电侧</em>：1,500,000 kWh 的过剩发电，没有任何 CfD 合约触及。</div>
+
+  <!-- ============ 动画图 ============ -->
+  <h2>1 · 看它动起来——晴天的价格钳制</h2>
+  <div class="mm">光伏（橙）在中午升至工厂负荷（青）之上；匹配电量（绿）被限制在用电量上限。</div>
+  <div class="fig">
+    <img src="../assets/cfd-s3-zh-cn.gif" alt="情景 3 的 24 小时动画图：光伏高于负荷，FMP 低于执行价 1,250" />
+    <div class="figcap">FMP 在中午降至约 930（光伏涌入电网）——始终低于 1,250 的执行价，因此 CfD 保持为正：工厂向开发商补差价。橙色光伏线高于青色负荷线的部分就是过剩。</div>
+  </div>
+
+  <!-- ============ 图 2：五行瀑布 ============ -->
+  <h2>2 · 编制五行账单（按用电量）</h2>
+  <div class="mm">账单只对你消费的 5,000,000 kWh 结算。过剩发电永远不会进入你的账单。</div>
+  <div class="fig">
+    <svg viewBox="0 0 720 200" role="img" aria-label="情景 3 月度成本构成">
+      <style>.cl{font-family:Arial,sans-serif;font-size:11px;fill:#fff;font-weight:700}
+             .clb{font-family:Arial,sans-serif;font-size:11px;fill:#212121}.s{font-size:10px;fill:#595959}</style>
+      <rect x="40"  y="46" width="402" height="46" fill="#0097A7"/>
+      <text x="241" y="74" text-anchor="middle" class="cl">1 · 市场电能 · 5.69B</text>
+      <rect x="442" y="46" width="127" height="46" fill="#78909C"/>
+      <text x="505" y="74" text-anchor="middle" class="cl">2 · 服务 1.80B</text>
+      <rect x="569" y="46" width="58" height="46" fill="#b0bec5"/>
+      <rect x="627" y="46" width="53" height="46" fill="#FFAB40"/>
+      <text x="598" y="110" text-anchor="middle" class="clb">3 · 结算费 0.82B</text>
+      <line x1="598" y1="92" x2="598" y2="104" stroke="#b0bec5"/>
+      <text x="678" y="124" text-anchor="end" class="clb">5 · CfD +0.75B</text>
+      <line x1="653" y1="92" x2="653" y2="118" stroke="#FFAB40"/>
+      <line x1="40" y1="36" x2="627" y2="36" stroke="#00727e" stroke-width="1.5"/>
+      <text x="333" y="30" text-anchor="middle" class="clb" fill="#00727e">C_EVN = 8,304,644,000（第 1–4 行；第 4 行 = 0）</text>
+      <text x="40" y="158" class="clb"><tspan font-weight="700">C_KH = C_EVN + CfD = 9,054,644,000 VND</tspan>  →  实际 ≈ <tspan font-weight="700" fill="#0097A7">1,811 VND/kWh</tspan></text>
+      <text x="40" y="180" class="s">实际 = 9,054,644,000 ÷ 5,000,000 kWh。结构上与情景 1 完全相同——只有 FMP（1,100）和过剩部分不同。</text>
+    </svg>
+    <div class="figcap">一张匹配式账单：第 4 行为零，CfD 是一个正的薄片（FMP 低于执行价）。过剩部分不在此账单上。</div>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>行</th><th>计算</th><th class="num">VND/月</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>市场电能</td><td><code>5,000,000 × 1,100 × 1.026 × 1.008</code></td><td class="num">5,688,144,000</td></tr>
+      <tr><td>2</td><td>服务费</td><td><code>5,000,000 × 360</code></td><td class="num">1,800,000,000</td></tr>
+      <tr><td>3</td><td>结算费</td><td><code>5,000,000 × 163.30</code></td><td class="num">816,500,000</td></tr>
+      <tr><td>4</td><td>额外零售购电</td><td><code>0 × 2,204</code></td><td class="num">0</td></tr>
+      <tr><td></td><td><strong>C_EVN</strong></td><td>第 1 + 2 + 3 + 4 行</td><td class="num"><strong>8,304,644,000</strong></td></tr>
+      <tr><td>5</td><td>CfD</td><td><code>(1,250 − 1,100) × 5,000,000</code></td><td class="num">+750,000,000</td></tr>
+      <tr><td></td><td><strong>C_KH</strong></td><td>C_EVN + CfD</td><td class="num"><strong>9,054,644,000</strong></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 图 3：过剩 ============ -->
+  <h2>3 · 过剩去了哪里（为何不产生价值）</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 210" role="img" aria-label="过剩发电仅按现货价，无 CfD">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}
+             .cl{font-size:11px;fill:#fff;font-weight:700}.clb{font-size:11px;fill:#212121}</style>
+      <text x="40" y="34" class="t clb"><tspan font-weight="700">计入发电量 ≈ 6,500,000 kWh</tspan></text>
+      <rect x="40"  y="46" width="492" height="44" fill="#2e9e6b"/>
+      <text x="286" y="74" text-anchor="middle" class="t cl">结算 5,000,000 kWh → 市场 + 费用 + CfD</text>
+      <rect x="532" y="46" width="148" height="44" fill="#b0bec5"/>
+      <text x="606" y="74" text-anchor="middle" class="t cl">过剩 1.5M</text>
+      <text x="606" y="108" text-anchor="middle" class="t s">仅现货 · 无 CfD</text>
+      <text x="40" y="140" class="t h">按现货价的过剩部分：</text>
+      <text x="40" y="162" class="t s">1,500,000 kWh × 1,100 VND/kWh（机端 ≈ 1,512,000 kWh）≈ <tspan font-weight="700" fill="#212121">1,663,200,000 VND</tspan> 归开发商——无执行价加成。</text>
+      <text x="40" y="184" class="t s">过剩上放弃的 CfD = (1,250 − 1,100) × 1,500,000 = <tspan font-weight="700" fill="#e0573e">225,000,000 VND</tspan>，执行价永远收不到。</text>
+      <text x="40" y="204" class="t s">教训：按你的<tspan font-weight="700">用电量</tspan>来确定合约规模——超额签约是为无法结算的电量买单。</text>
+    </svg>
+    <div class="figcap">CfD 以用电量为上限。任何超出用电量的发电只能按现货价出售——对双方而言都没有执行价。</div>
+  </div>
+
+  <!-- ============ 图 4：CfD 方向 ============ -->
+  <h2>4 · CfD 流向哪边？</h2>
+  <div class="fig">
+    <svg viewBox="0 0 720 130" role="img" aria-label="FMP 低于执行价意味着工厂向开发商补差价">
+      <style>.t{font-family:Arial,sans-serif}.h{font-weight:700;font-size:12px}.s{font-size:10px;fill:#595959}</style>
+      <line x1="60" y1="60" x2="660" y2="60" stroke="#E0E0E0" stroke-width="2"/>
+      <circle cx="280" cy="60" r="6" fill="#4285F4"/>
+      <text x="280" y="46" text-anchor="middle" class="t h" fill="#4285F4">FMP 1,100</text>
+      <line x1="440" y1="40" x2="440" y2="80" stroke="#212121" stroke-width="2"/>
+      <text x="440" y="32" text-anchor="middle" class="t h">执行价 1,250</text>
+      <path d="M280,72 Q360,100 440,72" fill="none" stroke="#FFAB40" stroke-width="2.5" marker-end="url(#cf)"/>
+      <text x="360" y="118" text-anchor="middle" class="t s" fill="#d98600">差额 150 × 5,000,000 = 工厂向开发商支付 750M</text>
+      <defs><marker id="cf" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#FFAB40"/></marker></defs>
+    </svg>
+    <div class="figcap">FMP（1,100）低于执行价（1,250）→ CfD 为正 → 工厂向开发商补差价——与情景 1 同向，差额更大，因为晴天月份压低了 FMP。</div>
+  </div>
+
+  <div class="callout"><span class="tag">三个标准情形并列</span>
+  <strong>S1 匹配：</strong>Q_c = Q_KH，第 4 行 = 0，CfD +500M。
+  <strong>S2 缺口：</strong>Q_c &lt; Q_KH，零售第 4 行回归，CfD −800M。
+  <strong>S3 过剩：</strong>发电 &gt; Q_KH，第 4 行再次 = 0，CfD +750M，且<span class="key">过剩不产生价值</span>。
+  电量轴（匹配 / 缺口 / 过剩）是主线；CfD 的符号只跟随 FMP 与执行价的高低。</div>
+
+  <div class="tryit">
+    <div class="ic">▶</div>
+    <div>这就是在线工具中的 <b>Workshop 3</b>：<a href="https://dppa-case.web.app">dppa-case.web.app</a>
+    → Workshop 3。五行账单读出 C_EVN <b>8,304,644,000</b> 和 C_KH <b>9,054,644,000</b>，CfD 为
+    <b>+750,000,000</b>——日内图显示光伏高于负荷。</div>
+  </div>
+
+  <h2>自我检测</h2>
+  <div class="quiz" data-answer="0">
+    <div class="q">1. 这 1,500,000 kWh 的过剩发电获得 ___</div>
+    <button class="opt">仅现货价</button>
+    <button class="opt">执行价加费用</button>
+    <button class="opt">零售价信用</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>超出用电量的部分不结算 CfD——开发商只能按 FMP 在现货市场出售。执行价从不触及它。</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">2. 由于用电量被完全匹配，第 4 行（额外购电）为 ___</div>
+    <button class="opt">恰好为零</button>
+    <button class="opt">最大的一行</button>
+    <button class="opt">一笔小额信用</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>无缺口（Q_KH − Q_khc = 0）→ 第 4 行 = 0，与情景 1 相同。过剩在发电侧，不在你的账单上。</div>
+  </div>
+  <div class="quiz" data-answer="0">
+    <div class="q">3. 情景 3 的 C_KH 等于 ___</div>
+    <button class="opt">9,054,644,000 VND</button>
+    <button class="opt">8,304,644,000 VND</button>
+    <button class="opt">9,063,196,000 VND</button>
+    <div class="fb"></div>
+    <div class="explain small" hidden>C_EVN 8,304,644,000 + CfD（+750,000,000）= 9,054,644,000。（8.30B 是 C_EVN；9.06B 是情景 1 的 C_KH。）</div>
+  </div>
+
+  <h2>继续阅读</h2>
+  <p>打开 <a href="https://dppa-case.web.app">dppa-case.web.app</a> → <strong>Workshop 3</strong>，对照上表阅读实时账单；
+  在 Workshop 1 ↔ 2 ↔ 3 之间切换，依次体会匹配、缺口与过剩。符号：
+  <a href="../reference/dppa-glossary.html">术语表</a>。</p>
+
+  <div class="ask"><strong>三个标准情形完成。</strong>准备好做现场练习了吗？打开
+  <a href="0010-group-workshop-zh-cn.html">小组工作坊</a>——分为买方与开发商，手算三个情景，然后谈判执行价。</div>
+
+  <div class="nav">
+    <a href="0008-scenario-2-shortfall.html">← 情景 2</a>
+    <a href="0010-group-workshop-zh-cn.html">下一个 → 小组工作坊</a>
+  </div>
+</div>
+</body>
+</html>

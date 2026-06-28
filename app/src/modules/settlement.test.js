@@ -323,4 +323,28 @@ describe('calculateSettlement', () => {
     expect(bill.plantRevenue.market).toBe(12902400000)
     expect(bill.plantRevenue.total).toBe(12102400000)
   })
+
+  it('reproduces Workshop 3 excess/over-generation five-line bill', () => {
+    const bill = buildFiveLineBill({
+      fmp: 1100,
+      strikePrice: 1250,
+      serviceFee: 360,
+      clearingFee: 163.3,
+      lossFactorPrecise: 1.026 * 1.008,
+      retailTariff: 2204,
+    }, {
+      contracted: 5000000,
+      total: 5000000,
+    })
+
+    expect(bill.lines.marketEnergy).toBe(5688144000)
+    expect(bill.lines.systemService).toBe(1800000000)
+    expect(bill.lines.diffClearing).toBe(816500000)
+    expect(bill.lines.additionalPurchase).toBe(0)
+    expect(bill.cEvn).toBe(8304644000)
+    expect(bill.lines.cfd).toBe(750000000)
+    expect(bill.cKh).toBe(9054644000)
+    expect(bill.plantRevenue.market).toBe(5544000000)
+    expect(bill.plantRevenue.total).toBe(6294000000)
+  })
 })

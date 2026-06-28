@@ -127,9 +127,29 @@ export const scenarioProfiles = {
     }),
     generationProfile: solarCurve(11000, 0.25),
   },
+  workshop3: {
+    id: 'workshop3',
+    kind: 'workshop',
+    label: 'Workshop 3',
+    description: 'Workshop Scenario 3 (excess): overbuilt solar generates more than the factory consumes. Consumption is fully matched (line 4 = 0); the excess settles nothing — spot only, no CfD.',
+    overrides: { strikePrice: 1250, marketPrice: 1100 },
+    // Bill settles on consumed/matched volume only (5,000,000). The over-generation
+    // excess is a daily-chart + narrative story, not a monthly-bill line.
+    monthlyVolumes: { contracted: 5000000, total: 5000000 },
+    fmpSide: 'below',
+    // Illustrative daily shape (solar clearly above load midday → excess story).
+    loadProfile: HOURS.map((hour) => {
+      if (hour < 6) return 4200
+      if (hour < 9) return 5200
+      if (hour < 16) return 6000
+      if (hour < 20) return 5200
+      return 4400
+    }),
+    generationProfile: solarCurve(9000, 0.22),
+  },
 }
 
-export const scenarioOrder = ['higherLoad', 'balanced', 'higherGen', 'workshop1', 'workshop2']
+export const scenarioOrder = ['higherLoad', 'balanced', 'higherGen', 'workshop1', 'workshop2', 'workshop3']
 
 export const defaultInputs = {
   scenarioId: 'balanced',
