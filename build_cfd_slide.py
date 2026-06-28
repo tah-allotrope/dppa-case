@@ -9,12 +9,46 @@ import io, os
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from PIL import Image
 
 # ---- deck palette ----
 TEAL="#0097A7"; AMBER="#FFAB40"; GREEN="#2e9e6b"; MAGENTA="#d6379a"; BLUE="#4285F4"
 INK="#212121"; GRAY="#595959"
 plt.rcParams["font.family"] = ["Arial","DejaVu Sans"]
+
+TEXTS = {
+    "en": {
+        "font": "Arial", "off": "Off-peak", "standard": "Standard", "peak": "Peak",
+        "load": "Factory load", "solar": "Solar generation", "matched": "Matched volume",
+        "strike": "Strike (dotted, VND/kWh)",
+        "main": "DPPA settlement: the overlap and the price clamp",
+        "hour": "{h}:00   load {load} · solar {solar} · matched {matched} kWh",
+        "below": "FMP {fmp} < strike 2,000  →  you top up developer",
+        "above": "FMP {fmp} > strike 2,000  →  developer pays you",
+        "equal": "FMP = strike  →  no CfD",
+    },
+    "vi": {
+        "font": "Arial", "off": "Thấp điểm", "standard": "Bình thường", "peak": "Cao điểm",
+        "load": "Phụ tải nhà máy", "solar": "Điện mặt trời", "matched": "Sản lượng khớp",
+        "strike": "Giá thực hiện (nét chấm, VND/kWh)",
+        "main": "Thanh toán DPPA: sản lượng khớp và giá thực hiện",
+        "hour": "{h}:00   phụ tải {load} · mặt trời {solar} · khớp {matched} kWh",
+        "below": "FMP {fmp} < giá thực hiện 2.000  →  bạn bù cho nhà phát triển",
+        "above": "FMP {fmp} > giá thực hiện 2.000  →  nhà phát triển trả bạn",
+        "equal": "FMP = giá thực hiện  →  không phát sinh CfD",
+    },
+    "zh": {
+        "font": "Microsoft YaHei", "off": "谷时段", "standard": "平时段", "peak": "峰时段",
+        "load": "工厂负荷", "solar": "光伏发电", "matched": "匹配电量",
+        "strike": "执行价（点线，VND/kWh）",
+        "main": "DPPA结算：匹配电量与执行价",
+        "hour": "{h}:00   负荷 {load} · 光伏 {solar} · 匹配 {matched} kWh",
+        "below": "FMP {fmp} < 执行价 2,000  →  您向开发商补差价",
+        "above": "FMP {fmp} > 执行价 2,000  →  开发商向您支付差价",
+        "equal": "FMP = 执行价  →  无CfD差额",
+    },
+}
 
 hours = list(range(24))
 load    = [3000,3000,3000,3000,3000,3000,4000,4000,4000,4700,4700,4700,4700,4700,4700,4700,3900,3900,3900,3900,3200,3200,3200,3200]
@@ -23,24 +57,26 @@ matched = [min(a,b) for a,b in zip(load,solar)]
 fmp     = [1190,1173,1156,1173,1224,1326,1428,1496,1564,1649,1700,1768,1836,1887,1955,2006,2074,2176,2312,2414,2210,1836,1564,1360]
 STRIKE  = 2000
 
-# ---- web-app TOU bands: (start, end, label, fill, labelcolor) ----
+# ---- Vietnam TOU bands, Mon-Sat (Decision 963/QD-BCT, effective 22 Apr 2026) ----
+# Sunday has no peak period: 00:00-06:00 off-peak; 06:00-24:00 standard.
 OFF=("#47d7ff",0.10,"#1f8fb0"); STD=("#ffd84f",0.13,"#b08900"); PK=("#ff68d8",0.10,"#c0379a")
-BANDS=[(0,4,"Off-peak",OFF),(4,9,"Standard",STD),(9,11,"Peak",PK),
-       (11,17,"Standard",STD),(17,20,"Peak",PK),(20,22,"Standard",STD),(22,24,"Off-peak",OFF)]
+BANDS=[(0,6,"off",OFF),(6,17.5,"standard",STD),
+       (17.5,22.5,"peak",PK),(22.5,24,"standard",STD)]
 
-def draw_base(axL):
+def draw_base(axL, lang="en"):
+    t = TEXTS[lang]
     axR = axL.twinx()
     # TOU overlay (behind everything)
     for s,e,name,(fill,a,lc) in BANDS:
         axL.axvspan(s-0.5, e-0.5, color=fill, alpha=a, zorder=0, lw=0)
-        axL.text((s+e)/2-0.5, 5080, name, ha="center", va="top", fontsize=9.5,
-                 color=lc, fontweight="bold", zorder=1)
+        axL.text((s+e)/2-0.5, 5080, t[name], ha="center", va="top", fontsize=9.5,
+                 color=lc, fontweight="bold", zorder=1, fontfamily=t["font"])
     # left axis (kWh/h)
     axL.fill_between(hours, load,  color=TEAL,  alpha=0.10, zorder=1)
-    axL.plot(hours, load,  color=TEAL,  lw=3.0, label="Factory load", zorder=2)
-    axL.plot(hours, solar, color=AMBER, lw=3.0, label="Solar generation", zorder=2)
+    axL.plot(hours, load,  color=TEAL,  lw=3.0, label=t["load"], zorder=2)
+    axL.plot(hours, solar, color=AMBER, lw=3.0, label=t["solar"], zorder=2)
     axL.fill_between(hours, matched, color=GREEN, alpha=0.30, zorder=1)
-    axL.plot(hours, matched, color=GREEN, lw=2.0, label="Matched volume", zorder=2)
+    axL.plot(hours, matched, color=GREEN, lw=2.0, label=t["matched"], zorder=2)
     axL.set_ylim(0, 5300); axL.set_xlim(-0.5, 23.5)
     axL.set_ylabel("kWh / h", color=GRAY, fontsize=13)
     axL.set_xticks(range(0,24,2)); axL.set_xticklabels([f"{h:02d}" for h in range(0,24,2)], color=GRAY, fontsize=11)
@@ -49,7 +85,8 @@ def draw_base(axL):
     for sp in axL.spines.values(): sp.set_color("#E0E0E0")
     # right axis (VND/kWh)
     axR.plot(hours, fmp, color=MAGENTA, lw=3.0, ls=(0,(7,4)), label="FMP (VND/kWh)", zorder=3)
-    axR.axhline(STRIKE, color=BLUE, lw=2.2, ls=(0,(5,5)), label="Strike (VND/kWh)", zorder=3)
+    axR.axhline(STRIKE, color=BLUE, lw=2.4, ls=(0,(1.2,3.0)),
+                dash_capstyle="round", label=t["strike"], zorder=3)
     axR.set_ylim(800, 2600)
     axR.set_ylabel("VND / kWh", color=MAGENTA, fontsize=13)
     axR.tick_params(axis="y", colors=MAGENTA, labelsize=11)
@@ -57,12 +94,16 @@ def draw_base(axL):
     for sp in axR.spines.values(): sp.set_color("#E0E0E0")
     return axR
 
-def legend_below(axL, axR):
+def legend_below(axL, axR, lang="en"):
     h1,l1 = axL.get_legend_handles_labels(); h2,l2 = axR.get_legend_handles_labels()
+    # A long explicit dotted sample remains legible after GIF quantization.
+    h2[-1] = Line2D([0],[0], color=BLUE, lw=2.4, linestyle=(0,(1.2,3.0)),
+                    dash_capstyle="round")
     axL.legend(h1+h2, l1+l2, loc="upper center", bbox_to_anchor=(0.5,-0.12),
-               ncol=5, frameon=False, fontsize=10.5, labelcolor=INK)
+               ncol=5, frameon=False, fontsize=10.5, labelcolor=INK,
+               handlelength=3.2, handletextpad=0.7, prop={"family": TEXTS[lang]["font"], "size": 10.5})
 
-SUB=("Load & solar overlap = matched (settles on CfD)  ·  TOU bands shown like the web app  ·  "
+SUB=("Load & solar overlap = matched (settles on CfD)  ·  TOU: Mon-Sat, Decision 963 (22 Apr 2026)  ·  "
      "FMP below strike → you top up; above → developer pays you")
 
 # ---------- static PNG ----------
@@ -79,34 +120,37 @@ print("PNG:", png, os.path.getsize(png), "bytes")
 
 # ---------- animated GIF (hour-by-hour highlight) ----------
 def fmt(n): return f"{n:,}"
-frames=[]
-for h in range(24):
-    fig, axL = plt.subplots(figsize=(11.0,6.2), dpi=100)
-    fig.patch.set_facecolor("white"); axL.set_facecolor("white")
-    axR = draw_base(axL); legend_below(axL, axR)
-    # vertical guide + highlighted markers
-    axL.axvline(h, color="#212121", alpha=0.30, lw=1.2, zorder=4)
-    for val,c in ((load[h],TEAL),(solar[h],AMBER),(matched[h],GREEN)):
-        axL.scatter([h],[val], s=120, color=c, edgecolor="white", linewidth=1.6, zorder=6)
-    axR.scatter([h],[fmp[h]], s=120, color=MAGENTA, edgecolor="white", linewidth=1.6, zorder=6)
-    # CfD direction
-    if fmp[h] < STRIKE: dirn=f"FMP {fmt(fmp[h])} < strike 2,000  →  you top up developer"
-    elif fmp[h] > STRIKE: dirn=f"FMP {fmt(fmp[h])} > strike 2,000  →  developer pays you"
-    else: dirn="FMP = strike  →  no CfD"
-    title=(f"{h:02d}:00   load {fmt(load[h])} · solar {fmt(solar[h])} · matched {fmt(matched[h])} kWh\n{dirn}")
-    fig.suptitle("DPPA settlement: the overlap and the price clamp", x=0.5, y=0.985,
-                 fontsize=15, fontweight="bold", color="#00727e")
-    axL.set_title(title, fontsize=11, color=INK, pad=8)
-    fig.subplots_adjust(left=0.07, right=0.93, top=0.84, bottom=0.18)
-    buf=io.BytesIO(); fig.savefig(buf, format="png", facecolor="white"); plt.close(fig)
-    buf.seek(0); frames.append(Image.open(buf).convert("RGB"))
+def generate_gif(lang, filename):
+    t = TEXTS[lang]
+    frames=[]
+    for h in range(24):
+        fig, axL = plt.subplots(figsize=(11.0,6.2), dpi=100)
+        fig.patch.set_facecolor("white"); axL.set_facecolor("white")
+        axR = draw_base(axL, lang); legend_below(axL, axR, lang)
+        # vertical guide + highlighted markers
+        axL.axvline(h, color="#212121", alpha=0.30, lw=1.2, zorder=4)
+        for val,c in ((load[h],TEAL),(solar[h],AMBER),(matched[h],GREEN)):
+            axL.scatter([h],[val], s=120, color=c, edgecolor="white", linewidth=1.6, zorder=6)
+        axR.scatter([h],[fmp[h]], s=120, color=MAGENTA, edgecolor="white", linewidth=1.6, zorder=6)
+        if fmp[h] < STRIKE: dirn=t["below"].format(fmp=fmt(fmp[h]))
+        elif fmp[h] > STRIKE: dirn=t["above"].format(fmp=fmt(fmp[h]))
+        else: dirn=t["equal"]
+        title=t["hour"].format(h=f"{h:02d}", load=fmt(load[h]), solar=fmt(solar[h]), matched=fmt(matched[h])) + "\n" + dirn
+        fig.suptitle(t["main"], x=0.5, y=0.985, fontsize=15, fontweight="bold",
+                     color="#00727e", fontfamily=t["font"])
+        axL.set_title(title, fontsize=11, color=INK, pad=8, fontfamily=t["font"])
+        fig.subplots_adjust(left=0.07, right=0.93, top=0.84, bottom=0.18)
+        buf=io.BytesIO(); fig.savefig(buf, format="png", facecolor="white"); plt.close(fig)
+        buf.seek(0); frames.append(Image.open(buf).convert("RGB"))
+    pframes=[f.quantize(colors=128, method=Image.MEDIANCUT) for f in frames]
+    gif=os.path.join("assets", filename)
+    pframes[0].save(gif, save_all=True, append_images=pframes[1:], duration=480,
+                    loop=0, optimize=True, disposal=2)
+    print("GIF:", gif, os.path.getsize(gif), "bytes,", len(pframes), "frames")
 
-# quantize for compact GIF
-pframes=[f.quantize(colors=128, method=Image.MEDIANCUT) for f in frames]
-gif=os.path.join("assets","cfd-consolidated-chart.gif")
-pframes[0].save(gif, save_all=True, append_images=pframes[1:], duration=480,
-                loop=0, optimize=True, disposal=2)
-print("GIF:", gif, os.path.getsize(gif), "bytes,", len(pframes), "frames")
+generate_gif("en", "cfd-consolidated-chart.gif")
+generate_gif("vi", "cfd-consolidated-chart-vi.gif")
+generate_gif("zh", "cfd-consolidated-chart-zh-cn.gif")
 
 # ---------- 16:9 slide .pptx (static PNG) ----------
 from pptx import Presentation
@@ -120,7 +164,7 @@ def tb(l,t,w,h,text,size,color,bold=True):
     p=f.paragraphs[0]; r=p.add_run(); r.text=text
     r.font.size=Pt(size); r.font.bold=bold; r.font.name="Arial"; r.font.color.rgb=RGBColor.from_string(color)
 tb(0.45,0.22,9.1,0.5,"DPPA settlement: the overlap and the price clamp",22,"00727E")
-tb(0.45,0.70,9.1,0.4,"TOU bands + load/solar/matched + FMP vs strike — one view, like the web app",12,"595959",bold=False)
+tb(0.45,0.70,9.1,0.4,"New TOU bands (Decision 963) + load/solar/matched + FMP vs strike",12,"595959",bold=False)
 iw,ih=Image.open(png).size; disp_w=9.0; disp_h=disp_w*ih/iw; top=1.18
 if top+disp_h>5.45: disp_h=5.45-top; disp_w=disp_h*iw/ih
 slide.shapes.add_picture(png, Inches((10-disp_w)/2), Inches(top), width=Inches(disp_w))
