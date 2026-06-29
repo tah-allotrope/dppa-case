@@ -4,6 +4,7 @@
 **Learner pages:** `lessons/0010-group-workshop.html` (run sheet) + `lessons/0011-worksheets.html` (compute grids).
 **Live tool:** https://dppa-case.web.app — Workshop 1 / 2 / 3 presets match these answers penny-for-penny.
 **Numbers source of truth:** `research/2026-06-29_dppa-scenario-numbers-spec.md`. Do not improvise figures — read them from there.
+**Companion:** the conference panel uses `facilitator/dppa-panel-guide.md` (the 22 CEBA panel questions, ranked and routed to a Developer / Genco / Buyer / Bank bench). It assumes this workshop's literacy and does not re-teach mechanics.
 
 > Keep this guide for facilitators only. The answer keys below are **not** on the learner pages — that is deliberate; participants compute first, then self-check in the app.
 
