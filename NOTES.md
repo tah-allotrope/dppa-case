@@ -40,6 +40,12 @@ Source: theme of `ceba/CEBA DPPA 2026.pptx` (Google-Slides / Material style, 16:
   / excess (S3). Canonical numbers live in `research/2026-06-29_dppa-scenario-numbers-spec.md`.
 - Per-scenario animated charts: `assets/cfd-s{1,2,3}-{en,vi,zh-cn}.gif/.mp4`, built by `build_cfd_slide.py`
   (now a per-scenario `SCENARIOS` dict). Regenerate with `py build_cfd_slide.py`.
+- **Printable bilingual handout (Word):** `lessons/DPPA_Worksheets_and_Answers.docx` — for each
+  scenario (S1/S2/S3) pairs a blank 5-line compute worksheet with its worked totals, plus a negotiation
+  block (worked example: `CfD = (1,200 − 1,150) × 5,000,000 = +250,000,000`; "crosses zero at
+  strike = FMP") and a 3-case comparison summary. Built by `build_worksheet_answer_docx.py` from the
+  reference template (`DPPA_Scenario_Answer_Summary.docx`), inheriting its blue banner / subhead /
+  callout / footer styling. Regenerate with `py build_worksheet_answer_docx.py`.
 
 ## Format preferences (from Lesson 1 feedback, 2026-06-26)
 - **More visuals.** Lead with diagrams/SVG, not prose. Aim for ≥2–3 visuals per lesson

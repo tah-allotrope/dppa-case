@@ -424,3 +424,22 @@ Grill-Me defaults adopted: Q-001 extract S3 from deck → fallback excess/higher
 - **Verification:** Vitest 44/44; `npm run build` clean (250 KB / 82 KB gzip); 0 console errors; all 11 lessons 200 OK with correct lang + no broken assets/links; 3 scenario charts visually verified.
 - **Visuals:** per-scenario animated CfD charts in 3 languages with correct strike lines and callouts (S1 FMP&lt;1,250; S2 FMP&gt;1,500; S3 sunny trough &lt;1,250 with solar above load).
 - **Deploy:** intentionally NOT deployed to Firebase (Q-003 default) — committed only.
+
+## DPPA Worksheets + Answer Summary (Bilingual Word Doc) — Completed 2026-06-29
+
+Implemented `plans/2026-06-29-dppa-worksheet-answer-docx-plan.md` (full plan).
+Grill-Me defaults adopted: Q-001 replace reference bodies with S1/S2/S3 · Q-002 inline totals under each grid.
+
+### Plan
+- [x] PHASE-01: Extracted style constants from the reference (banner `1F4E79` 18pt white bold / `D6E4F0` 14pt / 9pt legal; section head 12pt `1F4E79`; subhead bold `2E75B6`; data-table header `1F4E79`; callout `D6E4F0`; note `FFFFFF`; footer 8pt `888888`; A4 + 0.75in margins). Locked per-scenario grid rows EN/VI from `lessons/0011-worksheets.html` + `-vi.html` and totals from `research/2026-06-29_dppa-scenario-numbers-spec.md`.
+- [x] PHASE-02: `build_worksheet_answer_docx.py` — copies `DPPA_Scenario_Answer_Summary.docx` as template, clears body (preserves `sectPr` + A4 margins), defines `banner`/`section_head`/`subhead`/`data_table`/`callout`/`worksheet_grid`/`totals_table`/`excess_block`/`footer_line` helpers, emits title banner + shared constants/legal-basis block + footer.
+- [x] PHASE-03: For each scenario S1/S2/S3 emit scenario banner → inputs callout → blank fillable 5-line grid → answer totals table (S3 adds the excess block) → page break. Negotiation block: banner → 4-round proposal grid → result table → guidance callout (worked example at strike 1,200: `CfD = +250,000,000`). Closing 3-case comparison summary table (9 cols × 4 rows, `1F4E79` header).
+- [x] PHASE-04: Verified structure (37 paras + 15 tables; A4 + 0.75in margins preserved), number anchors (all 9 spec totals present byte-for-byte), VI parity (`Giá thực hiện`, `Phụ tải`, `Sản lượng khớp`, `Mua thêm bán lẻ`, `Phí dịch vụ`, `Phí bù trừ`, `Hiệu dụng`, `Dòng 1 + 2 + 3 + 4`; no zh-cn leak). Visual QA deferred to manual open-in-Word (no LibreOffice on this machine, CON-001). Recorded `learning-records/0004-worksheet-answer-docx.md`, updated NOTES.md, committed + pushed.
+
+### Review / Results
+- `lessons/DPPA_Worksheets_and_Answers.docx` (15 KB) generated; A4 + 0.75in margins + blue banner / subhead / callout / footer styling inherited from the reference by copy-template approach.
+- Per-scenario flow: `SCENARIO N — TITLE | KỊCH BẢN N — TIÊU ĐỀ` (centered, 18pt white bold on `1F4E79`) → 1×2 inputs callout (`D6E4F0`) → `Worksheet | Phiếu tính` subhead → 4-col fillable grid (header `1F4E79` white, body lines 1–4, `C_EVN`/`5 CfD`/`C_KH`/Effective rows, blank answer cells `FFFEF2`, bold cells `FFF7E6`) → `Answer (totals) | Đáp án` subhead → 2-col totals table → page break. S3 appends `The excess …` block with 3 blank rows.
+- Negotiation: banner → blank 4-round grid (Round / Proposed strike / CfD / Flows to) → blank result table → guidance callout (`CfD = (strike − 1,150) × 5,000,000` worked at 1,200; "crosses zero at strike = FMP"; three-gate trade-off).
+- Comparison summary: `SCENARIO COMPARISON SUMMARY | BẢNG SO SÁNH CÁC KỊCH BẢN` → 9-col × 4-row table (Scenario / Volume axis / Line 4 / FMP vs strike / CfD / C_EVN / C_KH / Effective / Risk lesson), EN | VI per cell.
+- Footer: `Prepared for CEBA 2026 Training | Được chuẩn bị cho Chương trình Đào tạo CEBA 2026 | Allotrope Partners Vietnam | Based on Decree 57/2025/NĐ-CP & Decree 243/2026/NĐ-CP` (8pt `888888`).
+- **Deploy:** local Word doc only — not deployed to Firebase (not a web asset).
