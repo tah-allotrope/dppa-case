@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Module 5 Worksheet — Compute the Bill (October 2026)</title>
+<link rel="stylesheet" href="../../assets/course.css" />
+<style>
+  @page { size: A4; margin: 14mm; }
+  .given { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; }
+  @media (max-width: 560px) { .given { grid-template-columns: repeat(2, 1fr); } }
+  .given div { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px;
+               font-family: var(--mono); font-size: 0.84rem; color: var(--teal-dk); }
+  table.ws { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  table.ws th, table.ws td { border: 1px solid var(--line); padding: 8px; font-size: 0.88rem; text-align: left; }
+  table.ws td.fill { background: #fffef2; min-width: 120px; height: 32px; }
+  table.ws td.fillb { background: #fff7e6; font-weight: 700; }
+  .printbtn { background: var(--teal); color: #fff; border: none; border-radius: 8px; padding: 9px 16px;
+              font-family: var(--sans); font-weight: 700; cursor: pointer; font-size: 0.92rem; }
+  .answer-key { border-top: 2px dashed var(--line); margin-top: 24px; padding-top: 14px; }
+  @media print {
+    .noprint { display: none !important; }
+    .answer-key { break-before: page; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow noprint">Modules 1-6 · Module 5 Exercise</div>
+  <h1>Compute the Bill — Song Hong Garment Co.</h1>
+  <p class="lead noprint">Ten minutes. Volumes are pre-filled. Fill the shaded cells by hand in VND millions,
+  then verify against the live app.</p>
+  <p class="noprint"><button class="printbtn" onclick="window.print()">⎙ Print worksheet + answer key</button></p>
+
+  <div class="given">
+    <div>Contracted Q_c = 5,000,000 kWh</div>
+    <div>Consumption Q_KH = 5,000,000 kWh</div>
+    <div>Market price (FMP) = 1,150 VND/kWh</div>
+    <div>Strike price = 1,250 VND/kWh</div>
+  </div>
+
+  <table class="ws">
+    <tr><th>#</th><th>Line</th><th>Your calculation</th><th>Your answer (VND millions)</th></tr>
+    <tr><td>1</td><td>Market energy</td><td class="fill"></td><td class="fill"></td></tr>
+    <tr><td>2</td><td>DPPA service fee</td><td class="fill"></td><td class="fill"></td></tr>
+    <tr><td>3</td><td>Balancing / clearing fee</td><td class="fill"></td><td class="fill"></td></tr>
+    <tr><td>4</td><td>Residual retail purchase</td><td class="fill"></td><td class="fill"></td></tr>
+    <tr><td colspan="3">C_EVN (sum of lines 1-4)</td><td class="fillb"></td></tr>
+    <tr><td>5</td><td>CfD settlement</td><td class="fill"></td><td class="fill"></td></tr>
+    <tr><td colspan="3"><strong>Total bill (C_KH)</strong></td><td class="fillb"></td></tr>
+    <tr><td colspan="3">Compare vs BAU (11,020 tr VND) — cheaper or more expensive?</td><td class="fill"></td></tr>
+  </table>
+
+  <!-- Answer key generated from assets/teaching/spine-s1.json — do not hand-edit numbers. -->
+  <div class="answer-key">
+    <h2>Answer Key</h2>
+    <table class="ws">
+      <tr><th>#</th><th>Line</th><th>Calculation</th><th>VND millions</th></tr>
+      <tr><td>1</td><td>Market energy</td><td>5,000,000 &times; 1,150 &times; 1.034208</td><td>5,947</td></tr>
+      <tr><td>2</td><td>DPPA service fee</td><td>5,000,000 &times; 360</td><td>1,800</td></tr>
+      <tr><td>3</td><td>Balancing / clearing fee</td><td>5,000,000 &times; 163.30</td><td>817</td></tr>
+      <tr><td>4</td><td>Residual retail purchase</td><td>0 &times; 2,204</td><td>0</td></tr>
+      <tr><td colspan="3"><strong>C_EVN</strong></td><td><strong>8,563</strong></td></tr>
+      <tr><td>5</td><td>CfD settlement</td><td>(1,250 &minus; 1,150) &times; 5,000,000</td><td>+500</td></tr>
+      <tr><td colspan="3"><strong>Total bill (C_KH)</strong></td><td><strong>9,063</strong></td></tr>
+      <tr><td colspan="3">vs BAU (11,020)</td><td><strong>1,957 cheaper</strong></td></tr>
+    </table>
+  </div>
+</div>
+</body>
+</html>

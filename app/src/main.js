@@ -3,6 +3,7 @@ import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes,
 import { renderMultiYearChart, renderProfileChart } from './modules/chart'
 import { buildFiveLineBill, buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement, projectMultiYear } from './modules/settlement'
 import { renderAppShell, renderFiveLineBill, renderFormulas, renderMultiYearPanel, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
+import { initTeachMode } from './modules/teach'
 
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Unhandled promise rejection:', event.reason)
@@ -194,3 +195,4 @@ renderAppShell(document.querySelector('#app'), getScenarioList(), settlementMode
 syncControls()
 syncInputsFromState()
 updateView()
+initTeachMode()

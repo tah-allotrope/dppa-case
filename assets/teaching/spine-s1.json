@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "scenario": "S1 matched (base case)",
+    "source": "app/src/modules/settlement.js buildFiveLineBill + research/2026-06-29_dppa-scenario-numbers-spec.md",
+    "generatedBy": "app/scripts/export-spine.mjs"
+  },
+  "factory": {
+    "name": "Song Hong Garment Co.",
+    "nameVi": "Công ty May Sông Hồng",
+    "nameZh": "红河制衣公司",
+    "sector": "Garment manufacturing, 110kV connection",
+    "monthlyLoadKwh": 5000000
+  },
+  "inputs": {
+    "fmp": 1150,
+    "strikePrice": 1250,
+    "serviceFee": 360,
+    "clearingFee": 163.3,
+    "retailTariff": 2204,
+    "lossFactorPrecise": 1.034208,
+    "lossFactorKppOnly": 1.008,
+    "contractedKwh": 5000000,
+    "totalConsumptionKwh": 5000000
+  },
+  "bau": {
+    "monthlyVnd": 11020000000,
+    "monthlyVndMillionsRounded": 11020
+  },
+  "bill": {
+    "lines": {
+      "marketEnergy": {
+        "label": "Market energy",
+        "vnd": 5946696000,
+        "vndMillionsRounded": 5947
+      },
+      "systemService": {
+        "label": "DPPA service fee",
+        "vnd": 1800000000,
+        "vndMillionsRounded": 1800
+      },
+      "diffClearing": {
+        "label": "Balancing / clearing fee",
+        "vnd": 816500000,
+        "vndMillionsRounded": 817
+      },
+      "additionalPurchase": {
+        "label": "Residual retail purchase",
+        "vnd": 0,
+        "vndMillionsRounded": 0
+      },
+      "cfd": {
+        "label": "CfD settlement",
+        "vnd": 500000000,
+        "vndMillionsRounded": 500
+      }
+    },
+    "cEvn": {
+      "vnd": 8563196000,
+      "vndMillionsRounded": 8563
+    },
+    "cKh": {
+      "vnd": 9063196000,
+      "vndMillionsRounded": 9063
+    },
+    "plantRevenue": {
+      "market": {
+        "vnd": 5796000000,
+        "vndMillionsRounded": 5796
+      },
+      "cfd": {
+        "vnd": 500000000,
+        "vndMillionsRounded": 500
+      },
+      "total": {
+        "vnd": 6296000000,
+        "vndMillionsRounded": 6296
+      }
+    }
+  },
+  "comparison": {
+    "bauMonthlyVndMillionsRounded": 11020,
+    "dppaMonthlyVndMillionsRounded": 9063,
+    "deltaVndMillionsRounded": -1957,
+    "effectiveVndPerKwh": 1812.6
+  },
+  "gates": {
+    "buyer": {
+      "label": "Buyer gate",
+      "rule": "Cumulative DPPA cost <= cumulative BAU cost",
+      "thresholdText": "C_KH (life) <= C_BAU (life)"
+    },
+    "lender": {
+      "label": "Lender gate",
+      "rule": "DSCR every year",
+      "thresholdText": ">= 1.20x"
+    },
+    "investor": {
+      "label": "Investor gate",
+      "rule": "Equity IRR",
+      "thresholdText": "12-15%"
+    }
+  },
+  "levers": [
+    {
+      "name": "Strike price",
+      "movesWhen": "Lower strike -> lower CfD cost when FMP is below strike"
+    },
+    {
+      "name": "Contracted volume (Q_c)",
+      "movesWhen": "Match Q_c to real consumption to avoid excess/shortfall risk"
+    },
+    {
+      "name": "Tenor / escalation",
+      "movesWhen": "Longer lock trades flexibility for price certainty"
+    },
+    {
+      "name": "Settlement mode",
+      "movesWhen": "Matched-only vs generation vs allocated changes who bears volume risk"
+    },
+    {
+      "name": "Termination / step-out terms",
+      "movesWhen": "Determines the cost of exiting if the deal stops passing the three gates"
+    }
+  ]
+}

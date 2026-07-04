@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DPPA Reference Card — Modules 1-6 (October 2026)</title>
+<link rel="stylesheet" href="../../assets/course.css" />
+<style>
+  @page { size: A4; margin: 14mm; }
+  body { margin: 0; }
+  .card-page { width: 100%; box-sizing: border-box; }
+  .card-page + .card-page { break-before: page; }
+  .card-title { font-size: 1.3rem; margin: 0 0 4px; color: var(--teal-dk); }
+  .card-sub { font-size: 0.82rem; color: var(--bluegray); margin: 0 0 14px; }
+  .sankey-row { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+  .line-item { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 6px 10px;
+               border: 1px solid var(--line); border-radius: 6px; font-size: 0.86rem; }
+  .line-item .label { font-weight: 600; }
+  .line-item .gloss { display: block; font-size: 0.72rem; color: var(--bluegray); font-weight: 400; }
+  .line-item .amount { font-family: var(--mono); font-weight: 700; color: var(--teal-dk); white-space: nowrap; }
+  .total-row { background: #212121; color: #fff; }
+  .total-row .amount { color: #fff; }
+  table.decoder { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 10px 0 16px; }
+  table.decoder td, table.decoder th { border: 1px solid var(--line); padding: 5px 8px; text-align: left; }
+  table.decoder th { background: var(--panel); }
+  .gate-row { display: flex; gap: 10px; margin: 10px 0; }
+  .gate { flex: 1; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; }
+  .gate .gate-name { font-weight: 700; color: var(--teal-dk); display: block; margin-bottom: 3px; }
+  .printbtn { background: var(--teal); color: #fff; border: none; border-radius: 8px; padding: 9px 16px;
+              font-family: var(--sans); font-weight: 700; cursor: pointer; font-size: 0.92rem; }
+  @media print { .noprint { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<p class="noprint"><button class="printbtn" onclick="window.print()">⎙ Print (A4, duplex)</button></p>
+
+<!-- ================= SIDE A ================= -->
+<div class="card-page">
+  <p class="card-title">DPPA Reference Card — Side A: The Five-Line Bill</p>
+  <p class="card-sub">Song Hong Garment Co. · Scenario 1 (matched, base case) · every figure from app/src/modules/settlement.js</p>
+
+  <div class="sankey-row">
+    <div class="line-item"><span class="label">1. Market energy<span class="gloss">VI: Năng lượng thị trường · ZH: 市场电价</span></span><span class="amount">5,947 tr VND</span></div>
+    <div class="line-item"><span class="label">2. DPPA service fee<span class="gloss">VI: Phí dịch vụ DPPA · ZH: DPPA服务费</span></span><span class="amount">1,800 tr VND</span></div>
+    <div class="line-item"><span class="label">3. Balancing / clearing fee<span class="gloss">VI: Phí cân bằng · ZH: 平衡费</span></span><span class="amount">817 tr VND</span></div>
+    <div class="line-item"><span class="label">4. Residual retail purchase<span class="gloss">VI: Mua bù thiếu hụt · ZH: 剩余零售购电</span></span><span class="amount">0 tr VND</span></div>
+    <div class="line-item"><span class="label">5. CfD settlement<span class="gloss">VI: Thanh toán CfD · ZH: CfD差价结算</span></span><span class="amount">+500 tr VND</span></div>
+    <div class="line-item total-row"><span class="label">Total bill (C_KH)</span><span class="amount">9,063 tr VND</span></div>
+  </div>
+  <p style="font-size:0.78rem;color:var(--bluegray)">BAU comparison (retail only, no DPPA): 11,020 tr VND/month. Key gloss terms: matched energy
+  (VI: sản lượng khớp · ZH: 匹配电量) · loss factor (VI: hệ số tổn thất · ZH: 损耗系数) · strike
+  (VI: giá thực hiện · ZH: 执行价) · market price (VI: giá thị trường · ZH: 市场价) · top-up / refund
+  (VI: bù / hoàn trả · ZH: 补差价/退还) · reference bill (VI: hóa đơn tham chiếu · ZH: 参考账单).</p>
+</div>
+
+<!-- ================= SIDE B ================= -->
+<div class="card-page">
+  <p class="card-title">Side B: Decree-57 Decoder + Reference Tables</p>
+  <p class="card-sub">Use only after Module 6 — this maps the plain-language bill above to the official notation.</p>
+
+  <table class="decoder">
+    <tr><th>Plain language</th><th>Decree 57/2025 symbol</th></tr>
+    <tr><td>Matched / settled volume</td><td>Q_khc</td></tr>
+    <tr><td>Total consumption</td><td>Q_KH</td></tr>
+    <tr><td>Delivered volume at meter</td><td>Q_adj = Q_meter / K_pp</td></tr>
+    <tr><td>Market price</td><td>FMP</td></tr>
+    <tr><td>Locked / contract price</td><td>Strike (P_c)</td></tr>
+    <tr><td>Loss conversion (110kV)</td><td>K_pp = 1.008</td></tr>
+    <tr><td>Price-conversion coefficient</td><td>k = 1.026</td></tr>
+    <tr><td>DPPA service fee</td><td>C_dppa_dv = 360 VND/kWh</td></tr>
+    <tr><td>Balancing / clearing fee</td><td>P_cl = 163.30 VND/kWh</td></tr>
+    <tr><td>Residual retail price</td><td>P1 = 2,204 VND/kWh</td></tr>
+    <tr><td>EVN-billed subtotal</td><td>C_EVN = lines 1-4</td></tr>
+    <tr><td>Total bill</td><td>C_KH = C_EVN + C_CfD</td></tr>
+  </table>
+
+  <p class="card-sub" style="margin-bottom:4px">TOU rate matrix (110kV connection, Mon–Sat; Sunday = no peak)</p>
+  <table class="decoder">
+    <tr><th>Period</th><th>Hours</th><th>Approx. VND/kWh</th></tr>
+    <tr><td>Off-peak</td><td>00:00–06:00</td><td>~1,100</td></tr>
+    <tr><td>Standard</td><td>06:00–17:30, 22:30–24:00</td><td>~2,000</td></tr>
+    <tr><td>Peak</td><td>17:30–22:30</td><td>~3,700</td></tr>
+  </table>
+
+  <p class="card-sub" style="margin-bottom:4px">The three gates</p>
+  <div class="gate-row">
+    <div class="gate"><span class="gate-name">Buyer</span>Cumulative DPPA cost &le; cumulative BAU cost</div>
+    <div class="gate"><span class="gate-name">Lender</span>DSCR &ge; 1.20x every year</div>
+    <div class="gate"><span class="gate-name">Investor</span>Equity IRR 12–15%</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
