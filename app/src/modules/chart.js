@@ -3,6 +3,23 @@ import Chart from 'chart.js/auto'
 let profileChart
 let multiYearChart
 
+function token(name, fallback) {
+  if (typeof document === 'undefined') return fallback
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback
+}
+
+export function refreshChartTheme() {
+  for (const chart of [profileChart, multiYearChart]) {
+    if (!chart) continue
+    chart.options.animation = false
+    chart.options.scales.x.ticks.color = token('--chart-tick', '#bcd5ff')
+    chart.options.scales.x.grid.color = token('--chart-grid', 'rgba(160, 183, 217, 0.12)')
+    chart.update('none')
+  }
+}
+
+if (typeof window !== 'undefined') window.addEventListener('dppa-theme-change', refreshChartTheme)
+
 const neonGrid = 'rgba(160, 183, 217, 0.12)'
 const tickColor = '#bcd5ff'
 
@@ -167,7 +184,7 @@ function baseOptions(inputs) {
   return {
     responsive: true,
     maintainAspectRatio: false,
-    animation: { duration: 350 },
+    animation: typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 350 },
     layout: { padding: { top: 64 } },
     plugins: {
       legend: {

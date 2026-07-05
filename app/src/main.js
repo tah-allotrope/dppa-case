@@ -1,9 +1,12 @@
 import './style.css'
+import './theme.css'
 import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve, buildWorkshopFmpCurve } from './data/default-scenarios'
 import { renderMultiYearChart, renderProfileChart } from './modules/chart'
 import { buildFiveLineBill, buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement, projectMultiYear } from './modules/settlement'
 import { renderAppShell, renderFiveLineBill, renderFormulas, renderMultiYearPanel, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
 import { initTeachMode } from './modules/teach'
+import { initTheme } from './modules/theme'
+import { initTour } from './modules/tour'
 
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Unhandled promise rejection:', event.reason)
@@ -192,7 +195,9 @@ function syncInputsFromState() {
 }
 
 renderAppShell(document.querySelector('#app'), getScenarioList(), settlementModes)
+initTheme()
 syncControls()
 syncInputsFromState()
 updateView()
 initTeachMode()
+initTour()

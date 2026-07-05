@@ -3,6 +3,8 @@ dist/
 .env
 *.log
 .DS_Store
+test-results/
+playwright-report/
 .firebase/
 .firebaserc
 nul

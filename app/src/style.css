@@ -1,4 +1,11 @@
 :root {
+  --font-size-base: 16px;
+  --chart-grid: rgba(160, 183, 217, 0.12);
+  --chart-tick: #bcd5ff;
+  --series-load: #47d7ff;
+  --series-solar: #ffd84f;
+  --series-matched: #f5fbff;
+  --series-fmp: #ff3d7f;
   font-family: 'Segoe UI', sans-serif;
   color: #f4fbff;
   background: #050816;

@@ -53,21 +53,6 @@ function buildBanner(state) {
   `
   document.body.appendChild(banner)
 
-  const style = document.createElement('style')
-  style.textContent = `
-    #teachBanner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10000;
-      background: #0b1220; color: #f6fbff; border-top: 2px solid #47d7ff;
-      font-family: 'Inter', system-ui, sans-serif; padding: 10px 16px; }
-    .teach-banner-inner { display: flex; align-items: center; gap: 16px; max-width: 1100px; margin: 0 auto; }
-    .teach-banner-text { flex: 1; display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; }
-    .teach-step-counter { color: #47d7ff; }
-    .teach-expected { color: #8b97a8; font-size: 0.8rem; }
-    #teachPrev, #teachNext { background: #16213a; color: #f6fbff; border: 1px solid #2a3a5c;
-      border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 1rem; }
-    #teachPrev:hover, #teachNext:hover { background: #1f2d4d; }
-  `
-  document.head.appendChild(style)
-
   document.querySelector('#teachPrev').addEventListener('click', () => {
     state.index = (state.index - 1 + teachSteps.length) % teachSteps.length
     applyStep(state.index)
