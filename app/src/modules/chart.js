@@ -1,7 +1,12 @@
 import Chart from 'chart.js/auto'
+import { convertMoney, formatMoney, EXCHANGE_RATE } from './formatters'
 
 let profileChart
 let multiYearChart
+// Mutated in place on every renderProfileChart call so the tariffOverlay
+// plugin's getState() closure (captured once, at chart creation) always
+// reads the latest inputs/currency instead of a throwaway per-call object.
+const profileChartState = { inputs: null, currency: 'VND' }
 
 function token(name, fallback) {
   if (typeof document === 'undefined') return fallback
@@ -74,7 +79,7 @@ function makeTariffPlugin(getState) {
       if (state.inputs && state.inputs.strikePrice) {
         const yFmpScale = chart.scales['yFmp']
         if (yFmpScale) {
-          const strikeY = yFmpScale.getPixelForValue(state.inputs.strikePrice)
+          const strikeY = yFmpScale.getPixelForValue(convertMoney(state.inputs.strikePrice, state.currency))
           if (strikeY >= area.top && strikeY <= area.bottom) {
             ctx.save()
             ctx.setLineDash([8, 5])
@@ -90,7 +95,7 @@ function makeTariffPlugin(getState) {
             ctx.fillStyle = 'rgba(82, 144, 255, 0.9)'
             ctx.textAlign = 'right'
             ctx.textBaseline = 'bottom'
-            ctx.fillText(`Strike ${Math.round(state.inputs.strikePrice).toLocaleString()}`, area.right - 2, strikeY - 2)
+            ctx.fillText(`Strike ${formatMoney(state.inputs.strikePrice, { currency: state.currency, precise: state.currency === 'USD' })}`, area.right - 2, strikeY - 2)
             ctx.restore()
           }
         }
@@ -150,7 +155,7 @@ function makeTariffPlugin(getState) {
           // Flat retail reference shown for context only in this v1 teaching model.
           ctx.font = '8px "Segoe UI", sans-serif'
           ctx.fillStyle = band.textColor
-          ctx.fillText(`Illustrative retail: ${Math.round(state.inputs.retailTariff).toLocaleString()}`, cx, area.top + 27)
+          ctx.fillText(`Illustrative retail: ${formatMoney(state.inputs.retailTariff, { currency: state.currency, precise: state.currency === 'USD' })}`, cx, area.top + 27)
 
           // Per-band FMP: use the midpoint hour of this band to read from fmpCurve
           const midHour = Math.floor((band.startHour + band.endHour) / 2)
@@ -158,7 +163,7 @@ function makeTariffPlugin(getState) {
             ? (state.inputs.fmpCurve[midHour] ?? state.inputs.marketPrice)
             : state.inputs.marketPrice
           ctx.fillStyle = FMP_COLOR
-          ctx.fillText(`FMP: ${Math.round(bandFmp).toLocaleString()} VND/kWh`, cx, area.top + 38)
+          ctx.fillText(`FMP: ${formatMoney(bandFmp, { currency: state.currency, precise: state.currency === 'USD', perKwh: true })}`, cx, area.top + 38)
         }
 
         ctx.restore()
@@ -167,7 +172,7 @@ function makeTariffPlugin(getState) {
   }
 }
 
-function baseOptions(inputs) {
+function baseOptions(inputs, currency = 'VND') {
   // Determine a sensible range for the FMP axis based on the curve + strike
   const strikePrice = inputs?.strikePrice ?? 1741
   const fmpCurve = inputs?.fmpCurve ?? []
@@ -180,6 +185,9 @@ function baseOptions(inputs) {
     yFmpMin -= pad
     yFmpMax += pad
   }
+  yFmpMin = convertMoney(yFmpMin, currency)
+  yFmpMax = convertMoney(yFmpMax, currency)
+  const isUsd = currency === 'USD'
 
   return {
     responsive: true,
@@ -209,11 +217,11 @@ function baseOptions(inputs) {
         grid: { drawOnChartArea: false },
         ticks: {
           color: FMP_COLOR,
-          callback: (v) => `${(v / 1000).toFixed(1)}k`,
+          callback: (v) => (isUsd ? v.toFixed(3) : `${(v / 1000).toFixed(1)}k`),
         },
         title: {
           display: true,
-          text: 'VND/kWh',
+          text: `${currency}/kWh`,
           color: FMP_COLOR,
           font: { size: 10 },
         },
@@ -222,9 +230,12 @@ function baseOptions(inputs) {
   }
 }
 
-export function renderProfileChart(canvas, labels, intervals, selectedHour, onSelect, inputs) {
-  // Mutable state bag read by the plugin on every draw
-  const state = { inputs }
+export function renderProfileChart(canvas, labels, intervals, selectedHour, onSelect, inputs, currency = 'VND') {
+  // Shared, module-level state bag read by the plugin on every draw — mutated
+  // in place below rather than reassigned, so the plugin's captured closure
+  // (set once, at chart creation) always sees the latest values.
+  profileChartState.inputs = inputs
+  profileChartState.currency = currency
   const isNarrowViewport = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
     ? window.matchMedia('(max-width: 520px)').matches
     : false
@@ -237,7 +248,7 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
   const fmpBaseHover = isNarrowViewport ? 4 : 6
   const fmpSelHover = isNarrowViewport ? 7 : 10
 
-  function buildDatasets(ivs, selHour) {
+  function buildDatasets(ivs, selHour, curr) {
     return [
       {
         label: 'Factory load',
@@ -277,8 +288,8 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
         yAxisID: 'y',
       },
       {
-        label: 'FMP (VND/kWh)',
-        data: ivs.map(i => i.fmp),
+        label: `FMP (${curr}/kWh)`,
+        data: ivs.map(i => convertMoney(i.fmp, curr)),
         borderColor: FMP_COLOR,
         backgroundColor: 'rgba(255,61,127,0)',
         fill: false,
@@ -294,13 +305,14 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
   }
 
   if (profileChart) {
-    state.inputs = inputs
-    profileChart.data.datasets = buildDatasets(intervals, selectedHour)
+    profileChart.data.datasets = buildDatasets(intervals, selectedHour, currency)
     profileChart.data.labels = labels
-    // Refresh scale bounds when inputs change (e.g. slider moved)
-    const updatedOptions = baseOptions(inputs)
+    // Refresh scale bounds/formatting when inputs or currency change
+    const updatedOptions = baseOptions(inputs, currency)
     profileChart.options.scales.yFmp.min = updatedOptions.scales.yFmp.min
     profileChart.options.scales.yFmp.max = updatedOptions.scales.yFmp.max
+    profileChart.options.scales.yFmp.ticks.callback = updatedOptions.scales.yFmp.ticks.callback
+    profileChart.options.scales.yFmp.title.text = updatedOptions.scales.yFmp.title.text
     profileChart.options.onClick = (event) => {
       const pts = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
       if (pts.length) onSelect(pts[0].index)
@@ -311,15 +323,15 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
 
   profileChart = new Chart(canvas, {
     type: 'line',
-    data: { labels, datasets: buildDatasets(intervals, selectedHour) },
+    data: { labels, datasets: buildDatasets(intervals, selectedHour, currency) },
     options: {
-      ...baseOptions(inputs),
+      ...baseOptions(inputs, currency),
       onClick: (event) => {
         const pts = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
         if (pts.length) onSelect(pts[0].index)
       },
     },
-    plugins: [makeTariffPlugin(() => state)],
+    plugins: [makeTariffPlugin(() => profileChartState)],
   })
 
   return profileChart
@@ -330,7 +342,7 @@ export function renderMultiYearChart(canvas, multiYear, currency) {
 
   const { yearlyData } = multiYear
   const isUsd = currency === 'USD'
-  const divisor = isUsd ? 25000 * 1e6 : 1e9
+  const divisor = isUsd ? EXCHANGE_RATE * 1e6 : 1e9
   const unitLabel = isUsd ? 'M USD' : 'B VND'
 
   const labels = yearlyData.map((y) => `Y${y.year}`)

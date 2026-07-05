@@ -80,7 +80,7 @@ async function updateView() {
     renderProfileChart(document.querySelector('#profileChart'), hourLabels, settlement.intervals, selectedInterval.hour, (hour) => {
       state.selectedHour = hour
       updateView()
-    }, inputs)
+    }, inputs, state.currency)
   } catch (error) {
     console.error('Profile chart render failed:', error)
   }
