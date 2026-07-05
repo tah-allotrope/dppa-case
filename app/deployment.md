@@ -18,6 +18,7 @@ npx firebase deploy --only hosting --project dppa-case
 
 | Date | Commit | Description |
 |---|---|---|
+| 2026-07-05 | `ed21985`+ | App quality, visuals & testing uplift (PHASE-01..06): lint/CI, Playwright functional suite (scenarios/controls/teach mode), presenter theme + token system, bilingual guided tour, visual-snapshot scaffolding |
 | 2026-06-26 | `048ce2a`+ | Workshop chart realism (realistic load/solar/FMP curves, FMP constrained to deck side of strike) + multi-year relocated below daily graph + control-feedback notes |
 | 2026-06-26 | `33d294f` | July scenario-training workshop presets, deck corrections, parity harness, UI integration deployed via Codex |
 | 2026-06-23 | `29b91e4` | Sprint 1: Workshop Demo Safety — error handling, loading splash, touch feedback |
@@ -39,7 +40,20 @@ GitHub Actions runs lint, unit tests, functional/visual Playwright tests, and th
 
 ## Quality commands
 
-Run `npm run lint`, `npm test`, `npm run e2e`, and `npm run build`. The complete local Q-001 fallback gate is `npm run predeploy`. Run visual checks with `npm run e2e:visual`; update fixed-environment baselines with `npm run e2e:visual -- --update-snapshots`.
+Run `npm run lint`, `npm test`, `npm run e2e`, and `npm run build`. The complete local Q-001 fallback gate is `npm run predeploy`. Run visual checks with `npm run e2e:visual`; update baselines with `npm run e2e:visual -- --update-snapshots`.
+
+Pixel-snapshot comparison runs on the two Chromium projects only (`chromium-desktop`, `chromium-tablet`). WebKit's headless text/anti-aliasing output was found not to be pixel-stable run-to-run even with identical input (2-4% diffs on a clean re-run), so `webkit-mobile` keeps full functional e2e coverage but is excluded from `@visual` via `testIgnore` in `playwright.config.js`.
+
+Locally on Windows, running visual snapshots requires `--workers=1` — running the 3 Playwright projects in parallel produces enough CPU contention to intermittently blow the screenshot-stability window even on Chromium. CI runners are dedicated and should not need this, but if `npm run e2e:visual` is flaky in CI, add `--workers=1` there too before assuming a real regression.
+
+### Visual baseline bootstrap (one-time)
+
+No snapshot baselines are committed yet. Local Windows-generated (`-win32.png`) baselines are intentionally **not** committed — Playwright suffixes snapshot filenames by OS, so they wouldn't match CI's Linux run anyway, and cross-OS font rendering differs enough to produce false failures (this is why `npm run e2e:visual` is `continue-on-error: true` in `.github/workflows/ci.yml` for now). To bootstrap real baselines:
+
+1. Trigger the `app-quality` workflow on a throwaway branch (or run it once manually).
+2. Download the job's working tree, or add a one-off step that runs `npm run e2e:visual -- --update-snapshots` and uploads `app/e2e/visual.spec.js-snapshots/` as an artifact.
+3. Commit the resulting `-linux.png` files to `app/e2e/visual.spec.js-snapshots/`.
+4. Remove `continue-on-error: true` from the `e2e:visual` step in `ci.yml` once baselines are committed and green.
 
 ## Pre-workshop checklist
 

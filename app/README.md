@@ -15,8 +15,12 @@ Then open the local Vite URL shown in the terminal, usually `http://127.0.0.1:51
 
 ```bash
 npm test
+npm run lint
+npm run e2e
 npm run build
 ```
+
+Use `?present=1` for the high-contrast projector theme and `?teach=1` for the six-step presenter flow. New participants receive a four-step bilingual EN/VN tour.
 
 ## What it shows
 

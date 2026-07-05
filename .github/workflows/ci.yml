@@ -20,7 +20,10 @@ jobs:
       - run: npm test
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run e2e
+      # No Linux baselines are committed yet (see app/deployment.md "Visual baseline
+      # bootstrap"); this step is non-blocking until the first CI-generated set lands.
       - run: npm run e2e:visual
+        continue-on-error: true
       - run: npm run build
       - if: failure()
         uses: actions/upload-artifact@v4

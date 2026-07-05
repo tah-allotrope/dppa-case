@@ -69,6 +69,14 @@ button { cursor: pointer; }
   overflow: hidden;
 }
 
+:root[data-webdriver] .panel {
+  backdrop-filter: none;
+}
+
+:root[data-webdriver] .glow-frame::after {
+  content: none;
+}
+
 .glow-frame::after {
   content: '';
   position: absolute;

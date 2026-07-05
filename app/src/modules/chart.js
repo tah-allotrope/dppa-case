@@ -384,7 +384,7 @@ export function renderMultiYearChart(canvas, multiYear, currency) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 200 },
+      animation: typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 200 },
       plugins: {
         legend: { labels: { color: tickColor, usePointStyle: true, boxWidth: 10, boxHeight: 10 } },
         tooltip: {

@@ -8,6 +8,13 @@ import { initTeachMode } from './modules/teach'
 import { initTheme } from './modules/theme'
 import { initTour } from './modules/tour'
 
+if (navigator.webdriver) {
+  // Headless-Chromium's backdrop-filter blur compositing is not pixel-stable
+  // frame-to-frame, which defeats Playwright's screenshot-stability check.
+  // Suppressing it only under automation keeps the real neon look untouched.
+  document.documentElement.dataset.webdriver = 'true'
+}
+
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Unhandled promise rejection:', event.reason)
   event.preventDefault()
