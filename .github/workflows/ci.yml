@@ -12,10 +12,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
           cache-dependency-path: app/package-lock.json
-      - run: npm ci
+      # npm ci previously failed here on optional-native-binary lockfile drift
+      # (@emnapi/core missing) caused by a local/CI npm-version mismatch when the
+      # lockfile was last regenerated; npm install is more tolerant of this class
+      # of platform-optional-dependency resolution difference.
+      - run: npm install
       - run: npm run lint
       - run: npm test
       - run: npx playwright install --with-deps chromium webkit
