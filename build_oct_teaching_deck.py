@@ -155,14 +155,29 @@ def divider(prs, module_num, t):
 
 
 def fallback_slide(prs, module_num, gif_path=None, note=""):
+    from PIL import Image
     s = blank_slide(prs)
     add_textbox(s, 0.5, 0.3, 9.0, 0.5, f"[Fallback — Module {module_num} app demo]", 16, GRAY, bold=True)
-    if gif_path and os.path.exists(gif_path):
+    mp4_path = os.path.join(ASSETS, "fallback", f"teach-m{module_num}.mp4")
+    poster_path = os.path.join(ASSETS, "fallback", f"teach-m{module_num}-poster.png")
+    if os.path.exists(mp4_path):
+        iw, ih = Image.open(poster_path).size if os.path.exists(poster_path) else (1280, 720)
+        left, top, max_width, max_height = 0.5, 0.9, 9.0, 3.9
+        ratio = min(max_width / iw, max_height / ih)
+        w_in, h_in = iw * ratio, ih * ratio
+        x_in = left + (max_width - w_in) / 2
+        y_in = top + (max_height - h_in) / 2
+        s.shapes.add_movie(
+            mp4_path, Inches(x_in), Inches(y_in), Inches(w_in), Inches(h_in),
+            poster_frame_image=poster_path if os.path.exists(poster_path) else None,
+            mime_type="video/mp4",
+        )
+    elif gif_path and os.path.exists(gif_path):
         add_picture_fit(s, gif_path, 0.5, 0.9, 9.0, 3.9)
     else:
         add_textbox(s, 0.5, 1.5, 9.0, 1.0,
-                    "Recorded demo not yet captured — see PHASE-02 TASK-02-05. "
-                    "Record from ?teach=1 step for this module and drop the GIF/MP4 in assets/teaching/fallback/.",
+                    "Recorded demo not yet captured. Run: npm run record:demos (app/) — "
+                    "this regenerates assets/teaching/fallback/teach-m*.mp4 from the live ?teach=1 steps.",
                     12, GRAY)
     if note:
         add_textbox(s, 0.5, 4.9, 9.0, 0.3, note, 9, GRAY)

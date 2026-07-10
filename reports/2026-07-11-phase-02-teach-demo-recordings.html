@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: PHASE-02 Teach-Demo Recordings</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#111111',
+          primaryTextColor: '#e8f6ff',
+          primaryBorderColor: '#00f5ff',
+          lineColor: '#39ff14',
+          secondaryColor: '#121a1a',
+          tertiaryColor: '#111111',
+          background: '#0d0d0d',
+          mainBkg: '#0d0d0d',
+          nodeBorder: '#00f5ff',
+          clusterBkg: '#111111',
+          clusterBorder: '#39ff14',
+          edgeLabelBackground: '#0d0d0d'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg-soft: #111111;
+      --panel: rgba(13, 13, 13, 0.88);
+      --panel-strong: rgba(19, 19, 19, 0.96);
+      --line: rgba(0, 245, 255, 0.26);
+      --line-strong: rgba(57, 255, 20, 0.38);
+      --text: #e9f6ff;
+      --muted: #8ea3ad;
+      --accent-blue: #00f5ff;
+      --accent-green: #39ff14;
+      --glow-blue: 0 0 18px rgba(0, 245, 255, 0.42);
+      --glow-green: 0 0 18px rgba(57, 255, 20, 0.28);
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.32);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      position: relative;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0, 245, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(57, 255, 20, 0.08), transparent 24%),
+        linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text);
+      font-family: var(--narrative-font);
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.16;
+    }
+
+    a {
+      color: var(--accent-blue);
+    }
+
+    code,
+    pre,
+    .technical,
+    .meta-chip,
+    .section-kicker,
+    .pill,
+    .metric-label,
+    .metric-value,
+    .repo-tag,
+    .mermaid {
+      font-family: var(--technical-font);
+    }
+
+    .page-shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 32px 0 72px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      position: relative;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(0, 245, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+        var(--panel-strong);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -55% 42%;
+      height: 280px;
+      background: radial-gradient(circle, rgba(0, 245, 255, 0.18), transparent 64%);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr);
+      gap: 22px;
+      align-items: end;
+    }
+
+    .section-kicker {
+      margin: 0 0 12px;
+      color: var(--accent-green);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      text-shadow: var(--glow-green);
+    }
+
+    .phase-title {
+      margin: 0;
+      max-width: 16ch;
+      font-size: clamp(2.1rem, 4.2vw, 3.7rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      color: #f5feff;
+      text-transform: uppercase;
+      text-wrap: balance;
+      text-shadow: 0 0 24px rgba(0, 245, 255, 0.2);
+    }
+
+    .hero-summary {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .hero-meta {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border: 1px solid rgba(57, 255, 20, 0.2);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.025);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.24);
+    }
+
+    .meta-label {
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .meta-chip {
+      color: var(--accent-blue);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-shadow: var(--glow-blue);
+      word-break: break-word;
+    }
+
+    .repo-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 245, 255, 0.24);
+      border-radius: 999px;
+      background: rgba(0, 245, 255, 0.08);
+      color: var(--accent-blue);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+    }
+
+    .section {
+      position: relative;
+      margin-top: 22px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.9), rgba(57, 255, 20, 0.9), transparent);
+      transform: translateY(-1px);
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      line-height: 1.1;
+      color: #f0feff;
+    }
+
+    .section-index {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent-green);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-shadow: var(--glow-green);
+    }
+
+    .section-index::after {
+      content: "";
+      width: 44px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), transparent);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .column-card,
+    .diagram-frame,
+    .technical-frame,
+    .viz-frame,
+    .question-frame,
+    .empty-state {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+        rgba(7, 7, 7, 0.82);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.012);
+    }
+
+    .column-card {
+      padding: 18px;
+      min-height: 160px;
+    }
+
+    .column-label {
+      margin: 0 0 12px;
+      color: var(--accent-blue);
+      font-size: 0.83rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      text-shadow: var(--glow-blue);
+    }
+
+    .splitter {
+      width: 100%;
+      height: 1px;
+      margin: 8px 0 16px;
+      background: linear-gradient(90deg, rgba(0, 245, 255, 0.4), transparent);
+    }
+
+    .diagram-frame,
+    .chart-frame,
+    .technical-frame,
+    .viz-frame,
+    .question-frame {
+      padding: 18px;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--text);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .chart-frame,
+    .viz-frame {
+      overflow: hidden;
+    }
+
+    .technical-frame {
+      color: #d6f6ff;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .technical-frame th,
+    .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      vertical-align: top;
+    }
+
+    .technical-frame th {
+      color: var(--accent-green);
+      font-size: 0.76rem;
+      text-align: left;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .chart-frame canvas,
+    .technical-frame > canvas,
+    .viz-frame canvas,
+    canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 280px !important;
+      min-height: 280px;
+      max-height: 280px;
+    }
+
+    .empty-state {
+      padding: 22px;
+      text-align: center;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent-blue);
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: var(--glow-blue);
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      padding: 14px 16px;
+      border: 1px solid rgba(0, 245, 255, 0.18);
+      border-radius: var(--radius-sm);
+      background: rgba(0, 245, 255, 0.04);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      color: var(--accent-green);
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-shadow: var(--glow-green);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border: 1px solid rgba(57, 255, 20, 0.22);
+      border-radius: 999px;
+      background: rgba(57, 255, 20, 0.06);
+      color: #d9ffd0;
+      font-size: 0.8rem;
+    }
+
+    .question-frame ul,
+    .technical-frame ul,
+    .column-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .question-frame li,
+    .technical-frame li,
+    .column-card li {
+      margin-bottom: 8px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: right;
+      color: rgba(142, 163, 173, 0.72);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .summary-grid,
+      .metric-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .phase-title {
+        max-width: none;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, 1180px);
+        padding-top: 16px;
+        padding-bottom: 42px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .section::before {
+        left: 18px;
+        right: 18px;
+      }
+
+      .phase-title {
+        font-size: clamp(2rem, 12vw, 3rem);
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / PHASE-02</p>
+          <h1 class="phase-title">Teach-Demo Recordings</h1>
+          <p class="hero-summary">
+            Automated the single biggest remaining stage-failure contingency: the six
+            hidden fallback slides in the October teaching deck used to say "recorded
+            demo not yet captured — needs a human." They now embed real MP4 recordings
+            of the live <code>?teach=1</code> presenter flow, generated end-to-end by
+            one command and re-runnable whenever the numbers or UI change.
+          </p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">project :: dppa-case</span>
+            <span class="pill">date :: 2026-07-11</span>
+            <span class="pill">plan :: 2026-07-10-october-readiness-hardening-plan</span>
+          </div>
+          <div class="repo-tag">repo :: dppa-case (branch cc-nightly/20260710-213046)</div>
+        </div>
+
+        <div class="hero-meta">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">dppa-case</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">dppa-case</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-11</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Input -> Output</div>
+          <h2 class="section-title">Input -> Output Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <p class="column-label">Input (before)</p>
+          <ul>
+            <li>6 hidden fallback slides in <code>ceba/DPPA Presentation Oct 2026 To Teach.pptx</code>, each showing placeholder text pointing at an old plan task number</li>
+            <li>A working <code>?teach=1</code> six-step presenter mode already driving real DOM controls (<code>app/src/modules/teach.js</code> + <code>app/src/data/teach-steps.js</code>), previously only usable live, never recorded</li>
+            <li><code>ffmpeg-static</code> and a recording script did not exist in <code>app/</code></li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <p class="column-label">Output (after)</p>
+          <ul>
+            <li><code>app/scripts/record-teach-demos.mjs</code> (new) + <code>npm run record:demos</code> — builds the app, serves it on a dedicated port, drives Chromium through each of the 6 teach steps, records video, transcodes to H.264 MP4, extracts a representative poster frame</li>
+            <li><code>assets/teaching/fallback/teach-m{1..6}.mp4</code> + <code>teach-m{1..6}-poster.png</code> (12 files, ~8.5 MB total) — committed, regenerable</li>
+            <li><code>build_oct_teaching_deck.py</code>'s <code>fallback_slide()</code> now embeds the MP4 (with poster) via <code>python-pptx</code>'s <code>add_movie</code>, falling back to GIF then placeholder text if a recording is missing</li>
+            <li>Rebuilt deck: 6 real media shapes, 0 placeholder-text fallback slides remaining, audit still PASS</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Logic Flow</div>
+          <h2 class="section-title">Logic Flow</h2>
+        </div>
+      </div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">
+flowchart LR
+  A["npm install -D<br/>ffmpeg-static"] --> B["vite build"]
+  B --> C["spawn vite preview<br/>on port 4174"]
+  C --> D["poll until<br/>HTTP 200"]
+  D --> E["for each of 6 steps:<br/>fresh Chromium context"]
+  E --> F["goto ?teach=1&present=1<br/>click #teachNext x N"]
+  F --> G{"step needs<br/>live action?"}
+  G -->|M3: sign flip| H["drag marketPrice<br/>1200 to 1350"]
+  G -->|M6: lever| I["drag strikePrice<br/>1250 down to 1100"]
+  G -->|other steps| J["hold 4s"]
+  H --> K["close context<br/>flush webm"]
+  I --> K
+  J --> K
+  K --> L["ffmpeg transcode<br/>to H.264 mp4"]
+  L --> M["ffmpeg -sseof -2<br/>extract poster frame"]
+  M --> N["verify 12 files<br/>each greater than 20KB"]
+  N --> O["fallback_slide() embeds<br/>mp4 + poster via add_movie"]
+  O --> P["rebuild deck<br/>audit PASS, 6 media shapes"]
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Math / Algorithm Used</div>
+          <h2 class="section-title">Math / Algorithm Used</h2>
+        </div>
+      </div>
+      <div class="technical-frame">
+        <p>No settlement math changed. The only "algorithm" in this phase is the
+        aspect-fit placement reused from the deck's existing <code>add_picture_fit</code>
+        pattern, applied to the embedded movie so it centers within the same
+        0.5in/0.9in/9.0in/3.9in slide region every other fallback visual uses:</p>
+        <p><code>ratio = min(max_width / image_width, max_height / image_height)</code><br/>
+        <code>w = image_width × ratio, h = image_height × ratio</code><br/>
+        <code>x = left + (max_width − w) / 2, y = top + (max_height − h) / 2</code></p>
+        <p>where <em>image_width/height</em> come from the poster PNG (so the movie
+        frame is sized identically to how the poster would have been placed as a
+        static picture), and all other symbols are inches on the slide canvas.</p>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Tools / Formulas / Methods</div>
+          <h2 class="section-title">Tools / Formulas / Methods</h2>
+        </div>
+      </div>
+      <div class="technical-frame technical">
+        <table>
+          <thead>
+            <tr><th>Tool / Command</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>@playwright/test</code> <code>chromium.launch()</code> + <code>recordVideo</code></td><td>Headless Chromium at 1280x720, one fresh context per step, native WebM capture</td></tr>
+            <tr><td><code>ffmpeg-static</code> (new devDependency, pinned binary)</td><td>WebM → H.264/yuv420p MP4 transcode + single-frame poster extraction</td></tr>
+            <tr><td><code>-sseof -2 -i in.mp4 -update 1 -frames:v 1 out.png</code></td><td>Seeks 2s from end-of-file before grabbing the poster frame — the fix for the first attempt, where frame 0 was mid-navigation and nearly blank</td></tr>
+            <tr><td><code>page.locator('#id').evaluate(...)</code> dispatching an <code>input</code> event</td><td>Drives the exact same sliders a presenter would drag, mirroring <code>setControlValue</code> in <code>teach.js</code></td></tr>
+            <tr><td><code>pptx.shapes.add_movie(path, x, y, w, h, poster_frame_image, mime_type="video/mp4")</code></td><td>Embeds the recording directly in the PPTX with a still poster shown until playback starts</td></tr>
+            <tr><td><code>npm test</code>, <code>npm run lint</code>, <code>npm run e2e</code>, <code>npm run build</code></td><td>Full regression battery, run after the change to confirm zero impact on existing app behavior</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Results &amp; Visualizations</div>
+          <h2 class="section-title">Results &amp; Visualizations</h2>
+        </div>
+      </div>
+      <div class="viz-frame">
+        <div class="metric-strip">
+          <div class="metric">
+            <div class="metric-label">Recordings produced</div>
+            <div class="metric-value">6 MP4 + 6 posters</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Media shapes in rebuilt deck</div>
+            <div class="metric-value">6 / 6</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Vitest / e2e result</div>
+            <div class="metric-value">51 unit + 27 e2e, all pass</div>
+          </div>
+        </div>
+        <div class="chart-frame" style="margin-top:18px;">
+          <canvas id="assetSizeChart"></canvas>
+        </div>
+      </div>
+      <script>
+        window.addEventListener('DOMContentLoaded', () => {
+          const ctx = document.getElementById('assetSizeChart');
+          if (!ctx || !window.Chart) return;
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6'],
+              datasets: [
+                { label: 'MP4 (KB)', data: [786, 828, 874, 971, 944, 1309], backgroundColor: '#00f5ff' },
+                { label: 'Poster PNG (KB)', data: [740, 471, 513, 475, 492, 464], backgroundColor: '#39ff14' }
+              ]
+            },
+            options: {
+              animation: false,
+              resizeDelay: 150,
+              normalized: true,
+              maintainAspectRatio: false,
+              responsive: true,
+              plugins: { legend: { labels: { color: '#e9f6ff' } } },
+              scales: {
+                x: { ticks: { color: '#8ea3ad' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                y: { ticks: { color: '#8ea3ad' }, grid: { color: 'rgba(255,255,255,0.06)' }, title: { display: true, text: 'KB', color: '#8ea3ad' } }
+              }
+            }
+          });
+        });
+      </script>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Limitations / Second-Best Alternative</div>
+          <h2 class="section-title">Limitations / Second-Best Alternative</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li>Headless Chromium's smooth-scroll and Chart.js animation timing may render very slightly differently than a live demo would look to the room. Accepted because <code>?present=1</code> is applied during recording (matching the projector theme) and these are fallback slides only played if the live app fails — clarity, not pixel-perfect fidelity to a live session, is the bar.</li>
+          <li>PowerPoint autoplay/click-to-play behavior for embedded MP4s has not been confirmed in real PowerPoint from this session (no PowerPoint available in this environment). This is flagged as a human-only manual check (<code>MANUAL-001</code> in the plan) and is already on the facilitator's pre-session checklist.</li>
+          <li>Second-best alternative (rejected, per the plan's ALT-001): a human screen-records the six demos manually. Rejected because that is the exact failure mode that left the fallbacks empty since July — not regenerable, blocks on human availability, and drifts silently the next time a scenario number changes.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Errors / Warnings / Flags</div>
+          <h2 class="section-title">Errors / Warnings / Flags Encountered</h2>
+        </div>
+      </div>
+      <div class="question-frame technical">
+        <ul>
+          <li><strong>Fixed in this session:</strong> the first recording pass produced 5 identical, tiny (4,346-byte) poster PNGs for modules 2-6 — <code>ffmpeg -frames:v 1</code> was grabbing frame 0 of each clip, captured mid-navigation before the page settled. Fixed by seeking 2 seconds from end-of-file (<code>-sseof -2</code>) before extracting the poster; re-ran the full recording and confirmed all 6 posters now carry real, varied content (464-740 KB range).</li>
+          <li><strong>Environment quirk (not a code bug):</strong> the shell's ambient <code>PYTHONPATH</code> points at a broken sandboxed venv (missing native <code>lxml</code>/<code>Pillow</code> extensions), which makes bare <code>py</code> invocations fail. The repo's own documented convention (<code>PYTHONPATH= py script.py</code>) sidesteps this; every Python command in this phase used that prefix and succeeded.</li>
+          <li><strong>Flagged, not resolved:</strong> the orchestrator's instructions contained a contradiction — a detailed, explicit "execute the first two phases, then STOP, do NOT execute phase 3" block, followed by a trailing line reading "Execute first three phase with git commit push at end." The explicit stop instruction was treated as authoritative and PHASE-03 was not started.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Open Questions / Next Phase Seeds</div>
+          <h2 class="section-title">Open Questions / Next Phase Seeds</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li>PHASE-03 (real 56-scenario gate sweep behind the M5 heatmap) is next in the plan and does not depend on this phase — it may run independently once resumed.</li>
+          <li>Seed for later: a human should confirm in real PowerPoint that the embedded MP4s autoplay (or are easy to click-to-play) during an actual slideshow — this is the one part of PHASE-02 that could not be verified from this environment.</li>
+          <li>No open questions remain for the automated portion of PHASE-02 — all exit criteria in the plan were met and verified with copy-paste-reproducible commands.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+    }
+  </script>
+</body>
+</html>

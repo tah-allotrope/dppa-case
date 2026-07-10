@@ -1,5 +1,12 @@
 # Teaching Notes & Preferences
 
+## October readiness hardening (2026-07-11)
+- Teach-mode fallback slides (the 6 hidden slides shown only if the live app fails)
+  now embed real recorded MP4s instead of placeholder text. Regenerate with
+  `cd app && npm run record:demos`, then rebuild the deck
+  (`PYTHONPATH= py build_oct_teaching_deck.py --lang en`). See
+  `plans/2026-07-10-october-readiness-hardening-plan.md` PHASE-02.
+
 ## How the user wants to be taught
 - **Distill, don't reproduce.** The deck is too wordy; each lesson = one crisp visual
   mental model that fits in working memory and can be whiteboarded in <5 min.

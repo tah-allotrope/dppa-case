@@ -22,6 +22,19 @@ npm run build
 
 Use `?present=1` for the high-contrast projector theme and `?teach=1` for the six-step presenter flow. New participants receive a four-step bilingual EN/VN tour.
 
+## Regenerate teach-mode fallback recordings
+
+```bash
+npm run record:demos
+```
+
+Records all six `?teach=1` presenter demos as MP4s (with poster frames) via
+Playwright + ffmpeg-static, writing to `../assets/teaching/fallback/teach-m{1..6}.mp4`
+and `teach-m{1..6}-poster.png`. `build_oct_teaching_deck.py` embeds these on the
+deck's hidden fallback slides automatically when present. Re-run this whenever
+`src/data/teach-steps.js` or the underlying scenario numbers change, then rebuild
+the deck (`PYTHONPATH= py build_oct_teaching_deck.py --lang en` from the repo root).
+
 ## What it shows
 
 - hourly factory load vs solar generation overlap;
