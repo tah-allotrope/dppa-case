@@ -15,6 +15,19 @@
   Fixed along the way: `app/src/modules/settlement.js` had an extensionless import
   (`from './profiles'`) that Vite tolerates but plain Node ESM does not — changed to
   `'./profiles.js'` so `node scripts/export-*.mjs` runs without a custom loader.
+- QR code (dppa-case.web.app) now on the deck's close slide
+  (`assets/teaching/qr-app-{en,vi,zh}.png`); `verify_deck_numbers.py` reconciles every
+  on-slide VND figure against the spine/sweep exports and runs as a CI job
+  (`deck-parity` in `.github/workflows/ci.yml`) alongside the app `quality` job.
+- **Translation prep:** `assets/teaching/terminology-map.json` +
+  `research/dppa-terminology-map.md` carry the EN→VI→ZH vocabulary that already
+  exists in the repo (breadcrumb labels, worksheet terms); `build_oct_teaching_deck.py
+  --lang vi|zh` now reads this map and refuses to build while any consumed key is
+  `UNTRANSLATED` — translate the map, don't touch the build script, when that work
+  starts (see `plans/2026-october-readiness-checklist.md`).
+- **Fresh-viewer test kit:** `facilitator/fresh-viewer-kit/` makes the one
+  validation that actually proves the redesign works (DEC-003) schedulable — hand
+  the folder to a volunteer who didn't attend July.
 
 ## How the user wants to be taught
 - **Distill, don't reproduce.** The deck is too wordy; each lesson = one crisp visual

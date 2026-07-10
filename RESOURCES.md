@@ -13,6 +13,13 @@ mission is to teach *this* deck, and the repo already encodes the verified mecha
 - **Verified number basis** — `app/src/data/default-scenarios.js` + `deck-qa/consolidation-map.md`.
   Retail 2,204 · fees 523.3 · loss 1.0342 · strike 2,000 · FMP ~1,427 (illustrative).
 - **Buyer guide** — `reports/2026-04-07-vietnam-dppa-buyer-guide.md`. Narrative companion.
+- **October 2026 teaching deck** — `ceba/DPPA Presentation Oct 2026 To Teach.pptx`
+  (27 slides, visual-first rebuild from the master). Numbers trace to
+  `assets/teaching/spine-s1.json` (five-line bill) and `assets/teaching/gate-sweep.json`
+  (56-scenario gate sweep, current result 5/56). Trust: HIGH (audited + parity-checked in CI).
+- **Terminology map** — `assets/teaching/terminology-map.json` +
+  `research/dppa-terminology-map.md`. The approved EN→VI→ZH vocabulary carrier for
+  PHASE-06 (vi/zh-cn deck cloning) — translate here, not by hand-editing the deck script.
 
 ## Primary (external / regulatory)
 - **Decree 57/2025/ND-CP** — DPPA framework (eligibility ≥22 kV, ≥200,000 kWh/mo, fee

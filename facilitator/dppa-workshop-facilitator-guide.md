@@ -154,7 +154,7 @@ This is a *different, shorter session* than the 90-min group workshop above: it 
 Timing flex: if running long, compress M4 (drop the multi-year app moment, state the crossover year verbally) before touching the M5 exercise — the hand-compute is the session's success criterion and should not be cut.
 
 ### Contingency
-- App fails at any teach-mode step → unhide the matching fallback slide (right after that module's divider) and play the recorded GIF/MP4. M3's fallback is `assets/cfd-s1-en.gif` (already recorded); M1/M2/M4/M5/M6 fallbacks are placeholders pending PHASE-02 TASK-02-05 screen-capture recordings of the live `?teach=1` steps — record these before October.
+- App fails at any teach-mode step → unhide the matching fallback slide (right after that module's divider) and play the recorded MP4. All six modules now have real recordings (`assets/teaching/fallback/teach-m1.mp4` … `teach-m6.mp4`, auto-embedded by `build_oct_teaching_deck.py`); M3's fallback additionally reuses `assets/cfd-s1-en.gif`. Regenerate any of these with `cd app && npm run record:demos` if the numbers or UI change, then rebuild the deck.
 - Wifi fails entirely → switch to the local `vite preview` build; the URL bar changes but the demo steps are identical.
 
 ### Pre-session validation (do this before October, not during)

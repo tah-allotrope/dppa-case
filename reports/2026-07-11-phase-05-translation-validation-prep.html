@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: PHASE-05 Translation &amp; Validation Prep</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#111111',
+          primaryTextColor: '#e8f6ff',
+          primaryBorderColor: '#00f5ff',
+          lineColor: '#39ff14',
+          secondaryColor: '#121a1a',
+          tertiaryColor: '#111111',
+          background: '#0d0d0d',
+          mainBkg: '#0d0d0d',
+          nodeBorder: '#00f5ff',
+          clusterBkg: '#111111',
+          clusterBorder: '#39ff14',
+          edgeLabelBackground: '#0d0d0d'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg-soft: #111111;
+      --panel: rgba(13, 13, 13, 0.88);
+      --panel-strong: rgba(19, 19, 19, 0.96);
+      --line: rgba(0, 245, 255, 0.26);
+      --line-strong: rgba(57, 255, 20, 0.38);
+      --text: #e9f6ff;
+      --muted: #8ea3ad;
+      --accent-blue: #00f5ff;
+      --accent-green: #39ff14;
+      --glow-blue: 0 0 18px rgba(0, 245, 255, 0.42);
+      --glow-green: 0 0 18px rgba(57, 255, 20, 0.28);
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.32);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      position: relative;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0, 245, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(57, 255, 20, 0.08), transparent 24%),
+        linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text);
+      font-family: var(--narrative-font);
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.16;
+    }
+
+    a {
+      color: var(--accent-blue);
+    }
+
+    code,
+    pre,
+    .technical,
+    .meta-chip,
+    .section-kicker,
+    .pill,
+    .metric-label,
+    .metric-value,
+    .repo-tag,
+    .mermaid {
+      font-family: var(--technical-font);
+    }
+
+    .page-shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 32px 0 72px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      position: relative;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(0, 245, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+        var(--panel-strong);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -55% 42%;
+      height: 280px;
+      background: radial-gradient(circle, rgba(0, 245, 255, 0.18), transparent 64%);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr);
+      gap: 22px;
+      align-items: end;
+    }
+
+    .section-kicker {
+      margin: 0 0 12px;
+      color: var(--accent-green);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      text-shadow: var(--glow-green);
+    }
+
+    .phase-title {
+      margin: 0;
+      max-width: 18ch;
+      font-size: clamp(1.9rem, 3.8vw, 3.3rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      color: #f5feff;
+      text-transform: uppercase;
+      text-wrap: balance;
+      text-shadow: 0 0 24px rgba(0, 245, 255, 0.2);
+    }
+
+    .hero-summary {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .hero-meta {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border: 1px solid rgba(57, 255, 20, 0.2);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.025);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.24);
+    }
+
+    .meta-label {
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .meta-chip {
+      color: var(--accent-blue);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-shadow: var(--glow-blue);
+      word-break: break-word;
+    }
+
+    .repo-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 245, 255, 0.24);
+      border-radius: 999px;
+      background: rgba(0, 245, 255, 0.08);
+      color: var(--accent-blue);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+    }
+
+    .section {
+      position: relative;
+      margin-top: 22px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.9), rgba(57, 255, 20, 0.9), transparent);
+      transform: translateY(-1px);
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      line-height: 1.1;
+      color: #f0feff;
+    }
+
+    .section-index {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent-green);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-shadow: var(--glow-green);
+    }
+
+    .section-index::after {
+      content: "";
+      width: 44px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), transparent);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .column-card,
+    .diagram-frame,
+    .technical-frame,
+    .viz-frame,
+    .question-frame,
+    .empty-state {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+        rgba(7, 7, 7, 0.82);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.012);
+    }
+
+    .column-card {
+      padding: 18px;
+      min-height: 160px;
+    }
+
+    .column-label {
+      margin: 0 0 12px;
+      color: var(--accent-blue);
+      font-size: 0.83rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      text-shadow: var(--glow-blue);
+    }
+
+    .splitter {
+      width: 100%;
+      height: 1px;
+      margin: 8px 0 16px;
+      background: linear-gradient(90deg, rgba(0, 245, 255, 0.4), transparent);
+    }
+
+    .diagram-frame,
+    .chart-frame,
+    .technical-frame,
+    .viz-frame,
+    .question-frame {
+      padding: 18px;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--text);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .chart-frame,
+    .viz-frame {
+      overflow: hidden;
+    }
+
+    .technical-frame {
+      color: #d6f6ff;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .technical-frame th,
+    .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      vertical-align: top;
+    }
+
+    .technical-frame th {
+      color: var(--accent-green);
+      font-size: 0.76rem;
+      text-align: left;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .chart-frame canvas,
+    .technical-frame > canvas,
+    .viz-frame canvas,
+    canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 280px !important;
+      min-height: 280px;
+      max-height: 280px;
+    }
+
+    .empty-state {
+      padding: 22px;
+      text-align: center;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent-blue);
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: var(--glow-blue);
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      padding: 14px 16px;
+      border: 1px solid rgba(0, 245, 255, 0.18);
+      border-radius: var(--radius-sm);
+      background: rgba(0, 245, 255, 0.04);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      color: var(--accent-green);
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-shadow: var(--glow-green);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border: 1px solid rgba(57, 255, 20, 0.22);
+      border-radius: 999px;
+      background: rgba(57, 255, 20, 0.06);
+      color: #d9ffd0;
+      font-size: 0.8rem;
+    }
+
+    .question-frame ul,
+    .technical-frame ul,
+    .column-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .question-frame li,
+    .technical-frame li,
+    .column-card li {
+      margin-bottom: 8px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: right;
+      color: rgba(142, 163, 173, 0.72);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .summary-grid,
+      .metric-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .phase-title {
+        max-width: none;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, 1180px);
+        padding-top: 16px;
+        padding-bottom: 42px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .section::before {
+        left: 18px;
+        right: 18px;
+      }
+
+      .phase-title {
+        font-size: clamp(2rem, 12vw, 3rem);
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / PHASE-05</p>
+          <h1 class="phase-title">Translation &amp; Validation Prep</h1>
+          <p class="hero-summary">
+            Built the vocabulary carrier and the test kit that make the two remaining
+            human-only steps — fresh-viewer validation and vi/zh-cn cloning —
+            schedulable without further design work. The deck build now refuses to
+            produce a Vietnamese or Chinese deck while any translation is missing,
+            replacing a silent English fallback with a loud, actionable failure.
+          </p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">project :: dppa-case</span>
+            <span class="pill">date :: 2026-07-11</span>
+            <span class="pill">plan :: 2026-07-10-october-readiness-hardening-plan</span>
+          </div>
+          <div class="repo-tag">repo :: dppa-case (branch cc-nightly/20260710-213046)</div>
+        </div>
+
+        <div class="hero-meta">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">dppa-case</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">dppa-case</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-11</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Input -> Output</div>
+          <h2 class="section-title">Input -> Output Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <p class="column-label">Input (before)</p>
+          <ul>
+            <li><code>build_oct_teaching_deck.py</code>: <code>TEXT["vi"] = TEXT["en"]</code> / <code>TEXT["zh"] = TEXT["en"]</code> — a silent English-fallback placeholder with no translation tracking</li>
+            <li>No structured way to know which deck sentences already have an approved translation elsewhere in the repo (lessons, worksheets, glossary) versus which are genuinely new</li>
+            <li>The fresh-viewer test (the one validation that proves DEC-003) was described only as a single checklist bullet in the facilitator guide — no kit, no rubric, no feedback instrument</li>
+            <li>No dated, concrete plan existed for the remaining path to an October session (Q-001/Q-002 in the original teaching-revamp brainstorm were still open)</li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <p class="column-label">Output (after)</p>
+          <ul>
+            <li><code>assets/teaching/terminology-map.json</code> (new) — 43 entries, one per <code>TEXT["en"]</code> key; 12 VI / 10 ZH genuinely sourced from existing repo assets (breadcrumb labels, worksheet terms), the rest honestly <code>UNTRANSLATED</code></li>
+            <li><code>research/dppa-terminology-map.md</code> (new) — human-readable term table with citations, for whoever does the actual translation later</li>
+            <li><code>build_oct_teaching_deck.py</code>: new <code>load_text(lang)</code> reads the map for vi/zh, aborts loudly listing every unresolved key; <code>--lang en</code> is untouched (byte-stable, confirmed)</li>
+            <li><code>facilitator/fresh-viewer-kit/</code> (new: <code>README.md</code>, <code>rubric.md</code>, <code>feedback-form.md</code>) — a self-contained packet a presenter can hand to any volunteer</li>
+            <li><code>plans/2026-october-readiness-checklist.md</code> (new) — dated backward plan from Oct 1, already marking PHASE-01 through PHASE-04's work as done ahead of schedule</li>
+            <li>Fixed a stale reference in the facilitator guide claiming 5 of 6 fallback recordings were still pending (they were completed in PHASE-02)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Logic Flow</div>
+          <h2 class="section-title">Logic Flow</h2>
+        </div>
+      </div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">
+flowchart LR
+  A["Search lessons/*-vi.html,<br/>*-zh-cn.html, build_teaching_visuals.py<br/>TEXTS for exact-match translations"] --> B["4 genuine verbatim matches found:<br/>divider x6 (breadcrumb labels),<br/>m2a_title, m3_title, m4_title"]
+  B --> C["terminology-map.json:<br/>43 entries, cited sources,<br/>UNTRANSLATED elsewhere"]
+  C --> D["build_oct_teaching_deck.py<br/>load_text(lang)"]
+  D --> E{"lang == en?"}
+  E -->|yes| F["return TEXT['en']<br/>unchanged, byte-stable"]
+  E -->|no| G["overlay map onto<br/>TEXT['en'] copy"]
+  G --> H{"any key still<br/>UNTRANSLATED?"}
+  H -->|yes| I["exit 1, list every<br/>missing key by name"]
+  H -->|no| J["build proceeds"]
+  K["fresh-viewer-kit/:<br/>README + rubric + feedback-form"] --> L["schedulable human validation<br/>of DEC-003 success criterion"]
+  M["october-readiness-checklist.md"] --> N["dated path to freeze,<br/>marks PHASE-01..04 done early"]
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Math / Algorithm Used</div>
+          <h2 class="section-title">Math / Algorithm Used</h2>
+        </div>
+      </div>
+      <div class="technical-frame">
+        <div class="empty-state">
+          <strong>No numeric formulas in this phase</strong>
+          The only "logic" is the key-resolution algorithm in <code>load_text(lang)</code>:
+          for each of 20 simple keys, 4 six/three-item list keys, and 5 decoder-row plain-language
+          labels, look up the corresponding <code>terminology-map.json</code> entry; if absent or
+          literally the string <code>"UNTRANSLATED"</code>, add it to a missing-keys list; after
+          processing every key, if that list is non-empty, print it and exit 1 — otherwise return
+          the fully-overlaid text structure. <code>m6_levers</code> is explicitly excluded (sourced
+          from <code>spine-s1.json</code>, not this map).
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Tools / Formulas / Methods</div>
+          <h2 class="section-title">Tools / Formulas / Methods</h2>
+        </div>
+      </div>
+      <div class="technical-frame technical">
+        <table>
+          <thead>
+            <tr><th>Tool / File</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>assets/teaching/terminology-map.json</code> (new)</td><td>Machine-readable EN/VI/ZH overlay, one entry per <code>TEXT["en"]</code> key, cited sources per translated entry</td></tr>
+            <tr><td><code>research/dppa-terminology-map.md</code> (new)</td><td>Human-readable term table + explicit list of known gaps not to guess at</td></tr>
+            <tr><td><code>load_text(lang)</code> in <code>build_oct_teaching_deck.py</code></td><td>Reads the map, overlays onto <code>TEXT["en"]</code>, fails loudly on incompleteness</td></tr>
+            <tr><td><code>facilitator/fresh-viewer-kit/{README,rubric,feedback-form}.md</code> (new)</td><td>Self-contained packet: instructions, live-scoring rubric with the exact answer key from <code>spine-s1.json</code>, and a volunteer-facing feedback form</td></tr>
+            <tr><td><code>plans/2026-october-readiness-checklist.md</code> (new)</td><td>Dated, checkbox-format path to the session, marking what's already done</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Results &amp; Visualizations</div>
+          <h2 class="section-title">Results &amp; Visualizations</h2>
+        </div>
+      </div>
+      <div class="viz-frame">
+        <div class="metric-strip">
+          <div class="metric">
+            <div class="metric-label">Map entries</div>
+            <div class="metric-value">43</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Genuinely sourced</div>
+            <div class="metric-value">12 VI / 10 ZH</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">--lang en stability</div>
+            <div class="metric-value">Byte-stable, confirmed</div>
+          </div>
+        </div>
+        <div class="chart-frame" style="margin-top:18px;">
+          <canvas id="translationChart"></canvas>
+        </div>
+      </div>
+      <script>
+        window.addEventListener('DOMContentLoaded', () => {
+          const ctx = document.getElementById('translationChart');
+          if (!ctx || !window.Chart) return;
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['Vietnamese', 'Chinese'],
+              datasets: [
+                { label: 'Sourced (reused from existing assets)', data: [12, 10], backgroundColor: '#39ff14' },
+                { label: 'UNTRANSLATED (new Oct-2026 sentences)', data: [31, 33], backgroundColor: 'rgba(255,255,255,0.15)' }
+              ]
+            },
+            options: {
+              animation: false,
+              resizeDelay: 150,
+              normalized: true,
+              maintainAspectRatio: false,
+              responsive: true,
+              indexAxis: 'y',
+              plugins: { legend: { labels: { color: '#e9f6ff' } } },
+              scales: {
+                x: { stacked: true, ticks: { color: '#8ea3ad' }, grid: { color: 'rgba(255,255,255,0.06)' }, title: { display: true, text: 'Entries (of 43)', color: '#8ea3ad' } },
+                y: { stacked: true, ticks: { color: '#8ea3ad' }, grid: { display: false } }
+              }
+            }
+          });
+        });
+      </script>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Limitations / Second-Best Alternative</div>
+          <h2 class="section-title">Limitations / Second-Best Alternative</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li>31 of 43 (VI) / 33 of 43 (ZH) entries are honestly <code>UNTRANSLATED</code> — this phase deliberately did not invent translations for the new Oct-2026 slide sentences, per ASM-007. That work is scoped to happen after content freeze, by a qualified speaker, using this map as the vocabulary starting point.</li>
+          <li>Second-best alternative (rejected): approximate the untranslated deck sentences using the differently-worded VI/ZH chart captions already in <code>build_teaching_visuals.py</code> (e.g. its own <code>m1_title</code>/<code>m5_title</code>, which say something similar but not identical). Rejected — a paraphrase presented as a sourced translation would be worse than an honest gap, since it could silently ship wrong wording under a false "trust: verified" label.</li>
+          <li>The fresh-viewer test and the timed solo dry-run remain genuinely human-only — this phase only lowers the activation energy to schedule them, it cannot substitute for a real person sitting through the session.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Errors / Warnings / Flags</div>
+          <h2 class="section-title">Errors / Warnings / Flags Encountered</h2>
+        </div>
+      </div>
+      <div class="question-frame technical">
+        <ul>
+          <li>No test, lint, audit, or parity failures in this phase. <code>--lang en</code> rebuilt identically (same first/last slide text, 27 slides, audit PASS, parity PASS); <code>--lang vi</code> and <code>--lang zh</code> both correctly exited 1 with distinct, asymmetric missing-key lists (confirming the per-language independence the plan's edge-case test spec called for — e.g. "Total consumption" is translated for VI but not ZH, and the missing-key lists reflect that difference exactly).</li>
+          <li>Found and fixed one stale doc reference while updating the facilitator guide's contingency section: it still said 5 of 6 fallback recordings were pending PHASE-02, which had already shipped all 6 in this same session.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Open Questions / Next Phase Seeds</div>
+          <h2 class="section-title">Open Questions / Next Phase Seeds</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li>PHASE-06 (root-directory cleanup) is next — deliberately last since it's pure hygiene with no dependency on this phase's outputs.</li>
+          <li>Seed for later: once a fresh-viewer test actually runs, its <code>rubric.md</code>/<code>feedback-form.md</code> pair should be filed somewhere durable (e.g. a dated copy in <code>reports/</code>) rather than overwritten by the next test run.</li>
+          <li>Seed for later: Q-001 (exact October date/venue) and Q-002 (who is the fresh-viewer volunteer) from the original teaching-revamp brainstorm are still open — <code>plans/2026-october-readiness-checklist.md</code> now gives a concrete backward plan assuming Oct 1, but the user should confirm the real date to firm up the mid/late-September windows.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+    }
+  </script>
+</body>
+</html>
