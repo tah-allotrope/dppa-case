@@ -230,11 +230,14 @@ def m6_levers_slide(prs, t):
 def close_slide(prs, t):
     s = blank_slide(prs)
     add_textbox(s, 0.5, 0.4, 9.0, 0.6, t["close_title"], 22, TEAL, bold=True, align=PP_ALIGN.CENTER)
-    add_picture_fit(s, os.path.join(ASSETS, "cold-open-bill-pair-en.png"), 1.0, 1.1, 8.0, 3.0)
+    add_picture_fit(s, os.path.join(ASSETS, "cold-open-bill-pair-en.png"), 0.4, 1.1, 6.8, 3.0)
+    qr_path = os.path.join(ASSETS, "qr-app-en.png")
+    if os.path.exists(qr_path):
+        add_picture_fit(s, qr_path, 7.5, 1.3, 1.9, 1.9)
+        add_textbox(s, 7.5, 3.25, 1.9, 0.3, "Scan: dppa-case.web.app", 8, GRAY, align=PP_ALIGN.CENTER)
     add_textbox(s, 0.5, 4.3, 9.0, 0.6, t["close_body"], 12, GRAY, align=PP_ALIGN.CENTER)
     set_notes(s, "CLOSE (2 min). Point back at the cold-open bars. "
-                 "Invite to the 90-min scenario workshop for negotiation practice. QR: dppa-case.web.app and lessons index "
-                 "(QR image pending python 'qrcode' package — currently a text URL; see PHASE-03 note).")
+                 "Invite to the 90-min scenario workshop for negotiation practice. QR: dppa-case.web.app and lessons index.")
     return s
 
 

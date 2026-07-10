@@ -389,6 +389,21 @@ def render_breadcrumb(lang):
         print("PNG:", path, os.path.getsize(path), "bytes")
 
 
+APP_URL = "https://dppa-case.web.app"
+
+
+def render_qr(lang):
+    import qrcode
+
+    os.makedirs(OUT_DIR, exist_ok=True)
+    path = os.path.join(OUT_DIR, f"qr-app-{lang}.png")
+    img = qrcode.make(APP_URL, border=2)
+    img = img.resize((400, 400))
+    img.save(path)
+    print("PNG:", path, os.path.getsize(path), "bytes")
+    return path
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--lang", default="en", choices=["en", "vi", "zh"])
@@ -401,6 +416,7 @@ def main():
     render_m3_seesaw(args.lang, spine)
     render_m4_three_doors(args.lang, spine)
     render_m5_heatmap(args.lang, spine, sweep)
+    render_qr(args.lang)
     render_cold_open(args.lang, spine)
     render_breadcrumb(args.lang)
 

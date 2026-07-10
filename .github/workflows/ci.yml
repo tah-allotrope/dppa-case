@@ -34,6 +34,31 @@ jobs:
         with:
           name: playwright-report
           path: app/playwright-report
+  deck-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Install app deps
+        working-directory: app
+        run: npm install
+      - name: Regenerate spine + sweep from the settlement engine
+        working-directory: app
+        run: |
+          node scripts/export-spine.mjs
+          node scripts/export-sweep.mjs
+      - name: Fail if the committed exports drifted from the engine
+        run: git diff --exit-code assets/teaching/spine-s1.json assets/teaching/gate-sweep.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install python-pptx
+      - run: python audit_teaching_deck.py
+      - run: python verify_deck_numbers.py
   # Q-001 fallback: Firebase deployment intentionally disabled until credentials exist.
   # deploy:
   #   needs: quality
