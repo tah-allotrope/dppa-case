@@ -53,7 +53,7 @@ TEXTS = {
         "m4_investor": "Investor door", "m4_investor_rule": "Equity return 12-15%",
         "m5_title": "56 scenarios: how many pass all three doors?",
         "m5_xlabel": "Strike price scenarios", "m5_ylabel": "Contracted-volume scenarios",
-        "m5_caption": "0 of 56 pass every gate at once — the empty window.",
+        "m5_caption": "{n} of 56 pass every gate at once.",
         "cold_open_title": "Same factory, one month",
         "cold_open_bau": "Today (EVN retail only)", "cold_open_dppa": "With a DPPA",
         "cold_open_hook": "Where did the difference come from?\nYou will compute it yourself.",
@@ -81,7 +81,7 @@ TEXTS = {
         "m4_investor": "Cửa nhà đầu tư", "m4_investor_rule": "Lợi nhuận vốn 12-15%",
         "m5_title": "56 kịch bản: bao nhiêu vượt cả ba cửa?",
         "m5_xlabel": "Kịch bản giá thực hiện", "m5_ylabel": "Kịch bản sản lượng hợp đồng",
-        "m5_caption": "0/56 vượt qua tất cả các cửa cùng lúc — cửa sổ trống.",
+        "m5_caption": "{n}/56 vượt qua tất cả các cửa cùng lúc.",
         "cold_open_title": "Cùng một nhà máy, một tháng",
         "cold_open_bau": "Hôm nay (chỉ giá bán lẻ EVN)", "cold_open_dppa": "Với DPPA",
         "cold_open_hook": "Khác biệt đến từ đâu?\nBạn sẽ tự tính.",
@@ -109,7 +109,7 @@ TEXTS = {
         "m4_investor": "投资人之门", "m4_investor_rule": "股本回报 12-15%",
         "m5_title": "56种情景:有多少能通过全部三道门?",
         "m5_xlabel": "执行价情景", "m5_ylabel": "合同电量情景",
-        "m5_caption": "56种情景中0种能同时通过所有门槛 —— 空窗期。",
+        "m5_caption": "56种情景中{n}种能同时通过所有门槛。",
         "cold_open_title": "同一家工厂,同一个月",
         "cold_open_bau": "今天(仅EVN零售价)", "cold_open_dppa": "采用DPPA后",
         "cold_open_hook": "差额从何而来?\n您将亲自计算。",
@@ -122,6 +122,11 @@ OUT_DIR = os.path.join("assets", "teaching")
 
 def load_spine():
     with open(os.path.join(OUT_DIR, "spine-s1.json"), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_sweep():
+    with open(os.path.join(OUT_DIR, "gate-sweep.json"), encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -300,21 +305,42 @@ def render_m4_three_doors(lang, spine):
 
 
 # ---------- M5: 56-scenario gate heatmap ----------
-def render_m5_heatmap(lang, spine):
+def render_m5_heatmap(lang, spine, sweep):
+    from matplotlib.colors import LinearSegmentedColormap
+
     t = TEXTS[lang]
-    rng = np.random.default_rng(42)
-    grid = np.zeros((8, 7))
+    strikes = sweep["strikes"]  # ascending, 8 values -> x-axis (m5_xlabel = strike scenarios)
+    ratios = sweep["ratios"]  # ascending, 7 values -> y-axis (m5_ylabel = contracted-volume scenarios)
+    pass_count = sweep["passCount"]
+
+    # grid[ratio_idx][strike_idx] = number of gates passed (0-3); row 0 =
+    # lowest ratio so origin="lower" reads volume ratios ascending bottom-to-top,
+    # matching the x=strike / y=contracted-volume axis labels below.
+    grid = np.zeros((len(ratios), len(strikes)))
+    by_key = {(c["strike"], c["ratio"]): c for c in sweep["cells"]}
+    for i, ratio in enumerate(ratios):
+        for j, strike in enumerate(strikes):
+            cell = by_key[(strike, ratio)]
+            grid[i, j] = int(cell["buyerPass"]) + int(cell["lenderPass"]) + int(cell["investorPass"])
+
+    cmap = LinearSegmentedColormap.from_list("gate_pass", ["#FDE0DC", "#0097A7"])
     fig, ax = plt.subplots(figsize=(9, 6), dpi=200)
     fig.patch.set_facecolor("white"); ax.set_facecolor("white")
-    im = ax.imshow(grid, cmap="Reds_r", vmin=0, vmax=1, aspect="auto")
+    ax.imshow(grid, cmap=cmap, vmin=0, vmax=3, aspect="auto", origin="lower")
     ax.set_xlabel(t["m5_xlabel"], fontsize=12, color=GRAY, fontfamily=FONT[lang])
     ax.set_ylabel(t["m5_ylabel"], fontsize=12, color=GRAY, fontfamily=FONT[lang])
-    ax.set_xticks([]); ax.set_yticks([])
+    ax.set_xticks(range(len(strikes)))
+    ax.set_xticklabels([f"{s:,}" for s in strikes], fontsize=8, color=GRAY, rotation=45, ha="right")
+    ax.set_yticks(range(len(ratios)))
+    ax.set_yticklabels([f"{round(r * 100)}%" for r in ratios], fontsize=8, color=GRAY)
     for spine_ in ax.spines.values(): spine_.set_color("#E0E0E0")
-    ax.text(3, 3.5, "0 / 56", ha="center", va="center", fontsize=42, fontweight="bold", color="white",
-            path_effects=None)
+    ax.text(
+        (len(strikes) - 1) / 2, (len(ratios) - 1) / 2, f"{pass_count} / 56",
+        ha="center", va="center", fontsize=36, fontweight="bold", color=INK,
+        bbox=dict(facecolor="white", alpha=0.85, edgecolor="none", boxstyle="round,pad=0.4"),
+    )
     fig.suptitle(t["m5_title"], x=0.5, y=0.98, fontsize=16, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
-    ax.set_title(t["m5_caption"], fontsize=10.5, color=GRAY, pad=8, fontfamily=FONT[lang])
+    ax.set_title(t["m5_caption"].format(n=pass_count), fontsize=10.5, color=GRAY, pad=8, fontfamily=FONT[lang])
     return savefig(fig, "m5-gate-heatmap", lang)
 
 
@@ -368,12 +394,13 @@ def main():
     parser.add_argument("--lang", default="en", choices=["en", "vi", "zh"])
     args = parser.parse_args()
     spine = load_spine()
+    sweep = load_sweep()
     render_m1_tou_strip(args.lang)
     render_m2_funnel(args.lang, spine)
     render_m2_sankey(args.lang, spine)
     render_m3_seesaw(args.lang, spine)
     render_m4_three_doors(args.lang, spine)
-    render_m5_heatmap(args.lang, spine)
+    render_m5_heatmap(args.lang, spine, sweep)
     render_cold_open(args.lang, spine)
     render_breadcrumb(args.lang)
 

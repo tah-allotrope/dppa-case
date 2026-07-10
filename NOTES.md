@@ -6,6 +6,15 @@
   `cd app && npm run record:demos`, then rebuild the deck
   (`PYTHONPATH= py build_oct_teaching_deck.py --lang en`). See
   `plans/2026-07-10-october-readiness-hardening-plan.md` PHASE-02.
+- The M5 heatmap's "N of 56" figure is now computed from a real strike x volume
+  gate sweep (`cd app && node scripts/export-sweep.mjs` → `assets/teaching/gate-sweep.json`),
+  not a hard-coded placeholder. Current computed result: **5 of 56** combinations
+  clear all three gates (buyer/lender/investor) at once. Re-run the sweep, then
+  `PYTHONPATH= py build_teaching_visuals.py --lang en` and rebuild the deck, whenever
+  `settlement.js` or the escalation assumptions change. See PHASE-03 of the same plan.
+  Fixed along the way: `app/src/modules/settlement.js` had an extensionless import
+  (`from './profiles'`) that Vite tolerates but plain Node ESM does not — changed to
+  `'./profiles.js'` so `node scripts/export-*.mjs` runs without a custom loader.
 
 ## How the user wants to be taught
 - **Distill, don't reproduce.** The deck is too wordy; each lesson = one crisp visual

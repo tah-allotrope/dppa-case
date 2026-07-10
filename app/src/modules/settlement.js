@@ -1,4 +1,4 @@
-import { deriveVolumes, sumVolume } from './profiles'
+import { deriveVolumes, sumVolume } from './profiles.js'
 
 export function classifyInterval(volume) {
   if (volume.load > volume.generation) {

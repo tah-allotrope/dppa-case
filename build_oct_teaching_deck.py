@@ -23,11 +23,15 @@ GRAY = "595959"
 with open(os.path.join(ASSETS, "spine-s1.json"), encoding="utf-8") as f:
     SPINE = json.load(f)
 
+with open(os.path.join(ASSETS, "gate-sweep.json"), encoding="utf-8") as f:
+    SWEEP = json.load(f)
+
 L = SPINE["bill"]["lines"]
 CEVN = SPINE["bill"]["cEvn"]["vndMillionsRounded"]
 CKH = SPINE["bill"]["cKh"]["vndMillionsRounded"]
 BAU = SPINE["comparison"]["bauMonthlyVndMillionsRounded"]
 FACTORY = SPINE["factory"]["name"]
+PASS_COUNT = SWEEP["passCount"]
 
 TEXT = {
     "en": {
@@ -53,8 +57,8 @@ TEXT = {
         "m3_app": "App moment: drag the market-price slider through the strike and watch the CfD line flip sign.",
         "m4_title": "Three doors the deal must pass",
         "m4_body": "Buyer: cost below doing nothing. Lender: covered every year. Investor: return earned. All three, or no deal.",
-        "m5_title": "56 scenarios, one empty window",
-        "m5_body": "Sweep strike x volume across both case studies: zero of 56 combinations clear all three doors at once.",
+        "m5_title": "56 scenarios, how many clear the window",
+        "m5_body": f"Sweep strike x volume across both case studies: {PASS_COUNT} of 56 combinations clear all three doors at once.",
         "m5_exercise": "Your turn: compute this factory's five-line bill from the worksheet, then verify it in the app.",
         "m6_decoder_title": "Decoder: your words, the decree's symbols",
         "m6_decoder_rows": [
@@ -297,10 +301,10 @@ def build(lang):
                  f"residual {L['additionalPurchase']['vndMillionsRounded']:,}, CfD {L['cfd']['vndMillionsRounded']:,}, "
                  f"total {CKH:,} tr VND. APP MOMENT: verify against the five-line-bill panel.")
     fallback_slide(prs, 5)
-    content_slide(prs, "The empty window, revealed", "Now scale your month x12 x20 strikes: zero of 56 pass all three doors.",
+    content_slide(prs, "The window, revealed", f"Now scale your month x12 x20 strikes: {PASS_COUNT} of 56 pass all three doors.",
                   os.path.join(ASSETS, "m5-gate-heatmap-en.png"),
                   "M5 REVEAL (2 min). This is the punchline: the exercise they just did, multiplied across a lifetime "
-                  "and a strike sweep, is why the window is empty in these two case studies.")
+                  f"and a strike sweep, is why only {PASS_COUNT} of 56 combinations clear every gate in these two case studies.")
 
     divider(prs, 6, t)
     m6_decoder_slide(prs, t)
