@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase Report :: PHASE-06 Root Cleanup</title>
+  <meta name="color-scheme" content="dark">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#111111',
+          primaryTextColor: '#e8f6ff',
+          primaryBorderColor: '#00f5ff',
+          lineColor: '#39ff14',
+          secondaryColor: '#121a1a',
+          tertiaryColor: '#111111',
+          background: '#0d0d0d',
+          mainBkg: '#0d0d0d',
+          nodeBorder: '#00f5ff',
+          clusterBkg: '#111111',
+          clusterBorder: '#39ff14',
+          edgeLabelBackground: '#0d0d0d'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg-soft: #111111;
+      --panel: rgba(13, 13, 13, 0.88);
+      --panel-strong: rgba(19, 19, 19, 0.96);
+      --line: rgba(0, 245, 255, 0.26);
+      --line-strong: rgba(57, 255, 20, 0.38);
+      --text: #e9f6ff;
+      --muted: #8ea3ad;
+      --accent-blue: #00f5ff;
+      --accent-green: #39ff14;
+      --glow-blue: 0 0 18px rgba(0, 245, 255, 0.42);
+      --glow-green: 0 0 18px rgba(57, 255, 20, 0.28);
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.32);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --narrative-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --technical-font: "Cascadia Code", "Fira Code", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      position: relative;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0, 245, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(57, 255, 20, 0.08), transparent 24%),
+        linear-gradient(180deg, #050505 0%, #0d0d0d 36%, #090909 100%);
+      color: var(--text);
+      font-family: var(--narrative-font);
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.16;
+    }
+
+    a {
+      color: var(--accent-blue);
+    }
+
+    code,
+    pre,
+    .technical,
+    .meta-chip,
+    .section-kicker,
+    .pill,
+    .metric-label,
+    .metric-value,
+    .repo-tag,
+    .mermaid {
+      font-family: var(--technical-font);
+    }
+
+    .page-shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 32px 0 72px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      position: relative;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        linear-gradient(145deg, rgba(0, 245, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+        var(--panel-strong);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -55% 42%;
+      height: 280px;
+      background: radial-gradient(circle, rgba(0, 245, 255, 0.18), transparent 64%);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr);
+      gap: 22px;
+      align-items: end;
+    }
+
+    .section-kicker {
+      margin: 0 0 12px;
+      color: var(--accent-green);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      text-shadow: var(--glow-green);
+    }
+
+    .phase-title {
+      margin: 0;
+      max-width: 16ch;
+      font-size: clamp(2.2rem, 4.4vw, 4rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      color: #f5feff;
+      text-transform: uppercase;
+      text-wrap: balance;
+      text-shadow: 0 0 24px rgba(0, 245, 255, 0.2);
+    }
+
+    .hero-summary {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .hero-meta {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meta-card {
+      padding: 16px 18px;
+      border: 1px solid rgba(57, 255, 20, 0.2);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.025);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.24);
+    }
+
+    .meta-label {
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .meta-chip {
+      color: var(--accent-blue);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-shadow: var(--glow-blue);
+      word-break: break-word;
+    }
+
+    .repo-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 245, 255, 0.24);
+      border-radius: 999px;
+      background: rgba(0, 245, 255, 0.08);
+      color: var(--accent-blue);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+    }
+
+    .section {
+      position: relative;
+      margin-top: 22px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.9), rgba(57, 255, 20, 0.9), transparent);
+      transform: translateY(-1px);
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      line-height: 1.1;
+      color: #f0feff;
+    }
+
+    .section-index {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent-green);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-shadow: var(--glow-green);
+    }
+
+    .section-index::after {
+      content: "";
+      width: 44px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(57, 255, 20, 0.9), transparent);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .column-card,
+    .diagram-frame,
+    .technical-frame,
+    .viz-frame,
+    .question-frame,
+    .empty-state {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+        rgba(7, 7, 7, 0.82);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.012);
+    }
+
+    .column-card {
+      padding: 18px;
+      min-height: 160px;
+    }
+
+    .column-label {
+      margin: 0 0 12px;
+      color: var(--accent-blue);
+      font-size: 0.83rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      text-shadow: var(--glow-blue);
+    }
+
+    .splitter {
+      width: 100%;
+      height: 1px;
+      margin: 8px 0 16px;
+      background: linear-gradient(90deg, rgba(0, 245, 255, 0.4), transparent);
+    }
+
+    .diagram-frame,
+    .chart-frame,
+    .technical-frame,
+    .viz-frame,
+    .question-frame {
+      padding: 18px;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .mermaid {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      color: var(--text);
+    }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .chart-frame,
+    .viz-frame {
+      overflow: hidden;
+    }
+
+    .technical-frame {
+      color: #d6f6ff;
+    }
+
+    .technical-frame table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .technical-frame th,
+    .technical-frame td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      vertical-align: top;
+    }
+
+    .technical-frame th {
+      color: var(--accent-green);
+      font-size: 0.76rem;
+      text-align: left;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .chart-frame canvas,
+    .technical-frame > canvas,
+    .viz-frame canvas,
+    canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 280px !important;
+      min-height: 280px;
+      max-height: 280px;
+    }
+
+    .empty-state {
+      padding: 22px;
+      text-align: center;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent-blue);
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: var(--glow-blue);
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      padding: 14px 16px;
+      border: 1px solid rgba(0, 245, 255, 0.18);
+      border-radius: var(--radius-sm);
+      background: rgba(0, 245, 255, 0.04);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      color: var(--accent-green);
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-shadow: var(--glow-green);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border: 1px solid rgba(57, 255, 20, 0.22);
+      border-radius: 999px;
+      background: rgba(57, 255, 20, 0.06);
+      color: #d9ffd0;
+      font-size: 0.8rem;
+    }
+
+    .question-frame ul,
+    .technical-frame ul,
+    .column-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .question-frame li,
+    .technical-frame li,
+    .column-card li {
+      margin-bottom: 8px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: right;
+      color: rgba(142, 163, 173, 0.72);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .summary-grid,
+      .metric-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .phase-title {
+        max-width: none;
+      }
+
+    }
+
+    @media (max-width: 640px) {
+      .page-shell {
+        width: min(100vw - 20px, 1180px);
+        padding-top: 16px;
+        padding-bottom: 42px;
+      }
+
+      .hero,
+      .section {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .section::before {
+        left: 18px;
+        right: 18px;
+      }
+
+      .phase-title {
+        font-size: clamp(2rem, 12vw, 3rem);
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="phase-header">
+      <div class="hero-grid">
+        <div>
+          <p class="section-kicker">Phase Report / PHASE-06</p>
+          <h1 class="phase-title">Root Cleanup</h1>
+          <p class="hero-summary">
+            Removed 79 obsolete files from the repo root — April-era manual QA
+            screenshots and probe JSON files superseded by the Playwright visual
+            suite — after verifying no living script or doc silently depended on
+            them. Two files were kept back mid-cleanup once a genuine live
+            reference was found. This closes out the six-phase October readiness
+            hardening plan.
+          </p>
+          <div class="pill-row" aria-label="report metadata">
+            <span class="pill">project :: dppa-case</span>
+            <span class="pill">date :: 2026-07-11</span>
+            <span class="pill">plan :: 2026-07-10-october-readiness-hardening-plan</span>
+          </div>
+          <div class="repo-tag">repo :: dppa-case (branch cc-nightly/20260710-213046)</div>
+        </div>
+
+        <div class="hero-meta">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">dppa-case</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">dppa-case</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-11</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="input-output-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Input -> Output</div>
+          <h2 class="section-title">Input -> Output Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="column-card">
+          <p class="column-label">Input (before)</p>
+          <ul>
+            <li>72 tracked root-level PNGs — April 2026 manual QA screenshots (desktop/mobile reviews, walkthroughs, presentation renders) from before the Playwright visual-snapshot suite existed</li>
+            <li>3 root-level snapshot markdown files (`browser-snapshot.md`, `desktop-current-snapshot.md`, `desktop-local-before-snapshot.md`)</li>
+            <li>6 root-level probe JSON files (`overflow-check.json`, `overflow-check-after.json`, `ratio-check.json`, `ratio-check-after.json`, `walkthrough-overflow-detail.json`, `walkthrough-scroll-state.json`)</li>
+            <li>2 untracked zero/near-zero-byte `nul` files (root and `app/`) — Windows artifacts already covered by `.gitignore` but never cleaned from disk</li>
+          </ul>
+        </div>
+        <div class="column-card">
+          <p class="column-label">Output (after)</p>
+          <ul>
+            <li>79 files removed from git (81 candidates minus 2 kept back — see below)</li>
+            <li>Both `nul` files deleted from disk</li>
+            <li><strong>Caught mid-cleanup:</strong> `desktop-current.png` and `current-app-screenshot.png` are still referenced by a live (if legacy) build script (`build-deck.js:159`) and by `factory-presentation-instructions.md`. Restored both before committing rather than leaving a broken reference — the cleanup's own safety check (TASK-06-03) is what caught this.</li>
+            <li>`assets/teaching/` (57 PNGs), `app/`, `lessons/`, `deck-qa/` and every other subdirectory untouched — the deletion glob was root-level only, verified by pattern (`grep -v "/"`)</li>
+            <li>No tracked `*.log` files existed (checked, none found — no action needed)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="logic-flow">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Logic Flow</div>
+          <h2 class="section-title">Logic Flow</h2>
+        </div>
+      </div>
+      <div class="diagram-frame technical">
+        <div class="mermaid">
+flowchart LR
+  A["git ls-files -- *.png<br/>| grep -v '/'"] --> B["72 root-level PNGs<br/>identified"]
+  B --> C["git rm 72 PNGs + 3 snapshot<br/>mds + 6 probe jsons"]
+  C --> D["rm untracked nul,<br/>app/nul"]
+  D --> E["grep build scripts/docs<br/>for deleted filenames"]
+  E --> F{"any live<br/>reference found?"}
+  F -->|yes: 2 files| G["git restore --staged<br/>--worktree the 2 files"]
+  F -->|no| H["proceed"]
+  G --> I["re-run grep:<br/>confirms clean"]
+  H --> I
+  I --> J["full battery: deck audit,<br/>parity, vitest, lint, e2e, build"]
+  J --> K["all green -> commit"]
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="math-algorithm-used">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Math / Algorithm Used</div>
+          <h2 class="section-title">Math / Algorithm Used</h2>
+        </div>
+      </div>
+      <div class="technical-frame">
+        <div class="empty-state">
+          <strong>Not applicable</strong>
+          Deletion-only hygiene phase; no formulas or scoring logic involved. The
+          only "logic" was the safety check: grep every build script and doc for
+          filename-shaped substrings of the deleted files, restore anything with
+          a genuine live reference before committing.
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tools-formulas-methods">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Tools / Formulas / Methods</div>
+          <h2 class="section-title">Tools / Formulas / Methods</h2>
+        </div>
+      </div>
+      <div class="technical-frame technical">
+        <table>
+          <thead>
+            <tr><th>Command</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>git ls-files -- "*.png" | grep -v "/"</code></td><td>Enumerate root-level-only tracked PNGs (excludes any path containing a slash, so subdirectories are never touched)</td></tr>
+            <tr><td><code>git rm</code> (72 PNGs + 9 named files)</td><td>Remove from git while keeping full recoverability in history</td></tr>
+            <tr><td><code>rm -f nul app/nul</code></td><td>Delete untracked, gitignored zero-byte artifacts from disk</td></tr>
+            <tr><td>Filename-pattern grep across <code>*.py *.js *.mjs *.md *.yml</code></td><td>Safety check for live references before committing (TASK-06-03); first broad pass hit noise from unrelated prose, refined to a filename-shaped regex requiring a <code>.png</code> suffix</td></tr>
+            <tr><td><code>git restore --staged --worktree</code></td><td>Un-delete the 2 files the refined grep found still in active use</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="results-visualizations">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Results &amp; Visualizations</div>
+          <h2 class="section-title">Results &amp; Visualizations</h2>
+        </div>
+      </div>
+      <div class="viz-frame">
+        <div class="metric-strip">
+          <div class="metric">
+            <div class="metric-label">Files removed</div>
+            <div class="metric-value">79</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Files kept back (live refs)</div>
+            <div class="metric-value">2</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Full battery result</div>
+            <div class="metric-value">All green</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative" id="limitations-second-best-alternative">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Limitations / Second-Best Alternative</div>
+          <h2 class="section-title">Limitations / Second-Best Alternative</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li><code>build-deck.js</code> (a root-level legacy deck builder, superseded by the Python build scripts, referenced from <code>package.json</code>'s <code>main</code> field but not wired to any npm script) still references <code>desktop-current.png</code>. Rather than judging it dead code and deleting it — a call the plan's ASM-008 explicitly reserves for a future phase, not this deletion-only cleanup — the referenced image was kept. This is a conservative, reversible choice: the file costs nothing to keep and the alternative (declaring legacy code dead without the user's sign-off) is exactly the kind of unauthorized judgment call the project's own guidelines warn against.</li>
+          <li>Second-best alternative (rejected): delete all 81 candidate files unconditionally, since the plan's brainstorm called them "superseded." Rejected because the plan's own TASK-06-03 explicitly requires resolving any live-reference hit before committing — a blanket deletion would have shipped a broken reference in a script that, legacy or not, still exists and still runs if invoked.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="errors-warnings-flags-encountered">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Errors / Warnings / Flags</div>
+          <h2 class="section-title">Errors / Warnings / Flags Encountered</h2>
+        </div>
+      </div>
+      <div class="question-frame technical">
+        <ul>
+          <li>First reference-check grep produced ~64 KB of noise (matches inside <code>.playwright-mcp/*.yml</code> session recordings, where phrases like "selected-hour load" matched the pattern as plain English, not as filenames). Refined the regex to require a literal <code>.png</code> suffix, which correctly surfaced only the 2 real hits and eliminated the false positives.</li>
+          <li>Rebuilding the deck as a build-script sanity check produced an incidental binary diff in the tracked <code>.pptx</code> (PowerPoint zip containers are not byte-deterministic across rebuilds even with identical logical content). Reverted with <code>git restore</code> since PHASE-06 is scoped to deletions only — this diff did not belong in this phase's commit.</li>
+          <li>No test, lint, audit, or parity failures. Full battery green after cleanup: deck audit PASS, parity PASS, vitest 51/51, eslint clean, playwright e2e 27/27, production build clean.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section narrative" id="open-questions-next-phase-seeds">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Open Questions / Next Phase Seeds</div>
+          <h2 class="section-title">Open Questions / Next Phase Seeds</h2>
+        </div>
+      </div>
+      <div class="question-frame">
+        <ul>
+          <li>This is the last phase of <code>plans/2026-07-10-october-readiness-hardening-plan.md</code> — all six phases are now complete on <code>cc-nightly/20260710-213046</code>.</li>
+          <li>Seed for later (explicitly deferred, not a gap): whether <code>build-deck.js</code>, the root <code>package.json</code>, and other superseded root scripts (<code>apply_corrections.py</code>, <code>apply_deck_corrections.{py,js}</code>, <code>verify_deck_app_parity.{py,js}</code>) should be moved into a <code>tools/</code> directory or retired outright is a judgment call for the user, not this cleanup — flagged in the original brainstorm (Theme B3) but out of scope here per ASM-008.</li>
+          <li>Seed for later: the remaining human-only steps across all six phases (PowerPoint autoplay smoke test, app deploy, timed solo dry-run, fresh-viewer test, duplex print test) are consolidated in <code>plans/2026-october-readiness-checklist.md</code>.</li>
+        </ul>
+      </div>
+      <div class="footer-note">artifact generated for reflection, not presentation theater</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+    }
+  </script>
+</body>
+</html>
