@@ -10,3 +10,5 @@ playwright-report/
 nul
 background/
 .claude/
+__pycache__/
+*.pyc

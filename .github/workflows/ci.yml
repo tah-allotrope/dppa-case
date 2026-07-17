@@ -59,6 +59,8 @@ jobs:
       - run: pip install python-pptx
       - run: python audit_teaching_deck.py
       - run: python verify_deck_numbers.py
+      - run: python tools/check_retired_figures.py
+      - run: python -m unittest discover -s tools/tests -v
   # Q-001 fallback: Firebase deployment intentionally disabled until credentials exist.
   # deploy:
   #   needs: quality
