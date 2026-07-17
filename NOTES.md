@@ -28,6 +28,10 @@
 - **Fresh-viewer test kit:** `facilitator/fresh-viewer-kit/` makes the one
   validation that actually proves the redesign works (DEC-003) schedulable — hand
   the folder to a volunteer who didn't attend July.
+- **Human-blocked register:** every item that needs a person, not a coding session
+  (date/venue confirmation, translator, Firebase creds, fresh-viewer scheduling), is
+  tracked in one dated table — see the "Human-blocked register" section of
+  `plans/2026-october-readiness-checklist.md`.
 
 ## How the user wants to be taught
 - **Distill, don't reproduce.** The deck is too wordy; each lesson = one crisp visual

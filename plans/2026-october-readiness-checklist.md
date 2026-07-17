@@ -6,6 +6,22 @@ open — no confirmed date/venue as of this checklist's writing, 2026-07-11).
 Adjust the dates below if the real date is confirmed; the sequence and gates
 do not change.
 
+## Human-blocked register
+
+Every item below needs a person, not a coding session — dates are
+backward-planned from the same assumed **October 1, 2026** session date as
+the rest of this checklist (ASM-008 of
+`plans/2026-07-17-prose-parity-second-pipeline-plan.md`) and move together if
+the real date is confirmed.
+
+| # | Item | Owner | Needed by | Blocks |
+|---|---|---|---|---|
+| H1 | Confirm session date & venue (Q-001, open since 2026-07-04) | Presenter | 2026-08-15 | every date below |
+| H2 | Engage qualified VI/ZH translator for `assets/teaching/terminology-map.json` | Presenter | 2026-08-25 | localization (deck + app), late-Sept print run |
+| H3 | Recalibrate lender/investor gate proxies with real Allotrope deal data — or accept the illustrative band | Presenter + Allotrope | 2026-09-01 | gate-sweep credibility work, M5 rehearsal |
+| H4 | Firebase deploy credentials → enable the commented `deploy` job in `.github/workflows/ci.yml` | Presenter | 2026-09-08 | QR codes pointing at a current build |
+| H5 | Schedule fresh-viewer volunteer (kit: `facilitator/fresh-viewer-kit/`) | Presenter | 2026-09-08 | content freeze (gate for 2026-09-15) |
+
 Status legend: **[x] done** (verified in this session or an earlier one) ·
 **[ ] pending** · **(human-only)** = cannot be executed by an autonomous
 coding session, needs a person with a browser/PowerPoint/printer.

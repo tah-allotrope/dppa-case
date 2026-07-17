@@ -22,13 +22,25 @@ mission is to teach *this* deck, and the repo already encodes the verified mecha
   PHASE-06 (vi/zh-cn deck cloning) — translate here, not by hand-editing the deck script.
 
 ## Primary (external / regulatory)
-- **Decree 57/2025/ND-CP** — DPPA framework (eligibility ≥22 kV, ≥200,000 kWh/mo, fee
-  structure). Trust: HIGH (primary law). *Cited in deck; obtain official text to verify.*
+- **Decree 57/2025/NĐ-CP** — DPPA framework (eligibility ≥22 kV, ≥200,000 kWh/mo, fee
+  structure). Issued 2025-03-03 by the Government. Trust: HIGH (primary law, official
+  text confirmed). Official text: https://vanban.chinhphu.vn/?pageid=27160&docid=213012
+  (accessed 2026-07-17; see `research/2026-07-17_fmp-and-decree-sources.md`).
 - **Circular 16/2025/TT-BCT** — settlement detail (FMP = SMP + CAN, 30-min intervals).
-  Trust: HIGH (primary regulation).
+  Issued 2025-02-01 by MOIT, amended by Circular 36/2025/TT-BCT (2025-06-03). Trust:
+  HIGH (primary regulation, official text confirmed). Official text:
+  https://chinhphu.vn/?pageid=27160&docid=212947&classid=1&orggroupid=4 (accessed
+  2026-07-17; consolidated text with the amendment:
+  https://minhbach.moit.gov.vn/upload/2005517/20250610/VBHN_so_11_TT16TT36_quy_dinh_van_hanh_thi_truong_dien__clean___1__d56c8.pdf).
 - **EAVCED public training** — source of the Module 2 worked example. Trust: MEDIUM.
-- **NSMO / ERAV** — system operator / regulator for actual FMP series. NOTE: FMP ~1,427
-  is **illustrative**; primary FMP data is not publicly published. Trust: N/A (gap).
+- **NSMO / ERAV** — system operator / regulator for actual FMP series. FMP ~1,427 in
+  `app/src/data/default-scenarios.js` remains **illustrative** (ASM-007 of
+  `plans/2026-07-17-prose-parity-second-pipeline-plan.md`: never replaced by this
+  research). NSMO/ERAV do not publish a raw per-interval FMP dataset, but periodic
+  averages are reportable: 1,423.5 VND/kWh (first 7 months of 2024) and 1,255 VND/kWh
+  (Q1 2026) — see `research/2026-07-17_fmp-and-decree-sources.md` for sources, dates,
+  and a "how to cite on a slide" note. Trust: MEDIUM (press-reported NSMO-sourced
+  averages, not a raw published series).
 
 ## Communities (wisdom)
 - **CEBA / Clean Energy Buyers Association** network — buyer-side practitioners; good for
@@ -39,5 +51,11 @@ mission is to teach *this* deck, and the repo already encodes the verified mecha
   bring Module 4's questions. (URLs to confirm before sharing.)
 
 ## Gaps to fill
-- Official Decree 57 / Circular 16 source URLs (currently cited second-hand via the deck).
-- A public or proxy FMP time series to replace the illustrative ~1,427 figure.
+- **Closed (2026-07-17):** Official Decree 57 / Circular 16 source URLs — see the
+  "Primary (external / regulatory)" entries above and
+  `research/2026-07-17_fmp-and-decree-sources.md`.
+- **Bounded, not closed (2026-07-17):** No official NSMO/ERAV raw FMP dataset was found
+  and confirmed accessible; two press-reported period averages exist instead (see
+  above). The illustrative FMP 1,427 in the app is **not** replaced by this research
+  (ASM-007). Re-check NSMO's own site (nsmo.vn) for a published series if this becomes
+  load-bearing for a specific slide claim.
