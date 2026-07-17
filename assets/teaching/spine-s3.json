@@ -1,0 +1,86 @@
+{
+  "meta": {
+    "scenario": "S3 excess (over-generation, matched settlement)",
+    "source": "app/src/modules/settlement.js buildFiveLineBill + research/2026-06-29_dppa-scenario-numbers-spec.md",
+    "generatedBy": "app/scripts/export-spine.mjs"
+  },
+  "inputs": {
+    "fmp": 1100,
+    "strikePrice": 1250,
+    "serviceFee": 360,
+    "clearingFee": 163.3,
+    "retailTariff": 2204,
+    "lossFactorPrecise": 1.034208,
+    "lossFactorKppOnly": 1.008,
+    "contractedKwh": 5000000,
+    "totalConsumptionKwh": 5000000
+  },
+  "bau": {
+    "monthlyVnd": 11020000000,
+    "monthlyVndMillionsRounded": 11020
+  },
+  "bill": {
+    "lines": {
+      "marketEnergy": {
+        "label": "Market energy",
+        "vnd": 5688144000,
+        "vndMillionsRounded": 5688
+      },
+      "systemService": {
+        "label": "DPPA service fee",
+        "vnd": 1800000000,
+        "vndMillionsRounded": 1800
+      },
+      "diffClearing": {
+        "label": "Balancing / clearing fee",
+        "vnd": 816500000,
+        "vndMillionsRounded": 817
+      },
+      "additionalPurchase": {
+        "label": "Residual retail purchase",
+        "vnd": 0,
+        "vndMillionsRounded": 0
+      },
+      "cfd": {
+        "label": "CfD settlement",
+        "vnd": 750000000,
+        "vndMillionsRounded": 750
+      }
+    },
+    "cEvn": {
+      "vnd": 8304644000,
+      "vndMillionsRounded": 8305
+    },
+    "cKh": {
+      "vnd": 9054644000,
+      "vndMillionsRounded": 9055
+    },
+    "plantRevenue": {
+      "market": {
+        "vnd": 5544000000,
+        "vndMillionsRounded": 5544
+      },
+      "cfd": {
+        "vnd": 750000000,
+        "vndMillionsRounded": 750
+      },
+      "total": {
+        "vnd": 6294000000,
+        "vndMillionsRounded": 6294
+      }
+    }
+  },
+  "comparison": {
+    "bauMonthlyVndMillionsRounded": 11020,
+    "dppaMonthlyVndMillionsRounded": 9055,
+    "deltaVndMillionsRounded": -1965,
+    "effectiveVndPerKwh": 1810.9
+  },
+  "excess": {
+    "generationKwh": 6500000,
+    "excessKwh": 1500000,
+    "spotValueVnd": 1663200000,
+    "spotFormulaText": "1,500,000 × 1.008 × 1,100",
+    "note": "Narrative only — the excess settles at spot with no CfD; it is not a bill line."
+  }
+}

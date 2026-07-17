@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "scenario": "S2 shortfall (contracted below consumption)",
+    "source": "app/src/modules/settlement.js buildFiveLineBill + research/2026-06-29_dppa-scenario-numbers-spec.md",
+    "generatedBy": "app/scripts/export-spine.mjs"
+  },
+  "inputs": {
+    "fmp": 1600,
+    "strikePrice": 1500,
+    "serviceFee": 360,
+    "clearingFee": 163.3,
+    "retailTariff": 2204,
+    "lossFactorPrecise": 1.034208,
+    "lossFactorKppOnly": 1.008,
+    "contractedKwh": 8000000,
+    "totalConsumptionKwh": 9000000
+  },
+  "bau": {
+    "monthlyVnd": 19836000000,
+    "monthlyVndMillionsRounded": 19836
+  },
+  "bill": {
+    "lines": {
+      "marketEnergy": {
+        "label": "Market energy",
+        "vnd": 13237862400,
+        "vndMillionsRounded": 13238
+      },
+      "systemService": {
+        "label": "DPPA service fee",
+        "vnd": 2880000000,
+        "vndMillionsRounded": 2880
+      },
+      "diffClearing": {
+        "label": "Balancing / clearing fee",
+        "vnd": 1306400000,
+        "vndMillionsRounded": 1306
+      },
+      "additionalPurchase": {
+        "label": "Residual retail purchase",
+        "vnd": 2204000000,
+        "vndMillionsRounded": 2204
+      },
+      "cfd": {
+        "label": "CfD settlement",
+        "vnd": -800000000,
+        "vndMillionsRounded": -800
+      }
+    },
+    "cEvn": {
+      "vnd": 19628262400,
+      "vndMillionsRounded": 19628
+    },
+    "cKh": {
+      "vnd": 18828262400,
+      "vndMillionsRounded": 18828
+    },
+    "plantRevenue": {
+      "market": {
+        "vnd": 12902400000,
+        "vndMillionsRounded": 12902
+      },
+      "cfd": {
+        "vnd": -800000000,
+        "vndMillionsRounded": -800
+      },
+      "total": {
+        "vnd": 12102400000,
+        "vndMillionsRounded": 12102
+      }
+    }
+  },
+  "comparison": {
+    "bauMonthlyVndMillionsRounded": 19836,
+    "dppaMonthlyVndMillionsRounded": 18828,
+    "deltaVndMillionsRounded": -1008,
+    "effectiveVndPerKwh": 2092
+  }
+}

@@ -52,7 +52,7 @@ jobs:
           node scripts/export-spine.mjs
           node scripts/export-sweep.mjs
       - name: Fail if the committed exports drifted from the engine
-        run: git diff --exit-code assets/teaching/spine-s1.json assets/teaching/gate-sweep.json
+        run: git diff --exit-code assets/teaching/spine-s1.json assets/teaching/spine-s2.json assets/teaching/spine-s3.json assets/teaching/gate-sweep.json
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
