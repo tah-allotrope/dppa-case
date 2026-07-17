@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Prose Parity & Second-Pipeline Hardening — Phases 1–2</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell {
+      width: min(var(--page-width), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 0;
+      max-width: 16ch;
+      font-family: var(--display-font);
+      font-size: clamp(2.4rem, 4.4vw, 4rem);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 60ch;
+      color: var(--ink-soft);
+      font-size: 1rem;
+    }
+
+    .takeaway {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(59, 111, 118, 0.08);
+      color: #20373a;
+      font-size: 1.02rem;
+    }
+
+    .meta-grid { display: grid; gap: 12px; }
+
+    .meta-card, .section, .subcard, .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card { padding: 16px 18px; border-radius: var(--radius-md); }
+
+    .meta-label {
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip {
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 18px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .status-done { background: rgba(59, 111, 118, 0.14); color: var(--accent-2); }
+    .status-pending { background: rgba(159, 123, 79, 0.16); color: var(--accent); }
+
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subcard {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .subcard h3, .subcard h4 { margin: 0 0 10px; font-size: 1rem; line-height: 1.2; }
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child { margin-top: 0; }
+
+    .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 16px; }
+
+    .stat {
+      padding: 14px 16px;
+      border: 1px solid rgba(59, 111, 118, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(59, 111, 118, 0.06);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stat-label {
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .stat-value { margin-top: 8px; color: var(--accent-2); font-size: 1.18rem; font-weight: 700; }
+
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .diagram-frame {
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: contain;
+      max-height: min(70vh, 720px);
+    }
+
+    .chart-frame, .viz-frame { overflow: hidden; }
+
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--ink); }
+
+    .mermaid svg {
+      display: block;
+      width: auto !important;
+      min-width: 100%;
+      max-width: none !important;
+      height: auto !important;
+    }
+
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh, 560px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: 300px !important;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    .technical-frame table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+
+    .technical-frame th, .technical-frame td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .technical-frame th {
+      color: var(--accent);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .technical-frame code { font-size: 0.85em; }
+
+    .empty-state {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      color: var(--ink-soft);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    ul, ol { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    .footer-note {
+      margin-top: 18px;
+      color: rgba(95, 86, 76, 0.74);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid {
+        grid-template-columns: 1fr;
+      }
+      .title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { width: min(100vw - 20px, var(--page-width)); padding-top: 16px; padding-bottom: 36px; }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .title { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+    }
+
+    @media print {
+      :root {
+        --paper: #ffffff;
+        --paper-strong: #ffffff;
+        --ink: #111111;
+        --ink-soft: #444444;
+        --line: #d6d1c8;
+      }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame,
+      .diagram-frame, .viz-frame, .empty-state, .stat {
+        background: #ffffff;
+        box-shadow: none;
+      }
+      .hero, .section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header, .takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Prose Parity &amp; Second-Pipeline Hardening — Phases 1–2</h1>
+          <p class="lede">
+            A synthesis of the first two phases of a five-phase plan to close a second,
+            unguarded number pipeline in the DPPA teaching repo — the hand-typed figures
+            in facilitator guides, lesson pages, and the printed handout that sit outside
+            the engine-traced deck pipeline.
+          </p>
+          <div class="takeaway">
+            Fixed four live-wrong references (three files still said "0 of 56" six days
+            after the real answer became "5 of 56") and shipped a CI gate that makes this
+            exact class of drift impossible to reintroduce silently. Three phases remain
+            open: S2/S3 spine exports, the handout generator rewire, and the sourcing/
+            human-blocked-register work.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">DPPA Teaching Case &amp; App</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">dppa-case (master)</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-17</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What was found</h3>
+          <p>A fresh verification pass on 2026-07-17 discovered that a July 11 fix — which
+          upgraded the M5 gate-sweep headline from a placeholder "0 of 56" to a computed
+          "5 of 56" — never fully propagated. Three living documents (a lender-panel
+          answer key and two learner lesson pages) still stated the retired figure,
+          meaning a presenter reading from the panel guide would have said "zero" in a
+          room where the deck said "five."</p>
+        </div>
+        <div class="subcard">
+          <h3>What was done</h3>
+          <p>Phase 1 corrected all five occurrences across the three files and reframed
+          the surrounding narrative from an "empty window" to a "narrow window" story so
+          the prose matches the number. Phase 2 built a permanent CI gate — a
+          retired-figures denylist checker — so any future headline change that isn't
+          fully propagated fails the build instead of surviving silently for six days.</p>
+        </div>
+        <div class="subcard">
+          <h3>Verification posture</h3>
+          <p>Every claim in this report is grounded in commands actually run this
+          session: the stale-reference grep, the new checker's pass/fail output, a
+          planted-failure drill that proved the gate can fail, 8 passing unit tests, and
+          confirmation that the pre-existing deck verifiers (<code>audit_teaching_deck.py</code>,
+          <code>verify_deck_numbers.py</code>) were unaffected.</p>
+        </div>
+        <div class="subcard">
+          <h3>What's still open</h3>
+          <p>The underlying plan has five phases; only the first two (repo hygiene +
+          denylist) are executed. Phases 3–5 — generating S2/S3 spine exports from the
+          settlement engine, rewiring the printed Word handout to read from them instead
+          of hand-typed figures, and closing the FMP/decree sourcing gaps — remain
+          not yet executed and are the natural next session's work.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>This repository teaches the Vietnam DPPA (Direct Power Purchase Agreement)
+        settlement mechanics to factory CFOs and lenders via a slide deck, a live web
+        app, printed handouts, and facilitator guides — all of which must agree on the
+        same numbers. An earlier hardening effort made the <em>deck</em> pipeline
+        trustworthy: the settlement engine (<code>app/src/modules/settlement.js</code>)
+        computes every figure, exports it to JSON, and a CI job (<code>deck-parity</code>)
+        regenerates and diffs those exports on every push.</p>
+        <p>A 2026-07-17 review found that trustworthiness stops at the deck. The
+        <strong>prose artifacts</strong> — facilitator guides, lesson HTML pages, and the
+        Word document participants take home — carry the same canonical figures
+        hand-typed, with no equivalent check. The proof this gap is real, not
+        theoretical: three documents were still stating a retired placeholder figure
+        ("0 of 56" gate-sweep pass count) six days after the correct value ("5 of 56")
+        was computed and shipped everywhere else.</p>
+        <p>The objective of the governing plan
+        (<code>plans/2026-07-17-prose-parity-second-pipeline-plan.md</code>) is to close
+        this second pipeline: fix what's wrong today, build a permanent gate against
+        recurrence, extend the engine's JSON exports to the two scenarios (S2, S3) it
+        doesn't yet cover, wire the handout generator to read from them, and add a
+        verifier that any large figure in prose is either an engine export or an
+        explicitly justified literal. This report covers the first two of that plan's
+        five phases.</p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Plan input</h3>
+          <ul>
+            <li><code>plans/2026-07-17-prose-parity-second-pipeline-plan.md</code> — the
+            five-phase governing plan, itself derived from
+            <code>research/2026-07-17-prose-parity-and-plan-gaps-brainstorm.md</code>.</li>
+            <li>Explicitly scoped to <strong>complement, not replace</strong>
+            <code>plans/2026-07-16-gate-credibility-pipeline-hardening-plan.md</code>,
+            a separate five-phase effort covering the gate-sweep's assumption
+            credibility and the Python toolchain's reproducibility.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Executed this session</h3>
+          <ul>
+            <li><strong>PHASE-01</strong> — stale-reference hotfix &amp; repo hygiene
+            (7 tasks).</li>
+            <li><strong>PHASE-02</strong> — retired-figures denylist checker, wired
+            into CI (5 tasks).</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Explicitly out of scope this session</h3>
+          <ul>
+            <li>PHASE-03 (S2/S3 spine exports), PHASE-04 (handout rewire + prose-figures
+            verifier), PHASE-05 (sourcing gaps + human-blocked register) — all still
+            open, see Implementation Path.</li>
+            <li>Anything owned by the companion gate-credibility plan: the sweep's
+            band rework, <code>requirements.txt</code>, deck-build CI job, localization,
+            app URL state.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Decision boundary honored</h3>
+          <ul>
+            <li>No number, formula, or engine call in
+            <code>app/src/modules/settlement.js</code> was touched — this work reads
+            the engine, never changes it.</li>
+            <li>Historical documents (<code>plans/</code>, <code>research/</code>,
+            <code>reports/</code>, <code>learning-records/</code>) were deliberately
+            left untouched — they are records of what was believed at the time, not
+            living prose.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Assumptions applied</h3>
+          <ul>
+            <li><strong>ASM-001</strong> — the "0 of 56" references were judged stale,
+            not intentional historical framing (no document frames "0" as a July-era
+            figure; the panel guide predates the real sweep). Applied: update to the
+            current computed value with narrow-window framing.</li>
+            <li><strong>ASM-003</strong> — "living" documents (subject to the checker)
+            are <code>NOTES.md</code>, <code>RESOURCES.md</code>, <code>MISSION.md</code>,
+            <code>lessons.md</code>, <code>facilitator/**/*.md</code>,
+            <code>lessons/**/*.html</code>. Historical records
+            (<code>plans/</code>, <code>research/</code>, <code>reports/</code>,
+            <code>learning-records/</code>) are permanently exempt.</li>
+            <li><strong>ASM-006</strong> — retired-figure matching is case-insensitive
+            substring, line-by-line, plain strings only (no regex) — kept the config
+            auditable at the cost of some intentional over-matching (see Risks).</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints honored</h3>
+          <ul>
+            <li><strong>CON-002</strong> — no <code>requirements.txt</code> exists yet
+            in this repo (that's the companion plan's job), so every new Python file
+            this session uses the standard library only: <code>json</code>,
+            <code>pathlib</code>, <code>sys</code>, <code>unittest</code>, <code>tempfile</code>.</li>
+            <li><strong>CON-003</strong> — no number, formula, or engine call was
+            modified.</li>
+            <li>Windows-authoring constraint: local commands were run with the
+            documented <code>PYTHONPATH= </code> prefix (a stale <code>PYTHONPATH</code>
+            on the author's machine otherwise shadows imports); this is harmless
+            elsewhere and preserved in every documented command.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>Each phase followed the same discipline: implement the exact tasks specified
+        in the plan, run the closest available verification (a targeted grep sweep for
+        Phase 1; the new checker plus its unit tests and a planted-failure drill for
+        Phase 2), fix anything red before committing, then commit with a message that
+        traces back to the plan's task IDs. Nothing was marked done without a command
+        actually producing the expected output in this session.</p>
+        <p>Phase 2's checker was specifically validated with a <strong>planted-failure
+        drill</strong>: the retired string was temporarily reintroduced into
+        <code>NOTES.md</code>, the checker was run and confirmed to exit 1 naming the
+        exact file and line, and only then was the change reverted (confirmed via
+        <code>git diff --stat</code> showing no residue). This follows the plan's own
+        principle: "a gate never seen failing is not known to work."</p>
+        <p>A repo-hygiene side effect was also caught and corrected mid-session: the new
+        Python module's compiled bytecode (<code>__pycache__/*.pyc</code>) was
+        auto-staged by <code>git add -A</code>; this was unstaged, deleted, and
+        <code>__pycache__/</code> / <code>*.pyc</code> were added to
+        <code>.gitignore</code> before the Phase 2 commit, so no build artifact entered
+        history.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Orientation</div>
+          <div class="stat-value">multi-phase</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Audience</div>
+          <div class="stat-value">stakeholder-safe</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Evidence Rule</div>
+          <div class="stat-value">no invented data</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>PHASE-01 — Stale-Reference Hotfix &amp; Repo Hygiene <span class="status-badge status-done">Done</span></h3>
+          <p>Committed the four previously-untracked planning documents as one commit
+          (preserving planning state independent of execution), confirmed and deleted
+          the empty <code>cc-nightly/20260710-213046</code> branch (zero unique commits
+          vs master, verified before deletion) both locally and on origin, then fixed
+          five occurrences of the retired figure across three files:</p>
+          <ul>
+            <li><code>facilitator/dppa-panel-guide.md</code> — two lender-panel
+            answer-key anchors (an initial grep sweep found one; a second pass caught a
+            duplicate at a different line that the first grep's scope had missed).</li>
+            <li><code>lessons/0004-module-4-three-gates.html</code> — a narrative
+            paragraph and an FAQ prompt.</li>
+            <li><code>lessons/0005-module-5-canonical-cases.html</code> — an SVG
+            callout's visible text <em>and</em> its <code>aria-label</code> (both had to
+            change together for accessibility parity).</li>
+          </ul>
+          <p>Every fix also reframed "empty window" language to "narrow window," since
+          the correct fact (5 of 56 pass) tells a different teaching story than the
+          placeholder (0 of 56) did.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-02 — Retired-Figures Denylist <span class="status-badge status-done">Done</span></h3>
+          <p>Built <code>tools/check_retired_figures.py</code> (stdlib-only) plus its
+          config <code>tools/retired_figures.json</code>, which scans six living-document
+          globs for five denylisted phrasings of the retired figure. Added 8 unit tests
+          in <code>tools/tests/test_check_retired_figures.py</code> covering
+          case-insensitivity, an intentional substring-strictness edge case, an
+          empty-denylist no-op, and a missing-config failure. Wired two new steps into
+          the existing <code>deck-parity</code> CI job. Proved the gate works with a
+          planted-failure drill, then reverted the plant cleanly.</p>
+          <p>This phase is the direct answer to what Phase 1 revealed: the same class of
+          drift (a headline changes, not every reference updates) will recur the next
+          time the gate-sweep number moves — which the companion plan's own PHASE-01 is
+          expected to trigger. The denylist's config file carries an explicit note
+          telling that plan's executor which new strings to add when that happens.</p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <pre class="mermaid">
+flowchart LR
+  A["2026-07-11: gate sweep computed,<br/>headline becomes '5 of 56'"] --> B["Deck + visuals +<br/>1 facilitator guide updated"]
+  B --> C["3 other living docs<br/>still say '0 of 56'"]
+  C --> D["2026-07-17: fresh verification<br/>pass discovers the gap"]
+  D --> E["PHASE-01: fix 5 occurrences<br/>across 3 files"]
+  E --> F["PHASE-02: build denylist checker<br/>+ CI gate + planted-failure drill"]
+  F --> G["Future headline changes<br/>cannot silently under-propagate"]
+        </pre>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Finding 1 — the drift was real and audience-facing.</strong> The
+        worst instance was in <code>facilitator/dppa-panel-guide.md</code>, a document
+        written specifically to prep answers for a live lender panel. A presenter using
+        it would have confidently stated a number the deck itself no longer supported.
+        This was not a cosmetic typo; it was a live factual inconsistency between two
+        artifacts the same audience could see side by side.</p>
+        <p><strong>Finding 2 — a one-time fix wasn't the actual gap; the missing
+        mechanism was.</strong> The July 11 sprint's own completion report claimed the
+        facilitator references were updated. It updated <em>one</em> of at least four
+        locations. The lesson isn't "look harder next time" — it's that any manual
+        propagation step across N files will eventually miss one, and only a mechanical
+        check catches that reliably. Phase 2's denylist is that mechanism.</p>
+        <p><strong>Finding 3 — the fix generalizes cheaply.</strong> The checker's
+        config-driven design means the companion gate-credibility plan (expected to
+        retire "5 of 56" itself when it extends the sweep grid) has a documented,
+        one-line-per-phrase extension point already in place, rather than needing to
+        invent its own propagation-safety mechanism.</p>
+        <p><strong>Recommendation:</strong> proceed to PHASE-03 (S2/S3 spine exports)
+        next. It has no dependency on the still-open FMP/decree research (PHASE-05,
+        parallelizable) and directly enables PHASE-04's handout rewire, which retires
+        the single largest remaining source of hand-typed canonical figures in the
+        repository — the printed document participants take home and cannot be
+        hot-fixed once distributed.</p>
+      </div>
+      <div class="viz-frame">
+        <canvas id="scopeChart" role="img" aria-label="Bar chart comparing plan scope: tasks completed vs remaining, and file changes committed by phase"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>PHASE-03 — S2/S3 Spine Exports <span class="status-badge status-pending">Next</span></h3>
+          <p>Refactor <code>app/scripts/export-spine.mjs</code> into a
+          <code>buildSpinePack(scenarioKey)</code> covering all three workshop
+          scenarios, with six hard-coded anchor assertions (verified by hand during
+          planning against the engine's actual output) and a byte-identity guarantee
+          for the existing S1 export, which CI already diffs. Depends on: nothing
+          outside this repo. Owner: next execution session.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-04 — Handout Generation &amp; Prose-Figures Verifier <span class="status-badge status-pending">Pending</span></h3>
+          <p>Rewire <code>build_worksheet_answer_docx.py</code> to read the S1/S2/S3
+          spines instead of hand-typed totals, with a content-identity check against the
+          currently-committed handout. Add
+          <code>tools/verify_prose_figures.py</code>, the general-purpose sibling to
+          Phase 2's denylist — it asserts every large figure in living prose is either
+          an engine export or an explicitly justified literal. Depends on: PHASE-03.</p>
+        </div>
+        <div class="subcard">
+          <h3>PHASE-05 — Sourcing Gaps &amp; Human-Blocked Register <span class="status-badge status-pending">Pending</span></h3>
+          <p>Research official Decree 57/2025/ND-CP and Circular 16/2025/TT-BCT source
+          URLs and a public FMP proxy series; close or explicitly bound
+          <code>RESOURCES.md</code>'s two open gaps. Add a dated five-row human-blocked
+          register to the October readiness checklist. Depends on: nothing — can run in
+          parallel with any other phase, requires internet access.</p>
+        </div>
+        <div class="subcard">
+          <h3>Coordination note</h3>
+          <p>This plan and the companion gate-credibility plan both create
+          <code>tools/</code> and <code>tools/tests/</code>; file names are disjoint so
+          no conflict is expected. Whichever plan's PHASE-01 (gate-sweep rework) lands
+          first must add the newly-retired "5 of 56" phrasings to
+          <code>tools/retired_figures.json</code> in the <em>same commit</em> — that
+          contract is documented in this plan's Gotchas section and in the config
+          file's own <code>notes</code> field.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Known risks</h3>
+          <ul>
+            <li><strong>The "5 of 56" value just written will itself retire soon.</strong>
+            The companion plan's gate-sweep rework is expected to move the headline to a
+            band out of a larger grid (~70 cells). This is by design — Phase 2's
+            denylist is exactly the mechanism that will flag any straggler when that
+            happens, per the coordination note above.</li>
+            <li><strong>Substring matching is intentionally strict.</strong> A phrase
+            like "10 of 56" would trip the checker because it contains "0 of 56." This
+            is documented and tested as deliberate: any future headline phrasing should
+            use the computed figure rather than a hand-typed number that happens to
+            share a suffix.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open questions (deferred to later phases)</h3>
+          <ul>
+            <li>Whether the lender/investor gate proxy constants (currently
+            illustrative) will be recalibrated with real Allotrope deal data — explicitly
+            out of scope for both this plan and the companion plan; needs private data
+            a human must supply.</li>
+            <li>The October session date remains unconfirmed as of this report; PHASE-05's
+            human-blocked register (not yet built) will need updated dates once it is.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="technical-frame" style="grid-column: 1 / -1;">
+          <table>
+            <thead>
+              <tr><th>Evidence</th><th>Command</th><th>Result</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Nightly branch had zero unique commits</td>
+                <td><code>git log master..cc-nightly/20260710-213046 --oneline</code></td>
+                <td>Empty output — confirmed safe to delete</td>
+              </tr>
+              <tr>
+                <td>Stale-reference sweep after Phase 1 fixes</td>
+                <td><code>grep -rniE "0 of 56|zero of 56|0-of-56|0 ?/ ?56" ...</code></td>
+                <td>Exit 1 (no matches) — clean</td>
+              </tr>
+              <tr>
+                <td>Retired-figures checker, real repo</td>
+                <td><code>py tools/check_retired_figures.py</code></td>
+                <td><code>RETIRED-FIGURES PASS (28 files scanned)</code></td>
+              </tr>
+              <tr>
+                <td>Unit test suite</td>
+                <td><code>py -m unittest discover -s tools/tests -v</code></td>
+                <td>8 tests, all <code>ok</code></td>
+              </tr>
+              <tr>
+                <td>Planted-failure drill</td>
+                <td>Reintroduced "0 of 56" into <code>NOTES.md</code>, re-ran checker</td>
+                <td>Exit 1, named <code>NOTES.md:3</code> exactly; reverted with no residue</td>
+              </tr>
+              <tr>
+                <td>Pre-existing deck verifiers unaffected</td>
+                <td><code>py audit_teaching_deck.py</code> / <code>py verify_deck_numbers.py</code></td>
+                <td><code>PASS</code> / <code>PARITY PASS — 5 figures ... all reconcile</code></td>
+              </tr>
+              <tr>
+                <td>CI workflow YAML validity</td>
+                <td><code>python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"</code></td>
+                <td><code>YAML OK</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="subcard">
+          <h3>Commits produced this session</h3>
+          <ul>
+            <li><code>50536d4</code> — docs: commit gate-credibility and prose-parity
+            planning artifacts</li>
+            <li><code>765db92</code> — phase-1: fix stale "0 of 56" gate-sweep
+            references, prune empty nightly branch</li>
+            <li><code>132fe3f</code> — phase-2: add retired-figures denylist checker,
+            wire into CI</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Files created</h3>
+          <ul>
+            <li><code>tools/retired_figures.json</code></li>
+            <li><code>tools/check_retired_figures.py</code></li>
+            <li><code>tools/tests/__init__.py</code></li>
+            <li><code>tools/tests/test_check_retired_figures.py</code></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+    }
+
+    (function() {
+      const el = document.getElementById('scopeChart');
+      if (!el || !window.Chart) return;
+      new Chart(el, {
+        type: 'bar',
+        data: {
+          labels: ['PHASE-01 tasks', 'PHASE-02 tasks', 'PHASE-03 (pending)', 'PHASE-04 (pending)', 'PHASE-05 (pending)'],
+          datasets: [{
+            label: 'Plan tasks',
+            data: [7, 5, 7, 8, 6],
+            backgroundColor: ['#3b6f76', '#3b6f76', '#dccdb6', '#dccdb6', '#dccdb6'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          maintainAspectRatio: false,
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Plan tasks by phase (executed vs. pending), from plans/2026-07-17-prose-parity-second-pipeline-plan.md' }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'task count' } }
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
