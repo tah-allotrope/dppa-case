@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Prose Parity &amp; Second-Pipeline Hardening — Phases 3–5</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell { width: min(var(--page-width), calc(100vw - 32px)); margin: 0 auto; padding: 28px 0 56px; }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr); gap: 24px; align-items: end; }
+    .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+    .title { margin: 0; max-width: 16ch; font-family: var(--display-font); font-size: clamp(2.4rem, 4.4vw, 4rem); line-height: 1.0; letter-spacing: -0.03em; text-wrap: balance; }
+    .lede { margin: 18px 0 0; max-width: 60ch; color: var(--ink-soft); font-size: 1rem; }
+    .takeaway { margin-top: 22px; padding: 18px 20px; border-left: 4px solid var(--accent-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: rgba(59, 111, 118, 0.08); color: #20373a; font-size: 1.02rem; }
+    .meta-grid { display: grid; gap: 12px; }
+    .meta-card, .section, .subcard, .empty-state { border: 1px solid rgba(95, 72, 46, 0.12); background: rgba(255, 253, 249, 0.88); box-shadow: var(--shadow); }
+    .meta-card { padding: 16px 18px; border-radius: var(--radius-md); }
+    .meta-label { color: var(--ink-soft); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .meta-chip { margin-top: 8px; color: var(--accent); font-size: 1rem; font-weight: 700; word-break: break-word; }
+    .section { margin-top: 22px; padding: 24px; border-radius: var(--radius-lg); break-inside: avoid; page-break-inside: avoid; }
+    .section-header { display: flex; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .section-index { color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+    .section-title { margin: 0; font-family: var(--display-font); font-size: clamp(1.45rem, 2vw, 2rem); line-height: 1.05; }
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { display: grid; gap: 16px; }
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .subcard { padding: 18px; border-radius: var(--radius-md); break-inside: avoid; page-break-inside: avoid; }
+    .subcard h3, .subcard h4 { margin: 0 0 10px; font-size: 1rem; line-height: 1.2; }
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child { margin-top: 0; }
+    .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 16px; }
+    .stat { padding: 14px 16px; border: 1px solid rgba(59, 111, 118, 0.16); border-radius: var(--radius-sm); background: rgba(59, 111, 118, 0.06); break-inside: avoid; page-break-inside: avoid; }
+    .stat-label { color: var(--ink-soft); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .stat-value { margin-top: 8px; color: var(--accent-2); font-size: 1.18rem; font-weight: 700; }
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.54); break-inside: avoid; page-break-inside: avoid; }
+    .diagram-frame { overflow-x: auto; overflow-y: auto; overscroll-behavior-x: contain; overscroll-behavior-y: contain; max-height: min(70vh, 720px); }
+    .chart-frame, .viz-frame { overflow: hidden; }
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--ink); }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh, 560px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart { display: block; width: 100% !important; max-width: 100%; height: 300px !important; min-height: 300px; max-height: 300px; }
+    .technical-frame table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    .technical-frame th { color: var(--accent); font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .empty-state { padding: 20px; border-radius: var(--radius-md); text-align: center; color: var(--ink-soft); break-inside: avoid; page-break-inside: avoid; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent); font-size: 0.84rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    ul, ol { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+    .footer-note { margin-top: 18px; color: rgba(95, 86, 76, 0.74); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+    code.inline { background: rgba(59,111,118,0.1); padding: 1px 6px; border-radius: 6px; font-size: 0.88em; }
+
+    @media (max-width: 920px) {
+      .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { grid-template-columns: 1fr; }
+      .title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { width: min(100vw - 20px, var(--page-width)); padding-top: 16px; padding-bottom: 36px; }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .title { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+    }
+
+    @media print {
+      :root { --paper: #ffffff; --paper-strong: #ffffff; --ink: #111111; --ink-soft: #444444; --line: #d6d1c8; }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame, .empty-state, .stat { background: #ffffff; box-shadow: none; }
+      .hero, .section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header, .takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Prose Parity &amp; Second-Pipeline Hardening — Phases 3–5</h1>
+          <p class="lede">
+            Extending the DPPA teaching repo's "engine is the single source of truth" law from the
+            deck into the printed handout and the sourcing record — closing the plan that Phases
+            1–2 (stale-figure hotfix and the retired-figures denylist) started six days earlier.
+          </p>
+          <div class="takeaway">
+            All five phases of the governing plan are now complete and committed to <code class="inline">master</code>.
+            Every scenario total in the printed handout is now generated from the settlement engine
+            (not hand-typed), a CI gate proves no large figure in living prose is unaccounted-for,
+            and the two open regulatory/data sourcing gaps are closed or explicitly bounded.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card"><div class="meta-label">Project</div><div class="meta-chip">DPPA Settlement Teaching Case</div></div>
+          <div class="meta-card"><div class="meta-label">Repository</div><div class="meta-chip">dppa-case</div></div>
+          <div class="meta-card"><div class="meta-label">Date</div><div class="meta-chip">2026-07-17</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div><div class="section-index">01 / Executive Summary</div><h2 class="section-title">Executive Summary</h2></div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What changed</h3>
+          <ul>
+            <li>The engine's exported number pack now covers all three workshop scenarios (S1/S2/S3), not just S1, with six hard anchor assertions and a byte-identity guarantee on the pre-existing S1 file.</li>
+            <li>The printed Word handout (<code class="inline">DPPA_Worksheets_and_Answers.docx</code>) is generated from those exports instead of hand-typed — verified text/table-identical to the previously committed version.</li>
+            <li>A new CI gate (<code class="inline">verify_prose_figures.py</code>) fails the build if any large figure in living teaching prose is neither an engine export nor an explicitly justified, reasoned literal.</li>
+            <li>Both regulations the deck cites (Decree 57/2025/NĐ-CP, Circular 16/2025/TT-BCT) now have confirmed official-gazette URLs; the FMP data gap is bounded with two dated, sourced reference points instead of left open.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Why it matters</h3>
+          <p>
+            Phases 1–2 (completed earlier the same day) fixed live factual errors and stopped them
+            from silently recurring in prose. That still left the handout — the one artifact a
+            facilitator hands to a room and cannot hot-fix once printed — hand-typing the same
+            class of number the deck pipeline had already learned to distrust. Phases 3–5 close
+            that gap and retire the last unguarded number surface in the repo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div><div class="section-index">02 / Background &amp; Objective</div><h2 class="section-title">Background &amp; Objective</h2></div>
+      </div>
+      <div class="narrative">
+        <p>
+          The repo teaches Vietnam's Direct Power Purchase Agreement (DPPA) settlement mechanics
+          through a live app, a slide deck, facilitator guides, and a printed handout, all of which
+          must agree on the same VND/kWh figures. A July 2026 hardening sprint made the deck
+          pipeline trustworthy: <code class="inline">app/src/modules/settlement.js</code> computes
+          every figure, JSON exports are the interface, and CI regenerates and diffs them
+          (<code class="inline">deck-parity</code>). That sprint's own after-action review
+          (this plan's originating brainstorm) found the sprint had stopped short: three prose
+          documents still stated a retired headline figure, and the printed handout — plus ~76
+          other hand-typed figures across 15 prose files — had no verification at all.
+        </p>
+        <p>
+          Phases 1–2, executed earlier on 2026-07-17, fixed the live stale references and built a
+          permanent CI denylist so a retired figure can never silently reappear. This report covers
+          Phases 3–5: extending the engine's JSON export contract to the two scenarios it didn't
+          cover, wiring the handout builder to that contract, building the second CI gate that
+          catches <em>any</em> unaccounted-for large figure (not just previously-retired ones), and
+          closing the plan's two research gaps (regulatory source URLs, an FMP proxy series).
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div><div class="section-index">03 / Inputs &amp; Scope</div><h2 class="section-title">Inputs &amp; Scope</h2></div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Inputs</h3>
+          <ul>
+            <li>Governing plan: <code class="inline">plans/2026-07-17-prose-parity-second-pipeline-plan.md</code> (5 phases, exact anchor-value specification for S1/S2/S3).</li>
+            <li>Engine: <code class="inline">app/src/modules/settlement.js</code> (<code class="inline">buildFiveLineBill</code>) and <code class="inline">app/src/data/default-scenarios.js</code> (<code class="inline">workshop1/2/3</code> presets).</li>
+            <li>Existing export contract: <code class="inline">app/scripts/export-spine.mjs</code> (S1-only prior to this work) and its CI diff line in <code class="inline">deck-parity</code>.</li>
+            <li>Existing handout builder: <code class="inline">build_worksheet_answer_docx.py</code>, hand-typing every scenario total from a research spec.</li>
+            <li>Phase 2 pattern to extend: <code class="inline">tools/check_retired_figures.py</code> (a denylist scanner) as the architectural precedent for the new prose-figures verifier.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scope boundaries</h3>
+          <ul>
+            <li>Out of scope: everything owned by the companion plan <code class="inline">plans/2026-07-16-gate-credibility-pipeline-hardening-plan.md</code> — the gate-sweep rework, <code class="inline">requirements.txt</code>, the deck-build CI job, localization.</li>
+            <li>Explicitly not touched: <code class="inline">app/src/modules/settlement.js</code> (the engine itself, read-only in this plan) and the illustrative app-level FMP constant (1,427 VND/kWh) — sourcing research bounds the gap around it, never replaces it.</li>
+            <li>Prose-figures verifier scope: only comma-grouped tokens ≥ 1,000,000 (four-digit prices and decimals excluded by design — stable, low drift risk).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div><div class="section-index">04 / Assumptions &amp; Constraints</div><h2 class="section-title">Assumptions &amp; Constraints</h2></div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Binding assumptions carried from the plan</h3>
+          <ul>
+            <li>"Living" prose (scanned by both CI checkers) = <code class="inline">NOTES.md</code>, <code class="inline">RESOURCES.md</code>, <code class="inline">MISSION.md</code>, <code class="inline">lessons.md</code>, <code class="inline">facilitator/**/*.md</code>, <code class="inline">lessons/**/*.html</code>. Plans/research/reports/learning-records are historical record and are never scanned.</li>
+            <li>The companion gate-credibility plan had not executed when this work ran — all paths targeted the current (unmoved) layout.</li>
+            <li>S3's over-generation volume (6,500,000 kWh/month) is chart/narrative context only, declared as a named constant with cited provenance — never a bill line.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints and environment limits</h3>
+          <ul>
+            <li><code class="inline">assets/teaching/spine-s1.json</code> had to remain byte-identical after the export refactor (CI diffs it exactly) — verified with <code class="inline">git diff --exit-code</code> before every commit.</li>
+            <li>New Python tooling is stdlib-only (no <code class="inline">requirements.txt</code> exists yet).</li>
+            <li>This session's Python interpreter with <code class="inline">python-pptx</code>/<code class="inline">python-docx</code> installed was not the one on <code class="inline">PATH</code> — the pre-existing deck verifiers (<code class="inline">audit_teaching_deck.py</code>, <code class="inline">verify_deck_numbers.py</code>) could not be re-run locally this session; this is a pre-existing environment gap unrelated to the changes made and does not affect CI, which installs <code class="inline">python-pptx</code> explicitly.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div><div class="section-index">05 / Methodology</div><h2 class="section-title">Methodology</h2></div>
+      </div>
+      <div class="narrative">
+        <p>
+          Each phase followed the same discipline: implement, run the closest available check,
+          fix any red result before committing, then commit with a descriptive message — never
+          committing red. For the two new CI gates specifically, "passing once" was not treated as
+          proof; each was validated with a <strong>planted-failure drill</strong> — a known-bad
+          value was temporarily introduced into a real repo file, the checker's failure output was
+          confirmed to name the exact file and line, and the change was reverted with a zero-residue
+          diff. For the handout regeneration, correctness was proven by extracting and diff-comparing
+          the paragraph and table text of the old and newly-generated <code class="inline">.docx</code>
+          files, accepting binary-level differences (fonts, XML structure) as expected noise while
+          requiring textual content to be exactly identical.
+        </p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Orientation</div><div class="stat-value">multi-phase</div></div>
+        <div class="stat"><div class="stat-label">Audience</div><div class="stat-value">stakeholder-safe</div></div>
+        <div class="stat"><div class="stat-label">Evidence Rule</div><div class="stat-value">no invented data</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div><div class="section-index">06 / Phase-by-Phase Analysis</div><h2 class="section-title">Phase-by-Phase Analysis</h2></div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 1 — Stale-Reference Hotfix (prior, same-day)</h3>
+          <p>Fixed three living documents still stating the retired "0 of 56" gate-sweep result; committed untracked planning docs; pruned an empty nightly branch. Confirmed clean via a repo-wide grep sweep.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 2 — Retired-Figures Denylist (prior, same-day)</h3>
+          <p>Built <code class="inline">tools/check_retired_figures.py</code> and its config, wired into CI, proved it fails on a planted stale figure and passes clean otherwise. Established the pattern this report's new gate extends.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 3 — S2/S3 Spine Exports</h3>
+          <p>
+            Refactored <code class="inline">export-spine.mjs</code> around a new
+            <code class="inline">buildSpinePack(scenarioKey)</code> function. S1's output is
+            byte-identical (verified by <code class="inline">git diff --exit-code</code>); S2 and
+            S3 packs are new, each with six hard anchor assertions matching the plan's
+            specification table exactly (e.g. S2 <code class="inline">cEvn = 19,628,262,400</code>;
+            S3 <code class="inline">cfd = 750,000,000</code>). Added six vitest cases covering all
+            anchors plus a rejection test for an unknown scenario key. The exporter's <code class="inline">main()</code>
+            was also guarded to run only when invoked as a script (not on import), so the new
+            vitest suite can import <code class="inline">buildSpinePack</code> without triggering
+            file writes as a side effect.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 4 — Handout Generation &amp; Prose-Figures Verifier</h3>
+          <p>
+            Rewired <code class="inline">build_worksheet_answer_docx.py</code> to load the three
+            spine JSONs and format every scenario total, comparison-table cell, and the S3 excess
+            block from them — module-level assertions refuse to build from drifted spines. A grep
+            for the six previously-hardcoded totals now returns zero matches. Built
+            <code class="inline">tools/verify_prose_figures.py</code>: it collects every
+            ≥7-digit figure the engine exports, scans living prose for comma-grouped tokens, and
+            fails on anything not in that canonical set or an explicitly justified literal. A
+            necessary refinement discovered during triage: the token regex was initially matching
+            unrelated comma-separated numbers inside inline chart-data <code class="inline">&lt;script&gt;</code>
+            blocks and SVG-coordinate HTML comments (e.g. a Chart.js data array), so both are now
+            stripped (preserving line numbers) before scanning — a false-positive class the plan
+            did not anticipate. After that fix, 15 genuine literals were triaged and justified with
+            reasons (a negotiation hypothetical, two intentional wrong-answer quiz distractors, a
+            derived-but-not-exported S2/S3 sub-figure, and a pre-existing separate illustrative case
+            table), and two apparent near-misses were confirmed to be deliberate pedagogical
+            distractors rather than stale drift.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 5 — Sourcing Gaps &amp; Human-Blocked Register</h3>
+          <p>
+            Located and confirmed the official-gazette text of both cited regulations (Decree
+            57/2025/NĐ-CP, issued 2025-03-03; Circular 16/2025/TT-BCT, issued 2025-02-01, amended
+            by Circular 36/2025/TT-BCT). For the FMP proxy series, no raw NSMO/ERAV dataset was
+            found — the gap is documented as bounded, not silently left open — but two dated,
+            sourced period averages were located (1,423.5 VND/kWh for early 2024; 1,255 VND/kWh
+            for Q1 2026), bracketing the app's illustrative 1,427 figure. Added a five-item
+            human-blocked register to the October readiness checklist and cross-linked it from
+            <code class="inline">NOTES.md</code>.
+          </p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <pre class="mermaid">
+flowchart LR
+  P1["Phase 1\nStale-figure hotfix"] --> P2["Phase 2\nRetired-figures denylist"]
+  P2 --> P3["Phase 3\nS2/S3 spine exports\n+ 6 anchor asserts"]
+  P3 --> P4["Phase 4\nHandout wired to spines\n+ prose-figures verifier"]
+  P4 --> P5["Phase 5\nSourcing gaps closed\n+ human-blocked register"]
+  P5 --> DONE["All 5 phases green\non master"]
+        </pre>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div><div class="section-index">07 / Findings &amp; Recommendation</div><h2 class="section-title">Findings &amp; Recommendation</h2></div>
+      </div>
+      <div class="narrative">
+        <p>
+          <strong>Finding 1.</strong> The last unguarded number surface in the repo — the printed
+          handout — is now generated, not typed, closing the same class of risk the deck pipeline
+          closed months earlier for a document that cannot be hot-fixed once printed.
+        </p>
+        <p>
+          <strong>Finding 2.</strong> A denylist alone (Phase 2) only catches figures someone
+          remembered to retire. The new prose-figures verifier (Phase 4) is a stronger net: it
+          fails on <em>any</em> unaccounted-for large figure, including ones nobody flagged yet —
+          verified by a planted one-digit drill that the checker caught and named precisely.
+        </p>
+        <p>
+          <strong>Finding 3.</strong> Two figures in the deck's teaching narrative look like typos
+          at a glance (<code class="inline">8,263,196,000</code> in lessons/0007;
+          <code class="inline">20,428,262,400</code> in lessons/0008) but are deliberate
+          wrong-answer quiz distractors — the triage rule ("differs by a few digits → fix, don't
+          allowlist") correctly does not apply to values explicitly labeled as wrong. This is
+          recorded with reasons in <code class="inline">tools/prose_figure_literals.json</code>
+          rather than "fixed," since there was nothing broken.
+        </p>
+        <p>
+          <strong>Recommendation.</strong> Proceed to Phase 6 hygiene review of this plan's own
+          companion coordination contract (retired-figures notes field) once the gate-credibility
+          plan's gate-sweep rework lands and retires "5 of 56" — that hand-off is already documented
+          in this plan's Gotchas section and requires no new design work, only execution when the
+          time comes.
+        </p>
+      </div>
+      <div class="viz-frame">
+        <canvas id="tasksChart" class="report-chart" aria-label="Tasks completed per phase" role="img"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div><div class="section-index">08 / Implementation Path</div><h2 class="section-title">Implementation Path</h2></div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Already shipped (this report)</h3>
+          <ul>
+            <li>Phases 1–5 implemented, tested, and committed to <code class="inline">master</code> in sequence, each gated on a passing check before commit.</li>
+            <li>CI (<code class="inline">deck-parity</code> job) now runs six checks after the spine/sweep diff: <code class="inline">audit_teaching_deck.py</code>, <code class="inline">verify_deck_numbers.py</code>, <code class="inline">check_retired_figures.py</code>, <code class="inline">verify_prose_figures.py</code>, and the <code class="inline">tools/tests</code> unittest suite.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Next, when triggered by external events</h3>
+          <ul>
+            <li>When the companion gate-credibility plan retires "5 of 56", add the listed strings to <code class="inline">tools/retired_figures.json</code>'s <code class="inline">retired</code> array in the same commit (contract already documented in this plan's Gotchas).</li>
+            <li>Work the five-item human-blocked register in <code class="inline">plans/2026-october-readiness-checklist.md</code> as its "Needed by" dates approach, starting with H1 (confirm session date).</li>
+            <li>Re-check NSMO's own site for a directly linkable raw FMP series if a specific slide claim needs load-bearing sourcing beyond the two period averages this report cites.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div><div class="section-index">09 / Risks / Open Questions</div><h2 class="section-title">Risks / Open Questions</h2></div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Risks</h3>
+          <ul>
+            <li>The prose-figures verifier's justified-literals file could accumulate entries over time if future editors reach for an allowlist instead of fixing genuine drift — the triage rule in Phase 4's task list is the guardrail, but it depends on the next editor reading it.</li>
+            <li>This session could not re-run the pre-existing <code class="inline">python-pptx</code>-dependent deck verifiers locally (environment gap, not a code issue) — CI remains the authoritative check for those two scripts until the next session confirms local parity.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open questions</h3>
+          <ul>
+            <li>No raw NSMO/ERAV FMP dataset was confirmed accessible in this pass — if a specific upcoming slide needs a load-bearing (not illustrative) FMP citation, that gap should be revisited before the session date.</li>
+            <li>The October session date itself (H1 in the human-blocked register) remains unconfirmed as of 2026-07-17 and gates every other dated item in the register.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div><div class="section-index">10 / Appendices / Evidence Notes</div><h2 class="section-title">Appendices / Evidence Notes</h2></div>
+      </div>
+      <div class="appendix-grid">
+        <div class="subcard technical-frame">
+          <h3>Commits produced this session</h3>
+          <table>
+            <thead><tr><th>Phase</th><th>Commit</th><th>Summary</th></tr></thead>
+            <tbody>
+              <tr><td>3</td><td><code class="inline">66e198c</code></td><td>Extend engine spine exports to S2/S3 with anchor assertions</td></tr>
+              <tr><td>4</td><td><code class="inline">1b74bec</code></td><td>Generate handout from spines, add prose-figures verifier</td></tr>
+              <tr><td>5</td><td><code class="inline">36c6e22</code></td><td>Source Decree 57/Circular 16 official texts, FMP proxy range, human-blocked register</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="subcard technical-frame">
+          <h3>Verification evidence</h3>
+          <table>
+            <thead><tr><th>Check</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>App test suite (<code class="inline">npm test</code>)</td><td>57/57 passed</td></tr>
+              <tr><td>Spine export vitest suite</td><td>6/6 passed</td></tr>
+              <tr><td>Python tools unittest suite</td><td>20/20 passed</td></tr>
+              <tr><td>S1 byte-identity (<code class="inline">git diff --exit-code</code>)</td><td>exit 0, no diff</td></tr>
+              <tr><td>Handout text/table parity (old vs. regenerated)</td><td>zero-line diff</td></tr>
+              <tr><td>Hardcoded totals grep in handout builder</td><td>zero matches</td></tr>
+              <tr><td>Retired-figures planted drill (Phase 2, re-verified)</td><td>caught, reverted cleanly</td></tr>
+              <tr><td>Prose-figures planted drill (Phase 4)</td><td>caught exact file:line, reverted cleanly</td></tr>
+              <tr><td>CI YAML validity</td><td>parses clean</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="subcard">
+          <h3>Key sources (Phase 5)</h3>
+          <ul>
+            <li>Decree 57/2025/NĐ-CP — <a href="https://vanban.chinhphu.vn/?pageid=27160&amp;docid=213012">vanban.chinhphu.vn</a> (accessed 2026-07-17)</li>
+            <li>Circular 16/2025/TT-BCT — <a href="https://chinhphu.vn/?pageid=27160&amp;docid=212947&amp;classid=1&amp;orggroupid=4">chinhphu.vn</a> (accessed 2026-07-17)</li>
+            <li>FMP early-2024 average — <a href="https://nangluongvietnam.vn/gia-dien-toan-phan-binh-quan-fmp-cac-thang-dau-nam-2024-giam-so-voi-cung-ky-2023-33042.html">Tạp chí Năng lượng Việt Nam</a></li>
+            <li>FMP Q1 2026 average — <a href="https://vneconomy.vn/ap-luc-chi-phi-mua-dien-dau-vao-tang-tu-quy-22026.htm">VnEconomy</a></li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Full detail</h3>
+          <p>
+            Complete source-level detail lives in the governing plan
+            (<code class="inline">plans/2026-07-17-prose-parity-second-pipeline-plan.md</code>),
+            the Phase 1–2 companion report
+            (<code class="inline">reports/2026-07-17-final-phase-1-2-prose-parity-hotfix-and-denylist.html</code>),
+            and the sourcing research note
+            (<code class="inline">research/2026-07-17_fmp-and-decree-sources.md</code>).
+          </p>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+    }
+
+    (function () {
+      const el = document.getElementById('tasksChart');
+      if (!el || !window.Chart) return;
+      new Chart(el, {
+        type: 'bar',
+        data: {
+          labels: ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4', 'Phase 5'],
+          datasets: [{
+            label: 'Tasks completed',
+            data: [7, 5, 7, 8, 6],
+            backgroundColor: '#3b6f76',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          maintainAspectRatio: false,
+          responsive: true,
+          plugins: { legend: { display: false }, title: { display: true, text: 'Tasks completed per phase (per plan task lists)' } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
