@@ -10,13 +10,17 @@ comparison summary table.
 The visual shell (A4, 0.75in margins, blue banner / subhead / callout /
 footer styling) is inherited by copying the reference template
 ``lessons/DPPA_Scenario_Answer_Summary.docx`` and clearing its scenario
-body. The numeric totals are copied verbatim from
-``research/2026-06-29_dppa-scenario-numbers-spec.md``.
+body. The numeric totals are read from the engine-generated spine packs
+(``assets/teaching/spine-s{1,2,3}.json`` — see PHASE-04 of
+plans/2026-07-17-prose-parity-second-pipeline-plan.md), not hand-typed; the
+module refuses to build from drifted spines (see the assertions right
+after ``load_spines``).
 
 Run:  python build_worksheet_answer_docx.py
 """
 from __future__ import annotations
 
+import json
 import shutil
 from copy import deepcopy
 from pathlib import Path
@@ -67,81 +71,125 @@ FOOTER_TEXT = (
 )
 
 # ----------------------------------------------------------------------
-# Canonical numbers — verbatim from research/2026-06-29_dppa-scenario-numbers-spec.md
+# Spine loading — engine-generated numbers (PHASE-04)
+# ----------------------------------------------------------------------
+def load_spines(root: Path) -> dict[str, dict]:
+    """Load assets/teaching/spine-s{1,2,3}.json, keyed 's1'/'s2'/'s3'."""
+    spines: dict[str, dict] = {}
+    for key in ("s1", "s2", "s3"):
+        path = root / "assets" / "teaching" / f"spine-{key}.json"
+        if not path.exists():
+            raise FileNotFoundError(f"Missing spine export: {path}")
+        spines[key] = json.loads(path.read_text(encoding="utf-8"))
+    return spines
+
+
+def fmt_vnd(value: int) -> str:
+    """Comma-grouped absolute value, U+2212 minus prefix when negative."""
+    return f"−{abs(value):,}" if value < 0 else f"{value:,}"
+
+
+def fmt_signed_vnd(value: int) -> str:
+    """Like fmt_vnd but with an explicit '+' for positives (CfD lines)."""
+    return f"−{abs(value):,}" if value < 0 else f"+{value:,}"
+
+
+def fmt_effective(c_kh_vnd: int, total_kwh: int) -> str:
+    return f"≈ {round(c_kh_vnd / total_kwh):,} VND/kWh"
+
+
+def fmt_int(value: int) -> str:
+    return f"{value:,}"
+
+
+SPINES = load_spines(ROOT)
+
+# Refuse to build from drifted spines — same anchors as
+# app/scripts/export-spine.mjs and Specification S1 of the plan.
+assert SPINES["s1"]["bill"]["cKh"]["vnd"] == 9_063_196_000
+assert SPINES["s2"]["bill"]["cEvn"]["vnd"] == 19_628_262_400
+assert SPINES["s2"]["bill"]["cKh"]["vnd"] == 18_828_262_400
+assert SPINES["s3"]["bill"]["cEvn"]["vnd"] == 8_304_644_000
+assert SPINES["s3"]["bill"]["cKh"]["vnd"] == 9_054_644_000
+assert SPINES["s3"]["bill"]["lines"]["cfd"]["vnd"] == 750_000_000
+
+# ----------------------------------------------------------------------
+# Canonical (small) constants — shared across scenarios, sourced from S1's
+# spine inputs since fees/loss-factor are identical for all three scenarios.
 # ----------------------------------------------------------------------
 K = 1.026
-K_PP = 1.008
-K_KPP = 1.034208                          # k * K_pp (precise)
-SERVICE = 360
-CLEARING = 163.30
-FEES = 523.30                             # service + clearing
-RETAIL = 2_204
+K_PP = SPINES["s1"]["inputs"]["lossFactorKppOnly"]
+K_KPP = SPINES["s1"]["inputs"]["lossFactorPrecise"]   # k * K_pp (precise)
+SERVICE = SPINES["s1"]["inputs"]["serviceFee"]
+CLEARING = SPINES["s1"]["inputs"]["clearingFee"]
+FEES = SERVICE + CLEARING                             # service + clearing
+RETAIL = SPINES["s1"]["inputs"]["retailTariff"]
+
+
+def build_scenario(key: str, en_title: str, vi_title: str) -> dict:
+    """Build one SCENARIOS entry from its spine pack — every totals[*][4]
+    and lines[*][3] figure is formatted from the engine, never typed."""
+    spine = SPINES[key]
+    inputs = spine["inputs"]
+    bill = spine["bill"]
+    contracted = inputs["contractedKwh"]
+    total = inputs["totalConsumptionKwh"]
+    shortfall = total - contracted
+    fmp = inputs["fmp"]
+    strike = inputs["strikePrice"]
+    has_excess = "excess" in spine
+
+    if has_excess:
+        given_en = (f"Q_KH = {fmt_int(total)}   ·   gen ≈ {fmt_int(spine['excess']['generationKwh'])}"
+                    f"   ·   FMP = {fmt_int(fmp)}   ·   Strike = {fmt_int(strike)}")
+        given_vi = (f"Q_KH = {fmt_int(total)}   ·   phát ≈ {fmt_int(spine['excess']['generationKwh'])}"
+                    f"   ·   FMP = {fmt_int(fmp)}   ·   Giá TH = {fmt_int(strike)}")
+    else:
+        given_en = (f"Q_c = {fmt_int(contracted)}   ·   Q_KH = {fmt_int(total)}"
+                    f"   ·   FMP = {fmt_int(fmp)}   ·   Strike = {fmt_int(strike)}")
+        given_vi = (f"Q_c = {fmt_int(contracted)}   ·   Q_KH = {fmt_int(total)}"
+                    f"   ·   FMP = {fmt_int(fmp)}   ·   Giá TH = {fmt_int(strike)}")
+
+    lines = [
+        ("1", "Market energy", "Điện năng thị trường", f"{fmt_int(contracted)} × {fmt_int(fmp)} × 1.026 × 1.008"),
+        ("2", "Service fee", "Phí dịch vụ", f"{fmt_int(contracted)} × {fmt_int(SERVICE)}"),
+        ("3", "Clearing fee", "Phí bù trừ", f"{fmt_int(contracted)} × {CLEARING:.2f}"),
+        ("4", "Additional retail", "Mua thêm bán lẻ", f"{fmt_int(shortfall)} × {fmt_int(RETAIL)}"),
+    ]
+
+    cfd_formula = f"({fmt_int(strike)} − {fmt_int(fmp)}) × {fmt_int(contracted)}"
+    totals = [
+        ("C_EVN", "C_EVN", "lines 1 + 2 + 3 + 4", "dòng 1 + 2 + 3 + 4", fmt_vnd(bill["cEvn"]["vnd"])),
+        ("5", "CfD", cfd_formula, cfd_formula, fmt_signed_vnd(bill["lines"]["cfd"]["vnd"])),
+        ("C_KH", "C_KH", "C_EVN + CfD", "C_EVN + CfD", fmt_vnd(bill["cKh"]["vnd"])),
+        ("", "Effective", f"C_KH ÷ {fmt_int(total)}", f"C_KH ÷ {fmt_int(total)}", fmt_effective(bill["cKh"]["vnd"], total)),
+    ]
+
+    excess_block = None
+    if has_excess:
+        ex = spine["excess"]
+        excess_block = [
+            ("Excess volume", "Sản lượng dư thừa", f"{fmt_int(ex['generationKwh'])} − {fmt_int(total)}", ""),
+            ("Spot value of excess", "Giá spot của dư thừa", ex["spotFormulaText"], ""),
+            ("Foregone CfD uplift", "CfD bị bỏ lỡ", f"({fmt_int(strike)} − {fmt_int(fmp)}) × {fmt_int(ex['excessKwh'])}", ""),
+        ]
+
+    return {
+        "key": key.upper(),
+        "en_title": en_title,
+        "vi_title": vi_title,
+        "given_en": given_en,
+        "given_vi": given_vi,
+        "lines": lines,
+        "totals": totals,
+        "excess_block": excess_block,
+    }
+
 
 SCENARIOS = [
-    {
-        "key": "S1",
-        "en_title": "SCENARIO 1 — MATCHED  (Load = Gen)",
-        "vi_title": "KỊCH BẢN 1 — KHỚP  (Phụ tải = Phát điện)",
-        "given_en": "Q_c = 5,000,000   ·   Q_KH = 5,000,000   ·   FMP = 1,150   ·   Strike = 1,250",
-        "given_vi": "Q_c = 5,000,000   ·   Q_KH = 5,000,000   ·   FMP = 1,150   ·   Giá TH = 1,250",
-        "lines": [
-            ("1", "Market energy",  "Điện năng thị trường", "5,000,000 × 1,150 × 1.026 × 1.008"),
-            ("2", "Service fee",    "Phí dịch vụ",          "5,000,000 × 360"),
-            ("3", "Clearing fee",   "Phí bù trừ",           "5,000,000 × 163.30"),
-            ("4", "Additional retail", "Mua thêm bán lẻ",    "0 × 2,204"),
-        ],
-        "totals": [
-            ("C_EVN", "C_EVN",         "lines 1 + 2 + 3 + 4", "dòng 1 + 2 + 3 + 4", "8,563,196,000"),
-            ("5",   "CfD",             "(1,250 − 1,150) × 5,000,000", "(1,250 − 1,150) × 5,000,000", "+500,000,000"),
-            ("C_KH", "C_KH",           "C_EVN + CfD",         "C_EVN + CfD",         "9,063,196,000"),
-            ("",    "Effective",       "C_KH ÷ 5,000,000",    "C_KH ÷ 5,000,000",    "≈ 1,813 VND/kWh"),
-        ],
-        "excess_block": None,
-    },
-    {
-        "key": "S2",
-        "en_title": "SCENARIO 2 — SHORTFALL  (Load > Gen)",
-        "vi_title": "KỊCH BẢN 2 — THIẾU HỤT  (Phụ tải > Phát điện)",
-        "given_en": "Q_c = 8,000,000   ·   Q_KH = 9,000,000   ·   FMP = 1,600   ·   Strike = 1,500",
-        "given_vi": "Q_c = 8,000,000   ·   Q_KH = 9,000,000   ·   FMP = 1,600   ·   Giá TH = 1,500",
-        "lines": [
-            ("1", "Market energy",  "Điện năng thị trường", "8,000,000 × 1,600 × 1.026 × 1.008"),
-            ("2", "Service fee",    "Phí dịch vụ",          "8,000,000 × 360"),
-            ("3", "Clearing fee",   "Phí bù trừ",           "8,000,000 × 163.30"),
-            ("4", "Additional retail", "Mua thêm bán lẻ",    "1,000,000 × 2,204"),
-        ],
-        "totals": [
-            ("C_EVN", "C_EVN",         "lines 1 + 2 + 3 + 4", "dòng 1 + 2 + 3 + 4", "19,628,262,400"),
-            ("5",   "CfD",             "(1,500 − 1,600) × 8,000,000", "(1,500 − 1,600) × 8,000,000", "−800,000,000"),
-            ("C_KH", "C_KH",           "C_EVN + CfD",         "C_EVN + CfD",         "18,828,262,400"),
-            ("",    "Effective",       "C_KH ÷ 9,000,000",    "C_KH ÷ 9,000,000",    "≈ 2,092 VND/kWh"),
-        ],
-        "excess_block": None,
-    },
-    {
-        "key": "S3",
-        "en_title": "SCENARIO 3 — EXCESS  (Load < Gen)",
-        "vi_title": "KỊCH BẢN 3 — DƯ THỪA  (Phụ tải < Phát điện)",
-        "given_en": "Q_KH = 5,000,000   ·   gen ≈ 6,500,000   ·   FMP = 1,100   ·   Strike = 1,250",
-        "given_vi": "Q_KH = 5,000,000   ·   phát ≈ 6,500,000   ·   FMP = 1,100   ·   Giá TH = 1,250",
-        "lines": [
-            ("1", "Market energy",  "Điện năng thị trường", "5,000,000 × 1,100 × 1.026 × 1.008"),
-            ("2", "Service fee",    "Phí dịch vụ",          "5,000,000 × 360"),
-            ("3", "Clearing fee",   "Phí bù trừ",           "5,000,000 × 163.30"),
-            ("4", "Additional retail", "Mua thêm bán lẻ",    "0 × 2,204"),
-        ],
-        "totals": [
-            ("C_EVN", "C_EVN",         "lines 1 + 2 + 3 + 4", "dòng 1 + 2 + 3 + 4", "8,304,644,000"),
-            ("5",   "CfD",             "(1,250 − 1,100) × 5,000,000", "(1,250 − 1,100) × 5,000,000", "+750,000,000"),
-            ("C_KH", "C_KH",           "C_EVN + CfD",         "C_EVN + CfD",         "9,054,644,000"),
-            ("",    "Effective",       "C_KH ÷ 5,000,000",    "C_KH ÷ 5,000,000",    "≈ 1,811 VND/kWh"),
-        ],
-        "excess_block": [
-            ("Excess volume",       "Sản lượng dư thừa",   "6,500,000 − 5,000,000",   ""),
-            ("Spot value of excess","Giá spot của dư thừa", "1,500,000 × 1.008 × 1,100", ""),
-            ("Foregone CfD uplift", "CfD bị bỏ lỡ",         "(1,250 − 1,100) × 1,500,000", ""),
-        ],
-    },
+    build_scenario("s1", "SCENARIO 1 — MATCHED  (Load = Gen)", "KỊCH BẢN 1 — KHỚP  (Phụ tải = Phát điện)"),
+    build_scenario("s2", "SCENARIO 2 — SHORTFALL  (Load > Gen)", "KỊCH BẢN 2 — THIẾU HỤT  (Phụ tải > Phát điện)"),
+    build_scenario("s3", "SCENARIO 3 — EXCESS  (Load < Gen)", "KỊCH BẢN 3 — DƯ THỪA  (Phụ tải < Phát điện)"),
 ]
 
 # 3-case comparison summary rows (header + 3 data rows; EN | VI)
@@ -156,41 +204,61 @@ COMPARISON_HEADER = [
     "Effective (VND/kWh)\nHiệu dụng",
     "Risk lesson\nBài học rủi ro",
 ]
-COMPARISON_ROWS = [
-    [
-        "S1 Matched  |  S1 Khớp",
-        "Q_c = Q_KH",
-        "0",
-        "1,150 < 1,250",
-        "+500,000,000\nfactory → developer\nnhà máy → nhà phát triển",
-        "8,563,196,000",
-        "9,063,196,000",
-        "~1,813",
-        "strike must be bankable  |  giá thực hiện phải khả thi",
-    ],
-    [
-        "S2 Shortfall  |  S2 Thiếu hụt",
-        "Q_c < Q_KH",
-        "2,204,000,000",
-        "1,600 > 1,500",
-        "−800,000,000\ndeveloper → factory\nnhà phát triển → nhà máy",
-        "19,628,262,400",
-        "18,828,262,400",
-        "~2,092",
-        "shortfall always at retail  |  phần thiếu luôn tính giá bán lẻ",
-    ],
-    [
-        "S3 Excess  |  S3 Dư thừa",
-        "gen > Q_KH (over-contract)",
-        "0",
-        "1,100 < 1,250",
-        "+750,000,000\nfactory → developer\nnhà máy → nhà phát triển",
-        "8,304,644,000",
-        "9,054,644,000",
-        "~1,811",
-        "excess earns nothing  |  phần dư không tạo giá trị",
-    ],
-]
+# Per-scenario narrative fields not carried by the spine (labels, volume-axis
+# framing, cross-payer flow direction, the risk-lesson teaching line).
+COMPARISON_META = {
+    "s1": {
+        "label": "S1 Matched  |  S1 Khớp",
+        "volume_axis": "Q_c = Q_KH",
+        "flow_en": "factory → developer",
+        "flow_vi": "nhà máy → nhà phát triển",
+        "risk_lesson": "strike must be bankable  |  giá thực hiện phải khả thi",
+    },
+    "s2": {
+        "label": "S2 Shortfall  |  S2 Thiếu hụt",
+        "volume_axis": "Q_c < Q_KH",
+        "flow_en": "developer → factory",
+        "flow_vi": "nhà phát triển → nhà máy",
+        "risk_lesson": "shortfall always at retail  |  phần thiếu luôn tính giá bán lẻ",
+    },
+    "s3": {
+        "label": "S3 Excess  |  S3 Dư thừa",
+        "volume_axis": "gen > Q_KH (over-contract)",
+        "flow_en": "factory → developer",
+        "flow_vi": "nhà máy → nhà phát triển",
+        "risk_lesson": "excess earns nothing  |  phần dư không tạo giá trị",
+    },
+}
+
+
+def build_comparison_rows() -> list[list[str]]:
+    rows = []
+    for key in ("s1", "s2", "s3"):
+        spine = SPINES[key]
+        meta = COMPARISON_META[key]
+        inputs = spine["inputs"]
+        bill = spine["bill"]
+        total = inputs["totalConsumptionKwh"]
+        fmp = inputs["fmp"]
+        strike = inputs["strikePrice"]
+        cfd = bill["lines"]["cfd"]["vnd"]
+        additional = bill["lines"]["additionalPurchase"]["vnd"]
+        effective = round(bill["cKh"]["vnd"] / total)
+        rows.append([
+            meta["label"],
+            meta["volume_axis"],
+            fmt_int(additional),
+            f"{fmt_int(fmp)} {'<' if fmp < strike else '>'} {fmt_int(strike)}",
+            f"{fmt_signed_vnd(cfd)}\n{meta['flow_en']}\n{meta['flow_vi']}",
+            fmt_int(bill["cEvn"]["vnd"]),
+            fmt_int(bill["cKh"]["vnd"]),
+            f"~{effective:,}",
+            meta["risk_lesson"],
+        ])
+    return rows
+
+
+COMPARISON_ROWS = build_comparison_rows()
 
 # Negotiation grid — blank proposal rows + guidance text
 NEGOTIATION_GRID_HEADER = [
