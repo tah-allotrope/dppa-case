@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Phase 1&ndash;2: Deploy Recovery &amp; Freshness Guardrails</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell { width: min(var(--page-width), calc(100vw - 32px)); margin: 0 auto; padding: 28px 0 56px; }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr); gap: 24px; align-items: end; }
+    .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+    .title { margin: 0; max-width: 18ch; font-family: var(--display-font); font-size: clamp(2.2rem, 4vw, 3.6rem); line-height: 1.0; letter-spacing: -0.03em; text-wrap: balance; }
+    .lede { margin: 18px 0 0; max-width: 60ch; color: var(--ink-soft); font-size: 1rem; }
+    .takeaway { margin-top: 22px; padding: 18px 20px; border-left: 4px solid var(--accent-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: rgba(59, 111, 118, 0.08); color: #20373a; font-size: 1.02rem; }
+    .meta-grid { display: grid; gap: 12px; }
+    .meta-card, .section, .subcard, .empty-state { border: 1px solid rgba(95, 72, 46, 0.12); background: rgba(255, 253, 249, 0.88); box-shadow: var(--shadow); }
+    .meta-card { padding: 16px 18px; border-radius: var(--radius-md); }
+    .meta-label { color: var(--ink-soft); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .meta-chip { margin-top: 8px; color: var(--accent); font-size: 1rem; font-weight: 700; word-break: break-word; }
+    .section { margin-top: 22px; padding: 24px; border-radius: var(--radius-lg); break-inside: avoid; page-break-inside: avoid; }
+    .section-header { display: flex; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .section-index { color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+    .section-title { margin: 0; font-family: var(--display-font); font-size: clamp(1.45rem, 2vw, 2rem); line-height: 1.05; }
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { display: grid; gap: 16px; }
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .subcard { padding: 18px; border-radius: var(--radius-md); break-inside: avoid; page-break-inside: avoid; }
+    .subcard h3, .subcard h4 { margin: 0 0 10px; font-size: 1rem; line-height: 1.2; }
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child { margin-top: 0; }
+    .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 16px; }
+    .stat { padding: 14px 16px; border: 1px solid rgba(59, 111, 118, 0.16); border-radius: var(--radius-sm); background: rgba(59, 111, 118, 0.06); break-inside: avoid; page-break-inside: avoid; }
+    .stat-label { color: var(--ink-soft); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .stat-value { margin-top: 8px; color: var(--accent-2); font-size: 1.18rem; font-weight: 700; }
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.54); break-inside: avoid; page-break-inside: avoid; }
+    .diagram-frame { overflow-x: auto; overflow-y: auto; overscroll-behavior-x: contain; overscroll-behavior-y: contain; max-height: min(70vh, 720px); }
+    .chart-frame, .viz-frame { overflow: hidden; }
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--ink); }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh, 560px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart { display: block; width: 100% !important; max-width: 100%; height: 300px !important; min-height: 300px; max-height: 300px; }
+    .technical-frame table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    .technical-frame th { color: var(--accent); font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .empty-state { padding: 20px; border-radius: var(--radius-md); text-align: center; color: var(--ink-soft); break-inside: avoid; page-break-inside: avoid; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent); font-size: 0.84rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    ul, ol { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+    .footer-note { margin-top: 18px; color: rgba(95, 86, 76, 0.74); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+    code.inline { background: rgba(59,111,118,0.1); padding: 1px 6px; border-radius: 6px; font-size: 0.88em; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+    .badge-done { background: rgba(59, 111, 118, 0.16); color: #1f4a4e; }
+    .badge-pending { background: rgba(157, 107, 55, 0.16); color: #7a5527; }
+
+    @media (max-width: 920px) {
+      .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { grid-template-columns: 1fr; }
+      .title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { width: min(100vw - 20px, var(--page-width)); padding-top: 16px; padding-bottom: 36px; }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .title { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+    }
+
+    @media print {
+      :root { --paper: #ffffff; --paper-strong: #ffffff; --ink: #111111; --ink-soft: #444444; --line: #d6d1c8; }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame, .empty-state, .stat { background: #ffffff; box-shadow: none; }
+      .hero, .section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header, .takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Phase 1&ndash;2: Deploy Recovery &amp; Freshness Guardrails</h1>
+          <p class="lede">
+            The first two phases of a five-phase plan to close what a fresh repo review found
+            outside the DPPA teaching case's already-hardened number pipeline: a stale production
+            deploy, a mislabeled release tag, and no mechanism to notice either drifting again.
+          </p>
+          <div class="takeaway">
+            The live demo site at <code class="inline">dppa-case.web.app</code> — the URL on the
+            teaching deck's closing-slide QR code — had been serving software from before the
+            entire October redesign for 18 commits. It is now redeployed from current
+            <code class="inline">master</code>, correctly tagged, and every future build embeds a
+            verifiable commit marker that two new scheduled checks compare against reality every
+            week, with no proprietary tooling and no new credentials required.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card"><div class="meta-label">Project</div><div class="meta-chip">DPPA Settlement Teaching Case</div></div>
+          <div class="meta-card"><div class="meta-label">Repository</div><div class="meta-chip">dppa-case</div></div>
+          <div class="meta-card"><div class="meta-label">Date</div><div class="meta-chip">2026-07-22</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div><div class="section-index">01 / Executive Summary</div><h2 class="section-title">Executive Summary</h2></div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What changed</h3>
+          <ul>
+            <li><strong>Deploy recovered.</strong> <code class="inline">https://dppa-case.web.app</code> was redeployed from the current <code class="inline">master</code> tip, bringing in 18 commits of work — the entire October Modules 1&ndash;6 teaching-revamp, the readiness-hardening arc, and the prose-parity number-pipeline hardening — that had never reached the live site.</li>
+            <li><strong>Release tag corrected.</strong> The existing <code class="inline">v1.0-oct-workshop</code> tag predates the October redesign despite its name; a new tag, <code class="inline">v1.1-oct-workshop-hardened</code>, now marks the commit that actually contains October-workshop content. The old tag was left in place (not force-moved) to avoid rewriting a pushed ref.</li>
+            <li><strong>MISSION.md corrected.</strong> The project's own north-star document still described the July 2026 session as upcoming; it has already happened (and is the session that exposed the symbol-overload failure the whole October rebuild responds to).</li>
+            <li><strong>Drift is now self-detecting.</strong> Every future build embeds a build-commit marker; two new stdlib Python checkers and a weekly scheduled GitHub Actions workflow compare the live site against <code class="inline">master</code> and watch the project's human-blocked-deadline register, so this specific class of silent drift cannot recur unnoticed.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Why it matters</h3>
+          <p>
+            A repo can have a rigorously verified number pipeline (deck ↔ engine ↔ prose, already
+            CI-gated by earlier work) and still fail its actual purpose if the artifact people are
+            directed to is stale. The QR code on the teaching deck's closing slide points at this
+            URL; anyone scanning it before this fix would have reached a build with no teach-mode
+            banner, no gate-sweep heatmap, and none of the fixes the October rebuild exists to
+            deliver. This work closes that specific gap and, more durably, removes the dependency
+            on anyone remembering to check it again before the real session.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div><div class="section-index">02 / Background &amp; Objective</div><h2 class="section-title">Background &amp; Objective</h2></div>
+      </div>
+      <div class="narrative">
+        <p>
+          The repo teaches Vietnam's Direct Power Purchase Agreement (DPPA) settlement mechanics
+          through a live web app, a slide deck, facilitator guides, and printed handouts. A prior
+          hardening arc (documented in <code class="inline">plans/2026-07-17-prose-parity-second-pipeline-plan.md</code>)
+          made the deck's figures trustworthy: the settlement engine computes every number, JSON
+          exports are the interface, and CI regenerates and diffs them. A follow-up repo review
+          on 2026-07-21 deliberately looked outside that already-hardened territory and found the
+          opposite kind of gap: the live demo tool and its release tag were both frozen at a
+          pre-redesign commit from 2026-07-05, CI was silent on visual regressions and
+          accessibility, root-level files had drifted into unsorted clutter, and a documentation
+          gap had been flagged by three separate analysis passes without ever being closed
+          (<code class="inline">research/2026-07-21-deploy-drift-and-repo-hygiene-brainstorm.md</code>).
+        </p>
+        <p>
+          The resulting five-phase plan (<code class="inline">plans/2026-07-21-deploy-drift-repo-hygiene-plan.md</code>)
+          sequences that work by consequence and effort: fix what's live and stale first, then
+          make that fix durable with automated guardrails, then close CI rigor gaps, then
+          declutter, then document. This report covers execution of the first two phases —
+          deploy recovery and the freshness guardrails — which together were judged the
+          highest-consequence, lowest-effort work in the plan.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div><div class="section-index">03 / Inputs &amp; Scope</div><h2 class="section-title">Inputs &amp; Scope</h2></div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Inputs</h3>
+          <ul>
+            <li>Governing plan: <code class="inline">plans/2026-07-21-deploy-drift-repo-hygiene-plan.md</code> (5 phases; this report covers Phase 1 and Phase 2 only).</li>
+            <li>Source brainstorm: <code class="inline">research/2026-07-21-deploy-drift-and-repo-hygiene-brainstorm.md</code> — the deploy/tag drift finding and its exact commit-hash evidence.</li>
+            <li>App build tooling: <code class="inline">app/vite.config.js</code>, <code class="inline">app/package.json</code>'s <code class="inline">predeploy</code> script (lint + full Vitest suite + full Playwright e2e suite + production build).</li>
+            <li>Deploy target: Firebase Hosting project <code class="inline">dppa-case</code>, bound via <code class="inline">app/.firebaserc</code> (gitignored, pre-existing on the executing machine).</li>
+            <li>Existing checker pattern to extend: <code class="inline">tools/check_retired_figures.py</code> — the architectural precedent (stdlib-only, pure functions plus a thin <code class="inline">main()</code>) both new checkers in Phase 2 follow.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Scope boundaries</h3>
+          <ul>
+            <li>Out of scope for this report: Phase 3 (visual-regression baselines, accessibility testing, coverage reporting), Phase 4 (archiving one-off root scripts and orphaned deck files), and Phase 5 (the overdue <code class="inline">learning-records/0005</code>) — all remain to be executed; see Section 09.</li>
+            <li>Explicitly not touched: the settlement engine (<code class="inline">app/src/modules/settlement.js</code>), any number-pipeline CI gate from the prior hardening plan, and CI-based automated Firebase deploy (still blocked on credentials — tracked as item H4 in the human-blocked register, unaffected by this work).</li>
+            <li>The freshness checkers' scope is deliberately narrow: they detect <em>that</em> drift exists (a stale deploy, a deadline arriving), not <em>why</em> — diagnosis and remediation remain a human or a later coding session's job.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div><div class="section-index">04 / Assumptions &amp; Constraints</div><h2 class="section-title">Assumptions &amp; Constraints</h2></div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Binding assumptions applied</h3>
+          <ul>
+            <li>Firebase CLI authentication on the executing machine was assumed already valid (per the plan's <code class="inline">ASM-001</code>); confirmed true — <code class="inline">npx firebase projects:list</code> showed <code class="inline">dppa-case</code> already accessible, no interactive login was needed.</li>
+            <li>The existing <code class="inline">v1.0-oct-workshop</code> tag was not deleted or force-moved (<code class="inline">ASM-003</code>) — a new tag was created instead, matching this repo's established non-destructive convention (<code class="inline">git mv</code> over <code class="inline">rm</code> elsewhere in the repo).</li>
+            <li>Calendar-based drift reminders were implemented as a scheduled GitHub Actions workflow rather than any proprietary scheduling primitive (<code class="inline">DEC-002</code>), so the guardrail requires no new infrastructure or credentials beyond what this repo's CI already uses.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints and environment notes</h3>
+          <ul>
+            <li>New Python tooling is stdlib-only — no <code class="inline">requirements.txt</code> exists in this repo (<code class="inline">CON-001</code>).</li>
+            <li><code class="inline">check_deploy_freshness.py</code> must never hard-fail on network unreachability, only on a confirmed reachable-but-stale deploy (<code class="inline">CON-002</code>) — verified by design, not yet by a live network-outage drill.</li>
+            <li>Local Playwright execution on this Windows machine required <code class="inline">--workers=1</code> for the WebKit project to avoid CPU-contention timeouts during browser launch — a pre-existing, already-documented environment characteristic (<code class="inline">app/deployment.md</code>'s notes on parallel-worker contention), not a regression introduced by this work.</li>
+            <li>The scheduled workflow's weekly cadence (Monday 09:00 UTC) has not yet had its first real scheduled firing observed — it was validated via YAML-parse correctness and the underlying scripts' local dry runs, not an actual cron trigger.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div><div class="section-index">05 / Methodology</div><h2 class="section-title">Methodology</h2></div>
+      </div>
+      <div class="narrative">
+        <p>
+          Each phase followed the plan's own gate: implement, run the closest available check
+          (lint, full unit suite, full e2e suite, build), fix anything red before committing, and
+          verify the specific outcome the phase claims (a live deploy actually serving new
+          content; a freshness checker actually reporting <code class="inline">PASS</code> against
+          a real deployed marker) rather than trusting that "the code looks right." Where a first
+          run surfaced a false signal — the WebKit e2e timeouts turned out to be a local
+          browser-binary/version mismatch, not a real regression — the investigation traced it to
+          root cause (a stale Playwright browser cache) before concluding the suite was clean,
+          rather than working around it silently.
+        </p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Orientation</div><div class="stat-value">multi-phase</div></div>
+        <div class="stat"><div class="stat-label">Audience</div><div class="stat-value">stakeholder-safe</div></div>
+        <div class="stat"><div class="stat-label">Evidence Rule</div><div class="stat-value">no invented data</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div><div class="section-index">06 / Phase-by-Phase Analysis</div><h2 class="section-title">Phase-by-Phase Analysis</h2></div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 1 — Deploy Recovery &amp; Mission Framing Fix <span class="badge badge-done">done</span></h3>
+          <p>
+            Corrected <code class="inline">MISSION.md</code>'s stale "upcoming July 2026" framing
+            to reflect that the session already happened and exposed the symbol-overload failure
+            the whole redesign responds to. Ran the full local <code class="inline">predeploy</code>
+            gate (lint, 57 unit tests, 27 e2e tests across three browser projects, production
+            build) and confirmed it green before deploying. Deployed to Firebase Hosting, then
+            verified the served bundle byte-for-byte against the local build output and confirmed
+            the teach-mode module is present. Created the corrected release tag
+            <code class="inline">v1.1-oct-workshop-hardened</code> and updated
+            <code class="inline">app/deployment.md</code>'s deploy log and pre-workshop checklist.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 2 — Deploy &amp; Human-Blocked-Register Freshness Guardrails <span class="badge badge-done">done</span></h3>
+          <p>
+            Added a small Vite plugin that injects a <code class="inline">&lt;meta name="build-commit"&gt;</code>
+            tag into every built <code class="inline">index.html</code>, making the deployed
+            bundle's origin commit mechanically verifiable. Rebuilt and redeployed so the live
+            site actually carries the marker. Built two stdlib-only Python checkers —
+            <code class="inline">check_deploy_freshness.py</code> (compares the live marker
+            against local <code class="inline">git HEAD</code>, failing soft on network errors)
+            and <code class="inline">check_human_blocked_register.py</code> (classifies each
+            readiness-checklist deadline as OK / due-soon / overdue) — following the exact style
+            convention of the repo's existing <code class="inline">tools/check_retired_figures.py</code>.
+            Wired both into a new weekly-scheduled GitHub Actions workflow
+            (<code class="inline">.github/workflows/freshness-checks.yml</code>), also
+            manually triggerable. A failing scheduled run uses GitHub's own default
+            notification mechanism — no new infrastructure.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 3 — CI Rigor Hardening <span class="badge badge-pending">not started</span></h3>
+          <p>
+            Bootstrap real Linux visual-regression baselines (currently
+            <code class="inline">continue-on-error: true</code> and structurally unable to fail
+            CI), add an <code class="inline">@axe-core/playwright</code> accessibility gate, and
+            add Vitest coverage reporting. Scoped and sequenced in the governing plan; not
+            attempted in this session.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 4 &amp; 5 — Repo Hygiene and the Missing Learning Record <span class="badge badge-pending">not started</span></h3>
+          <p>
+            Phase 4 archives 12 one-off root scripts and 6 orphaned deck/screenshot files into
+            <code class="inline">archive/</code> via non-destructive <code class="inline">git mv</code>.
+            Phase 5 writes <code class="inline">learning-records/0005</code>, synthesizing the
+            July symbol-overload failure through the October redesign and hardening arc — a
+            documentation gap three separate prior analysis passes have flagged without any of
+            them closing it. Neither was attempted in this session.
+          </p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <pre class="mermaid">
+flowchart LR
+  P1["Phase 1\nDeploy recovery +\nMISSION.md fix"] --> P2["Phase 2\nBuild-commit marker +\nfreshness checkers +\nscheduled workflow"]
+  P2 --> P3["Phase 3\nVisual regression +\naccessibility + coverage\n(not started)"]
+  P3 --> P4["Phase 4\nArchive one-off\nscripts + decks\n(not started)"]
+  P4 --> P5["Phase 5\nlearning-records/0005\n(not started)"]
+  style P1 fill:#efe4d0,stroke:#3b6f76
+  style P2 fill:#efe4d0,stroke:#3b6f76
+  style P3 fill:#fbf7f1,stroke:#9d6b37,stroke-dasharray: 4 3
+  style P4 fill:#fbf7f1,stroke:#9d6b37,stroke-dasharray: 4 3
+  style P5 fill:#fbf7f1,stroke:#9d6b37,stroke-dasharray: 4 3
+        </pre>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div><div class="section-index">07 / Findings &amp; Recommendation</div><h2 class="section-title">Findings &amp; Recommendation</h2></div>
+      </div>
+      <div class="narrative">
+        <p>
+          <strong>Finding 1.</strong> The live demo tool was not merely "a bit behind" — it was
+          missing the entire body of work the October redesign exists to deliver (teach mode, the
+          gate-sweep heatmap, the QR code flow, translation scaffolding). A number-pipeline CI
+          gate proving the deck's figures are correct provides no protection against the separate
+          failure mode of the deployed artifact itself being stale; these are orthogonal risks and
+          this repo previously only guarded one of them.
+        </p>
+        <p>
+          <strong>Finding 2.</strong> The gap had a social-contract dimension, not just a technical
+          one: the release tag <code class="inline">v1.0-oct-workshop</code> would have actively
+          misled a future reader (including a future coding session) into believing October content
+          was already tagged and shipped. Naming a tag after content it doesn't yet contain is a
+          worse failure mode than having no tag at all.
+        </p>
+        <p>
+          <strong>Finding 3.</strong> Both new checkers were validated against real, not synthetic,
+          end states before being trusted: <code class="inline">check_deploy_freshness.py</code>
+          was run against the actual live site both before the marker existed (correctly reporting
+          <code class="inline">UNKNOWN</code>, not a false failure) and after the redeploy
+          (reporting <code class="inline">PASS</code> against the real deployed commit).
+          <code class="inline">check_human_blocked_register.py</code> was run against the real
+          checklist file, not just its unit-test fixtures, and correctly classified all five
+          register items as <code class="inline">OK</code>.
+        </p>
+        <p>
+          <strong>Recommendation.</strong> Proceed to Phase 3 next — it is independent of Phases 1
+          and 2 (per the plan's dependency table) and closes the remaining CI-rigor gaps
+          (toothless visual regression, no accessibility testing) while the deploy-freshness
+          guardrail from Phase 2 is still fresh context. Phases 4 and 5 can run in parallel with
+          Phase 3 or with each other, since none of the remaining phases depend on one another.
+        </p>
+      </div>
+      <div class="viz-frame">
+        <canvas id="staleCommitsChart" class="report-chart" aria-label="Commits between the live deploy and master, before and after this session's Phase 1 redeploy" role="img"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div><div class="section-index">08 / Implementation Path</div><h2 class="section-title">Implementation Path</h2></div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Already shipped (this session)</h3>
+          <ul>
+            <li><code class="inline">https://dppa-case.web.app</code> redeployed from current <code class="inline">master</code>; verified byte-identical to the local production build.</li>
+            <li>Release tag <code class="inline">v1.1-oct-workshop-hardened</code> created and pushed; <code class="inline">app/deployment.md</code>'s deploy log and pre-workshop checklist updated.</li>
+            <li><code class="inline">MISSION.md</code>'s session framing corrected from upcoming-July to completed-July/upcoming-October.</li>
+            <li>Build-commit marker plugin shipped in <code class="inline">app/vite.config.js</code>; live site rebuilt and redeployed a second time so the marker is actually present.</li>
+            <li><code class="inline">tools/check_deploy_freshness.py</code> and <code class="inline">tools/check_human_blocked_register.py</code> shipped with unit tests, both passing against real repo/site state.</li>
+            <li><code class="inline">.github/workflows/freshness-checks.yml</code> shipped — weekly scheduled, also <code class="inline">workflow_dispatch</code>-able on demand.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Next, per the governing plan</h3>
+          <ul>
+            <li><strong>Phase 3</strong> — bootstrap Linux visual-regression baselines (steps already documented in <code class="inline">app/deployment.md</code>), add <code class="inline">@axe-core/playwright</code>, add Vitest coverage reporting.</li>
+            <li><strong>Phase 4</strong> — archive 12 one-off root scripts and 6 orphaned deck/screenshot files into <code class="inline">archive/</code> via <code class="inline">git mv</code>; label the 6 remaining live scripts.</li>
+            <li><strong>Phase 5</strong> — write <code class="inline">learning-records/0005</code>, closing a documentation gap three prior analysis passes have flagged without resolving.</li>
+            <li>Watch for the first real scheduled firing of <code class="inline">freshness-checks.yml</code> (next Monday 09:00 UTC, or trigger manually via <code class="inline">workflow_dispatch</code>) to confirm the guardrail behaves correctly outside a manual dry run.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div><div class="section-index">09 / Risks / Open Questions</div><h2 class="section-title">Risks / Open Questions</h2></div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Risks</h3>
+          <ul>
+            <li>GitHub's default notification for a failed scheduled workflow goes by email to repo watchers, which the sole maintainer may not check as promptly as a chat alert — acknowledged as a known limitation in the governing plan (<code class="inline">RISK-02-01</code>), not addressed in this session.</li>
+            <li>The deploy-freshness checker compares raw commit hashes, not app-content hashes — a future commit that touches only non-app files (docs, other tooling) will make the checker report a one-commit "STALE" finding even though the deployed app bundle is unchanged. This is a known, accepted simplification (matching the plan's Specification exactly), not a defect, but a future reader should not be surprised by it.</li>
+            <li>The scheduled workflow has not yet had a real weekly firing observed end-to-end; only local dry runs and YAML-parse validation have occurred so far.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open questions</h3>
+          <ul>
+            <li>Phases 3&ndash;5 of the governing plan remain unexecuted; none of their exit criteria have been checked in this session.</li>
+            <li>The human-blocked register's earliest deadline (H1, confirm session date, needed by 2026-08-15) remains open as of this report — unaffected by this session's work, but worth tracking as the date approaches, which is now exactly what Phase 2's new weekly check does automatically.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div><div class="section-index">10 / Appendices / Evidence Notes</div><h2 class="section-title">Appendices / Evidence Notes</h2></div>
+      </div>
+      <div class="appendix-grid">
+        <div class="subcard technical-frame">
+          <h3>Commits produced this session</h3>
+          <table>
+            <thead><tr><th>Step</th><th>Commit</th><th>Summary</th></tr></thead>
+            <tbody>
+              <tr><td>Planning docs</td><td><code class="inline">565acd5</code></td><td>Commit deploy-drift/repo-hygiene brainstorm and execution plan</td></tr>
+              <tr><td>Phase 1 (doc fix)</td><td><code class="inline">f5fd22a</code></td><td>Correct MISSION.md session framing; tagged <code class="inline">v1.1-oct-workshop-hardened</code> here</td></tr>
+              <tr><td>Phase 1 (deploy)</td><td><code class="inline">e55319e</code></td><td>Redeploy live app from current master, correct release tag</td></tr>
+              <tr><td>Phase 2</td><td><code class="inline">7329b58</code></td><td>Build-commit marker + deploy/human-blocked-register freshness checkers, scheduled weekly</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="subcard technical-frame">
+          <h3>Verification evidence</h3>
+          <table>
+            <thead><tr><th>Check</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>App lint (<code class="inline">npm run lint</code>)</td><td>clean</td></tr>
+              <tr><td>App unit suite (<code class="inline">npm test</code>)</td><td>57/57 passed</td></tr>
+              <tr><td>App e2e suite (<code class="inline">npx playwright test --grep-invert @visual --workers=1</code>)</td><td>27/27 passed</td></tr>
+              <tr><td>App production build</td><td>clean, 258 KB main bundle (gzip 84.9 KB)</td></tr>
+              <tr><td>Deployed bundle vs. local build output</td><td>byte-identical (diff clean)</td></tr>
+              <tr><td>Deployed bundle contains teach-mode module</td><td>confirmed (11 <code class="inline">teach</code> references in served JS)</td></tr>
+              <tr><td><code class="inline">tools/tests</code> suite (<code class="inline">unittest discover</code>)</td><td>35/35 passed, including 2 new test files</td></tr>
+              <tr><td><code class="inline">check_deploy_freshness.py</code> against real live site (post-redeploy)</td><td><code class="inline">DEPLOY-FRESHNESS PASS</code></td></tr>
+              <tr><td><code class="inline">check_human_blocked_register.py</code> against real checklist</td><td>all 5 items <code class="inline">OK</code></td></tr>
+              <tr><td><code class="inline">freshness-checks.yml</code> YAML validity</td><td>parses clean</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="subcard">
+          <h3>Key files touched</h3>
+          <ul>
+            <li><code class="inline">MISSION.md</code>, <code class="inline">app/deployment.md</code> — corrected session framing and deploy log.</li>
+            <li><code class="inline">app/vite.config.js</code> — build-commit marker plugin.</li>
+            <li><code class="inline">tools/check_deploy_freshness.py</code>, <code class="inline">tools/check_human_blocked_register.py</code> — new stdlib checkers plus their <code class="inline">tools/tests/</code> unit tests.</li>
+            <li><code class="inline">.github/workflows/freshness-checks.yml</code> — new weekly scheduled workflow.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Full detail</h3>
+          <p>
+            Complete phase-level task lists, function signatures, and exit criteria live in the
+            governing plan (<code class="inline">plans/2026-07-21-deploy-drift-repo-hygiene-plan.md</code>)
+            and the originating brainstorm
+            (<code class="inline">research/2026-07-21-deploy-drift-and-repo-hygiene-brainstorm.md</code>).
+          </p>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+    }
+
+    (function () {
+      const el = document.getElementById('staleCommitsChart');
+      if (!el || !window.Chart) return;
+      new Chart(el, {
+        type: 'bar',
+        data: {
+          labels: ['Before Phase 1 (2026-07-21)', 'After Phase 1 redeploy (2026-07-22)'],
+          datasets: [{
+            label: 'Commits between deployed site and master',
+            data: [18, 0],
+            backgroundColor: ['#9d6b37', '#3b6f76'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          animation: false,
+          resizeDelay: 150,
+          normalized: true,
+          maintainAspectRatio: false,
+          responsive: true,
+          plugins: { legend: { display: false }, title: { display: true, text: 'Deploy staleness closed by Phase 1 (git rev-list --count)' } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'commits behind master' } } }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
