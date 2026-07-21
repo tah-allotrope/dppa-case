@@ -18,10 +18,14 @@ npx firebase deploy --only hosting --project dppa-case
 
 | Date | Commit | Description |
 |---|---|---|
+| 2026-07-22 | `f5fd22a` | Redeploy after Oct teaching-revamp + readiness-hardening + prose-parity work (18 commits since the prior 2026-07-05 deploy) |
 | 2026-07-05 | `ed21985`+ | App quality, visuals & testing uplift (PHASE-01..06): lint/CI, Playwright functional suite (scenarios/controls/teach mode), presenter theme + token system, bilingual guided tour, visual-snapshot scaffolding |
 | 2026-06-26 | `048ce2a`+ | Workshop chart realism (realistic load/solar/FMP curves, FMP constrained to deck side of strike) + multi-year relocated below daily graph + control-feedback notes |
 | 2026-06-26 | `33d294f` | July scenario-training workshop presets, deck corrections, parity harness, UI integration deployed via Codex |
 | 2026-06-23 | `29b91e4` | Sprint 1: Workshop Demo Safety — error handling, loading splash, touch feedback |
+
+Note: the tag `v1.0-oct-workshop` (commit `5787aad`) predates the October redesign despite its
+name; `v1.1-oct-workshop-hardened` is the tag that actually reflects October-workshop content.
 
 ## CI Notes
 
@@ -63,4 +67,4 @@ No snapshot baselines are committed yet. Local Windows-generated (`-win32.png`) 
 - [ ] Complete the tour on physical iPhone Safari and a mid-size tablet.
 - [ ] Test venue Wi-Fi and preload the production URL.
 - [ ] Keep `npm run build && npm run preview -- --host 0.0.0.0` ready as the local fallback.
-- [ ] Confirm the green release commit is tagged `v1.0-oct-workshop`.
+- [ ] Confirm the green release commit is tagged `v1.1-oct-workshop-hardened`.
