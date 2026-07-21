@@ -2,11 +2,14 @@
 
 ## Why I'm learning this
 
-I am preparing to **teach and facilitate the Vietnam DPPA pricing session** (CEBA
-"Session 5.2: Off-Site Solutions Deep Dive") at the in-person factory workshop in
-**July 2026**. I work at Allotrope on clean-energy advisory, so I know solar/wind and
-project development — but I need to *own* the DPPA settlement mechanics cold so I can
-present them clearly and field hard CFO/lender questions live.
+I taught and facilitated the Vietnam DPPA pricing session (CEBA "Session 5.2: Off-Site
+Solutions Deep Dive") at the in-person factory workshop in **July 2026** — the session
+exposed a symbol-overload failure in Module 2 that lost the audience for the rest of the
+walkthrough (see `research/2026-07-04_dppa-modules-teaching-revamp-brainstorm.md`). I am
+now rebuilding the materials and preparing to teach the corrected version at the
+**October 2026** session. I work at Allotrope on clean-energy advisory, so I know
+solar/wind and project development — but I need to *own* the DPPA settlement mechanics
+cold so I can present them clearly and field hard CFO/lender questions live.
 
 The source deck (`ceba/CEBA DPPA 2026.pptx`, 44 slides, 6 modules) is **too wordy to
 teach from directly**. I want each module distilled into a crisp visual mental model I
