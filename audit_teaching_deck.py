@@ -1,3 +1,4 @@
+# LIVE: run by CI's deck-parity job (.github/workflows/ci.yml). Regenerate: PYTHONPATH= py audit_teaching_deck.py
 """PHASE-03 TASK-03-03: audit the rebuilt teaching deck against CON-002
 (<=30 words/content slide, Decree-57 symbols deferred until the M6 decoder)
 and reconcile every numeric string against assets/teaching/spine-s1.json.

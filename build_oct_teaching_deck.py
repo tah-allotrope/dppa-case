@@ -1,3 +1,4 @@
+# LIVE: NOTES.md-regenerable. Regenerate: PYTHONPATH= py build_oct_teaching_deck.py --lang en (also --lang vi|zh once translated)
 """PHASE-03 (Modules 1-6 teaching revamp): build the October 2026 teaching deck
 from the 44-slide master `ceba/CEBA DPPA 2026.pptx`, following the content spec
 in TEACH_SLIDES below (TASK-03-01). Visual-first, <=30 words/content slide,

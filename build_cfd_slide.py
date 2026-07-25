@@ -1,3 +1,4 @@
+# LIVE: NOTES.md-regenerable. Regenerate: py build_cfd_slide.py
 """Render the consolidated CfD chart AND the three per-scenario CfD charts with the
 web-app TOU overlay. For each chart we produce:
   - an animated GIF that sweeps hour-by-hour, highlighting each hour's data points

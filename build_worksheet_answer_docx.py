@@ -1,3 +1,4 @@
+# LIVE: NOTES.md-regenerable. Regenerate: py build_worksheet_answer_docx.py
 """
 Build lessons/DPPA_Worksheets_and_Answers.docx
 ==============================================

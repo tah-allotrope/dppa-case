@@ -85,6 +85,47 @@ class TestScanFiles(unittest.TestCase):
                 crf.REPO_ROOT, crf.CONFIG_PATH = old_root, old_config
 
 
+class TestScanScripts(unittest.TestCase):
+    def test_retired_figure_in_root_script_is_flagged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _write(root, "build_x.py", 'add_text(slide, "0 of 56")\n')
+            config = {"scanScripts": ["*.py"], "retired": REAL_CONFIG["retired"]}
+            violations = crf.scan_scripts(root, config)
+            self.assertEqual(len(violations), 1)
+            self.assertIn("RETIRED-FIGURE IN GENERATOR:", violations[0])
+            self.assertIn("build_x.py", violations[0])
+
+    def test_archived_script_is_excluded(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _write(root, "archive/build_x.py", 'add_text(slide, "0 of 56")\n')
+            config = {"scanScripts": ["archive/*.py"], "retired": REAL_CONFIG["retired"]}
+            violations = crf.scan_scripts(root, config)
+            self.assertEqual(violations, [])
+
+    def test_test_fixture_is_excluded(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _write(root, "tools/tests/fixture.py", 'x = "0 of 56"\n')
+            config = {"scanScripts": ["tools/tests/*.py"], "retired": REAL_CONFIG["retired"]}
+            violations = crf.scan_scripts(root, config)
+            self.assertEqual(violations, [])
+
+    def test_current_value_in_generator_is_not_flagged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _write(root, "build_x.py", 'add_text(slide, "5 of 56")\n')
+            config = {"scanScripts": ["*.py"], "retired": REAL_CONFIG["retired"]}
+            violations = crf.scan_scripts(root, config)
+            self.assertEqual(violations, [])
+
+    def test_real_repo_generators_are_clean(self):
+        config = REAL_CONFIG
+        violations = crf.scan_scripts(crf.REPO_ROOT, config)
+        self.assertEqual(violations, [], f"unexpected retired figures in generators: {violations}")
+
+
 class TestLoadConfig(unittest.TestCase):
     def test_missing_config_raises_system_exit(self):
         with tempfile.TemporaryDirectory() as tmp:

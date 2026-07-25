@@ -50,6 +50,14 @@ mission is to teach *this* deck, and the repo already encodes the verified mecha
 - The deck's own **panel on risk allocation & bank financing** is the immediate live forum —
   bring Module 4's questions. (URLs to confirm before sharing.)
 
+## Local-only source material
+
+- `background/*.pdf`, `background/*.pptx` — early source PDFs/decks (Ecoplexus workshop deck,
+  synthetic policy summary, a simplified CfD scenario deck) used while drafting this project.
+  `background/` is gitignored; these files were tracked anyway by accident until 2026-07-25 and
+  have since been untracked (`git rm --cached`, contents left on disk). They are not version
+  controlled — do not rely on them being present in a fresh clone.
+
 ## Gaps to fill
 - **Closed (2026-07-17):** Official Decree 57 / Circular 16 source URLs — see the
   "Primary (external / regulatory)" entries above and

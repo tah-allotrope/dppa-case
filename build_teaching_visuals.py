@@ -1,3 +1,4 @@
+# LIVE: NOTES.md-regenerable. Regenerate: PYTHONPATH= py build_teaching_visuals.py --lang en (also --lang vi|zh once translated)
 """PHASE-01 (Modules 1-6 teaching revamp): render every bespoke visual for the
 rebuilt deck from assets/teaching/spine-s1.json — the S1 numbers exported by
 app/scripts/export-spine.mjs, never hand-typed. Extends the build_cfd_slide.py

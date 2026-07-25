@@ -1,5 +1,28 @@
 # Teaching Notes & Preferences
 
+## Repo layout (2026-07-25)
+- The repo root now carries exactly **six** live build/verify scripts, each with a `# LIVE:`
+  header comment naming what runs it and the exact regenerate command: `audit_teaching_deck.py`,
+  `verify_deck_numbers.py`, `build_oct_teaching_deck.py`, `build_teaching_visuals.py`,
+  `build_cfd_slide.py`, `build_worksheet_answer_docx.py`. Everything else that used to live at
+  the root — 12 one-off scripts and 7 orphaned decks/screenshots from earlier consolidation
+  phases — moved into `archive/` (`git mv`, not deleted; see `archive/README.md` for what each
+  file was and its live equivalent, if any).
+- **Regeneration order** when `app/src/modules/settlement.js`, `app/src/data/default-scenarios.js`,
+  or the escalation assumptions change: `cd app && node scripts/export-spine.mjs && node
+  scripts/export-sweep.mjs` → `PYTHONPATH= py build_teaching_visuals.py --lang en` →
+  `PYTHONPATH= py build_oct_teaching_deck.py --lang en` → `PYTHONPATH= py audit_teaching_deck.py`
+  + `PYTHONPATH= py verify_deck_numbers.py`.
+- **Retirement rule:** whenever a headline figure changes (e.g. the gate-sweep pass count), add
+  the superseded value to `tools/retired_figures.json`'s `retired` list in the *same commit*.
+  `tools/check_retired_figures.py` scans both prose (`NOTES.md`, `RESOURCES.md`, `MISSION.md`,
+  `lessons.md`, `facilitator/**/*.md`, `lessons/**/*.html`) and the six live generator scripts
+  themselves — a build script that still hard-codes a retired figure is caught even before it
+  produces a slide with the wrong number on it (this closed a real gap: `build_callouts.py`, now
+  archived, still hard-coded the pre-gate-sweep placeholder value — see `archive/README.md` for
+  the retired figure it hard-coded, which is deliberately not repeated here so this note itself
+  doesn't trip the guard it describes).
+
 ## October readiness hardening (2026-07-11)
 - Teach-mode fallback slides (the 6 hidden slides shown only if the live app fails)
   now embed real recorded MP4s instead of placeholder text. Regenerate with

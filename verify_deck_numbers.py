@@ -1,3 +1,4 @@
+# LIVE: run by CI's deck-parity job (.github/workflows/ci.yml). Regenerate: PYTHONPATH= py verify_deck_numbers.py
 """PHASE-04 (October readiness hardening plan): reconciles every comma-grouped
 VND-millions figure shown on a slide BODY (never speaker notes, which
 intentionally carry exact answer-key numbers) against the canonical
