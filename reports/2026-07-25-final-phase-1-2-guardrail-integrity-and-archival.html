@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Guardrail Integrity &amp; Repo Hygiene — Phases 1–2</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell { width: min(var(--page-width), calc(100vw - 32px)); margin: 0 auto; padding: 28px 0 56px; }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr); gap: 24px; align-items: end; }
+
+    .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+
+    .title { margin: 0; max-width: 16ch; font-family: var(--display-font); font-size: clamp(2.4rem, 4.4vw, 4rem); line-height: 0.98; letter-spacing: -0.03em; text-wrap: balance; }
+
+    .lede { margin: 18px 0 0; max-width: 60ch; color: var(--ink-soft); font-size: 1rem; }
+
+    .takeaway { margin-top: 22px; padding: 18px 20px; border-left: 4px solid var(--accent-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: rgba(59, 111, 118, 0.08); color: #20373a; font-size: 1.02rem; }
+
+    .meta-grid { display: grid; gap: 12px; }
+
+    .meta-card, .section, .subcard, .empty-state { border: 1px solid rgba(95, 72, 46, 0.12); background: rgba(255, 253, 249, 0.88); box-shadow: var(--shadow); }
+
+    .meta-card { padding: 16px 18px; border-radius: var(--radius-md); }
+
+    .meta-label { color: var(--ink-soft); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; }
+
+    .meta-chip { margin-top: 8px; color: var(--accent); font-size: 1rem; font-weight: 700; word-break: break-word; }
+
+    .section { margin-top: 22px; padding: 24px; border-radius: var(--radius-lg); break-inside: avoid; page-break-inside: avoid; }
+
+    .section-header { display: flex; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+
+    .section-index { color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+
+    .section-title { margin: 0; font-family: var(--display-font); font-size: clamp(1.45rem, 2vw, 2rem); line-height: 1.05; }
+
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { display: grid; gap: 16px; }
+
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .subcard { padding: 18px; border-radius: var(--radius-md); break-inside: avoid; page-break-inside: avoid; }
+
+    .subcard h3, .subcard h4 { margin: 0 0 10px; font-size: 1rem; line-height: 1.2; }
+
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child { margin-top: 0; }
+
+    .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 16px; }
+
+    .stat { padding: 14px 16px; border: 1px solid rgba(59, 111, 118, 0.16); border-radius: var(--radius-sm); background: rgba(59, 111, 118, 0.06); break-inside: avoid; page-break-inside: avoid; }
+
+    .stat-label { color: var(--ink-soft); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+
+    .stat-value { margin-top: 8px; color: var(--accent-2); font-size: 1.18rem; font-weight: 700; }
+
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.54); break-inside: avoid; page-break-inside: avoid; }
+
+    .diagram-frame { overflow-x: auto; overflow-y: auto; overscroll-behavior-x: contain; overscroll-behavior-y: contain; max-height: min(70vh, 720px); }
+
+    .chart-frame, .viz-frame { overflow: hidden; }
+
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--ink); }
+
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh, 560px); }
+
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart { display: block; width: 100% !important; max-width: 100%; height: 300px !important; min-height: 300px; max-height: 300px; }
+
+    .technical-frame table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+
+    .technical-frame th { color: var(--accent); font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .empty-state { padding: 20px; border-radius: var(--radius-md); text-align: center; color: var(--ink-soft); break-inside: avoid; page-break-inside: avoid; }
+
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent); font-size: 0.84rem; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    ul, ol { margin: 0; padding-left: 20px; }
+
+    li { margin-bottom: 8px; }
+
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 0.78rem; font-weight: 600; }
+
+    .pill.ok { background: rgba(59, 111, 118, 0.14); color: var(--accent-2); }
+
+    .footer-note { margin-top: 18px; color: rgba(95, 86, 76, 0.74); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+
+    @media (max-width: 920px) {
+      .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { grid-template-columns: 1fr; }
+      .title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { width: min(100vw - 20px, var(--page-width)); padding-top: 16px; padding-bottom: 36px; }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .title { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+    }
+
+    @media print {
+      :root { --paper: #ffffff; --paper-strong: #ffffff; --ink: #111111; --ink-soft: #444444; --line: #d6d1c8; }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame, .empty-state, .stat { background: #ffffff; box-shadow: none; }
+      .hero, .section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header, .takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Guardrail Integrity &amp; Repo Hygiene — Phases 1–2</h1>
+          <p class="lede">
+            A presentation-ready synthesis of the first two phases of the 2026-07-25 guardrail-integrity
+            and localization plan: making the production-deploy freshness signal trustworthy, and closing
+            a generator-side blind spot in the repo's own number-accuracy guard.
+          </p>
+          <div class="takeaway">
+            Both phases are executed, verified against the live site, and committed. The deploy-freshness
+            check no longer trusts a label that could lie — it now compares served bytes to a fresh local
+            build — and the retired-figure guard now also scans the six scripts that generate the teaching
+            deck, catching one script that would have rendered a wrong number onto a slide. The repository's
+            <code>.git</code> directory was packed from ~248 MB of loose objects to a single ~135 MB pack.
+            Phases 3–6 (trilingual app, offline resilience, real CI gates, style/doc unification) remain as
+            planned, unexecuted next work.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">DPPA Case — Vietnam Synthetic DPPA Teaching Tool</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">tah-allotrope/dppa-case</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-07-25</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What was wrong</h3>
+          <p>
+            The live teaching app at <code>https://dppa-case.web.app</code> — the URL on the deck's
+            closing QR code — served a build whose embedded provenance marker named a commit
+            (<code>e55319e</code>) whose own source tree contained no code capable of producing that
+            marker. The deploy had been made from an uncommitted working tree, so the "which commit is
+            live" signal corresponded to no reviewable commit. Separately, the automated weekly freshness
+            check compared that marker against <code>git rev-parse HEAD</code>, meaning any commit at all
+            — including a documentation-only one — would report the site as stale on its first scheduled
+            run.
+          </p>
+        </div>
+        <div class="subcard">
+          <h3>What was fixed</h3>
+          <p>
+            Phase 1 replaced the marker with a dirty-tree-aware version and replaced the freshness
+            comparison with a content-hash comparison of the live site's actual JavaScript/CSS asset
+            filenames against a fresh local build — immune to a wrong, missing, or dirty marker. The app
+            was rebuilt and redeployed three times in sequence while iterating to a genuinely clean,
+            verified result; the release tag was moved to the deployed commit. Phase 2 found and archived
+            a live landmine: <code>build_callouts.py</code>, a script indistinguishable at a glance from
+            six still-run scripts, still hard-coded the retired figure "0 of 56" at 48pt bold red — the
+            repo's number-accuracy guard had never scanned generator scripts, only the prose they produce.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          This repository builds and maintains a teaching case for Vietnam's synthetic Direct Power
+          Purchase Agreement (DPPA) mechanism: a source PowerPoint deck, a settlement-math engine, a
+          live browser app used as a presenter's demo aid, and a pipeline of Python/Node scripts and CI
+          checks that keep every number across the deck, app, and worksheets in agreement. A 2026-07-25
+          research pass (<code>research/2026-07-25-guardrail-integrity-and-audience-localization-brainstorm.md</code>)
+          found that the freshness guardrail built three days earlier — itself meant to make "is the
+          live site current" a checkable fact instead of something someone has to remember — was
+          reporting an answer that could not be true, and was about to fire a false alarm on its first
+          scheduled run.
+        </p>
+        <p>
+          The resulting six-phase plan (<code>plans/2026-07-25-guardrail-integrity-and-localization-plan.md</code>)
+          scoped that fix (Phase 1) alongside five further hardening and localization phases. This report
+          covers execution of the first two: making deploy provenance honest (Phase 1) and closing the
+          generator-side blind spot in the repo's figure-accuracy guard plus archiving stale scripts and
+          binaries (Phase 2). Both were explicitly scoped as parallelizable and lowest-risk-highest-consequence
+          — the objective was to land them before the next scheduled freshness-check run and well ahead
+          of the 2026-09-15 English content freeze that governs the rest of the plan.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h4>Primary inputs</h4>
+          <ul>
+            <li><code>plans/2026-07-25-guardrail-integrity-and-localization-plan.md</code> — the six-phase
+              execution plan; this report covers PHASE-01 and PHASE-02 in full, including every listed
+              task, file change, and exit criterion.</li>
+            <li><code>research/2026-07-25-guardrail-integrity-and-audience-localization-brainstorm.md</code>
+              — the analysis that identified the marker/freshness contradiction and the generator-side
+              guard gap.</li>
+            <li>Prior plan <code>plans/2026-07-21-deploy-drift-repo-hygiene-plan.md</code> — 2 of its 5
+              phases had already been executed; this session's plan builds on and folds in the remainder
+              rather than re-scoping it a third time.</li>
+            <li>Live production state: <code>https://dppa-case.web.app</code>, fetched and diffed against
+              local builds at each verification step.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Explicit out of scope (held throughout)</h4>
+          <ul>
+            <li>No settlement formula, scenario constant, or exported spine/gate-sweep figure was
+              changed — confirmed by re-running <code>export-spine.mjs</code> / <code>export-sweep.mjs</code>
+              and diffing byte-for-byte against the committed JSON (clean).</li>
+            <li>No new Vietnamese/Chinese translation work (Phase 3 of the plan).</li>
+            <li>No deck rebuild, no offline/service-worker work (Phase 4), no CI-gate hardening for
+              visual regression/accessibility/coverage (Phase 5), no code-style unification or new
+              documentation architecture (Phase 6).</li>
+            <li>The commented-out Firebase CI deploy job was not enabled (blocked on credentials,
+              tracked separately in the human-blocked register).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h4>Assumptions that held</h4>
+          <ul>
+            <li><strong>ASM-001</strong> (plan): the Firebase CLI would already be authenticated on the
+              executing machine. Confirmed true — three consecutive deploys succeeded without any
+              credential prompt.</li>
+            <li><strong>CON-001</strong> (plan): the committed engine exports must stay byte-identical
+              throughout. Verified after Phase 2's archival with a clean <code>git diff --exit-code</code>
+              against regenerated <code>spine-s1/s2/s3.json</code> and <code>gate-sweep.json</code>.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Constraints and a mid-execution correction</h4>
+          <ul>
+            <li>The plan's own asset-comparison design (S2) assumed a straightforward glob match on
+              Firebase Hosting's header rules would target <code>/index.html</code>. In execution this
+              needed one iteration: <code>**/*.html</code> and then <code>/index.html</code> +
+              <code>/**/*.html</code> both failed to match the root path the SPA rewrite actually serves;
+              the working fix uses a broad <code>**</code> rule overridden by a more specific
+              <code>/assets/**</code> rule later in the list, per Firebase's documented same-key-override
+              behavior. Verified live via <code>curl</code> before proceeding.</li>
+            <li>The new generator-scanning guard caught its own documentation: a NOTES.md sentence
+              describing the fixed bug quoted the literal retired string and tripped the guard it was
+              describing. Rephrased to reference the finding without repeating the retired literal — a
+              small but genuine proof that the guard works as designed.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>
+          Each phase followed the same discipline: implement the change, run the closest available
+          verification (unit tests, lint, production build, functional end-to-end tests, and the repo's
+          own Python checker suite), fix anything red before committing, and commit only once green.
+          Where a task changed what the public production site serves — every task in Phase 1 — the
+          change was verified against the live URL directly (<code>curl</code> for headers and content,
+          the rewritten freshness checker for asset-hash equality) rather than trusted from a local build
+          alone. Two iterations inside Phase 1 (the cache-header glob, and a stale local <code>dist/</code>
+          build that predated a commit) were caught by this live-verification step rather than assumed
+          away, and both were corrected before moving on.
+        </p>
+        <p>
+          Phase 2 added a directory-exclusion design (test fixtures and the archive itself must not
+          trip the new generator scan) verified with five new unit tests before being run against the
+          real repository, which is what surfaced the <code>build_callouts.py</code> finding as a
+          real, reproducible failure rather than a hypothetical one.
+        </p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Phases executed</div>
+          <div class="stat-value">2 of 6</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Live deploys performed</div>
+          <div class="stat-value">3</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Evidence rule</div>
+          <div class="stat-value">no invented data</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 1 — Deploy Provenance &amp; Freshness Integrity</h3>
+          <p>
+            <code>app/vite.config.js</code>'s build-commit marker now appends <code>-dirty</code>
+            whenever <code>git status --porcelain</code> is non-empty at build time, so it can no longer
+            claim a bare commit hash for a build that doesn't match one. <code>tools/check_deploy_freshness.py</code>
+            was rewritten: instead of comparing the marker to <code>HEAD</code>, it now builds the
+            current tree locally and compares the live site's content-hashed <code>/assets/*</code>
+            filenames against that fresh build's — a comparison immune to a wrong, missing, or dirty
+            marker, and one a documentation-only commit cannot trip, because it never changes any asset's
+            hash. A live <code>-dirty</code> marker is still a hard failure regardless of matching assets.
+            <code>app/firebase.json</code> now serves <code>no-cache</code> on HTML and a one-year
+            immutable cache on hashed assets. A stray personal name in the app's header
+            (<code>"Rob — Vietnam synthetic DPPA"</code>) was removed. The app was deployed three times
+            in sequence while converging on a genuinely clean result, and the release tag
+            <code>v1.1-oct-workshop-hardened</code> was moved (force-push, by design — the old target
+            was already documented as misleading) to the final, freshness-verified commit.
+          </p>
+          <div class="pill-row">
+            <span class="pill ok">deploy-freshness: PASS, no -dirty marker</span>
+            <span class="pill ok">57/57 JS tests</span>
+            <span class="pill ok">9/9 functional e2e</span>
+            <span class="pill ok">headers verified live via curl</span>
+          </div>
+        </div>
+        <div class="subcard">
+          <h3>Phase 2 — Generator-Side Guard, Archival &amp; Repo Weight</h3>
+          <p>
+            <code>tools/retired_figures.json</code> gained a <code>scanScripts</code> pattern list
+            (root <code>*.py</code>/<code>*.js</code>, <code>tools/*.py</code>,
+            <code>app/scripts/*.mjs</code>), and <code>tools/check_retired_figures.py</code> now scans
+            it, excluding <code>tools/tests/</code>, <code>archive/</code>, <code>node_modules/</code>,
+            and <code>.git/</code>. Run before archival, it immediately failed on
+            <code>build_callouts.py</code> (three hits, including the 48pt-bold-red slide text) —
+            confirming the finding the brainstorm had only inferred from a static grep. Twelve one-off
+            scripts and seven orphaned binaries (three unused decks, a stale reference deck, two
+            manual-QA screenshots, and the build brief describing them) were moved into a new
+            <code>archive/</code> directory via <code>git mv</code>, with a README documenting each
+            file's original purpose and live equivalent, if any. The six still-live scripts each gained
+            a one-line header naming what runs them. Three files under the gitignored
+            <code>background/</code> directory that had been tracked anyway were untracked (kept on
+            disk). The repository was then packed with <code>git gc --aggressive --prune=now</code>.
+          </p>
+          <div class="pill-row">
+            <span class="pill ok">55/55 Python checker tests</span>
+            <span class="pill ok">deck pipeline verified post-archival</span>
+            <span class="pill ok">history preserved through git mv</span>
+            <span class="pill ok">git fsck clean</span>
+          </div>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <pre class="mermaid">
+flowchart LR
+  A["Build with dirty tree"] -->|"marker gets -dirty suffix"| B{"Freshness check"}
+  B -->|"marker ends -dirty"| F["FAIL: redeploy from clean tree"]
+  B -->|"marker clean"| C{"Live assets == fresh local build assets?"}
+  C -->|"yes"| P["PASS — write deploy log"]
+  C -->|"no"| S["STALE — redeploy instructions printed"]
+  P --> T["Move release tag to verified commit"]
+        </pre>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Finding 1 — the original freshness check would have false-alarmed on its very next scheduled run.</strong>
+          Comparing a marker to <code>HEAD</code> meant the Monday-morning scheduled workflow
+          (<code>.github/workflows/freshness-checks.yml</code>) was guaranteed to report the site stale
+          after any commit, including a report file. The asset-hash design adopted instead only reports
+          stale when the served bytes actually differ, which is the property that was actually wanted.</p>
+        <p><strong>Finding 2 — "the app content is current" and "the app's provenance metadata is
+          trustworthy" are different claims, and only the first was true before this work.</strong> The
+          served JavaScript bundle was already byte-identical to a fresh build at HEAD before Phase 1
+          began; the danger was entirely in the unfalsifiable marker, not stale content. This distinction
+          shaped the fix: rebuild trust in the signal rather than treat it as a content emergency.</p>
+        <p><strong>Finding 3 — a generator script, not just prose, can silently reintroduce a retired
+          number.</strong> <code>build_callouts.py</code> sat at the repo root, indistinguishable from
+          six still-run scripts, and would have rendered "0 of 56" (the pre-gate-sweep placeholder) onto
+          a financing-summary slide the next time anyone ran it. The existing guard only ever scanned the
+          documents a build script produces, never the script itself.</p>
+        <p><strong>Recommendation:</strong> proceed to Phase 3 (trilingual app) next, ahead of Phases 4–6.
+          It is the only remaining phase gated by an external deadline — the translator engagement
+          referenced in the plan needs the app's string inventory to brief against, and English content
+          changes must land before the 2026-09-15 freeze. Phases 4 (offline resilience), 5 (CI gate
+          hardening), and 6 (style/documentation unification, which explicitly depends on Phase 3 landing
+          first) do not carry the same deadline pressure and can follow in either order.</p>
+      </div>
+      <div class="viz-frame">
+        <canvas id="repoSizeChart" aria-label="Git repository size before and after packing" role="img"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h4>Immediate (this session)</h4>
+          <ul>
+            <li>Push both phases' commits to <code>origin/master</code> — the force-pushed release tag
+              move already went to the remote; the commits themselves have not yet.</li>
+            <li>Publish this report and confirm the freshness-checks scheduled workflow's next Monday
+              run (2026-07-27) reports green.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Next (Phase 3 — owner: engineering session)</h4>
+          <ul>
+            <li>Extract the app's user-visible English strings into a key/value table aligned with the
+              existing terminology map, add English-fallback language resolution, and wire in whatever
+              Vietnamese/Chinese translations already exist verbatim in the repo.</li>
+            <li>Land well before the translator engagement and the 2026-09-15 content freeze named in
+              the plan's binding constraints.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Following (Phases 4–5 — owner: engineering session, either order)</h4>
+          <ul>
+            <li>Phase 4: service worker for offline resilience at the venue, plus a bundle-size trim.</li>
+            <li>Phase 5: commit real visual-regression baselines, add accessibility testing, add
+              coverage reporting — converting decorative or absent CI gates into real ones.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Last (Phase 6 — owner: engineering session, depends on Phase 3)</h4>
+          <ul>
+            <li>Unify code style, add the root <code>CLAUDE.md</code> project-rules file, retire
+              <code>activeContext.md</code>, and write the overdue <code>learning-records/0005</code>
+              synthesizing the July-failure-to-October-redesign arc.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h4>Risks carried forward</h4>
+          <ul>
+            <li>The release tag <code>v1.1-oct-workshop-hardened</code> was force-moved to a new commit
+              and force-pushed as a tag ref — intentional, and consistent with the tag already being
+              documented as misleading at its old target, but it is a rewritten published ref and worth
+              noting explicitly.</li>
+            <li><code>git gc --aggressive</code> was run locally against a fully-committed tree and
+              verified with <code>git fsck --full</code> (clean) and a <code>git log --follow</code>
+              check on a moved file (history intact), but the repacked object database has not yet been
+              exercised by a push/clone round-trip.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h4>Open questions (explicitly deferred, not resolved)</h4>
+          <ul>
+            <li><strong>ASM-007</strong> (plan): whether the <code>.gif</code> copies of the CfD charts
+              in <code>assets/</code> (roughly 10 MB of duplication alongside their <code>.mp4</code>
+              equivalents) are still consumed anywhere was not determined. Recorded in
+              <code>archive/README.md</code> as a decision for a human, not resolved here.</li>
+            <li>The three files under <code>background/</code> that were untracked are still present on
+              disk locally but will not exist in a fresh clone — acceptable per the plan's scope, but
+              worth confirming no other tooling expects them to be checked out.</li>
+            <li>Phases 3–6 remain fully unexecuted; their own risks and open questions are documented in
+              the plan itself and are not re-litigated here.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="technical-frame">
+          <table>
+            <thead><tr><th>Check</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td><code>cd app &amp;&amp; npm test</code></td><td>57 passed (8 files)</td></tr>
+              <tr><td><code>cd app &amp;&amp; npm run lint</code></td><td>clean</td></tr>
+              <tr><td><code>cd app &amp;&amp; npm run build</code></td><td>clean, 84.87 kB gzip JS</td></tr>
+              <tr><td><code>npx playwright test --grep-invert @visual</code></td><td>9/9 passed</td></tr>
+              <tr><td><code>python -m unittest discover -s tools/tests</code></td><td>55 passed</td></tr>
+              <tr><td><code>python tools/check_deploy_freshness.py</code></td><td>PASS, marker <code>22bae59</code> / final <code>f524218</code> tree, no <code>-dirty</code></td></tr>
+              <tr><td><code>python tools/check_retired_figures.py</code></td><td>PASS, 42 files (28 prose, 14 scripts)</td></tr>
+              <tr><td><code>python audit_teaching_deck.py</code></td><td>PASS, 27 slides audited</td></tr>
+              <tr><td><code>python verify_deck_numbers.py</code></td><td>PARITY PASS, 5 figures reconciled</td></tr>
+              <tr><td><code>python tools/verify_prose_figures.py</code></td><td>PASS, 377 tokens / 28 files</td></tr>
+              <tr><td>Live header check (<code>curl -sI</code>)</td><td><code>/</code> and <code>/index.html</code>: no-cache; <code>/assets/*</code>: max-age=31536000, immutable</td></tr>
+              <tr><td><code>git fsck --full</code> (post-gc)</td><td>clean</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="technical-frame">
+          <table>
+            <thead><tr><th>Artifact</th><th>Detail</th></tr></thead>
+            <tbody>
+              <tr><td>Commits this session</td><td><code>b69efc3</code>, <code>22bae59</code>, <code>082b5aa</code> (Phase 1), <code>f524218</code> (Phase 2)</td></tr>
+              <tr><td>Final deployed &amp; verified commit</td><td><code>22bae59</code> (app-affecting); tree at report time <code>f524218</code></td></tr>
+              <tr><td>Release tag</td><td><code>v1.1-oct-workshop-hardened</code>, moved from <code>f5fd22a</code> to the deployed commit</td></tr>
+              <tr><td>Archived scripts</td><td>12, via <code>git mv</code> into <code>archive/</code></td></tr>
+              <tr><td>Archived binaries + docs</td><td>7 binaries + 1 build brief</td></tr>
+              <tr><td>Repo size (loose → packed)</td><td>248.53 MiB loose objects → 134.89 MiB in one pack</td></tr>
+              <tr><td>Untracked (kept on disk)</td><td>3 files under <code>background/</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+      window.__REPORT_CHART_DEFAULTS__ = {
+        animation: false,
+        resizeDelay: 150,
+        normalized: true,
+        maintainAspectRatio: false,
+        responsive: true
+      };
+
+      const ctx = document.getElementById('repoSizeChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Before (loose objects)', 'After (packed, git gc --aggressive)'],
+            datasets: [{
+              label: '.git size (MiB)',
+              data: [248.53, 134.89],
+              backgroundColor: ['#bfa37d', '#3b6f76'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false }, title: { display: true, text: 'Repository size, PHASE-02 packing (measured via git count-objects -vH)' } },
+            scales: { y: { beginAtZero: true, title: { display: true, text: 'MiB' } } },
+            animation: false,
+            resizeDelay: 150,
+            normalized: true,
+            maintainAspectRatio: false,
+            responsive: true
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
