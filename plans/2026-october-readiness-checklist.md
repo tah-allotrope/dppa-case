@@ -46,10 +46,12 @@ coding session, needs a person with a browser/PowerPoint/printer.
       in real PowerPoint; confirm the 6 embedded MP4 fallback slides autoplay
       or are easy to click-to-play; confirm hidden-slide unhide/reveal works
       in slideshow mode.
-- [ ] **(human-only)** Deploy the app (`cd app && npm run predeploy` then the
+- [x] **(human-only)** Deploy the app (`cd app && npm run predeploy` then the
       Firebase deploy command in `app/deployment.md`) so
       `https://dppa-case.web.app` reflects the teach-mode banner, presenter
-      theme, and current scenario numbers.
+      theme, and current scenario numbers. — done 2026-07-25, verified by
+      `python tools/check_deploy_freshness.py` (PASS, commit `22bae59`, no
+      `-dirty` marker; see `app/deployment.md`'s Last Deploy table).
 - [ ] If the illustrative lender/investor gate proxy constants in
       `app/scripts/export-sweep.mjs` (currently 1,380 / 1,450 VND/kWh) should
       be recalibrated with real developer economics, do it now — re-run
