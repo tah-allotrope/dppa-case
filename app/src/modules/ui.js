@@ -185,7 +185,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
         <div class="brand-block">
           <img class="brand-logo" src="/brand/allotrope-logo.png" alt="Allotrope logo" />
           <div>
-            <p class="eyebrow">Rob — Vietnam synthetic DPPA</p>
+            <p class="eyebrow">Vietnam synthetic DPPA</p>
             <h1>DPPA CFO visual explainer</h1>
             <p class="hero-copy">Click any hour to compare the 2025 teaching-model baseline against DPPA payment using documented example inputs and an illustrative FMP curve (no primary NSMO/ERAV source available).</p>
           </div>

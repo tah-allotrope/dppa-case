@@ -3,7 +3,9 @@ import { execSync } from 'node:child_process'
 
 function getBuildCommit() {
   try {
-    return execSync('git rev-parse HEAD').toString().trim()
+    const commit = execSync('git rev-parse HEAD').toString().trim()
+    const dirty = execSync('git status --porcelain').toString().trim().length > 0
+    return dirty ? `${commit}-dirty` : commit
   } catch {
     return 'unknown'
   }
