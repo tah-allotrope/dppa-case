@@ -385,54 +385,54 @@ the deploy log, remove the stray personal name from the app header, and redeploy
 clean tree so that every one of those statements is true of the live site.
 
 **Tasks**
-- [ ] TASK-01-01: In `app/vite.config.js`, replace `getBuildCommit()` with the S1 logic: run
+- [x] TASK-01-01: In `app/vite.config.js`, replace `getBuildCommit()` with the S1 logic: run
       `git rev-parse HEAD` and `git status --porcelain`, return `"unknown"` on any exception,
       append `-dirty` when `git status --porcelain` output is non-empty after trimming. Keep the
       existing `transformIndexHtml` insertion point and the exact meta-tag shape
       (`<meta name="build-commit" content="…">`) so the existing regex in the checker still matches.
       Leave the `test` and `build` config blocks untouched.
-- [ ] TASK-01-02: In `app/src/modules/ui.js`, inside `renderAppShell`, change the eyebrow text
+- [x] TASK-01-02: In `app/src/modules/ui.js`, inside `renderAppShell`, change the eyebrow text
       `Rob — Vietnam synthetic DPPA` to `Vietnam synthetic DPPA`. Change nothing else in that
       header block — the `<h1>DPPA CFO visual explainer</h1>` and the `hero-copy` paragraph stay
       exactly as they are.
-- [ ] TASK-01-03: Search the repository for any test or snapshot asserting the old eyebrow text
+- [x] TASK-01-03: Search the repository for any test or snapshot asserting the old eyebrow text
       (`grep -rn "Rob —" app/src app/e2e`) and update any match to the new string.
-- [ ] TASK-01-04: Rewrite `tools/check_deploy_freshness.py` to implement S2. Keep the module
+- [x] TASK-01-04: Rewrite `tools/check_deploy_freshness.py` to implement S2. Keep the module
       docstring's shape (purpose, exit-code policy, run instructions including the
       `PYTHONPATH= py` Windows note), keep `--url` and add `--skip-build` (see Function
       Signatures). Keep the rule that unreachable network is exit 0. Standard library only.
-- [ ] TASK-01-05: Add a `--write-log` flag to the same script that, on a PASS, rewrites the first
+- [x] TASK-01-05: Add a `--write-log` flag to the same script that, on a PASS, rewrites the first
       data row of the `## Last Deploy` table in `app/deployment.md` with today's date (UTC,
       `YYYY-MM-DD`), the short commit from the live marker, and the existing description text of
       that row — leaving all other rows and all other sections of the file untouched. If the current
       first data row's date already equals today's date, update it in place instead of inserting.
-- [ ] TASK-01-06: Extend `tools/tests/test_check_deploy_freshness.py` with the Test Specs below.
+- [x] TASK-01-06: Extend `tools/tests/test_check_deploy_freshness.py` with the Test Specs below.
       Use `unittest.mock.patch` on the module's fetch function; never make a real network call in a
       test.
-- [ ] TASK-01-07: Add a `headers` block to `app/firebase.json`: `**/*.html` →
+- [x] TASK-01-07: Add a `headers` block to `app/firebase.json`: `**/*.html` →
       `Cache-Control: no-cache`; `/assets/**` → `Cache-Control: public, max-age=31536000, immutable`.
       Leave `public`, `ignore`, and `rewrites` exactly as they are.
-- [ ] TASK-01-08: Correct the `## Last Deploy` table in `app/deployment.md`: the 2026-07-22 row
+- [x] TASK-01-08: Correct the `## Last Deploy` table in `app/deployment.md`: the 2026-07-22 row
       currently reads commit `f5fd22a`, which is wrong — the served marker says `e55319e` and the
       served bytes match a later tree. Replace that row's commit cell with
       `e55319e (marker; built from an uncommitted tree — see the 2026-07-25 row)` and add the note
       that the table's top row is now maintained by `python tools/check_deploy_freshness.py --write-log`.
-- [ ] TASK-01-09: Verify the working tree is clean (`git status --porcelain` prints nothing) after
+- [x] TASK-01-09: Verify the working tree is clean (`git status --porcelain` prints nothing) after
       committing TASK-01-01..08, then run the full deploy:
       ```bash
       cd app && npm run predeploy && npx firebase deploy --only hosting --project dppa-case
       ```
-- [ ] TASK-01-10: From the repo root, run `python tools/check_deploy_freshness.py --write-log` and
+- [x] TASK-01-10: From the repo root, run `python tools/check_deploy_freshness.py --write-log` and
       confirm it prints `DEPLOY-FRESHNESS PASS` and that the marker it reports contains **no**
       `-dirty` suffix. Commit the resulting `app/deployment.md` change.
-- [ ] TASK-01-11: Move the git tag `v1.1-oct-workshop-hardened` (currently on `f5fd22a`, which
+- [x] TASK-01-11: Move the git tag `v1.1-oct-workshop-hardened` (currently on `f5fd22a`, which
       predates both the freshness tooling and this deploy) to the deployed commit:
       ```bash
       git tag -f v1.1-oct-workshop-hardened
       git push --force origin refs/tags/v1.1-oct-workshop-hardened
       ```
       Then confirm `git rev-list --count v1.1-oct-workshop-hardened..HEAD` prints `0`.
-- [ ] TASK-01-12: In `plans/2026-october-readiness-checklist.md`, tick the "Early September"
+- [x] TASK-01-12: In `plans/2026-october-readiness-checklist.md`, tick the "Early September"
       item *"(human-only) Deploy the app …"* and append ` — done 2026-07-25, verified by
       python tools/check_deploy_freshness.py`.
 
@@ -535,50 +535,50 @@ twelve historical scripts from the six live ones so no future session runs a sta
 shrink a 252 MB repository that has never been packed.
 
 **Tasks**
-- [ ] TASK-02-01: Add `"scanScripts"` to `tools/retired_figures.json` as a new array of glob
+- [x] TASK-02-01: Add `"scanScripts"` to `tools/retired_figures.json` as a new array of glob
       patterns covering generators: `["*.py", "*.js", "tools/*.py", "app/scripts/*.mjs"]`.
       Keep the existing `"scan"` array unchanged. Add a `"scanScriptsNote"` explaining that
       generator files are scanned for retired figures because they *produce* prose, and that
       `tools/tests/**` and `archive/**` are excluded (test fixtures legitimately contain retired
       strings — see the existing `test_check_retired_figures.py`, which writes `"0 of 56"` into a
       temporary `NOTES.md`).
-- [ ] TASK-02-02: In `tools/check_retired_figures.py`, extend `_scanned_files` (or add a sibling)
+- [x] TASK-02-02: In `tools/check_retired_figures.py`, extend `_scanned_files` (or add a sibling)
       to also walk `scanScripts`, excluding any path under `tools/tests/`, `archive/`,
       `node_modules/`, or `.git/`. Report script hits with a distinct prefix
       `RETIRED-FIGURE IN GENERATOR:` so the failure message tells the reader that fixing the prose
       is not enough — the generator must be fixed or archived.
-- [ ] TASK-02-03: Add unittest cases to `tools/tests/test_check_retired_figures.py` per the Test
+- [x] TASK-02-03: Add unittest cases to `tools/tests/test_check_retired_figures.py` per the Test
       Specs below.
-- [ ] TASK-02-04: Run `python tools/check_retired_figures.py` and confirm it now fails, naming
+- [x] TASK-02-04: Run `python tools/check_retired_figures.py` and confirm it now fails, naming
       `build_callouts.py`.
-- [ ] TASK-02-05: Create `archive/` and `git mv` these **twelve** one-off scripts into it:
+- [x] TASK-02-05: Create `archive/` and `git mv` these **twelve** one-off scripts into it:
       `apply_corrections.py`, `apply_deck_corrections.js`, `apply_deck_corrections.py`,
       `build-deck.js`, `build_2026_from_ref.py`, `build_callouts.py`, `build_canonical_cases.py`,
       `build_policy_refresh.py`, `verify_deck_app_parity.js`, `verify_deck_app_parity.py`,
       `inspect_pptx.py`, `export-slides.ps1`.
       Then re-run `python tools/check_retired_figures.py` and confirm it passes (archive is
       excluded), so the guard and the archival together resolve the finding.
-- [ ] TASK-02-06: `git mv` these **seven** orphaned binaries into `archive/`:
+- [x] TASK-02-06: `git mv` these **seven** orphaned binaries into `archive/`:
       `dppa-case-study.pptx`, `dppa-factory-presentation.pptx`, `dppa-web-app-case-study.pptx`,
       `dppa-2026-factory-energy-proposal.pptx`, `ref/DPPA 2025 ref.pptx`,
       `current-app-screenshot.png`, `desktop-current.png`. Keep `ref/` if it becomes empty only
       when git leaves it — git does not track empty directories, so no action is needed.
       **Do not** move anything under `ceba/`, `assets/`, `lessons/`, or `background/`.
-- [ ] TASK-02-07: Write `archive/README.md` stating: (a) nothing in this directory is run by CI or
+- [x] TASK-02-07: Write `archive/README.md` stating: (a) nothing in this directory is run by CI or
       referenced by `NOTES.md`/`RESOURCES.md`; (b) each file's original root path and the reason it
       was retired; (c) an explicit warning that `build_callouts.py` hard-codes the retired figure
       `"0 of 56"` and must not be executed against current data; (d) that `build_2026_from_ref.py`
       consumes `archive/DPPA 2025 ref.pptx`, moved alongside it; (e) the open question from ASM-007
       about whether the `.gif` copies of the CfD charts in `assets/` are still consumed, left for a
       human to decide.
-- [ ] TASK-02-08: Add a one-line header comment as the **first line** of each of the six remaining
+- [x] TASK-02-08: Add a one-line header comment as the **first line** of each of the six remaining
       live root scripts — `audit_teaching_deck.py`, `verify_deck_numbers.py`,
       `build_oct_teaching_deck.py`, `build_teaching_visuals.py`, `build_cfd_slide.py`,
       `build_worksheet_answer_docx.py` — of the form
       `# LIVE: run by <CI job name | NOTES.md section>. Regenerate with: <exact command>`.
       For the Python files, place it above the existing module docstring so the docstring stays the
       module's `__doc__`.
-- [ ] TASK-02-09: Untrack the three files that are tracked despite `background/` being gitignored:
+- [x] TASK-02-09: Untrack the three files that are tracked despite `background/` being gitignored:
       ```bash
       git rm --cached "background/Ecoplexus_ DPPA Presentation_Fof CEBA Workshop.pdf" \
                       "background/Simplified DPPA CfD Settlement Scenario .pptx" \
@@ -586,9 +586,9 @@ shrink a 252 MB repository that has never been packed.
       ```
       The files stay on disk. Add a line to `RESOURCES.md` noting these source PDFs are local-only
       and not in version control.
-- [ ] TASK-02-10: Pack the repository: `git gc --aggressive --prune=now`. Record the
+- [x] TASK-02-10: Pack the repository: `git gc --aggressive --prune=now`. Record the
       before/after of `git count-objects -vH` in the phase's completion notes.
-- [ ] TASK-02-11: Update `NOTES.md` with a short "Repo layout (2026-07-25)" note: six live root
+- [x] TASK-02-11: Update `NOTES.md` with a short "Repo layout (2026-07-25)" note: six live root
       scripts, everything else under `archive/`, and the rule that a retired figure must be added
       to `tools/retired_figures.json` in the same commit.
 

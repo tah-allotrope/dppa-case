@@ -1,7 +1,7 @@
 ---
 title: "Deploy Recovery, Freshness Guardrails & Repo Hygiene"
 date: "2026-07-21"
-status: "draft"
+status: "superseded — PHASE-01/02 executed (commits f5fd22a, e55319e, 7329b58) and PHASE-04 executed as PHASE-02 of plans/2026-07-25-guardrail-integrity-and-localization-plan.md, which names this plan in its research_inputs as carrying forward the unexecuted PHASE-03/04/05"
 request: "Turn the 2026-07-21 deploy-drift-and-repo-hygiene brainstorm into a multi-phase execution plan: recover the stale production deploy and mislabeled release tag, add automated freshness guardrails for both the live site and the human-blocked readiness-checklist deadlines, close the CI rigor gaps (toothless visual regression, no accessibility testing, no coverage measurement), archive root-level one-off scripts and orphaned deck artifacts, and write the missing learning-record documenting the July symbol-overload failure -> October redesign -> hardening arc."
 plan_type: "multi-phase"
 research_inputs:
@@ -326,7 +326,7 @@ current `master` so it reflects the entire October teaching-revamp and hardening
 correctly-named release tag and an updated deploy log.
 
 **Tasks**
-- [ ] TASK-01-01: In `MISSION.md`, replace the paragraph at lines 5–9 (starting "I am preparing
+- [x] TASK-01-01: In `MISSION.md`, replace the paragraph at lines 5–9 (starting "I am preparing
       to **teach and facilitate the Vietnam DPPA pricing session**...") with:
       > I taught and facilitated the Vietnam DPPA pricing session (CEBA "Session 5.2: Off-Site
       > Solutions Deep Dive") at the in-person factory workshop in **July 2026** — the session
@@ -338,13 +338,13 @@ correctly-named release tag and an updated deploy log.
       > cold so I can present them clearly and field hard CFO/lender questions live.
       Leave the rest of `MISSION.md` (the "What success looks like," "How I'll know it worked,"
       and "Constraints / preferences" sections) untouched.
-- [ ] TASK-01-02: Commit the `MISSION.md` fix alone: `git add MISSION.md && git commit -m "docs: correct MISSION.md session framing from upcoming-July to completed-July/upcoming-October"`.
-- [ ] TASK-01-03: Run the full local predeploy gate: `cd app && npm install && npm run predeploy`
+- [x] TASK-01-02: Commit the `MISSION.md` fix alone: `git add MISSION.md && git commit -m "docs: correct MISSION.md session framing from upcoming-July to completed-July/upcoming-October"`.
+- [x] TASK-01-03: Run the full local predeploy gate: `cd app && npm install && npm run predeploy`
       (this runs lint, the full Vitest suite, the full Playwright e2e suite, and the production
       build in sequence — see `app/package.json`'s `predeploy` script). Confirm it exits `0`.
-- [ ] TASK-01-04: Deploy: `cd app && npx firebase deploy --only hosting --project dppa-case`. See
+- [x] TASK-01-04: Deploy: `cd app && npx firebase deploy --only hosting --project dppa-case`. See
       `ASM-001`/`ASM-002` for the authentication/`.firebaserc` fallback if this fails.
-- [ ] TASK-01-05: Verify the deployed content changed: fetch the live site and confirm it now
+- [x] TASK-01-05: Verify the deployed content changed: fetch the live site and confirm it now
       contains October-redesign-only markers absent from the pre-redesign build, e.g.
       `curl -s https://dppa-case.web.app/ | grep -c 'teach-mode\|Teach mode'` should be `>= 1`
       wherever the teach-mode banner's class/copy appears in the served HTML/inline script. If
@@ -353,14 +353,14 @@ correctly-named release tag and an updated deploy log.
       against the actual hashed asset filename from the served HTML's `<script type="module" src="...">`
       tag. Either check confirms the October `teach.js` module (`app/src/modules/teach.js`) is
       present in the deployed bundle.
-- [ ] TASK-01-06: Record the exact deployed commit: `git rev-parse HEAD` (this is the commit that
+- [x] TASK-01-06: Record the exact deployed commit: `git rev-parse HEAD` (this is the commit that
       includes TASK-01-01's `MISSION.md` fix, since it was committed before deploying — the app
       bundle itself is unaffected by that doc change, so the deployed *code* is unchanged from
       `bd2632e` regardless of exactly which commit `HEAD` is at deploy time).
-- [ ] TASK-01-07: Create the corrected release tag at the current commit:
+- [x] TASK-01-07: Create the corrected release tag at the current commit:
       `git tag -a v1.1-oct-workshop-hardened -m "Live deploy after Oct teaching-revamp + readiness-hardening + prose-parity work; supersedes v1.0-oct-workshop, which predates the October redesign despite its name." && git push origin v1.1-oct-workshop-hardened`.
       Do **not** delete or move `v1.0-oct-workshop` (see `ASM-003`).
-- [ ] TASK-01-08: Update `app/deployment.md`'s "Last Deploy" table: add a new row at the top with
+- [x] TASK-01-08: Update `app/deployment.md`'s "Last Deploy" table: add a new row at the top with
       today's date, the `git rev-parse HEAD` short hash from TASK-01-06, and the description
       "Redeploy after Oct teaching-revamp + readiness-hardening + prose-parity work (18 commits
       since the prior 2026-07-05 deploy)." Immediately below the table, add one sentence:
@@ -368,7 +368,7 @@ correctly-named release tag and an updated deploy log.
       its name; `v1.1-oct-workshop-hardened` is the tag that actually reflects October-workshop
       content." Update the "Pre-workshop checklist" item "Confirm the green release commit is
       tagged `v1.0-oct-workshop`" to say `v1.1-oct-workshop-hardened` instead.
-- [ ] TASK-01-09: Commit: `git add app/deployment.md && git commit -m "docs: record redeploy and correct release-tag reference in deployment.md"`.
+- [x] TASK-01-09: Commit: `git add app/deployment.md && git commit -m "docs: record redeploy and correct release-tag reference in deployment.md"`.
 
 **File Changes**
 - `MISSION.md` (modify): the single paragraph replacement per TASK-01-01; no other changes.
@@ -415,7 +415,7 @@ workflow runs both weekly so drift surfaces automatically instead of relying on 
 remembering to check.
 
 **Tasks**
-- [ ] TASK-02-01: Modify `app/vite.config.js` to inject a build-commit `<meta>` tag into the
+- [x] TASK-02-01: Modify `app/vite.config.js` to inject a build-commit `<meta>` tag into the
       built `index.html` via a Vite plugin using the `transformIndexHtml` hook:
       ```js
       import { defineConfig } from 'vite'
@@ -451,29 +451,29 @@ remembering to check.
       ```
       This runs only at build time (`vite build`), not in the Vitest test environment, so no
       test-side changes are needed.
-- [ ] TASK-02-02: Rebuild and redeploy so the *live* site actually carries the new marker (Phase
+- [x] TASK-02-02: Rebuild and redeploy so the *live* site actually carries the new marker (Phase
       1's deploy predates this plugin): `cd app && npm run build && npx firebase deploy --only hosting --project dppa-case`.
       Confirm locally first with `cd app && npm run build && grep -o '<meta name="build-commit"[^>]*>' dist/index.html`
       — expect one line containing the current `git rev-parse HEAD` value.
-- [ ] TASK-02-03: Create `tools/check_deploy_freshness.py` (stdlib only: `argparse`, `re`,
+- [x] TASK-02-03: Create `tools/check_deploy_freshness.py` (stdlib only: `argparse`, `re`,
       `subprocess`, `sys`, `urllib.request`, `urllib.error`), following the style of
       `tools/check_retired_figures.py` (module docstring naming this phase,
       `from __future__ import annotations`, pure functions plus a `main` entry point). Implement
       exactly the logic in Specification `S1`.
-- [ ] TASK-02-04: Create `tools/tests/test_check_deploy_freshness.py` (stdlib `unittest`) that
+- [x] TASK-02-04: Create `tools/tests/test_check_deploy_freshness.py` (stdlib `unittest`) that
       imports the module directly (no network, no subprocess in the tests — construct the pure
       functions to accept plain strings and mock `subprocess.run`/`urllib.request.urlopen` where
       unavoidable via `unittest.mock.patch`). Cover the Test Specs below.
-- [ ] TASK-02-05: Create `tools/check_human_blocked_register.py` (stdlib only: `argparse`,
+- [x] TASK-02-05: Create `tools/check_human_blocked_register.py` (stdlib only: `argparse`,
       `datetime`, `pathlib`, `re`, `sys`), same style convention. Implement exactly the logic in
       Specification `S2`. Default checklist path:
       `Path(__file__).resolve().parent.parent / "plans" / "2026-october-readiness-checklist.md"`,
       overridable via `--checklist`.
-- [ ] TASK-02-06: Create `tools/tests/test_check_human_blocked_register.py` (stdlib `unittest`).
+- [x] TASK-02-06: Create `tools/tests/test_check_human_blocked_register.py` (stdlib `unittest`).
       Do not read the real checklist file in the tests (its dates will change over time as
       register items are resolved) — construct a small synthetic markdown table string as an
       in-memory fixture for each test case. Cover the Test Specs below.
-- [ ] TASK-02-07: Create `.github/workflows/freshness-checks.yml`:
+- [x] TASK-02-07: Create `.github/workflows/freshness-checks.yml`:
       ```yaml
       name: freshness-checks
       on:
@@ -502,12 +502,12 @@ remembering to check.
       `python -m unittest discover -s tools/tests -v` on every push, which will automatically
       pick up the two new test files created in TASK-02-04/TASK-02-06 without any edit to
       `ci.yml` — do not duplicate that step in the new workflow file.
-- [ ] TASK-02-08: Local dry run of both checkers against real current state:
+- [x] TASK-02-08: Local dry run of both checkers against real current state:
       `python tools/check_deploy_freshness.py` (expect `DEPLOY-FRESHNESS PASS` once TASK-02-02's
       redeploy has happened) and `python tools/check_human_blocked_register.py` (expect
       `HUMAN-BLOCKED-REGISTER: all 5 item(s) OK` unless a register date is genuinely within 7
       days of today, in which case that is a true finding, not a bug).
-- [ ] TASK-02-09: Commit: `git add app/vite.config.js tools/check_deploy_freshness.py tools/check_human_blocked_register.py tools/tests/test_check_deploy_freshness.py tools/tests/test_check_human_blocked_register.py .github/workflows/freshness-checks.yml && git commit -m "feat: build-commit marker + deploy/human-blocked-register freshness checkers, scheduled weekly"`.
+- [x] TASK-02-09: Commit: `git add app/vite.config.js tools/check_deploy_freshness.py tools/check_human_blocked_register.py tools/tests/test_check_deploy_freshness.py tools/tests/test_check_human_blocked_register.py .github/workflows/freshness-checks.yml && git commit -m "feat: build-commit marker + deploy/human-blocked-register freshness checkers, scheduled weekly"`.
 
 **File Changes**
 - `app/vite.config.js` (modify): add the `buildCommitPlugin` and register it in `plugins`, per
@@ -735,7 +735,7 @@ are preserved under `archive/` via `git mv` (fully reversible, full history reta
 remaining live scripts each carry a one-line header stating why they must not be archived.
 
 **Tasks**
-- [ ] TASK-04-01: Create `archive/README.md`:
+- [x] TASK-04-01: Create `archive/README.md`:
       ```markdown
       # Archive
 
@@ -748,21 +748,21 @@ remaining live scripts each carry a one-line header stating why they must not be
       `audit_teaching_deck.py`, `verify_deck_numbers.py`, `build_oct_teaching_deck.py`,
       `build_teaching_visuals.py`, `build_cfd_slide.py`, `build_worksheet_answer_docx.py`.
       ```
-- [ ] TASK-04-02: `git mv` the 12 one-off scripts into `archive/` (flat, no subdirectory):
+- [x] TASK-04-02: `git mv` the 12 one-off scripts into `archive/` (flat, no subdirectory):
       `apply_corrections.py`, `apply_deck_corrections.js`, `apply_deck_corrections.py`,
       `build-deck.js`, `build_2026_from_ref.py`, `build_callouts.py`, `build_canonical_cases.py`,
       `build_policy_refresh.py`, `verify_deck_app_parity.js`, `verify_deck_app_parity.py`,
       `inspect_pptx.py`, `export-slides.ps1`.
-- [ ] TASK-04-03: `git mv` the 6 orphaned deck/screenshot files into `archive/` (flat):
+- [x] TASK-04-03: `git mv` the 6 orphaned deck/screenshot files into `archive/` (flat):
       `dppa-case-study.pptx`, `dppa-factory-presentation.pptx`, `dppa-web-app-case-study.pptx`,
       `dppa-2026-factory-energy-proposal.pptx`, `current-app-screenshot.png`,
       `desktop-current.png`.
-- [ ] TASK-04-04: `git mv ref archive/ref` (moves the whole `ref/` directory, currently containing
+- [x] TASK-04-04: `git mv ref archive/ref` (moves the whole `ref/` directory, currently containing
       only `ref/DPPA 2025 ref.pptx`, to `archive/ref/`).
 - [ ] TASK-04-05: Update the root `package.json`'s `"main"` field from `"build-deck.js"` to
       `"archive/build-deck.js"` so it still points at a real path (this field is otherwise unused
       metadata — no script in the repo requires this package as a module — but should not dangle).
-- [ ] TASK-04-06: Add a one-line comment as the first line of each of the 6 remaining live root
+- [x] TASK-04-06: Add a one-line comment as the first line of each of the 6 remaining live root
       scripts (a `#` comment as line 1 is always valid before a Python module docstring — it does
       not affect the docstring being the first *statement*):
       - `audit_teaching_deck.py`: `# LIVE: invoked by CI (.github/workflows/ci.yml, "deck-parity" job) via "python audit_teaching_deck.py". Do not move to archive/.`
@@ -776,7 +776,7 @@ remaining live scripts each carry a one-line header stating why they must not be
       must return no matches (historical records in `plans/`, `research/`, `reports/`,
       `learning-records/`, and `activeContext.md` legitimately keep references to what was true
       when they were written, and are excluded).
-- [ ] TASK-04-08: Commit: `git add -A && git commit -m "chore: archive one-off deck-build scripts and superseded pptx/screenshot artifacts (git mv, no deletions)"`.
+- [x] TASK-04-08: Commit: `git add -A && git commit -m "chore: archive one-off deck-build scripts and superseded pptx/screenshot artifacts (git mv, no deletions)"`.
 
 **File Changes**
 - `archive/README.md` (create): per TASK-04-01.
