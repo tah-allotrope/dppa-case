@@ -1,7 +1,7 @@
 ---
 title: "DPPA Scenario Group-Learning Workshop Module"
 date: "2026-06-29"
-status: "draft"
+status: "complete — bulk-corrected 2026-07-31 per directive: plan predates 2026-07-20 and is presumed fully implemented (NOT individually verified against git/code evidence)"
 request: "Based on brainstorm, build a multi-phase plan for a group-learning teaching module from the DPPA scenario-training slides — interactive group-learn experience with lively charts and visuals, plus group tasks that walk participants through all the calculations, numbers, and details."
 plan_type: "multi-phase"
 research_inputs:

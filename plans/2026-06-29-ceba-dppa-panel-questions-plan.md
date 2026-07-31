@@ -1,7 +1,7 @@
 ---
 title: "CEBA DPPA Panel Questions — Ranked & Seat-Routed Moderator Guide"
 date: "2026-06-29"
-status: "draft"
+status: "complete — bulk-corrected 2026-07-31 per directive: plan predates 2026-07-20 and is presumed fully implemented (NOT individually verified against git/code evidence)"
 request: "Regenerate (from the corrected brief) and execute: rank the real 22 CEBA panel questions, route each to the real 4-seat bench, and ship a facilitator panel guide."
 plan_type: "multi-phase"
 research_inputs:

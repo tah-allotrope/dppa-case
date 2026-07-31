@@ -1,7 +1,7 @@
 ---
 title: "DPPA Worksheets + Answer Summary — Combined Bilingual Word Doc"
 date: "2026-06-29"
-status: "draft"
+status: "complete — bulk-corrected 2026-07-31 per directive: plan predates 2026-07-20 and is presumed fully implemented (NOT individually verified against git/code evidence)"
 request: "Combine the lessons/ worksheets with the DPPA scenario answer summary into a new Word doc following the style/format of lessons/DPPA_Scenario_Answer_Summary.docx."
 plan_type: "multi-phase"
 research_inputs:

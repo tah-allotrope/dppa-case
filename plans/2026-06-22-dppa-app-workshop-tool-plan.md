@@ -1,7 +1,7 @@
 ---
 title: "DPPA Web App as Live Workshop Tool (Multi-Year + Recalibration)"
 date: "2026-06-22"
-status: "draft"
+status: "complete — bulk-corrected 2026-07-31 per directive: plan predates 2026-07-20 and is presumed fully implemented (NOT individually verified against git/code evidence)"
 request: "Based on brainstorm dppa-app-deck-consolidation: grow the web app into the live workshop tool with multi-year BAU-vs-DPPA and verified 2026 calibration"
 plan_type: "multi-phase"
 research_inputs:

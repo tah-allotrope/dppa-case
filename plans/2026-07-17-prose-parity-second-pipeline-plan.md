@@ -1,7 +1,7 @@
 ---
 title: "Prose Parity & Second-Pipeline Hardening"
 date: "2026-07-17"
-status: "draft"
+status: "complete — bulk-corrected 2026-07-31 per directive: plan predates 2026-07-20 and is presumed fully implemented (NOT individually verified against git/code evidence)"
 request: "Fix the live stale '0 of 56' references, commit/prune repo hygiene items, add a retired-figures denylist, extend the number-parity net to S2/S3 spine exports and the worksheet docx builder plus a prose-figures verifier, close the FMP/decree research gaps, and add a human-blocked register. Complements (does not replace) plans/2026-07-16-gate-credibility-pipeline-hardening-plan.md."
 plan_type: "multi-phase"
 research_inputs:

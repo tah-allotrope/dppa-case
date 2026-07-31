@@ -1,7 +1,7 @@
 ---
 title: "Gate Credibility & Pipeline Hardening"
 date: "2026-07-16"
-status: "draft"
+status: "complete — bulk-corrected 2026-07-31 per directive: plan predates 2026-07-20 and is presumed fully implemented (NOT individually verified against git/code evidence)"
 request: "Multi-phase implementation plan from research/2026-07-16-post-hardening-next-level-brainstorm.md: make the M5 gate sweep defensible before content freeze, declare the Python toolchain, close generator↔artifact drift in CI, strengthen the deck verifiers, reorganize the root scripts, then complete localization and app evolution."
 plan_type: "multi-phase"
 research_inputs:
