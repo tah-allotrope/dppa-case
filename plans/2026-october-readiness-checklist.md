@@ -1,7 +1,7 @@
 ---
 title: "October 2026 Readiness Checklist"
 date: "2026-07-11"
-status: "open — a live pre-session checklist: 5 human-blocked register items (H1-H5) are still pending, and every Mid-September, content-freeze, late-September, and day-of item remains unticked as of 2026-07-31"
+status: "open — a live pre-session checklist: 6 human-blocked register items (H1-H6) are still pending, and every Mid-September, content-freeze, late-September, and day-of item remains unticked as of 2026-07-31"
 plan_type: "checklist"
 ---
 

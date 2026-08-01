@@ -1,7 +1,7 @@
 ---
 title: "Guardrail Integrity, Trilingual App & Pre-Freeze Hardening"
 date: "2026-07-25"
-status: "draft"
+status: "in-progress - PHASE-01..05 committed and verified (commits 082b5aa..2df2874); PHASE-06 TASK-06-01/02/03 (style unification format pass) committed as 84e5503 on 2026-08-02; TASK-06-05..06-12 still open"
 request: "Turn research/2026-07-25-guardrail-integrity-and-audience-localization-brainstorm.md into a multi-phase execution plan saved to plans/"
 plan_type: "multi-phase"
 research_inputs:
@@ -1102,14 +1102,14 @@ engineer or agent one authoritative file of project rules instead of five partia
 documents.
 
 **Tasks**
-- [ ] TASK-06-01: Change `app/.prettierrc` to `{ "semi": false, "singleQuote": true, "trailingComma": "all", "printWidth": 100 }`
+- [x] TASK-06-01: Change `app/.prettierrc` to `{ "semi": false, "singleQuote": true, "trailingComma": "all", "printWidth": 100 }`
       — matching the dominant style of the engine files (`settlement.js`, `ui.js`, `main.js`,
       `chart.js`, `formatters.js`, `profiles.js`, `flow-diagram.js`), which are the largest and most
       frequently edited files in the app.
-- [ ] TASK-06-02: Change `app/package.json`'s `format` script from `prettier --write src` to
+- [x] TASK-06-02: Change `app/package.json`'s `format` script from `prettier --write src` to
       `prettier --write src e2e scripts` so the formatter covers every JavaScript surface in the app
       (today `e2e/` and `scripts/` are excluded, which is how the minified specs survived).
-- [ ] TASK-06-03: Run `cd app && npm run format` in a **single dedicated commit** containing no other
+- [x] TASK-06-03: Run `cd app && npm run format` in a **single dedicated commit** containing no other
       changes, so the large diff is reviewable in isolation. This reflows the five currently
       minified files: `src/modules/tour.js`, `src/modules/tour.test.js`, `src/theme.css`,
       `e2e/tour.spec.js`, and `e2e/visual.spec.js` (if PHASE-05 has not already reformatted the
@@ -1213,6 +1213,19 @@ documents.
   somewhere outside `app/`. Mitigation: the grep in TASK-06-06 covers the whole `app/` tree; extend
   it to the repo root (`grep -rn "js-resolve-loader" . --include=*.md --include=*.yml | grep -v node_modules`)
   before deleting.
+
+**Phase Completion Notes (2026-08-02)**
+- TASK-06-01/02/03 landed as the dedicated format commit `84e5503` — the `.prettierrc` flip, the
+  widened `format` script, and the repo-wide `npm run format` in one commit containing no other
+  changes, exactly as the task requires.
+- Verified: `npx prettier --check src e2e scripts` passes; `npm test` (73), `npm run lint`,
+  `npm run build`, and `npm run e2e` (57 passed, 3 documented skips) all pass; re-running
+  `export-spine.mjs` + `export-sweep.mjs` produces byte-identical `assets/teaching/*.json`
+  (CON-001 intact).
+- TASK-06-04 is effectively complete by that verification. TASK-06-05 through TASK-06-12 remain
+  unchecked: the CI `prettier --check` step, import-extension normalization, eslint `scripts/**`
+  un-ignore, root `CLAUDE.md`, `activeContext.md` retirement, `lessons.md` rename, learning record
+  `0005`, and the `NOTES.md` pointer. These remain open.
 
 ## Gotchas
 
