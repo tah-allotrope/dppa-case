@@ -3,6 +3,7 @@ import { describe, expect, it, beforeEach } from 'vitest'
 import { renderAppShell } from './ui'
 import { scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios'
 import { teachSteps } from '../data/teach-steps'
+import { STRINGS } from '../data/strings'
 import { initTeachMode } from './teach'
 
 function setup(search) {
@@ -33,7 +34,7 @@ describe('teach mode', () => {
     const banner = document.querySelector('#teachBanner')
     expect(banner).not.toBeNull()
     expect(banner.querySelector('.teach-step-counter').textContent).toContain(`1/${teachSteps.length}`)
-    expect(banner.querySelector('.teach-step-counter').textContent).toContain(teachSteps[0].title)
+    expect(banner.querySelector('.teach-step-counter').textContent).toContain(STRINGS.en[teachSteps[0].titleKey])
 
     const strikeInput = document.querySelector('#strikePrice')
     expect(Number(strikeInput.value)).toBe(teachSteps[0].controls.strikePrice)

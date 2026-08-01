@@ -107,6 +107,10 @@ coding session, needs a person with a browser/PowerPoint/printer.
       zh` to refresh localized visuals if any translated wording changed
       chart captions.
 - [ ] Print per-language A4 reference cards and worksheets.
+- [ ] Translate `app/src/data/strings.js`'s `vi`/`zh` values alongside
+      `assets/teaching/terminology-map.json`, then re-run
+      `cd app && npm run i18n:report` to confirm the untranslated count is 0
+      for both languages.
 - [ ] Re-run `PYTHONPATH= py audit_teaching_deck.py` and
       `PYTHONPATH= py verify_deck_numbers.py` against each language build.
 

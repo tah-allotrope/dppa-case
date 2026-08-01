@@ -2,6 +2,7 @@
 // app moments in the Modules 1-6 teaching revamp. Activated only by ?teach=1
 // so normal app UX is untouched without the flag (RISK-02-01 in the plan).
 import { teachSteps } from '../data/teach-steps'
+import { t } from './i18n'
 
 function setControlValue(id, value) {
   const el = document.querySelector(`#${id}`)
@@ -29,9 +30,12 @@ function applyStep(index) {
 
   const banner = document.querySelector('#teachBanner')
   if (banner) {
-    banner.querySelector('.teach-step-counter').textContent = `Demo ${index + 1}/${teachSteps.length} — ${step.title}`
-    banner.querySelector('.teach-annotation').textContent = step.annotation
-    banner.querySelector('.teach-expected').textContent = step.expected
+    banner.querySelector('.teach-step-counter').textContent = t('teach_demo_counter_template')
+      .replace('{index}', index + 1)
+      .replace('{total}', teachSteps.length)
+      .replace('{title}', t(step.titleKey))
+    banner.querySelector('.teach-annotation').textContent = t(step.annotationKey)
+    banner.querySelector('.teach-expected').textContent = t(step.expectedKey)
   }
 }
 
@@ -39,16 +43,16 @@ function buildBanner(state) {
   const banner = document.createElement('div')
   banner.id = 'teachBanner'
   banner.setAttribute('role', 'region')
-  banner.setAttribute('aria-label', 'Presenter teach mode')
+  banner.setAttribute('aria-label', t('teach_region_aria'))
   banner.innerHTML = `
     <div class="teach-banner-inner">
-      <button type="button" id="teachPrev" aria-label="Previous demo">&larr;</button>
+      <button type="button" id="teachPrev" aria-label="${t('teach_prev_aria')}">&larr;</button>
       <div class="teach-banner-text">
         <strong class="teach-step-counter"></strong>
         <span class="teach-annotation"></span>
         <em class="teach-expected"></em>
       </div>
-      <button type="button" id="teachNext" aria-label="Next demo">&rarr;</button>
+      <button type="button" id="teachNext" aria-label="${t('teach_next_aria')}">&rarr;</button>
     </div>
   `
   document.body.appendChild(banner)

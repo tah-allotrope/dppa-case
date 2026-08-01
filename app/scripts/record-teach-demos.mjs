@@ -10,6 +10,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ffmpegPath from 'ffmpeg-static'
 import { teachSteps } from '../src/data/teach-steps.js'
+import { STRINGS } from '../src/data/strings.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const APP_ROOT = join(__dirname, '..')
@@ -136,7 +137,7 @@ async function main() {
     try {
       for (let stepIndex = 0; stepIndex < teachSteps.length; stepIndex += 1) {
         const moduleNum = stepIndex + 1
-        console.log(`Recording step ${moduleNum}/${teachSteps.length}: ${teachSteps[stepIndex].title}`)
+        console.log(`Recording step ${moduleNum}/${teachSteps.length}: ${STRINGS.en[teachSteps[stepIndex].titleKey]}`)
         const webmPath = await recordStep(browser, stepIndex, TMP_DIR)
         const mp4Path = join(OUT_DIR, `teach-m${moduleNum}.mp4`)
         const posterPath = join(OUT_DIR, `teach-m${moduleNum}-poster.png`)

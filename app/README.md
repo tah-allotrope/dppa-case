@@ -20,7 +20,7 @@ npm run e2e
 npm run build
 ```
 
-Use `?present=1` for the high-contrast projector theme and `?teach=1` for the six-step presenter flow. New participants receive a four-step bilingual EN/VN tour.
+Use `?present=1` for the high-contrast projector theme and `?teach=1` for the six-step presenter flow. New participants receive a four-step guided tour. Use `?lang=en|vi|zh` to select the app language (persists to `localStorage`); untranslated strings fall back to English.
 
 ## Regenerate teach-mode fallback recordings
 

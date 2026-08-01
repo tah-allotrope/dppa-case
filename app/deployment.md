@@ -66,7 +66,14 @@ GitHub Actions runs lint, unit tests, functional/visual Playwright tests, and th
 
 - `?present=1` forces the high-contrast presenter theme.
 - `?teach=1` enables the six-step teaching banner and presenter theme.
-- The bilingual tour runs once on an unflagged first visit; the `?` header button relaunches it.
+- The tour runs once on an unflagged first visit; the `?` header button relaunches it. In a
+  non-English language it shows the resolved-language line first with the English line as a
+  secondary caption; in English it shows only the single line.
+- `?lang=en|vi|zh` selects the app language. The choice persists to `localStorage` under
+  `dppa-lang` and is also picked up from the browser's language when no `?lang=` or stored value
+  is present. A key with no translation yet falls back to English rather than showing a raw
+  placeholder — the app never renders the literal token `UNTRANSLATED`. Run
+  `npm run i18n:report` to see the per-language untranslated key count.
 
 ## Quality commands
 

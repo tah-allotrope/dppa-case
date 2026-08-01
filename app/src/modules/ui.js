@@ -1,5 +1,6 @@
 import { formatMoney, formatNumber } from './formatters'
 import { renderCancellationFlow } from './flow-diagram'
+import { t } from './i18n'
 
 
 function compactPill(label, value, tone = 'default') {
@@ -27,24 +28,27 @@ function paymentEquation(label, rate, quantityText, amount, formula, tone = 'def
   `
 }
 
-const ROLE_META = {
-  shown:  { cls: 'cancel-term-shown', sign: '+', title: 'FMP appears here — it will cancel' },
-  cancel: { cls: 'cancel-term-cancel', sign: '', title: 'FMP cancels against the developer swap' },
-  strike: { cls: 'cancel-term-strike', sign: '+', title: 'Strike price retained' },
-  charge: { cls: 'cancel-term-charge', sign: '+', title: 'DPPA system charge' },
-  loss:   { cls: 'cancel-term-loss', sign: '+', title: 'Loss adjustment: tiny residual from grid losses' },
-  retail: { cls: 'cancel-term-retail', sign: '+', title: 'Shortfall kWh still bought at retail tariff' },
+function roleMeta() {
+  return {
+    shown:  { cls: 'cancel-term-shown', sign: '+', title: t('role_shown_title') },
+    cancel: { cls: 'cancel-term-cancel', sign: '', title: t('role_cancel_title') },
+    strike: { cls: 'cancel-term-strike', sign: '+', title: t('role_strike_title') },
+    charge: { cls: 'cancel-term-charge', sign: '+', title: t('role_charge_title') },
+    loss:   { cls: 'cancel-term-loss', sign: '+', title: t('role_loss_title') },
+    retail: { cls: 'cancel-term-retail', sign: '+', title: t('role_retail_title') },
+  }
 }
 
 function fmpCancelStrip(steps, resultValue, currency, selectedFmp) {
+  const roleMetaMap = roleMeta()
   const terms = steps.map((step) => {
-    const meta = ROLE_META[step.role] || ROLE_META.loss
+    const meta = roleMetaMap[step.role] || roleMetaMap.loss
     const valueStr = formatMoney(Math.abs(step.value), { currency, precise: true, perKwh: true })
     const sign = step.role === 'cancel' ? '−' : (meta.sign || '+')
     const crossed = step.role === 'shown' || step.role === 'cancel' ? ' cancel-term-crossed' : ''
     return `
       <span class="cancel-eq-term ${meta.cls}${crossed}" title="${meta.title}">
-        <span class="cancel-eq-owner">${step.owner || 'Net'}</span>
+        <span class="cancel-eq-owner">${step.owner || t('fmp_cancel_owner_default')}</span>
         <span class="cancel-eq-sign">${sign}</span>
         <span class="cancel-eq-value">${valueStr}</span>
         <span class="cancel-eq-label">${step.label}</span>
@@ -55,16 +59,16 @@ function fmpCancelStrip(steps, resultValue, currency, selectedFmp) {
   return `
     <div class="fmp-cancel-strip">
       <div class="fmp-cancel-header">
-        <span class="fmp-cancel-title">FMP cancellation — per kWh on factory load</span>
-        <span class="fmp-cancel-context">Selected graph FMP: ${formatMoney(selectedFmp, { currency, precise: true, perKwh: true })}</span>
-        <span class="fmp-cancel-context">Boxes below are load-normalized contributions, so they can be smaller than the raw graph FMP.</span>
+        <span class="fmp-cancel-title">${t('fmp_cancel_title')}</span>
+        <span class="fmp-cancel-context">${t('fmp_cancel_context_selected')} ${formatMoney(selectedFmp, { currency, precise: true, perKwh: true })}</span>
+        <span class="fmp-cancel-context">${t('fmp_cancel_context_note')}</span>
       </div>
       <div class="fmp-cancel-equation">
         ${terms}
         <span class="cancel-eq-separator cancel-eq-equals">=</span>
         <span class="cancel-eq-term cancel-term-result">
           <span class="cancel-eq-value">${formatMoney(resultValue, { currency, precise: true, perKwh: true })}</span>
-          <span class="cancel-eq-label">net cost / kWh</span>
+          <span class="cancel-eq-label">${t('fmp_cancel_net_label')}</span>
         </span>
       </div>
     </div>
@@ -103,7 +107,7 @@ function buildNetEquations(item, formulas, currency) {
       ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained')
       : '',
     lossAmount > 0
-      ? netTerm(`Loss adj. ${fmtT(lossAmount)}`, 'retained')
+      ? netTerm(`${t('netterm_loss_adj')} ${fmtT(lossAmount)}`, 'retained')
       : '',
   ]
 
@@ -118,7 +122,7 @@ function buildNetEquations(item, formulas, currency) {
       ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained')
       : '',
     lossAmount > 0
-      ? netTerm(`Loss adj. ${fmtT(lossAmount)}`, 'retained')
+      ? netTerm(`${t('netterm_loss_adj')} ${fmtT(lossAmount)}`, 'retained')
       : '',
   ]
 
@@ -185,15 +189,15 @@ export function renderAppShell(root, scenarios, settlementModes) {
         <div class="brand-block">
           <img class="brand-logo" src="/brand/allotrope-logo.png" alt="Allotrope logo" />
           <div>
-            <p class="eyebrow">Vietnam synthetic DPPA</p>
-            <h1>DPPA CFO visual explainer</h1>
-            <p class="hero-copy">Click any hour to compare the 2025 teaching-model baseline against DPPA payment using documented example inputs and an illustrative FMP curve (no primary NSMO/ERAV source available).</p>
+            <p class="eyebrow">${t('header_eyebrow')}</p>
+            <h1>${t('header_title')}</h1>
+            <p class="hero-copy">${t('header_hero')}</p>
           </div>
         </div>
         <div class="topbar-actions">
-          <div class="toggle-group" id="currencyToggle" aria-label="Currency toggle">
-            <button class="toggle-button" data-currency="VND" type="button">VND</button>
-            <button class="toggle-button" data-currency="USD" type="button">USD</button>
+          <div class="toggle-group" id="currencyToggle" aria-label="${t('currency_toggle_aria')}">
+            <button class="toggle-button" data-currency="VND" type="button">${t('currency_vnd')}</button>
+            <button class="toggle-button" data-currency="USD" type="button">${t('currency_usd')}</button>
           </div>
         </div>
       </header>
@@ -204,30 +208,30 @@ export function renderAppShell(root, scenarios, settlementModes) {
             <div class="panel chart-panel">
               <div class="chart-headline">
               <div>
-                <p class="eyebrow">Profiles</p>
-                <h2>Load vs solar overlap</h2>
+                <p class="eyebrow">${t('chart_eyebrow')}</p>
+                <h2>${t('chart_title')}</h2>
               </div>
             </div>
               <div class="scenario-tabs" id="scenarioTabs">
                 ${scenarios.map((scenario) => `<button class="scenario-tab" data-scenario="${scenario.id}">${scenario.label}</button>`).join('')}
               </div>
               <div class="chart-wrap profile-wrap">
-                <canvas id="profileChart" aria-label="Load and generation chart"></canvas>
+                <canvas id="profileChart" aria-label="${t('chart_aria')}"></canvas>
               </div>
-              <p class="chart-tap-hint" id="chartTapHint">Click or tap any hour to inspect</p>
+              <p class="chart-tap-hint" id="chartTapHint">${t('chart_tap_hint')}</p>
               <div id="fiveLineBill"></div>
               <div class="hour-nav" id="hourNav">
-                <button class="hour-nav-btn" id="prevHour" type="button" aria-label="Previous hour">← Prev hour</button>
+                <button class="hour-nav-btn" id="prevHour" type="button" aria-label="${t('hour_prev_aria')}">${t('hour_prev_label')}</button>
                 <span class="hour-nav-label" id="hourNavLabel">12:00</span>
-                <button class="hour-nav-btn" id="nextHour" type="button" aria-label="Next hour">Next hour →</button>
+                <button class="hour-nav-btn" id="nextHour" type="button" aria-label="${t('hour_next_aria')}">${t('hour_next_label')}</button>
               </div>
             </div>
 
             <section class="panel walkthrough-panel glow-frame">
               <div class="panel-header">
               <div>
-                <p class="eyebrow">Load-vs-generation cases</p>
-                <h2>Clicked-hour cancellation view</h2>
+                <p class="eyebrow">${t('walkthrough_eyebrow')}</p>
+                <h2>${t('walkthrough_title')}</h2>
               </div>
               </div>
               <div class="walkthrough-grid" id="walkthroughCases"></div>
@@ -237,13 +241,13 @@ export function renderAppShell(root, scenarios, settlementModes) {
           <section class="panel multi-year-panel bottom-panel">
             <div class="panel-header">
               <div>
-                <p class="eyebrow">Multi-year projection</p>
-                <h2 id="multiYearTitle">20-year cumulative economics</h2>
+                <p class="eyebrow">${t('multiyear_eyebrow')}</p>
+                <h2 id="multiYearTitle">${t('multiyear_title_template').replace('{years}', '20')}</h2>
               </div>
             </div>
             <div class="multi-year-rollups" id="multiYearRollups"></div>
             <div class="chart-wrap multi-year-chart-wrap" style="height:260px">
-              <canvas id="multiYearChart" aria-label="Multi-year cumulative cost chart"></canvas>
+              <canvas id="multiYearChart" aria-label="${t('multiyear_chart_aria')}"></canvas>
             </div>
             <div class="assumptions-inline" id="multiYearParams"></div>
           </section>
@@ -251,8 +255,8 @@ export function renderAppShell(root, scenarios, settlementModes) {
           <div class="panel details-panel stage-panel">
             <div class="panel-header">
               <div>
-                <p class="eyebrow">Selected hour details</p>
-                <h2>EVN and developer payment build-up</h2>
+                <p class="eyebrow">${t('details_eyebrow')}</p>
+                <h2>${t('details_title')}</h2>
               </div>
             </div>
             <div id="selectedHourDetailsPanel"></div>
@@ -265,12 +269,12 @@ export function renderAppShell(root, scenarios, settlementModes) {
         <div class="panel formula-panel glow-frame">
           <div class="panel-header">
             <div>
-              <p class="eyebrow">Cancellation flow</p>
-              <h2>Selected-hour cancellation logic flow</h2>
+              <p class="eyebrow">${t('flow_eyebrow')}</p>
+              <h2>${t('flow_title')}</h2>
             </div>
           </div>
           <div class="cancellation-flow-card">
-            <div class="metric-label">Cancellation logic flow</div>
+            <div class="metric-label">${t('flow_metric_label')}</div>
             <div class="cancellation-flow" id="cancellationFlow"></div>
           </div>
           <p class="walkthrough-note" id="cancellationFlowNote"></p>
@@ -280,63 +284,63 @@ export function renderAppShell(root, scenarios, settlementModes) {
       <section class="panel controls-panel bottom-panel">
         <div class="panel-header">
           <div>
-            <p class="eyebrow">Controls</p>
-            <h2>Pricing assumptions</h2>
+            <p class="eyebrow">${t('controls_eyebrow')}</p>
+            <h2>${t('controls_title')}</h2>
           </div>
-          <button class="ghost-button" id="resetButton" type="button">Reset defaults</button>
+          <button class="ghost-button" id="resetButton" type="button">${t('controls_reset')}</button>
         </div>
         <div class="controls-grid">
           <label class="control-card">
-            <span>Developer strike price</span>
+            <span>${t('control_strike_label')}</span>
             <input id="strikePrice" type="range" min="1200" max="3200" step="0.01" />
             <strong data-output="strikePrice"></strong>
           </label>
           <label class="control-card">
-            <span>Market price / FMP (illustrative)</span>
+            <span>${t('control_market_label')}</span>
             <input id="marketPrice" type="range" min="900" max="2600" step="10" />
             <strong data-output="marketPrice"></strong>
           </label>
           <label class="control-card">
-            <span>DPPA charge</span>
+            <span>${t('control_charge_label')}</span>
             <input id="dppaCharge" type="range" min="250" max="800" step="1" />
             <strong data-output="dppaCharge"></strong>
           </label>
           <label class="control-card">
-            <span>Loss factor</span>
+            <span>${t('control_loss_label')}</span>
             <input id="lossFactor" type="range" min="1" max="1.08" step="0.001" />
             <strong data-output="lossFactor"></strong>
           </label>
           <label class="control-card select-card">
-            <span>Settlement quantity mode</span>
+            <span>${t('control_settlement_label')}</span>
             <select id="settlementMode">
               ${settlementModes.map((mode) => `<option value="${mode.value}">${mode.label}</option>`).join('')}
             </select>
             <strong data-output="settlementMode"></strong>
           </label>
           <label class="control-card">
-            <span>EVN tariff escalation</span>
+            <span>${t('control_evn_esc_label')}</span>
             <input id="evnEscalation" type="range" min="0" max="0.10" step="0.005" />
             <strong data-output="evnEscalation"></strong>
           </label>
           <label class="control-card">
-            <span>Strike escalation</span>
+            <span>${t('control_strike_esc_label')}</span>
             <input id="strikeEscalation" type="range" min="0" max="0.10" step="0.005" />
             <strong data-output="strikeEscalation"></strong>
           </label>
           <label class="control-card">
-            <span>Horizon years</span>
+            <span>${t('control_horizon_label')}</span>
             <input id="horizonYears" type="range" min="5" max="25" step="1" />
             <strong data-output="horizonYears"></strong>
           </label>
         </div>
-        <p class="control-hints">Strike &amp; FMP reshape the daily graph; escalation &amp; horizon reshape the multi-year projection above.</p>
+        <p class="control-hints">${t('control_hints')}</p>
         <div class="assumptions-inline">
-          <span>2025 teaching assumptions</span>
-          <span>Flat retail tariff in v1</span>
-          <span>Internal math stays in VND</span>
-          <span>Illustrative tariff blocks</span>
-          <span>Synthetic FMP curve</span>
-          <span>Click chart to inspect one hour</span>
+          <span>${t('assumptions_2025')}</span>
+          <span>${t('assumptions_flat_retail')}</span>
+          <span>${t('assumptions_internal_vnd')}</span>
+          <span>${t('assumptions_illustrative_blocks')}</span>
+          <span>${t('assumptions_synthetic_fmp')}</span>
+          <span>${t('assumptions_click_hint')}</span>
         </div>
       </section>
     </div>
@@ -353,22 +357,22 @@ export function renderFiveLineBill(container, bill, currency, scenario) {
   const fmt = (value, signed = false) => formatMoney(value, { currency, signed })
   const fmtN = (value) => formatNumber(value)
   const lines = [
-    ['1', 'Market energy', bill.lines.marketEnergy],
-    ['2', 'DPPA system service', bill.lines.systemService],
-    ['3', 'Differential clearing', bill.lines.diffClearing],
-    ['4', 'Additional retail purchase', bill.lines.additionalPurchase],
+    ['1', t('bill_line_market_energy'), bill.lines.marketEnergy],
+    ['2', t('bill_line_system_service'), bill.lines.systemService],
+    ['3', t('bill_line_diff_clearing'), bill.lines.diffClearing],
+    ['4', t('bill_line_additional_purchase'), bill.lines.additionalPurchase],
   ]
 
   container.innerHTML = `
     <section class="five-line-bill" aria-label="Monthly five-line settlement bill">
       <div class="five-line-head">
         <div>
-          <p class="eyebrow">Monthly settlement</p>
-          <h3>${scenario.label} deck bill</h3>
+          <p class="eyebrow">${t('bill_eyebrow')}</p>
+          <h3>${scenario.label} ${t('bill_title_suffix')}</h3>
         </div>
-        <span>${fmtN(bill.volumes.contracted)} contracted kWh</span>
+        <span>${fmtN(bill.volumes.contracted)} ${t('bill_contracted_suffix')}</span>
       </div>
-      <p class="five-line-caption">The graph above is an illustrative daily shape; this monthly 5-line bill is the deck-exact settlement.</p>
+      <p class="five-line-caption">${t('bill_caption')}</p>
       <div class="five-line-table">
         ${lines.map(([idx, label, value]) => `
           <div class="five-line-row">
@@ -379,23 +383,23 @@ export function renderFiveLineBill(container, bill, currency, scenario) {
         `).join('')}
         <div class="five-line-row subtotal">
           <span></span>
-          <strong>CEVN</strong>
+          <strong>${t('bill_cevn')}</strong>
           <b>${fmt(bill.cEvn)}</b>
         </div>
         <div class="five-line-row cfd">
           <span>5</span>
-          <strong>CfD settlement</strong>
+          <strong>${t('bill_cfd_settlement')}</strong>
           <b>${fmt(bill.lines.cfd, true)}</b>
         </div>
         <div class="five-line-row total">
           <span></span>
-          <strong>CKH net cost</strong>
+          <strong>${t('bill_ckh')}</strong>
           <b>${fmt(bill.cKh)}</b>
         </div>
       </div>
       <div class="plant-revenue-mirror">
-        <span>RE GENCO mirror</span>
-        <strong>${fmt(bill.plantRevenue.market)} market + ${fmt(bill.plantRevenue.cfd, true)} CfD = ${fmt(bill.plantRevenue.total)}</strong>
+        <span>${t('bill_mirror_label')}</span>
+        <strong>${fmt(bill.plantRevenue.market)} ${t('bill_mirror_market_suffix')} + ${fmt(bill.plantRevenue.cfd, true)} ${t('bill_mirror_cfd_suffix')} = ${fmt(bill.plantRevenue.total)}</strong>
       </div>
     </section>
   `
@@ -423,8 +427,8 @@ export function renderFormulas(result, warningText, currency) {
   }
 
   const note = result.cleanCancellation
-    ? `Clean cancellation: the spot/FMP reference is shown on EVN, then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment.`
-    : `Partial cancellation: mismatch volume keeps some uncancelled exposure, so rely on the actual selected-hour DPPA payment.`
+    ? t('flow_clean_note')
+    : t('flow_partial_note')
   const warningSuffix = warningText ? ` ${warningText}` : ''
   const noteNode = document.querySelector('#cancellationFlowNote')
   if (noteNode) noteNode.textContent = `${note}${warningSuffix}`
@@ -441,10 +445,10 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
   container.innerHTML = `
     <div class="settlement-grid">
       <div class="formula-detail-card evn-detail payment-panel">
-        <p class="formula-label">Payment to EVN per kWh of factory load</p>
+        <p class="formula-label">${t('details_evn_label')}</p>
         <div class="payment-stack">
           ${paymentEquation(
-            'Matched market slice',
+            t('details_evn_matched'),
             formatMoney(interval.load > 0 ? interval.evnMarket / interval.load : 0, { currency, precise: true, perKwh: true }),
             `${formatNumber(interval.matched)} matched kWh`,
              formatMoney(interval.evnMarket, { currency }),
@@ -452,7 +456,7 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
             'evn',
           )}
           ${paymentEquation(
-            'DPPA network charge',
+            t('details_evn_dppa_network'),
             formatMoney(interval.load > 0 ? interval.evnDppa / interval.load : 0, { currency, precise: true, perKwh: true }),
             `${formatNumber(interval.matched)} matched kWh`,
             formatMoney(interval.evnDppa, { currency }),
@@ -460,7 +464,7 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
             'accent',
           )}
           ${paymentEquation(
-            'Shortfall retail slice',
+            t('details_evn_shortfall'),
             formatMoney(interval.load > 0 ? interval.evnRetail / interval.load : 0, { currency, precise: true, perKwh: true }),
             `${formatNumber(interval.shortfall)} shortfall kWh`,
             formatMoney(interval.evnRetail, { currency }),
@@ -469,16 +473,16 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
           )}
         </div>
         <div class="payment-total-card evn-tone">
-          <span class="metric-label">EVN total</span>
+          <span class="metric-label">${t('details_evn_total')}</span>
           <strong>${formatMoney(evnUnitCost, { currency, precise: true, perKwh: true })}</strong>
-          <span>${formatMoney(interval.evnTotal, { currency })} for ${formatNumber(interval.load)} kWh load</span>
+          <span>${formatMoney(interval.evnTotal, { currency })} for ${formatNumber(interval.load)} ${t('details_load_suffix')}</span>
         </div>
       </div>
       <div class="formula-detail-card developer-detail payment-panel">
-        <p class="formula-label">Payment to developer per kWh of factory load</p>
+        <p class="formula-label">${t('details_dev_label')}</p>
         <div class="payment-stack">
           ${paymentEquation(
-            'CfD swap on contract quantity',
+            t('details_dev_cfd'),
             formatMoney(developerUnitCost, { currency, precise: true, perKwh: true, signed: true }),
              `${formatNumber(interval.contractQuantity)} contracted kWh`,
              formatMoney(interval.developer, { currency, signed: true }),
@@ -487,9 +491,9 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
           )}
         </div>
         <div class="payment-total-card developer-tone">
-          <span class="metric-label">Developer total</span>
+          <span class="metric-label">${t('details_dev_total')}</span>
           <strong>${formatMoney(developerUnitCost, { currency, precise: true, perKwh: true, signed: true })}</strong>
-          <span>${formatMoney(interval.developer, { currency, signed: true })} for ${formatNumber(interval.load)} kWh load</span>
+          <span>${formatMoney(interval.developer, { currency, signed: true })} for ${formatNumber(interval.load)} ${t('details_load_suffix')}</span>
         </div>
       </div>
     </div>
@@ -518,23 +522,23 @@ export function renderMultiYearPanel(multiYear, currency) {
   const fmt = (v) => formatMoney(v, { currency })
   const fmtPct = (v) => `${(v * 100).toFixed(1)}%`
   const savTone = (s) => s > 0 ? 'result' : s < 0 ? 'warning' : 'default'
-  const crossoverText = crossoverYear ? `Year ${crossoverYear}` : `&gt; ${years} yr`
+  const crossoverText = crossoverYear ? `${t('crossover_year_prefix')} ${crossoverYear}` : `${t('crossover_gt_prefix')} ${years} ${t('crossover_gt_suffix')}`
 
-  if (titleEl) titleEl.textContent = `${years}-year cumulative economics`
+  if (titleEl) titleEl.textContent = t('multiyear_title_template').replace('{years}', years)
 
   rollupsEl.innerHTML = `
-    ${compactPill('Year 1 savings', fmt(rollups.year1.savings), savTone(rollups.year1.savings))}
-    ${rollups.year10 ? compactPill('10-yr cumulative', fmt(rollups.year10.savings), savTone(rollups.year10.savings)) : ''}
-    ${compactPill(`${years}-yr lifetime`, fmt(rollups.lifetime.savings), savTone(rollups.lifetime.savings))}
-    ${compactPill('Crossover', crossoverText, crossoverYear ? 'accent' : 'default')}
+    ${compactPill(t('pill_year1_savings'), fmt(rollups.year1.savings), savTone(rollups.year1.savings))}
+    ${rollups.year10 ? compactPill(t('pill_10yr_cumulative'), fmt(rollups.year10.savings), savTone(rollups.year10.savings)) : ''}
+    ${compactPill(`${years}${t('pill_lifetime_suffix')}`, fmt(rollups.lifetime.savings), savTone(rollups.lifetime.savings))}
+    ${compactPill(t('pill_crossover'), crossoverText, crossoverYear ? 'accent' : 'default')}
   `
 
   if (paramsEl) {
     paramsEl.innerHTML = `
-      <span>EVN ${fmtPct(evnEscalation)}/yr</span>
-      <span>Strike ${fmtPct(strikeEscalation)}/yr</span>
-      <span>FMP flat</span>
-      <span>Rep. day × 365</span>
+      <span>${t('param_evn')} ${fmtPct(evnEscalation)}${t('param_pct_suffix')}</span>
+      <span>${t('param_strike')} ${fmtPct(strikeEscalation)}${t('param_pct_suffix')}</span>
+      <span>${t('param_fmp_flat')}</span>
+      <span>${t('param_rep_day')}</span>
     `
   }
 }

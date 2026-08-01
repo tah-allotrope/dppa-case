@@ -7,6 +7,7 @@ import { renderAppShell, renderFiveLineBill, renderFormulas, renderMultiYearPane
 import { initTeachMode } from './modules/teach'
 import { initTheme } from './modules/theme'
 import { initTour } from './modules/tour'
+import { initI18n, t } from './modules/i18n'
 
 if (navigator.webdriver) {
   // Headless-Chromium's backdrop-filter blur compositing is not pixel-stable
@@ -57,11 +58,11 @@ function applyScenarioDefaults(scenario) {
 
 function getWarningText(totals, scenario) {
   if (totals.excessRisk) {
-    return `Warning: ${scenario.label} currently settles more contracted energy than matched consumption. This is the overgeneration risk your CFO should watch.`
+    return t('warning_excess_risk_template').replace('{scenario}', scenario.label)
   }
 
   if (totals.blendedPrice > totals.noDppaBlended) {
-    return 'Current setup is more expensive than the no-DPPA baseline because either strike is high, DPPA charge is large, or matched volume is too low.'
+    return t('warning_expensive')
   }
 
   return ''
@@ -201,8 +202,30 @@ function syncInputsFromState() {
   document.querySelector('#horizonYears').value = state.horizonYears
 }
 
+function initLangSelector() {
+  const actions = document.querySelector('.topbar-actions')
+  if (!actions || document.querySelector('#langSelector')) return
+  const group = document.createElement('div')
+  group.id = 'langSelector'
+  group.className = 'toggle-group'
+  group.setAttribute('aria-label', 'Language')
+  group.innerHTML = ['en', 'vi', 'zh'].map((code) => (
+    `<button class="toggle-button" data-lang="${code}" type="button">${code.toUpperCase()}</button>`
+  )).join('')
+  group.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-lang]')
+    if (!button) return
+    const params = new URLSearchParams(window.location.search)
+    params.set('lang', button.dataset.lang)
+    window.location.search = params.toString()
+  })
+  actions.appendChild(group)
+}
+
+initI18n()
 renderAppShell(document.querySelector('#app'), getScenarioList(), settlementModes)
 initTheme()
+initLangSelector()
 syncControls()
 syncInputsFromState()
 updateView()

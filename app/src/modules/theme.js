@@ -1,3 +1,5 @@
+import { t } from "./i18n.js";
+
 const STORAGE_KEY = "dppa-theme";
 
 export function resolveTheme(search = window.location.search, storage = window.localStorage) {
@@ -22,8 +24,8 @@ export function initTheme() {
   button.id = "themeToggle";
   button.type = "button";
   button.className = "theme-toggle";
-  button.textContent = "Presenter theme";
-  button.setAttribute("aria-label", "Toggle presenter theme");
+  button.textContent = t("theme_presenter_toggle");
+  button.setAttribute("aria-label", t("theme_presenter_toggle_aria"));
   button.addEventListener("click", () => {
     const next = document.documentElement.dataset.theme === "present" ? "default" : "present";
     applyTheme(next, { persist: true });
