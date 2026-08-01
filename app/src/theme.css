@@ -1,7 +1,13 @@
-[data-theme='present'] { --bg:#f3f4f6;--panel:#fff;--panel-strong:#fff;--text:#111827;--muted:#374151;--cyan:#005a78;--border:#4b5563;--chart-grid:rgba(17,24,39,.2);--chart-tick:#111827;--font-size-base:18px;--shadow:none; }
+[data-theme='present'] { --bg:#f3f4f6;--panel:#fff;--panel-strong:#fff;--text:#111827;--muted:#374151;--cyan:#005a78;--mint:#0f6b52;--border:#4b5563;--chart-grid:rgba(17,24,39,.2);--chart-tick:#111827;--font-size-base:18px;--shadow:none; }
 [data-theme='present'] body { background:#f3f4f6;color:var(--text);font-size:var(--font-size-base); }
 [data-theme='present'] .panel { background:var(--panel);backdrop-filter:none;box-shadow:none;border-color:var(--border); }
 [data-theme='present'] .glow-frame::after { display:none; }
+[data-theme='present'] .hour-nav-label,[data-theme='present'] .formula-card pre,[data-theme='present'] .flow-value,[data-theme='present'] .walkthrough-note { color:var(--text); }
+[data-theme='present'] .fmp-cancel-strip { background:rgba(9,15,33,.92);border-color:rgba(255,255,255,.12);color:#f4fbff; }
+[data-theme='present'] .cancel-term-result .cancel-eq-label { color:rgba(154,255,222,.92); }
+[data-theme='present'] .cancel-eq-label { opacity:.92; }
+[data-theme='present'] .fmp-cancel-title { color:rgba(255,255,255,.72); }
+[data-theme='present'] .cancel-eq-owner { opacity:.96; }
 .theme-toggle,.tour-launch { min-height:40px;padding:8px 12px;border:1px solid var(--cyan);border-radius:8px;background:var(--panel);color:var(--text); }
 #teachBanner { position:fixed;left:0;right:0;bottom:0;z-index:10000;background:var(--panel-strong);color:var(--text);border-top:2px solid var(--cyan);padding:10px 16px; }
 .teach-banner-inner { display:flex;align-items:center;gap:16px;max-width:1100px;margin:0 auto; }.teach-banner-text { flex:1;display:flex;flex-direction:column;gap:2px;font-size:.9rem; }.teach-step-counter{color:var(--cyan)}.teach-expected{color:var(--muted);font-size:.8rem}#teachPrev,#teachNext{background:var(--panel);color:var(--text);border:1px solid var(--cyan);border-radius:6px;padding:6px 14px}

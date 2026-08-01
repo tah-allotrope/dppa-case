@@ -45,6 +45,20 @@ export default defineConfig({
   plugins: [buildCommitPlugin(), swManifestPlugin()],
   test: {
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary'],
+      exclude: ['e2e/**', 'scripts/**', '**/*.test.js', 'dist/**'],
+      // PHASE-05: thresholds are a ratchet set from a real measurement
+      // (rounded down), not an aspirational target — raise deliberately,
+      // never lower silently. See deployment.md's Quality commands section.
+      thresholds: {
+        lines: 78,
+        branches: 71,
+        functions: 79,
+        statements: 77,
+      },
+    },
   },
   build: {
     chunkSizeWarningLimit: 300,

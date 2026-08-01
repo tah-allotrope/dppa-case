@@ -28,6 +28,7 @@ the real date is confirmed.
 | H3 | Recalibrate lender/investor gate proxies with real Allotrope deal data — or accept the illustrative band | Presenter + Allotrope | 2026-09-01 | gate-sweep credibility work, M5 rehearsal |
 | H4 | Firebase deploy credentials → enable the commented `deploy` job in `.github/workflows/ci.yml` | Presenter | 2026-09-08 | QR codes pointing at a current build |
 | H5 | Schedule fresh-viewer volunteer (kit: `facilitator/fresh-viewer-kit/`) | Presenter | 2026-09-08 | content freeze (gate for 2026-09-15) |
+| H6 | Trigger the `visual-bootstrap` `workflow_dispatch` job on GitHub Actions, download the Linux `-linux.png` baselines, and commit them to `app/e2e/visual.spec.js-snapshots/` (then remove `continue-on-error` from the `e2e:visual` step and delete the bootstrap job) | Presenter | 2026-08-15 | PHASE-05's real visual-regression gate; requires pushing/running a workflow, which an unattended local coding session must not do |
 
 Status legend: **[x] done** (verified in this session or an earlier one) ·
 **[ ] pending** · **(human-only)** = cannot be executed by an autonomous

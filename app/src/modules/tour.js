@@ -14,7 +14,7 @@ export function startTour() {
   document.querySelector("#tourOverlay")?.remove();
   const overlay = document.createElement("div");
   overlay.id = "tourOverlay";
-  overlay.innerHTML = `<div class="tour-card" role="dialog" aria-modal="true"><h2></h2><h3></h3><p class="tour-en"></p><p class="tour-vi"></p><div class="tour-actions"><button data-tour="back">${t("tour_back")}</button><button data-tour="skip">${t("tour_skip")}</button><button data-tour="next">${t("tour_next")}</button></div></div>`;
+  overlay.innerHTML = `<div class="tour-card" role="dialog" aria-modal="true" aria-labelledby="tourCardTitle"><h2 id="tourCardTitle"></h2><h3></h3><p class="tour-en"></p><p class="tour-vi"></p><div class="tour-actions"><button data-tour="back">${t("tour_back")}</button><button data-tour="skip">${t("tour_skip")}</button><button data-tour="next">${t("tour_next")}</button></div></div>`;
   document.body.appendChild(overlay);
   const finish = () => {
     localStorage.setItem(DONE_KEY, "1");

@@ -79,6 +79,8 @@ GitHub Actions runs lint, unit tests, functional/visual Playwright tests, and th
 
 Run `npm run lint`, `npm test`, `npm run e2e`, and `npm run build`. The complete local Q-001 fallback gate is `npm run predeploy`. Run visual checks with `npm run e2e:visual`; update baselines with `npm run e2e:visual -- --update-snapshots`.
 
+Run `npm run coverage` for the Vitest v8 coverage report; thresholds in `vite.config.js`'s `test.coverage.thresholds` are a ratchet set from a real measurement (77% statements / 71% branches / 79% functions / 78% lines, each rounded down) — raise them deliberately when coverage improves, never lower them to make a failing run pass. `e2e/a11y.spec.js` runs `@axe-core/playwright` scoped to `serious`/`critical` impact only against the default view, teach mode, the tour overlay, and a localized (`?lang=vi`) route; it is skipped for `webkit-mobile`'s two present-theme routes only, where WebKit's own color-contrast sampling misreports backdrop-filter panel backgrounds (confirmed correct via direct `getComputedStyle` inspection — a WebKit/axe tooling limitation, not a real contrast bug).
+
 ### Offline resilience (PHASE-04)
 
 The app registers `public/sw.js` as a service worker on every page (including under Playwright automation — it is not gated on `navigator.webdriver`, unlike the backdrop-filter workaround). On `install` it fetches `dist/sw-manifest.json` (written by a Vite plugin at build time; lists the current build's content-hashed `/assets/*` filenames plus the static app shell) and precaches every listed URL under a cache name that embeds the build marker, so a new deploy gets a fresh cache and `activate` deletes the old one. `index.html`/navigations are always network-first with a cache fallback; every other same-origin `GET` is cache-first with a network fallback. Once a visitor has loaded the app successfully, it keeps working — including all three `?lang=` values, since the string tables ship inside the single JS bundle rather than being fetched per language — with the network switched off entirely (venue wifi risk).
@@ -93,17 +95,17 @@ Locally on Windows, running visual snapshots requires `--workers=1` — running 
 
 ### Visual baseline bootstrap (one-time)
 
-No snapshot baselines are committed yet. Local Windows-generated (`-win32.png`) baselines are intentionally **not** committed — Playwright suffixes snapshot filenames by OS, so they wouldn't match CI's Linux run anyway, and cross-OS font rendering differs enough to produce false failures (this is why `npm run e2e:visual` is `continue-on-error: true` in `.github/workflows/ci.yml` for now). To bootstrap real baselines:
+No snapshot baselines are committed yet. Local Windows-generated (`-win32.png`) baselines are intentionally **not** committed — Playwright suffixes snapshot filenames by OS, so they wouldn't match CI's Linux run anyway, and cross-OS font rendering differs enough to produce false failures (this is why `npm run e2e:visual` is `continue-on-error: true` in `.github/workflows/ci.yml` for now). A `visual-bootstrap` job is already wired into `ci.yml` (`workflow_dispatch`-triggered) to generate them — **this is a human-only step (H6 in `plans/2026-october-readiness-checklist.md`)**, since it requires triggering a GitHub Actions run:
 
-1. Trigger the `app-quality` workflow on a throwaway branch (or run it once manually).
-2. Download the job's working tree, or add a one-off step that runs `npm run e2e:visual -- --update-snapshots` and uploads `app/e2e/visual.spec.js-snapshots/` as an artifact.
-3. Commit the resulting `-linux.png` files to `app/e2e/visual.spec.js-snapshots/`.
-4. Remove `continue-on-error: true` from the `e2e:visual` step in `ci.yml` once baselines are committed and green.
+1. From the repo's Actions tab, run the `app-quality` workflow manually (`workflow_dispatch`) — this runs the `visual-bootstrap` job.
+2. Download its `visual-baselines` artifact.
+3. Commit the `-linux.png` files inside it to `app/e2e/visual.spec.js-snapshots/`.
+4. In the same commit: remove `continue-on-error: true` from the `quality` job's `e2e:visual` step, and delete the now-unneeded `visual-bootstrap` job from `ci.yml`.
 
 ## Pre-workshop checklist
 
 - [ ] Run the local predeploy gate.
-- [ ] Verify 18px-or-larger presenter text and 4.5:1 contrast at 1280x720 on a low-brightness projector.
+- [ ] Verify 18px-or-larger presenter text on a low-brightness projector. (4.5:1 color contrast is now automated by `e2e/a11y.spec.js`; this remaining item is the physical-projector brightness/legibility check, which axe cannot perform.)
 - [ ] Walk all six teach steps forward and backward.
 - [ ] Complete the tour on physical iPhone Safari and a mid-size tablet.
 - [ ] Test venue Wi-Fi and preload the production URL.

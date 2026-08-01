@@ -2,7 +2,36 @@ name: app-quality
 on:
   push:
   pull_request:
+  workflow_dispatch:
 jobs:
+  # PHASE-05 TASK-05-02: one-time bootstrap to generate Linux visual-regression
+  # baselines (Playwright suffixes snapshots by OS; Windows-generated
+  # `-win32.png` baselines are not valid for this Linux CI runner). Human-only
+  # step (H6 in plans/2026-october-readiness-checklist.md): trigger this job
+  # from the Actions tab, download the `visual-baselines` artifact, commit its
+  # `*-linux.png` files into `app/e2e/visual.spec.js-snapshots/`, then delete
+  # this job and remove `continue-on-error` from the `quality` job's
+  # `e2e:visual` step, all in the same commit.
+  visual-bootstrap:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e:visual -- --update-snapshots
+      - uses: actions/upload-artifact@v4
+        with:
+          name: visual-baselines
+          path: app/e2e/visual.spec.js-snapshots/
   quality:
     runs-on: ubuntu-latest
     defaults:
@@ -22,6 +51,7 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm test
+      - run: npm run coverage
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run e2e
       # No Linux baselines are committed yet (see app/deployment.md "Visual baseline

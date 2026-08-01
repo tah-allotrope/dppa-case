@@ -227,7 +227,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
               </div>
             </div>
 
-            <section class="panel walkthrough-panel glow-frame">
+            <section class="panel walkthrough-panel glow-frame" tabindex="0">
               <div class="panel-header">
               <div>
                 <p class="eyebrow">${t('walkthrough_eyebrow')}</p>
