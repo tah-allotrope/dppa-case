@@ -124,3 +124,7 @@ coding session, needs a person with a browser/PowerPoint/printer.
 - [ ] Bring a laptop with the deck, the local app build, and this repo
       checked out (in case a last-minute number needs re-verifying against
       `assets/teaching/spine-s1.json` or `gate-sweep.json`).
+- [ ] Venue offline drill: load `https://dppa-case.web.app` once on the
+      presenter laptop and on one phone, then enable airplane mode and
+      confirm the app still loads and the five-line bill still renders
+      (PHASE-04's service worker).

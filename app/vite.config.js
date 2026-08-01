@@ -21,8 +21,28 @@ function buildCommitPlugin() {
   }
 }
 
+// PHASE-04: app/public/** is copied verbatim by Vite (no hashing), so sw.js
+// cannot hard-code the emitted /assets/* filenames. This plugin writes a
+// manifest at generateBundle time that sw.js fetches during install.
+function swManifestPlugin() {
+  const commit = getBuildCommit()
+  return {
+    name: 'emit-sw-manifest',
+    generateBundle(_options, bundle) {
+      const assets = Object.values(bundle)
+        .filter((entry) => entry.fileName && !entry.fileName.endsWith('.map'))
+        .map((entry) => `/${entry.fileName}`)
+      this.emitFile({
+        type: 'asset',
+        fileName: 'sw-manifest.json',
+        source: JSON.stringify({ version: commit, assets }, null, 2),
+      })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [buildCommitPlugin()],
+  plugins: [buildCommitPlugin(), swManifestPlugin()],
   test: {
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
   },

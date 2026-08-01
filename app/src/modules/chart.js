@@ -1,5 +1,20 @@
-import Chart from 'chart.js/auto'
+import {
+  Chart,
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js'
 import { convertMoney, formatMoney, EXCHANGE_RATE } from './formatters'
+
+// PHASE-04: explicit registration instead of chart.js/auto trims the bundle to
+// only the line-chart building blocks this app actually renders (both charts
+// are `type: 'line'`; no bar/pie/radar chart is used anywhere).
+Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, Filler)
 
 let profileChart
 let multiYearChart
