@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { deriveVolumes, scaleProfile, sumVolume } from './profiles'
-import { buildFmpCurve, buildWorkshopFmpCurve, defaultInputs, scenarioProfiles } from '../data/default-scenarios'
+import {
+  buildFmpCurve,
+  buildWorkshopFmpCurve,
+  defaultInputs,
+  scenarioProfiles,
+} from '../data/default-scenarios'
 import { calculateSettlement } from './settlement'
 
 describe('scaleProfile', () => {
@@ -18,17 +23,38 @@ describe('deriveVolumes', () => {
   it('derives matched, shortfall, and excess correctly for a shortfall hour', () => {
     const volumes = deriveVolumes([5000], [2000])
     expect(volumes).toHaveLength(1)
-    expect(volumes[0]).toEqual({ hour: 0, load: 5000, generation: 2000, matched: 2000, shortfall: 3000, excess: 0 })
+    expect(volumes[0]).toEqual({
+      hour: 0,
+      load: 5000,
+      generation: 2000,
+      matched: 2000,
+      shortfall: 3000,
+      excess: 0,
+    })
   })
 
   it('derives matched, shortfall, and excess correctly for an excess hour', () => {
     const volumes = deriveVolumes([3000], [5000])
-    expect(volumes[0]).toEqual({ hour: 0, load: 3000, generation: 5000, matched: 3000, shortfall: 0, excess: 2000 })
+    expect(volumes[0]).toEqual({
+      hour: 0,
+      load: 3000,
+      generation: 5000,
+      matched: 3000,
+      shortfall: 0,
+      excess: 2000,
+    })
   })
 
   it('derives matched, shortfall, and excess correctly for a balanced hour', () => {
     const volumes = deriveVolumes([4700], [4700])
-    expect(volumes[0]).toEqual({ hour: 0, load: 4700, generation: 4700, matched: 4700, shortfall: 0, excess: 0 })
+    expect(volumes[0]).toEqual({
+      hour: 0,
+      load: 4700,
+      generation: 4700,
+      matched: 4700,
+      shortfall: 0,
+      excess: 0,
+    })
   })
 
   it('assigns hour index from the load profile position', () => {
@@ -122,7 +148,9 @@ describe('buildFmpCurve', () => {
     }
 
     const settlement = calculateSettlement(inputs)
-    const belowStrikeMatchedHours = settlement.intervals.filter((iv) => iv.matched > 0 && iv.fmp < inputs.strikePrice)
+    const belowStrikeMatchedHours = settlement.intervals.filter(
+      (iv) => iv.matched > 0 && iv.fmp < inputs.strikePrice,
+    )
 
     expect(belowStrikeMatchedHours.length).toBeGreaterThanOrEqual(4)
   })

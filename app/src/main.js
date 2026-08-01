@@ -1,9 +1,33 @@
 import './style.css'
 import './theme.css'
-import { defaultInputs, hours, scenarioOrder, scenarioProfiles, settlementModes, buildFmpCurve, buildWorkshopFmpCurve } from './data/default-scenarios'
+import {
+  defaultInputs,
+  hours,
+  scenarioOrder,
+  scenarioProfiles,
+  settlementModes,
+  buildFmpCurve,
+  buildWorkshopFmpCurve,
+} from './data/default-scenarios'
 import { renderMultiYearChart, renderProfileChart } from './modules/chart'
-import { buildFiveLineBill, buildFormulaBreakdown, buildSelectedWalkthroughCase, calculateSettlement, projectMultiYear } from './modules/settlement'
-import { renderAppShell, renderFiveLineBill, renderFormulas, renderMultiYearPanel, renderSelectedHourDetails, renderWalkthroughCases, setActiveCurrency, setActiveScenario, updateControlOutputs } from './modules/ui'
+import {
+  buildFiveLineBill,
+  buildFormulaBreakdown,
+  buildSelectedWalkthroughCase,
+  calculateSettlement,
+  projectMultiYear,
+} from './modules/settlement'
+import {
+  renderAppShell,
+  renderFiveLineBill,
+  renderFormulas,
+  renderMultiYearPanel,
+  renderSelectedHourDetails,
+  renderWalkthroughCases,
+  setActiveCurrency,
+  setActiveScenario,
+  updateControlOutputs,
+} from './modules/ui'
 import { initTeachMode } from './modules/teach'
 import { initTheme } from './modules/theme'
 import { initTour } from './modules/tour'
@@ -78,14 +102,27 @@ async function updateView() {
   const selectedWalkthroughCase = buildSelectedWalkthroughCase(inputs, selectedInterval)
 
   try {
-    renderProfileChart(document.querySelector('#profileChart'), hourLabels, settlement.intervals, selectedInterval.hour, (hour) => {
-      state.selectedHour = hour
-      updateView()
-    }, inputs, state.currency)
+    renderProfileChart(
+      document.querySelector('#profileChart'),
+      hourLabels,
+      settlement.intervals,
+      selectedInterval.hour,
+      (hour) => {
+        state.selectedHour = hour
+        updateView()
+      },
+      inputs,
+      state.currency,
+    )
   } catch (error) {
     console.error('Profile chart render failed:', error)
   }
-  renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedWalkthroughCase, state.currency, formulas)
+  renderWalkthroughCases(
+    document.querySelector('#walkthroughCases'),
+    selectedWalkthroughCase,
+    state.currency,
+    formulas,
+  )
   try {
     renderFormulas(formulas, getWarningText(settlement.totals, scenario), state.currency)
   } catch (error) {
@@ -100,15 +137,18 @@ async function updateView() {
     inputs,
   )
   if (scenario.kind === 'workshop') {
-    const bill = buildFiveLineBill({
-      fmp: state.marketPrice,
-      strikePrice: state.strikePrice,
-      serviceFee: state.dppaServiceFee,
-      clearingFee: state.dppaClearingFee,
-      lossFactorPrecise: 1.026 * 1.008,
-      lossFactor: state.lossFactor,
-      retailTariff: state.retailTariff,
-    }, scenario.monthlyVolumes)
+    const bill = buildFiveLineBill(
+      {
+        fmp: state.marketPrice,
+        strikePrice: state.strikePrice,
+        serviceFee: state.dppaServiceFee,
+        clearingFee: state.dppaClearingFee,
+        lossFactorPrecise: 1.026 * 1.008,
+        lossFactor: state.lossFactor,
+        retailTariff: state.retailTariff,
+      },
+      scenario.monthlyVolumes,
+    )
     renderFiveLineBill(document.querySelector('#fiveLineBill'), bill, state.currency, scenario)
   } else {
     renderFiveLineBill(document.querySelector('#fiveLineBill'), null, state.currency, scenario)
@@ -209,9 +249,12 @@ function initLangSelector() {
   group.id = 'langSelector'
   group.className = 'toggle-group'
   group.setAttribute('aria-label', 'Language')
-  group.innerHTML = ['en', 'vi', 'zh'].map((code) => (
-    `<button class="toggle-button" data-lang="${code}" type="button">${code.toUpperCase()}</button>`
-  )).join('')
+  group.innerHTML = ['en', 'vi', 'zh']
+    .map(
+      (code) =>
+        `<button class="toggle-button" data-lang="${code}" type="button">${code.toUpperCase()}</button>`,
+    )
+    .join('')
   group.addEventListener('click', (event) => {
     const button = event.target.closest('[data-lang]')
     if (!button) return

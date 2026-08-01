@@ -1,9 +1,26 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
-import { buildFmpCurve, defaultInputs, scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios'
+import {
+  buildFmpCurve,
+  defaultInputs,
+  scenarioOrder,
+  scenarioProfiles,
+  settlementModes,
+} from '../data/default-scenarios'
 import { formatMoney } from './formatters'
-import { buildFiveLineBill, buildSelectedWalkthroughCase, calculateSettlement, buildFormulaBreakdown } from './settlement'
-import { renderAppShell, renderFiveLineBill, renderFormulas, renderSelectedHourDetails, renderWalkthroughCases } from './ui'
+import {
+  buildFiveLineBill,
+  buildSelectedWalkthroughCase,
+  calculateSettlement,
+  buildFormulaBreakdown,
+} from './settlement'
+import {
+  renderAppShell,
+  renderFiveLineBill,
+  renderFormulas,
+  renderSelectedHourDetails,
+  renderWalkthroughCases,
+} from './ui'
 
 function normalizedText(selector) {
   return document.querySelector(selector).textContent.replace(/\s+/g, ' ').trim()
@@ -36,8 +53,12 @@ describe('storytelling shell', () => {
     // Multi-year projection now sits inside the focus column, before the cancellation flow
     expect(document.querySelector('.focus-column .multi-year-panel')).not.toBeNull()
     const order = document.querySelector('#app').innerHTML
-    expect(order.indexOf('id="multiYearChart"')).toBeLessThan(order.indexOf('id="cancellationFlow"'))
-    expect(order.indexOf('id="multiYearChart"')).toBeLessThan(order.indexOf('class="controls-grid"'))
+    expect(order.indexOf('id="multiYearChart"')).toBeLessThan(
+      order.indexOf('id="cancellationFlow"'),
+    )
+    expect(order.indexOf('id="multiYearChart"')).toBeLessThan(
+      order.indexOf('class="controls-grid"'),
+    )
     expect(document.querySelector('#app').textContent).toContain('reshape the daily graph')
     expect(document.querySelector('#dailyTotals')).toBeNull()
     expect(document.querySelector('#app').textContent).not.toContain('Cancellation effect')
@@ -45,21 +66,26 @@ describe('storytelling shell', () => {
     expect(document.querySelector('#app').textContent).toContain('2025 teaching assumptions')
     expect(document.querySelector('#app').textContent).toContain('Illustrative tariff blocks')
     expect(document.querySelector('#app').textContent).toContain('Synthetic FMP curve')
-    expect(document.querySelector('#app').textContent).not.toContain('weighted 22 kV to below 110 kV retail tariff')
+    expect(document.querySelector('#app').textContent).not.toContain(
+      'weighted 22 kV to below 110 kV retail tariff',
+    )
     expect(document.querySelector('#app').textContent).not.toContain('Savings vs BAU')
   })
 
   it('renders workshop five-line bill totals and clears it for curve scenarios', () => {
     document.body.innerHTML = '<div id="fiveLineBill"></div>'
     const node = document.querySelector('#fiveLineBill')
-    const bill = buildFiveLineBill({
-      fmp: 1150,
-      strikePrice: 1250,
-      serviceFee: 360,
-      clearingFee: 163.3,
-      lossFactorPrecise: 1.026 * 1.008,
-      retailTariff: 2204,
-    }, scenarioProfiles.workshop1.monthlyVolumes)
+    const bill = buildFiveLineBill(
+      {
+        fmp: 1150,
+        strikePrice: 1250,
+        serviceFee: 360,
+        clearingFee: 163.3,
+        lossFactorPrecise: 1.026 * 1.008,
+        retailTariff: 2204,
+      },
+      scenarioProfiles.workshop1.monthlyVolumes,
+    )
 
     renderFiveLineBill(node, bill, 'VND', scenarioProfiles.workshop1)
 
@@ -99,7 +125,12 @@ describe('selected-hour layout', () => {
     const formulas = buildFormulaBreakdown(inputs, interval)
     const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
 
-    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', formulas)
+    renderWalkthroughCases(
+      document.querySelector('#walkthroughCases'),
+      selectedCase,
+      'VND',
+      formulas,
+    )
 
     renderSelectedHourDetails(
       document.querySelector('#selectedHourDetailsPanel'),
@@ -108,11 +139,15 @@ describe('selected-hour layout', () => {
       inputs,
     )
 
-    expect(document.querySelector('#walkthroughCases').textContent).toContain('Net = EVN + Developer')
+    expect(document.querySelector('#walkthroughCases').textContent).toContain(
+      'Net = EVN + Developer',
+    )
     expect(document.querySelector('#walkthroughCases').textContent).toContain('FMP cancellation')
     // Payment build-up is in the details panel
     expect(document.querySelector('#selectedHourDetailsPanel .settlement-grid')).not.toBeNull()
-    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain('Payment to EVN per kWh of factory load')
+    expect(document.querySelector('#selectedHourDetailsPanel').textContent).toContain(
+      'Payment to EVN per kWh of factory load',
+    )
   })
 
   it('renders only the selected-hour load-vs-gen case card', () => {
@@ -131,9 +166,18 @@ describe('selected-hour layout', () => {
     const formulas = buildFormulaBreakdown(inputs, settlement.intervals[1])
     const interval = settlement.intervals[1]
     const fmpText = formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })
-    const strikeText = formatMoney(inputs.strikePrice, { currency: 'VND', precise: true, perKwh: true })
+    const strikeText = formatMoney(inputs.strikePrice, {
+      currency: 'VND',
+      precise: true,
+      perKwh: true,
+    })
 
-    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', formulas)
+    renderWalkthroughCases(
+      document.querySelector('#walkthroughCases'),
+      selectedCase,
+      'VND',
+      formulas,
+    )
 
     const text = normalizedText('#walkthroughCases')
 
@@ -144,7 +188,9 @@ describe('selected-hour layout', () => {
     expect(text).toContain(`FMP (${fmpText}) × Kpp (${kppText}) × 4,700 kWh`)
     expect(text).toContain('Developer =')
     expect(text).toContain(`− FMP (${fmpText}) × 4,700 kWh + Strike (${strikeText}) × 4,700 kWh`)
-    expect(text).toContain(`EVN = FMP (${fmpText}) × Kpp (${kppText}) × 4,700 kWh + CDPPA (523.30 VND/kWh) × 4,700 kWh =`)
+    expect(text).toContain(
+      `EVN = FMP (${fmpText}) × Kpp (${kppText}) × 4,700 kWh + CDPPA (523.30 VND/kWh) × 4,700 kWh =`,
+    )
     expect(text).toContain('FMP cancellation')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-cancelled-term')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-retained-term')
@@ -177,9 +223,18 @@ describe('selected-hour layout', () => {
     const breakdown = buildFormulaBreakdown(inputs, interval)
     const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
     const fmpText = formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })
-    const strikeText = formatMoney(inputs.strikePrice, { currency: 'VND', precise: true, perKwh: true })
+    const strikeText = formatMoney(inputs.strikePrice, {
+      currency: 'VND',
+      precise: true,
+      perKwh: true,
+    })
 
-    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
+    renderWalkthroughCases(
+      document.querySelector('#walkthroughCases'),
+      selectedCase,
+      'VND',
+      breakdown,
+    )
 
     renderSelectedHourDetails(
       document.querySelector('#selectedHourDetailsPanel'),
@@ -193,7 +248,9 @@ describe('selected-hour layout', () => {
     const text = normalizedText('#walkthroughCases')
 
     expect(normalizedText('#selectedHourDetailsPanel')).not.toContain('FMP cancellation')
-    expect(text).toContain(`EVN = FMP (${fmpText}) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh`)
+    expect(text).toContain(
+      `EVN = FMP (${fmpText}) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh`,
+    )
     expect(text).toContain('Developer =')
     expect(text).toContain(`− FMP (${fmpText}) × 4,700 kWh + Strike (1,741.35 VND/kWh) × 4,700 kWh`)
     expect(text).toContain('FMP cancellation')
@@ -204,19 +261,33 @@ describe('selected-hour layout', () => {
     expect(text).toContain('EVN')
     expect(text).toContain('Developer')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-cancelled-term')
-    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-retained-term default')
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain(
+      'net-retained-term default',
+    )
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('cancel-term-cancel')
-    expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain('net-retained-term result">CDPPA')
-    expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain('net-retained-term warning')
-    expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain('net-retained-term accent')
+    expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain(
+      'net-retained-term result">CDPPA',
+    )
+    expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain(
+      'net-retained-term warning',
+    )
+    expect(document.querySelector('#walkthroughCases').innerHTML).not.toContain(
+      'net-retained-term accent',
+    )
     expect(flowResult.kind).toBe('clean')
     expect(flowResult.flowHtml).toContain('flow-clean')
     expect(flowResult.flowHtml).toContain('Spot reference shown on EVN')
     expect(flowResult.flowHtml).toContain('Canceled on aligned volume')
-    expect(flowResult.flowHtml).toContain(`+ ${interval.contractQuantity.toLocaleString()} kWh × ${strikeText}`)
-    expect(flowResult.flowHtml).toContain(`− ${interval.cleanCancelledEnergy ? interval.cleanCancelledEnergy.toLocaleString() : interval.contractQuantity.toLocaleString()} kWh × ${fmpText}`)
+    expect(flowResult.flowHtml).toContain(
+      `+ ${interval.contractQuantity.toLocaleString()} kWh × ${strikeText}`,
+    )
+    expect(flowResult.flowHtml).toContain(
+      `− ${interval.cleanCancelledEnergy ? interval.cleanCancelledEnergy.toLocaleString() : interval.contractQuantity.toLocaleString()} kWh × ${fmpText}`,
+    )
     expect(document.querySelector('#cancellationFlow').innerHTML).toContain('flow-clean')
-    expect(document.querySelector('#cancellationFlow').classList.contains('cancellation-flow')).toBe(true)
+    expect(
+      document.querySelector('#cancellationFlow').classList.contains('cancellation-flow'),
+    ).toBe(true)
   })
 
   it('keeps the cancellation strip and neutral retained terms in a shortfall hour', () => {
@@ -240,7 +311,12 @@ describe('selected-hour layout', () => {
     const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
     const fmpText = formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })
 
-    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
+    renderWalkthroughCases(
+      document.querySelector('#walkthroughCases'),
+      selectedCase,
+      'VND',
+      breakdown,
+    )
 
     const text = normalizedText('#walkthroughCases')
     const html = document.querySelector('#walkthroughCases').innerHTML
@@ -281,15 +357,26 @@ describe('selected-hour layout', () => {
     const breakdown = buildFormulaBreakdown(inputs, interval)
     const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
 
-    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
+    renderWalkthroughCases(
+      document.querySelector('#walkthroughCases'),
+      selectedCase,
+      'VND',
+      breakdown,
+    )
 
     const netLines = document.querySelectorAll('#walkthroughCases .net-formula-line')
     const text = normalizedText('#walkthroughCases')
 
     expect(netLines).toHaveLength(1)
-    expect(text).toContain('Net = EVN + Developer = =Retail (1,833.00 VND/kWh) × 2,600 kWh=4,765,800 VND')
-    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('cancel-term-shown cancel-term-crossed')
-    expect(document.querySelector('#walkthroughCases').innerHTML).toContain('cancel-term-cancel cancel-term-crossed')
+    expect(text).toContain(
+      'Net = EVN + Developer = =Retail (1,833.00 VND/kWh) × 2,600 kWh=4,765,800 VND',
+    )
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain(
+      'cancel-term-shown cancel-term-crossed',
+    )
+    expect(document.querySelector('#walkthroughCases').innerHTML).toContain(
+      'cancel-term-cancel cancel-term-crossed',
+    )
   })
 
   it('keeps a matched below-strike hour visible in the settlement story', () => {
@@ -307,8 +394,12 @@ describe('selected-hour layout', () => {
     }
 
     const settlement = calculateSettlement(inputs)
-    const belowStrikeMatchedHours = settlement.intervals.filter((iv) => iv.matched > 0 && iv.fmp < inputs.strikePrice)
-    const interval = settlement.intervals.find((iv) => iv.matched > 0 && iv.fmp < inputs.strikePrice)
+    const belowStrikeMatchedHours = settlement.intervals.filter(
+      (iv) => iv.matched > 0 && iv.fmp < inputs.strikePrice,
+    )
+    const interval = settlement.intervals.find(
+      (iv) => iv.matched > 0 && iv.fmp < inputs.strikePrice,
+    )
 
     expect(belowStrikeMatchedHours.length).toBeGreaterThanOrEqual(4)
     expect(interval).toBeTruthy()
@@ -317,15 +408,30 @@ describe('selected-hour layout', () => {
     const breakdown = buildFormulaBreakdown(inputs, interval)
     const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
     const fmpText = formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })
-    const strikeText = formatMoney(inputs.strikePrice, { currency: 'VND', precise: true, perKwh: true })
+    const strikeText = formatMoney(inputs.strikePrice, {
+      currency: 'VND',
+      precise: true,
+      perKwh: true,
+    })
 
-    renderWalkthroughCases(document.querySelector('#walkthroughCases'), selectedCase, 'VND', breakdown)
+    renderWalkthroughCases(
+      document.querySelector('#walkthroughCases'),
+      selectedCase,
+      'VND',
+      breakdown,
+    )
     const flowResult = renderFormulas(breakdown, '', 'VND')
 
-    expect(normalizedText('#walkthroughCases')).toContain(`Strike (${strikeText}) × ${interval.contractQuantity.toLocaleString()} kWh`)
-    expect(normalizedText('#walkthroughCases')).toContain(formatMoney(interval.developer, { currency: 'VND', signed: true }))
+    expect(normalizedText('#walkthroughCases')).toContain(
+      `Strike (${strikeText}) × ${interval.contractQuantity.toLocaleString()} kWh`,
+    )
+    expect(normalizedText('#walkthroughCases')).toContain(
+      formatMoney(interval.developer, { currency: 'VND', signed: true }),
+    )
     expect(flowResult.flowHtml).toContain('Developer CfD swap')
-    expect(flowResult.flowHtml).toContain(`− ${interval.contractQuantity.toLocaleString()} kWh × ${fmpText}`)
+    expect(flowResult.flowHtml).toContain(
+      `− ${interval.contractQuantity.toLocaleString()} kWh × ${fmpText}`,
+    )
   })
 
   it('uses the clicked interval FMP in selected-hour detail formulas', () => {
@@ -356,8 +462,16 @@ describe('selected-hour layout', () => {
     const text = normalizedText('#selectedHourDetailsPanel')
 
     expect(interval.fmp).toBe(buildFmpCurve(1700)[0])
-    expect(text).toContain(formatMoney(interval.fmp * inputs.lossFactor, { currency: 'VND', precise: true, perKwh: true }))
-    expect(text).toContain(`(1,741.35 VND/kWh - ${formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })})`)
+    expect(text).toContain(
+      formatMoney(interval.fmp * inputs.lossFactor, {
+        currency: 'VND',
+        precise: true,
+        perKwh: true,
+      }),
+    )
+    expect(text).toContain(
+      `(1,741.35 VND/kWh - ${formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })})`,
+    )
     expect(text).not.toContain('(1,741.35 VND/kWh - 1,700.00 VND/kWh)')
   })
 })

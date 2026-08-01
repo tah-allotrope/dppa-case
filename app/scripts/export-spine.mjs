@@ -55,16 +55,39 @@ function buildInputsSection(profile, fmp, strikePrice) {
 function buildBillSection(bill) {
   return {
     lines: {
-      marketEnergy: { label: 'Market energy', vnd: bill.lines.marketEnergy, vndMillionsRounded: million(bill.lines.marketEnergy) },
-      systemService: { label: 'DPPA service fee', vnd: bill.lines.systemService, vndMillionsRounded: million(bill.lines.systemService) },
-      diffClearing: { label: 'Balancing / clearing fee', vnd: bill.lines.diffClearing, vndMillionsRounded: million(bill.lines.diffClearing) },
-      additionalPurchase: { label: 'Residual retail purchase', vnd: bill.lines.additionalPurchase, vndMillionsRounded: million(bill.lines.additionalPurchase) },
-      cfd: { label: 'CfD settlement', vnd: bill.lines.cfd, vndMillionsRounded: million(bill.lines.cfd) },
+      marketEnergy: {
+        label: 'Market energy',
+        vnd: bill.lines.marketEnergy,
+        vndMillionsRounded: million(bill.lines.marketEnergy),
+      },
+      systemService: {
+        label: 'DPPA service fee',
+        vnd: bill.lines.systemService,
+        vndMillionsRounded: million(bill.lines.systemService),
+      },
+      diffClearing: {
+        label: 'Balancing / clearing fee',
+        vnd: bill.lines.diffClearing,
+        vndMillionsRounded: million(bill.lines.diffClearing),
+      },
+      additionalPurchase: {
+        label: 'Residual retail purchase',
+        vnd: bill.lines.additionalPurchase,
+        vndMillionsRounded: million(bill.lines.additionalPurchase),
+      },
+      cfd: {
+        label: 'CfD settlement',
+        vnd: bill.lines.cfd,
+        vndMillionsRounded: million(bill.lines.cfd),
+      },
     },
     cEvn: { vnd: bill.cEvn, vndMillionsRounded: million(bill.cEvn) },
     cKh: { vnd: bill.cKh, vndMillionsRounded: million(bill.cKh) },
     plantRevenue: {
-      market: { vnd: bill.plantRevenue.market, vndMillionsRounded: million(bill.plantRevenue.market) },
+      market: {
+        vnd: bill.plantRevenue.market,
+        vndMillionsRounded: million(bill.plantRevenue.market),
+      },
       cfd: { vnd: bill.plantRevenue.cfd, vndMillionsRounded: million(bill.plantRevenue.cfd) },
       total: { vnd: bill.plantRevenue.total, vndMillionsRounded: million(bill.plantRevenue.total) },
     },
@@ -80,7 +103,8 @@ function buildComparisonSection(bauMonthlyVnd, bill, totalKwh) {
   }
 }
 
-const SOURCE_NOTE = 'app/src/modules/settlement.js buildFiveLineBill + research/2026-06-29_dppa-scenario-numbers-spec.md'
+const SOURCE_NOTE =
+  'app/src/modules/settlement.js buildFiveLineBill + research/2026-06-29_dppa-scenario-numbers-spec.md'
 
 export function buildSpinePack(scenarioKey) {
   if (scenarioKey === 's1') {
@@ -106,16 +130,35 @@ export function buildSpinePack(scenarioKey) {
       bill: buildBillSection(bill),
       comparison: buildComparisonSection(bauMonthlyVnd, bill, S1.monthlyVolumes.total),
       gates: {
-        buyer: { label: 'Buyer gate', rule: 'Cumulative DPPA cost <= cumulative BAU cost', thresholdText: 'C_KH (life) <= C_BAU (life)' },
+        buyer: {
+          label: 'Buyer gate',
+          rule: 'Cumulative DPPA cost <= cumulative BAU cost',
+          thresholdText: 'C_KH (life) <= C_BAU (life)',
+        },
         lender: { label: 'Lender gate', rule: 'DSCR every year', thresholdText: '>= 1.20x' },
         investor: { label: 'Investor gate', rule: 'Equity IRR', thresholdText: '12-15%' },
       },
       levers: [
-        { name: 'Strike price', movesWhen: 'Lower strike -> lower CfD cost when FMP is below strike' },
-        { name: 'Contracted volume (Q_c)', movesWhen: 'Match Q_c to real consumption to avoid excess/shortfall risk' },
-        { name: 'Tenor / escalation', movesWhen: 'Longer lock trades flexibility for price certainty' },
-        { name: 'Settlement mode', movesWhen: 'Matched-only vs generation vs allocated changes who bears volume risk' },
-        { name: 'Termination / step-out terms', movesWhen: 'Determines the cost of exiting if the deal stops passing the three gates' },
+        {
+          name: 'Strike price',
+          movesWhen: 'Lower strike -> lower CfD cost when FMP is below strike',
+        },
+        {
+          name: 'Contracted volume (Q_c)',
+          movesWhen: 'Match Q_c to real consumption to avoid excess/shortfall risk',
+        },
+        {
+          name: 'Tenor / escalation',
+          movesWhen: 'Longer lock trades flexibility for price certainty',
+        },
+        {
+          name: 'Settlement mode',
+          movesWhen: 'Matched-only vs generation vs allocated changes who bears volume risk',
+        },
+        {
+          name: 'Termination / step-out terms',
+          movesWhen: 'Determines the cost of exiting if the deal stops passing the three gates',
+        },
       ],
     }
   }
@@ -127,9 +170,10 @@ export function buildSpinePack(scenarioKey) {
 
     const pack = {
       meta: {
-        scenario: scenarioKey === 's2'
-          ? 'S2 shortfall (contracted below consumption)'
-          : 'S3 excess (over-generation, matched settlement)',
+        scenario:
+          scenarioKey === 's2'
+            ? 'S2 shortfall (contracted below consumption)'
+            : 'S3 excess (over-generation, matched settlement)',
         source: SOURCE_NOTE,
         generatedBy: 'app/scripts/export-spine.mjs',
       },

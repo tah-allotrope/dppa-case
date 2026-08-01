@@ -122,7 +122,10 @@ function main() {
     process.exit(1)
   }
 
-  writeFileSync(join(__dirname, '..', '..', 'assets', 'teaching', 'gate-sweep.json'), JSON.stringify(sweep, null, 2))
+  writeFileSync(
+    join(__dirname, '..', '..', 'assets', 'teaching', 'gate-sweep.json'),
+    JSON.stringify(sweep, null, 2),
+  )
   console.log('Wrote assets/teaching/gate-sweep.json')
   console.log('passCount:', sweep.passCount, '/', sweep.cells.length)
 }

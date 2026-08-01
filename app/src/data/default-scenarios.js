@@ -5,11 +5,30 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour)
 // This is demo data for teaching the cancellation effect, not a published Vietnam
 // market curve or a tariff-rule input.
 const FMP_SHAPE = [
-  0.70, 0.69, 0.68, 0.69, 0.72, // 00–04  off-peak: well below strike
-  0.78, 0.84, 0.88, 0.92, 0.97, // 05–09  matched hours stay below strike longer
-  1.00, 1.04, 1.08, 1.11, 1.15, // 10–14  crossing through strike into midday
-  1.18, 1.22, 1.28, 1.36, 1.42, // 15–19  afternoon to evening peak
-  1.30, 1.08, 0.92, 0.80,       // 20–23  easing back toward off-peak
+  0.7,
+  0.69,
+  0.68,
+  0.69,
+  0.72, // 00–04  off-peak: well below strike
+  0.78,
+  0.84,
+  0.88,
+  0.92,
+  0.97, // 05–09  matched hours stay below strike longer
+  1.0,
+  1.04,
+  1.08,
+  1.11,
+  1.15, // 10–14  crossing through strike into midday
+  1.18,
+  1.22,
+  1.28,
+  1.36,
+  1.42, // 15–19  afternoon to evening peak
+  1.3,
+  1.08,
+  0.92,
+  0.8, // 20–23  easing back toward off-peak
 ]
 
 export function buildFmpCurve(midpoint) {
@@ -131,7 +150,8 @@ export const scenarioProfiles = {
     id: 'workshop3',
     kind: 'workshop',
     label: 'Workshop 3',
-    description: 'Workshop Scenario 3 (excess): overbuilt solar generates more than the factory consumes. Consumption is fully matched (line 4 = 0); the excess settles nothing — spot only, no CfD.',
+    description:
+      'Workshop Scenario 3 (excess): overbuilt solar generates more than the factory consumes. Consumption is fully matched (line 4 = 0); the excess settles nothing — spot only, no CfD.',
     overrides: { strikePrice: 1250, marketPrice: 1100 },
     // Bill settles on consumed/matched volume only (5,000,000). The over-generation
     // excess is a daily-chart + narrative story, not a monthly-bill line.
@@ -149,7 +169,14 @@ export const scenarioProfiles = {
   },
 }
 
-export const scenarioOrder = ['higherLoad', 'balanced', 'higherGen', 'workshop1', 'workshop2', 'workshop3']
+export const scenarioOrder = [
+  'higherLoad',
+  'balanced',
+  'higherGen',
+  'workshop1',
+  'workshop2',
+  'workshop3',
+]
 
 export const defaultInputs = {
   scenarioId: 'balanced',
@@ -171,9 +198,9 @@ export const defaultInputs = {
   detailView: 'flow',
   selectedHour: 12,
   // Multi-year horizon defaults (used by projectMultiYear in settlement.js)
-  evnEscalation: 0.04,      // 4%/yr EVN tariff escalation (historical trend 2015-2024)
-  strikeEscalation: 0.04,   // 4%/yr strike escalation (fixed-VND index; negotiate separately)
-  horizonYears: 20,         // default lifetime horizon in years
+  evnEscalation: 0.04, // 4%/yr EVN tariff escalation (historical trend 2015-2024)
+  strikeEscalation: 0.04, // 4%/yr strike escalation (fixed-VND index; negotiate separately)
+  horizonYears: 20, // default lifetime horizon in years
 }
 
 export const settlementModes = [

@@ -9,7 +9,8 @@ export const STRINGS = {
   en: {
     header_eyebrow: 'Vietnam synthetic DPPA',
     header_title: 'DPPA CFO visual explainer',
-    header_hero: 'Click any hour to compare the 2025 teaching-model baseline against DPPA payment using documented example inputs and an illustrative FMP curve (no primary NSMO/ERAV source available).',
+    header_hero:
+      'Click any hour to compare the 2025 teaching-model baseline against DPPA payment using documented example inputs and an illustrative FMP curve (no primary NSMO/ERAV source available).',
     currency_toggle_aria: 'Currency toggle',
     currency_vnd: 'VND',
     currency_usd: 'USD',
@@ -43,7 +44,8 @@ export const STRINGS = {
     control_evn_esc_label: 'EVN tariff escalation',
     control_strike_esc_label: 'Strike escalation',
     control_horizon_label: 'Horizon years',
-    control_hints: 'Strike &amp; FMP reshape the daily graph; escalation &amp; horizon reshape the multi-year projection above.',
+    control_hints:
+      'Strike &amp; FMP reshape the daily graph; escalation &amp; horizon reshape the multi-year projection above.',
     assumptions_2025: '2025 teaching assumptions',
     assumptions_flat_retail: 'Flat retail tariff in v1',
     assumptions_internal_vnd: 'Internal math stays in VND',
@@ -54,7 +56,8 @@ export const STRINGS = {
     bill_eyebrow: 'Monthly settlement',
     bill_title_suffix: 'deck bill',
     bill_contracted_suffix: 'contracted kWh',
-    bill_caption: 'The graph above is an illustrative daily shape; this monthly 5-line bill is the deck-exact settlement.',
+    bill_caption:
+      'The graph above is an illustrative daily shape; this monthly 5-line bill is the deck-exact settlement.',
     bill_line_market_energy: 'Market energy',
     bill_line_system_service: 'DPPA system service',
     bill_line_diff_clearing: 'Differential clearing',
@@ -65,8 +68,10 @@ export const STRINGS = {
     bill_mirror_label: 'RE GENCO mirror',
     bill_mirror_market_suffix: 'market',
     bill_mirror_cfd_suffix: 'CfD',
-    flow_clean_note: 'Clean cancellation: the spot/FMP reference is shown on EVN, then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment.',
-    flow_partial_note: 'Partial cancellation: mismatch volume keeps some uncancelled exposure, so rely on the actual selected-hour DPPA payment.',
+    flow_clean_note:
+      'Clean cancellation: the spot/FMP reference is shown on EVN, then canceled on aligned volume, leaving strike + DPPA charge + loss adjustment.',
+    flow_partial_note:
+      'Partial cancellation: mismatch volume keeps some uncancelled exposure, so rely on the actual selected-hour DPPA payment.',
     details_evn_label: 'Payment to EVN per kWh of factory load',
     details_evn_matched: 'Matched market slice',
     details_evn_dppa_network: 'DPPA network charge',
@@ -84,7 +89,8 @@ export const STRINGS = {
     role_retail_title: 'Shortfall kWh still bought at retail tariff',
     fmp_cancel_title: 'FMP cancellation — per kWh on factory load',
     fmp_cancel_context_selected: 'Selected graph FMP:',
-    fmp_cancel_context_note: 'Boxes below are load-normalized contributions, so they can be smaller than the raw graph FMP.',
+    fmp_cancel_context_note:
+      'Boxes below are load-normalized contributions, so they can be smaller than the raw graph FMP.',
     fmp_cancel_net_label: 'net cost / kWh',
     fmp_cancel_owner_default: 'Net',
     netterm_loss_adj: 'Loss adj.',
@@ -101,8 +107,10 @@ export const STRINGS = {
     param_pct_suffix: '/yr',
     param_fmp_flat: 'FMP flat',
     param_rep_day: 'Rep. day × 365',
-    warning_excess_risk_template: 'Warning: {scenario} currently settles more contracted energy than matched consumption. This is the overgeneration risk your CFO should watch.',
-    warning_expensive: 'Current setup is more expensive than the no-DPPA baseline because either strike is high, DPPA charge is large, or matched volume is too low.',
+    warning_excess_risk_template:
+      'Warning: {scenario} currently settles more contracted energy than matched consumption. This is the overgeneration risk your CFO should watch.',
+    warning_expensive:
+      'Current setup is more expensive than the no-DPPA baseline because either strike is high, DPPA charge is large, or matched volume is too low.',
     theme_presenter_toggle: 'Presenter theme',
     theme_presenter_toggle_aria: 'Toggle presenter theme',
     tour_back: 'Back',
@@ -122,22 +130,28 @@ export const STRINGS = {
     tour_step_hour_title: 'Inspect each hour',
     tour_step_hour_body: 'Step through hourly matching.',
     teach_m1_title: 'M1 — The baseline',
-    teach_m1_annotation: 'This is Song Hong Garment Co.’s load today. Point at the midday hours — that is what EVN bills at TOU rates.',
+    teach_m1_annotation:
+      'This is Song Hong Garment Co.’s load today. Point at the midday hours — that is what EVN bills at TOU rates.',
     teach_m1_expected: 'Baseline BAU bill: ~11,020 million VND/month.',
     teach_m2_title: 'M2 — The five-line bill',
-    teach_m2_annotation: 'Five lines assemble into one bill. Read each line’s VND amount off the panel as the Sankey slide names it.',
+    teach_m2_annotation:
+      'Five lines assemble into one bill. Read each line’s VND amount off the panel as the Sankey slide names it.',
     teach_m2_expected: 'C_EVN 8,563m + CfD 500m = C_KH 9,063 million VND/month.',
     teach_m3_title: 'M3 — The lock (CfD sign flip)',
-    teach_m3_annotation: 'Drag the market-price slider up past 1,250 (the strike) live — watch the CfD line flip from a factory top-up to a developer payment.',
-    teach_m3_expected: 'Below strike: CfD +500m (factory pays). Above strike: CfD flips negative (developer pays).',
+    teach_m3_annotation:
+      'Drag the market-price slider up past 1,250 (the strike) live — watch the CfD line flip from a factory top-up to a developer payment.',
+    teach_m3_expected:
+      'Below strike: CfD +500m (factory pays). Above strike: CfD flips negative (developer pays).',
     teach_m4_title: 'M4 — Three doors (developer economics)',
-    teach_m4_annotation: 'This cumulative view is the buyer-gate check: does the DPPA line ever cross below the BAU line?',
+    teach_m4_annotation:
+      'This cumulative view is the buyer-gate check: does the DPPA line ever cross below the BAU line?',
     teach_m4_expected: 'Read the crossover year off the multi-year panel.',
     teach_m5_title: 'M5 — Verify the hand-compute',
     teach_m5_annotation: 'Participants: check your worksheet totals against this panel now.',
     teach_m5_expected: 'Matches the worksheet answer key exactly (spine-s1.json).',
     teach_m6_title: 'M6 — Levers (strike sensitivity)',
-    teach_m6_annotation: 'Lower the strike live — show how much the CfD line (and the total) moves. That is lever #1.',
+    teach_m6_annotation:
+      'Lower the strike live — show how much the CfD line (and the total) moves. That is lever #1.',
     teach_m6_expected: 'Lower strike narrows or reverses the CfD top-up.',
   },
   vi: {

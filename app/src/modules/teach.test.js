@@ -33,8 +33,12 @@ describe('teach mode', () => {
 
     const banner = document.querySelector('#teachBanner')
     expect(banner).not.toBeNull()
-    expect(banner.querySelector('.teach-step-counter').textContent).toContain(`1/${teachSteps.length}`)
-    expect(banner.querySelector('.teach-step-counter').textContent).toContain(STRINGS.en[teachSteps[0].titleKey])
+    expect(banner.querySelector('.teach-step-counter').textContent).toContain(
+      `1/${teachSteps.length}`,
+    )
+    expect(banner.querySelector('.teach-step-counter').textContent).toContain(
+      STRINGS.en[teachSteps[0].titleKey],
+    )
 
     const strikeInput = document.querySelector('#strikePrice')
     expect(Number(strikeInput.value)).toBe(teachSteps[0].controls.strikePrice)
@@ -45,12 +49,16 @@ describe('teach mode', () => {
     initTeachMode()
 
     document.querySelector('#teachNext').click()
-    expect(document.querySelector('.teach-step-counter').textContent).toContain(`2/${teachSteps.length}`)
+    expect(document.querySelector('.teach-step-counter').textContent).toContain(
+      `2/${teachSteps.length}`,
+    )
 
     for (let i = 0; i < teachSteps.length - 1; i++) {
       document.querySelector('#teachNext').click()
     }
-    expect(document.querySelector('.teach-step-counter').textContent).toContain(`1/${teachSteps.length}`)
+    expect(document.querySelector('.teach-step-counter').textContent).toContain(
+      `1/${teachSteps.length}`,
+    )
   })
 
   it('goes back to the previous step, wrapping to the last one', () => {
@@ -58,6 +66,8 @@ describe('teach mode', () => {
     initTeachMode()
 
     document.querySelector('#teachPrev').click()
-    expect(document.querySelector('.teach-step-counter').textContent).toContain(`${teachSteps.length}/${teachSteps.length}`)
+    expect(document.querySelector('.teach-step-counter').textContent).toContain(
+      `${teachSteps.length}/${teachSteps.length}`,
+    )
   })
 })

@@ -13,7 +13,7 @@
     "predeploy": "npm run lint && npm test && npm run e2e && npm run build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write src",
+    "format": "prettier --write src e2e scripts",
     "record:demos": "node scripts/record-teach-demos.mjs",
     "export:sweep": "node scripts/export-sweep.mjs",
     "i18n:report": "node scripts/i18n-report.mjs",

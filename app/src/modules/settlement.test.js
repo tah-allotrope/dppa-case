@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { buildFiveLineBill, buildFormulaBreakdown, buildSelectedWalkthroughCase, buildWalkthroughCases, calculateSettlement, classifyInterval, projectMultiYear } from './settlement'
+import {
+  buildFiveLineBill,
+  buildFormulaBreakdown,
+  buildSelectedWalkthroughCase,
+  buildWalkthroughCases,
+  calculateSettlement,
+  classifyInterval,
+  projectMultiYear,
+} from './settlement'
 
 describe('calculateSettlement', () => {
   it('reproduces the simple matched case from the report logic', () => {
@@ -61,13 +69,16 @@ describe('calculateSettlement', () => {
       retailTariff: 1833,
     })
 
-    const breakdown = buildFormulaBreakdown({
-      strikePrice: 1741.35,
-      marketPrice: 1700,
-      dppaCharge: 523.34,
-      lossFactor: 1.027263,
-      retailTariff: 1833,
-    }, result.intervals[0])
+    const breakdown = buildFormulaBreakdown(
+      {
+        strikePrice: 1741.35,
+        marketPrice: 1700,
+        dppaCharge: 523.34,
+        lossFactor: 1.027263,
+        retailTariff: 1833,
+      },
+      result.intervals[0],
+    )
 
     expect(breakdown.bauCost).toBe(9165000)
     expect(breakdown.dppaCost).toBeCloseTo(result.intervals[0].total, 5)
@@ -111,13 +122,16 @@ describe('calculateSettlement', () => {
       retailTariff: 1833,
     })
 
-    const breakdown = buildFormulaBreakdown({
-      strikePrice: 1741.35,
-      marketPrice: 1700,
-      dppaCharge: 523.34,
-      lossFactor: 1.027263,
-      retailTariff: 1833,
-    }, result.intervals[0])
+    const breakdown = buildFormulaBreakdown(
+      {
+        strikePrice: 1741.35,
+        marketPrice: 1700,
+        dppaCharge: 523.34,
+        lossFactor: 1.027263,
+        retailTariff: 1833,
+      },
+      result.intervals[0],
+    )
 
     expect(breakdown.cleanCancellation).toBe(false)
     expect(breakdown.mismatchVolume).toBe(2500)
@@ -147,7 +161,11 @@ describe('calculateSettlement', () => {
     const cases = buildWalkthroughCases(inputs, result.intervals)
 
     expect(cases).toHaveLength(3)
-    expect(cases.map((item) => item.classification.key)).toEqual(['shortfall', 'balanced', 'excess'])
+    expect(cases.map((item) => item.classification.key)).toEqual([
+      'shortfall',
+      'balanced',
+      'excess',
+    ])
     expect(cases[0].caseLabel).toBe('Load > Gen')
     expect(cases[1].caseLabel).toBe('Load = Gen')
     expect(cases[2].caseLabel).toBe('Load < Gen')
@@ -212,7 +230,11 @@ describe('calculateSettlement', () => {
       lossFactor: 1.0342,
       retailTariff: 2204,
     }
-    const result = projectMultiYear(inputs, { years: 3, evnEscalation: 0.04, strikeEscalation: 0.04 })
+    const result = projectMultiYear(inputs, {
+      years: 3,
+      evnEscalation: 0.04,
+      strikeEscalation: 0.04,
+    })
 
     // Year 1: factor = 1.0^0 = 1, so no change
     expect(result.yearlyData[0].retailTariff).toBeCloseTo(2204, 4)
@@ -277,17 +299,20 @@ describe('calculateSettlement', () => {
   })
 
   it('reproduces corrected July deck Workshop 1 five-line bill', () => {
-    const bill = buildFiveLineBill({
-      fmp: 1150,
-      strikePrice: 1250,
-      serviceFee: 360,
-      clearingFee: 163.3,
-      lossFactorPrecise: 1.026 * 1.008,
-      retailTariff: 2204,
-    }, {
-      contracted: 5000000,
-      total: 5000000,
-    })
+    const bill = buildFiveLineBill(
+      {
+        fmp: 1150,
+        strikePrice: 1250,
+        serviceFee: 360,
+        clearingFee: 163.3,
+        lossFactorPrecise: 1.026 * 1.008,
+        retailTariff: 2204,
+      },
+      {
+        contracted: 5000000,
+        total: 5000000,
+      },
+    )
 
     expect(bill.lines.marketEnergy).toBe(5946696000)
     expect(bill.lines.systemService).toBe(1800000000)
@@ -301,17 +326,20 @@ describe('calculateSettlement', () => {
   })
 
   it('reproduces corrected July deck Workshop 2 five-line bill', () => {
-    const bill = buildFiveLineBill({
-      fmp: 1600,
-      strikePrice: 1500,
-      serviceFee: 360,
-      clearingFee: 163.3,
-      lossFactorPrecise: 1.026 * 1.008,
-      retailTariff: 2204,
-    }, {
-      contracted: 8000000,
-      total: 9000000,
-    })
+    const bill = buildFiveLineBill(
+      {
+        fmp: 1600,
+        strikePrice: 1500,
+        serviceFee: 360,
+        clearingFee: 163.3,
+        lossFactorPrecise: 1.026 * 1.008,
+        retailTariff: 2204,
+      },
+      {
+        contracted: 8000000,
+        total: 9000000,
+      },
+    )
 
     expect(bill.lines.marketEnergy).toBe(13237862400)
     expect(bill.lines.systemService).toBe(2880000000)
@@ -325,17 +353,20 @@ describe('calculateSettlement', () => {
   })
 
   it('reproduces Workshop 3 excess/over-generation five-line bill', () => {
-    const bill = buildFiveLineBill({
-      fmp: 1100,
-      strikePrice: 1250,
-      serviceFee: 360,
-      clearingFee: 163.3,
-      lossFactorPrecise: 1.026 * 1.008,
-      retailTariff: 2204,
-    }, {
-      contracted: 5000000,
-      total: 5000000,
-    })
+    const bill = buildFiveLineBill(
+      {
+        fmp: 1100,
+        strikePrice: 1250,
+        serviceFee: 360,
+        clearingFee: 163.3,
+        lossFactorPrecise: 1.026 * 1.008,
+        retailTariff: 2204,
+      },
+      {
+        contracted: 5000000,
+        total: 5000000,
+      },
+    )
 
     expect(bill.lines.marketEnergy).toBe(5688144000)
     expect(bill.lines.systemService).toBe(1800000000)

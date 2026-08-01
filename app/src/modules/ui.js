@@ -2,7 +2,6 @@ import { formatMoney, formatNumber } from './formatters'
 import { renderCancellationFlow } from './flow-diagram'
 import { t } from './i18n'
 
-
 function compactPill(label, value, tone = 'default') {
   return `
     <div class="summary-pill ${tone}">
@@ -30,23 +29,24 @@ function paymentEquation(label, rate, quantityText, amount, formula, tone = 'def
 
 function roleMeta() {
   return {
-    shown:  { cls: 'cancel-term-shown', sign: '+', title: t('role_shown_title') },
+    shown: { cls: 'cancel-term-shown', sign: '+', title: t('role_shown_title') },
     cancel: { cls: 'cancel-term-cancel', sign: '', title: t('role_cancel_title') },
     strike: { cls: 'cancel-term-strike', sign: '+', title: t('role_strike_title') },
     charge: { cls: 'cancel-term-charge', sign: '+', title: t('role_charge_title') },
-    loss:   { cls: 'cancel-term-loss', sign: '+', title: t('role_loss_title') },
+    loss: { cls: 'cancel-term-loss', sign: '+', title: t('role_loss_title') },
     retail: { cls: 'cancel-term-retail', sign: '+', title: t('role_retail_title') },
   }
 }
 
 function fmpCancelStrip(steps, resultValue, currency, selectedFmp) {
   const roleMetaMap = roleMeta()
-  const terms = steps.map((step) => {
-    const meta = roleMetaMap[step.role] || roleMetaMap.loss
-    const valueStr = formatMoney(Math.abs(step.value), { currency, precise: true, perKwh: true })
-    const sign = step.role === 'cancel' ? '−' : (meta.sign || '+')
-    const crossed = step.role === 'shown' || step.role === 'cancel' ? ' cancel-term-crossed' : ''
-    return `
+  const terms = steps
+    .map((step) => {
+      const meta = roleMetaMap[step.role] || roleMetaMap.loss
+      const valueStr = formatMoney(Math.abs(step.value), { currency, precise: true, perKwh: true })
+      const sign = step.role === 'cancel' ? '−' : meta.sign || '+'
+      const crossed = step.role === 'shown' || step.role === 'cancel' ? ' cancel-term-crossed' : ''
+      return `
       <span class="cancel-eq-term ${meta.cls}${crossed}" title="${meta.title}">
         <span class="cancel-eq-owner">${step.owner || t('fmp_cancel_owner_default')}</span>
         <span class="cancel-eq-sign">${sign}</span>
@@ -54,7 +54,8 @@ function fmpCancelStrip(steps, resultValue, currency, selectedFmp) {
         <span class="cancel-eq-label">${step.label}</span>
       </span>
     `
-  }).join('<span class="cancel-eq-separator"></span>')
+    })
+    .join('<span class="cancel-eq-separator"></span>')
 
   return `
     <div class="fmp-cancel-strip">
@@ -88,7 +89,8 @@ function buildNetEquations(item, formulas, currency) {
   const fmtN = (v) => formatNumber(v)
   const fmtT = (v) => formatMoney(v, { currency })
   const kppFig = item.lossFactor != null ? item.lossFactor.toFixed(3) : '1.000'
-  const lossAmount = formulas?.evnLossCharge ?? Math.max(item.evnMarket - item.matched * item.fmp, 0)
+  const lossAmount =
+    formulas?.evnLossCharge ?? Math.max(item.evnMarket - item.matched * item.fmp, 0)
 
   const visibleTerms = [
     item.matched > 0
@@ -98,17 +100,21 @@ function buildNetEquations(item, formulas, currency) {
       ? netTerm(`CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`, 'retained')
       : '',
     Math.min(item.matched, item.contractQuantity) > 0
-      ? netTerm(`− FMP (${fmt(item.fmp)}) × ${fmtN(Math.min(item.matched, item.contractQuantity))} kWh`, 'cancelled')
+      ? netTerm(
+          `− FMP (${fmt(item.fmp)}) × ${fmtN(Math.min(item.matched, item.contractQuantity))} kWh`,
+          'cancelled',
+        )
       : '',
     item.contractQuantity > 0
-      ? netTerm(`Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`, 'retained')
+      ? netTerm(
+          `Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`,
+          'retained',
+        )
       : '',
     item.shortfall > 0
       ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained')
       : '',
-    lossAmount > 0
-      ? netTerm(`${t('netterm_loss_adj')} ${fmtT(lossAmount)}`, 'retained')
-      : '',
+    lossAmount > 0 ? netTerm(`${t('netterm_loss_adj')} ${fmtT(lossAmount)}`, 'retained') : '',
   ]
 
   const retainedTerms = [
@@ -116,21 +122,24 @@ function buildNetEquations(item, formulas, currency) {
       ? netTerm(`CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`, 'retained')
       : '',
     item.contractQuantity > 0
-      ? netTerm(`Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`, 'retained')
+      ? netTerm(
+          `Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`,
+          'retained',
+        )
       : '',
     item.shortfall > 0
       ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained')
       : '',
-    lossAmount > 0
-      ? netTerm(`${t('netterm_loss_adj')} ${fmtT(lossAmount)}`, 'retained')
-      : '',
+    lossAmount > 0 ? netTerm(`${t('netterm_loss_adj')} ${fmtT(lossAmount)}`, 'retained') : '',
   ]
 
   return {
     expanded: joinNetTerms(visibleTerms),
     simplified: joinNetTerms(retainedTerms),
     showExpanded: visibleTerms.filter(Boolean).length > 0,
-    showSimplified: retainedTerms.filter(Boolean).length > 0 && joinNetTerms(visibleTerms) !== joinNetTerms(retainedTerms),
+    showSimplified:
+      retainedTerms.filter(Boolean).length > 0 &&
+      joinNetTerms(visibleTerms) !== joinNetTerms(retainedTerms),
   }
 }
 
@@ -146,9 +155,10 @@ function walkthroughCaseCard(item, currency, formulas) {
   const dppachargeFig = fmt(item.dppaCharge)
   const retailFig = fmt(item.retailTariff)
 
-  const evnFormula = item.shortfall > 0
-    ? `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh + Retail (${retailFig}) × ${fmtN(item.shortfall)} kWh`
-    : `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh`
+  const evnFormula =
+    item.shortfall > 0
+      ? `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh + Retail (${retailFig}) × ${fmtN(item.shortfall)} kWh`
+      : `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh`
 
   const netTotal = item.evnAmount + item.cfdAmount
   const developerFormula = `− FMP (${fmpFig}) × ${fmtN(item.contractQuantity)} kWh + Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`
@@ -374,13 +384,17 @@ export function renderFiveLineBill(container, bill, currency, scenario) {
       </div>
       <p class="five-line-caption">${t('bill_caption')}</p>
       <div class="five-line-table">
-        ${lines.map(([idx, label, value]) => `
+        ${lines
+          .map(
+            ([idx, label, value]) => `
           <div class="five-line-row">
             <span>${idx}</span>
             <strong>${label}</strong>
             <b>${fmt(value)}</b>
           </div>
-        `).join('')}
+        `,
+          )
+          .join('')}
         <div class="five-line-row subtotal">
           <span></span>
           <strong>${t('bill_cevn')}</strong>
@@ -410,9 +424,15 @@ export function renderWalkthroughCases(container, selectedCase, currency, formul
     container.innerHTML = ''
     return
   }
-  const strip = formulas && formulas.fmpCancellationSteps
-    ? fmpCancelStrip(formulas.fmpCancellationSteps, formulas.dppaUnitCost, currency, formulas.marketPrice)
-    : ''
+  const strip =
+    formulas && formulas.fmpCancellationSteps
+      ? fmpCancelStrip(
+          formulas.fmpCancellationSteps,
+          formulas.dppaUnitCost,
+          currency,
+          formulas.marketPrice,
+        )
+      : ''
   container.innerHTML = walkthroughCaseCard(selectedCase, currency, formulas) + strip
 }
 
@@ -426,16 +446,13 @@ export function renderFormulas(result, warningText, currency) {
     container.classList.add('cancellation-flow')
   }
 
-  const note = result.cleanCancellation
-    ? t('flow_clean_note')
-    : t('flow_partial_note')
+  const note = result.cleanCancellation ? t('flow_clean_note') : t('flow_partial_note')
   const warningSuffix = warningText ? ` ${warningText}` : ''
   const noteNode = document.querySelector('#cancellationFlowNote')
   if (noteNode) noteNode.textContent = `${note}${warningSuffix}`
 
   return { flowHtml, kind: result.cleanCancellation ? 'clean' : 'partial' }
 }
-
 
 export function renderSelectedHourDetails(container, interval, currency, inputs) {
   const evnUnitCost = interval.load > 0 ? interval.evnTotal / interval.load : 0
@@ -449,15 +466,23 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
         <div class="payment-stack">
           ${paymentEquation(
             t('details_evn_matched'),
-            formatMoney(interval.load > 0 ? interval.evnMarket / interval.load : 0, { currency, precise: true, perKwh: true }),
+            formatMoney(interval.load > 0 ? interval.evnMarket / interval.load : 0, {
+              currency,
+              precise: true,
+              perKwh: true,
+            }),
             `${formatNumber(interval.matched)} matched kWh`,
-             formatMoney(interval.evnMarket, { currency }),
+            formatMoney(interval.evnMarket, { currency }),
             `${formatNumber(interval.matched)} / ${formatNumber(interval.load)} x ${formatMoney(intervalFmp * inputs.lossFactor, { currency, precise: true, perKwh: true })}`,
             'evn',
           )}
           ${paymentEquation(
             t('details_evn_dppa_network'),
-            formatMoney(interval.load > 0 ? interval.evnDppa / interval.load : 0, { currency, precise: true, perKwh: true }),
+            formatMoney(interval.load > 0 ? interval.evnDppa / interval.load : 0, {
+              currency,
+              precise: true,
+              perKwh: true,
+            }),
             `${formatNumber(interval.matched)} matched kWh`,
             formatMoney(interval.evnDppa, { currency }),
             `${formatNumber(interval.matched)} / ${formatNumber(interval.load)} x ${formatMoney(inputs.dppaCharge, { currency, precise: true, perKwh: true })}`,
@@ -465,7 +490,11 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
           )}
           ${paymentEquation(
             t('details_evn_shortfall'),
-            formatMoney(interval.load > 0 ? interval.evnRetail / interval.load : 0, { currency, precise: true, perKwh: true }),
+            formatMoney(interval.load > 0 ? interval.evnRetail / interval.load : 0, {
+              currency,
+              precise: true,
+              perKwh: true,
+            }),
             `${formatNumber(interval.shortfall)} shortfall kWh`,
             formatMoney(interval.evnRetail, { currency }),
             `${formatNumber(interval.shortfall)} / ${formatNumber(interval.load)} x ${formatMoney(inputs.retailTariff, { currency, precise: true, perKwh: true })}`,
@@ -484,8 +513,8 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
           ${paymentEquation(
             t('details_dev_cfd'),
             formatMoney(developerUnitCost, { currency, precise: true, perKwh: true, signed: true }),
-             `${formatNumber(interval.contractQuantity)} contracted kWh`,
-             formatMoney(interval.developer, { currency, signed: true }),
+            `${formatNumber(interval.contractQuantity)} contracted kWh`,
+            formatMoney(interval.developer, { currency, signed: true }),
             `${formatNumber(interval.contractQuantity)} / ${formatNumber(interval.load)} x (${formatMoney(inputs.strikePrice, { currency, precise: true, perKwh: true })} - ${formatMoney(intervalFmp, { currency, precise: true, perKwh: true })})`,
             'developer',
           )}
@@ -501,14 +530,28 @@ export function renderSelectedHourDetails(container, interval, currency, inputs)
 }
 
 export function updateControlOutputs(state, settlementModes, currency) {
-  document.querySelector('[data-output="strikePrice"]').textContent = formatMoney(state.strikePrice, { currency, precise: true, perKwh: true })
-  document.querySelector('[data-output="marketPrice"]').textContent = formatMoney(state.marketPrice, { currency, precise: true, perKwh: true })
-  document.querySelector('[data-output="dppaCharge"]').textContent = formatMoney(state.dppaCharge, { currency, precise: true, perKwh: true })
+  document.querySelector('[data-output="strikePrice"]').textContent = formatMoney(
+    state.strikePrice,
+    { currency, precise: true, perKwh: true },
+  )
+  document.querySelector('[data-output="marketPrice"]').textContent = formatMoney(
+    state.marketPrice,
+    { currency, precise: true, perKwh: true },
+  )
+  document.querySelector('[data-output="dppaCharge"]').textContent = formatMoney(state.dppaCharge, {
+    currency,
+    precise: true,
+    perKwh: true,
+  })
   document.querySelector('[data-output="lossFactor"]').textContent = state.lossFactor.toFixed(3)
   const activeMode = settlementModes.find((mode) => mode.value === state.settlementMode)
-  document.querySelector('[data-output="settlementMode"]').textContent = activeMode ? activeMode.label : state.settlementMode
-  document.querySelector('[data-output="evnEscalation"]').textContent = `${(state.evnEscalation * 100).toFixed(1)}%/yr`
-  document.querySelector('[data-output="strikeEscalation"]').textContent = `${(state.strikeEscalation * 100).toFixed(1)}%/yr`
+  document.querySelector('[data-output="settlementMode"]').textContent = activeMode
+    ? activeMode.label
+    : state.settlementMode
+  document.querySelector('[data-output="evnEscalation"]').textContent =
+    `${(state.evnEscalation * 100).toFixed(1)}%/yr`
+  document.querySelector('[data-output="strikeEscalation"]').textContent =
+    `${(state.strikeEscalation * 100).toFixed(1)}%/yr`
   document.querySelector('[data-output="horizonYears"]').textContent = `${state.horizonYears} yr`
 }
 
@@ -521,8 +564,10 @@ export function renderMultiYearPanel(multiYear, currency) {
   const { rollups, crossoverYear, years, evnEscalation, strikeEscalation } = multiYear
   const fmt = (v) => formatMoney(v, { currency })
   const fmtPct = (v) => `${(v * 100).toFixed(1)}%`
-  const savTone = (s) => s > 0 ? 'result' : s < 0 ? 'warning' : 'default'
-  const crossoverText = crossoverYear ? `${t('crossover_year_prefix')} ${crossoverYear}` : `${t('crossover_gt_prefix')} ${years} ${t('crossover_gt_suffix')}`
+  const savTone = (s) => (s > 0 ? 'result' : s < 0 ? 'warning' : 'default')
+  const crossoverText = crossoverYear
+    ? `${t('crossover_year_prefix')} ${crossoverYear}`
+    : `${t('crossover_gt_prefix')} ${years} ${t('crossover_gt_suffix')}`
 
   if (titleEl) titleEl.textContent = t('multiyear_title_template').replace('{years}', years)
 

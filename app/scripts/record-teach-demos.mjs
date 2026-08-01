@@ -22,8 +22,14 @@ const MIN_BYTES = 20 * 1024
 
 function run(cmd, args, opts = {}) {
   return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, { stdio: 'inherit', shell: process.platform === 'win32', ...opts })
-    child.on('exit', (code) => (code === 0 ? resolve() : reject(new Error(`${cmd} ${args.join(' ')} exited ${code}`))))
+    const child = spawn(cmd, args, {
+      stdio: 'inherit',
+      shell: process.platform === 'win32',
+      ...opts,
+    })
+    child.on('exit', (code) =>
+      code === 0 ? resolve() : reject(new Error(`${cmd} ${args.join(' ')} exited ${code}`)),
+    )
     child.on('error', reject)
   })
 }
@@ -38,7 +44,8 @@ function waitForServer(url, timeoutMs = 20000) {
       } catch {
         // server not up yet
       }
-      if (Date.now() - start > timeoutMs) return reject(new Error(`Server at ${url} did not respond within ${timeoutMs}ms`))
+      if (Date.now() - start > timeoutMs)
+        return reject(new Error(`Server at ${url} did not respond within ${timeoutMs}ms`))
       setTimeout(attempt, 300)
     }
     attempt()
@@ -47,7 +54,19 @@ function waitForServer(url, timeoutMs = 20000) {
 
 export function convertToMp4(webmPath, mp4Path, posterPath) {
   return new Promise((resolve, reject) => {
-    const transcodeArgs = ['-y', '-i', webmPath, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '30', '-an', mp4Path]
+    const transcodeArgs = [
+      '-y',
+      '-i',
+      webmPath,
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      '-r',
+      '30',
+      '-an',
+      mp4Path,
+    ]
     const transcode = spawn(ffmpegPath, transcodeArgs)
     let transcodeErr = ''
     transcode.stderr.on('data', (chunk) => (transcodeErr += chunk))
@@ -57,13 +76,26 @@ export function convertToMp4(webmPath, mp4Path, posterPath) {
       // Seek 2s from end-of-file rather than grabbing frame 0: the first
       // frame of every clip is captured mid-navigation/scroll and renders
       // near-blank, producing tiny, visually useless posters.
-      const posterArgs = ['-y', '-sseof', '-2', '-i', mp4Path, '-update', '1', '-frames:v', '1', posterPath]
+      const posterArgs = [
+        '-y',
+        '-sseof',
+        '-2',
+        '-i',
+        mp4Path,
+        '-update',
+        '1',
+        '-frames:v',
+        '1',
+        posterPath,
+      ]
       const poster = spawn(ffmpegPath, posterArgs)
       let posterErr = ''
       poster.stderr.on('data', (chunk) => (posterErr += chunk))
       poster.on('error', reject)
       poster.on('exit', (posterCode) =>
-        posterCode === 0 ? resolve() : reject(new Error(`ffmpeg poster extraction failed (${posterCode}): ${posterErr}`)),
+        posterCode === 0
+          ? resolve()
+          : reject(new Error(`ffmpeg poster extraction failed (${posterCode}): ${posterErr}`)),
       )
     })
   })
@@ -123,10 +155,14 @@ async function main() {
   await run('npm', ['run', 'build'], { cwd: APP_ROOT })
 
   console.log(`Starting preview server on port ${PORT}...`)
-  const preview = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--port', String(PORT)], {
-    cwd: APP_ROOT,
-    shell: process.platform === 'win32',
-  })
+  const preview = spawn(
+    'npm',
+    ['run', 'preview', '--', '--host', '127.0.0.1', '--port', String(PORT)],
+    {
+      cwd: APP_ROOT,
+      shell: process.platform === 'win32',
+    },
+  )
   preview.stdout.on('data', () => {})
   preview.stderr.on('data', () => {})
 
@@ -137,7 +173,9 @@ async function main() {
     try {
       for (let stepIndex = 0; stepIndex < teachSteps.length; stepIndex += 1) {
         const moduleNum = stepIndex + 1
-        console.log(`Recording step ${moduleNum}/${teachSteps.length}: ${STRINGS.en[teachSteps[stepIndex].titleKey]}`)
+        console.log(
+          `Recording step ${moduleNum}/${teachSteps.length}: ${STRINGS.en[teachSteps[stepIndex].titleKey]}`,
+        )
         const webmPath = await recordStep(browser, stepIndex, TMP_DIR)
         const mp4Path = join(OUT_DIR, `teach-m${moduleNum}.mp4`)
         const posterPath = join(OUT_DIR, `teach-m${moduleNum}-poster.png`)

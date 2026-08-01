@@ -14,7 +14,16 @@ import { convertMoney, formatMoney, EXCHANGE_RATE } from './formatters'
 // PHASE-04: explicit registration instead of chart.js/auto trims the bundle to
 // only the line-chart building blocks this app actually renders (both charts
 // are `type: 'line'`; no bar/pie/radar chart is used anywhere).
-Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, Filler)
+Chart.register(
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Tooltip,
+  Legend,
+  Filler,
+)
 
 let profileChart
 let multiYearChart
@@ -48,13 +57,69 @@ const tickColor = '#bcd5ff'
 // retail tariff input rather than time-of-use tariff settlement.
 // startHour/endHour map to the 0-23 hour axis.
 const TARIFF_BANDS = [
-  { label: 'Off-peak',  time: '10 pm – 4 am',     startHour: 0,  endHour: 4,  fill: 'rgba(71,215,255,0.06)',   lineColor: 'rgba(71,215,255,0.40)',  textColor: '#47d7ff' },
-  { label: 'Standard',  time: '4 am – 9:30 am',    startHour: 4,  endHour: 9,  fill: 'rgba(255,216,79,0.05)',    lineColor: 'rgba(255,216,79,0.40)',   textColor: '#ffd84f' },
-  { label: 'Peak',      time: '9:30 am – 11:30 am', startHour: 9,  endHour: 11, fill: 'rgba(255,104,216,0.07)',   lineColor: 'rgba(255,104,216,0.45)',  textColor: '#ff68d8' },
-  { label: 'Standard',  time: '11:30 am – 5 pm',   startHour: 11, endHour: 17, fill: 'rgba(255,216,79,0.05)',    lineColor: 'rgba(255,216,79,0.40)',   textColor: '#ffd84f' },
-  { label: 'Peak',      time: '5 pm – 8 pm',        startHour: 17, endHour: 20, fill: 'rgba(255,104,216,0.07)',   lineColor: 'rgba(255,104,216,0.45)',  textColor: '#ff68d8' },
-  { label: 'Standard',  time: '8 pm – 10 pm',       startHour: 20, endHour: 22, fill: 'rgba(255,216,79,0.05)',    lineColor: 'rgba(255,216,79,0.40)',   textColor: '#ffd84f' },
-  { label: 'Off-peak',  time: '10 pm – 12 am',      startHour: 22, endHour: 24, fill: 'rgba(71,215,255,0.06)',   lineColor: 'rgba(71,215,255,0.40)',  textColor: '#47d7ff' },
+  {
+    label: 'Off-peak',
+    time: '10 pm – 4 am',
+    startHour: 0,
+    endHour: 4,
+    fill: 'rgba(71,215,255,0.06)',
+    lineColor: 'rgba(71,215,255,0.40)',
+    textColor: '#47d7ff',
+  },
+  {
+    label: 'Standard',
+    time: '4 am – 9:30 am',
+    startHour: 4,
+    endHour: 9,
+    fill: 'rgba(255,216,79,0.05)',
+    lineColor: 'rgba(255,216,79,0.40)',
+    textColor: '#ffd84f',
+  },
+  {
+    label: 'Peak',
+    time: '9:30 am – 11:30 am',
+    startHour: 9,
+    endHour: 11,
+    fill: 'rgba(255,104,216,0.07)',
+    lineColor: 'rgba(255,104,216,0.45)',
+    textColor: '#ff68d8',
+  },
+  {
+    label: 'Standard',
+    time: '11:30 am – 5 pm',
+    startHour: 11,
+    endHour: 17,
+    fill: 'rgba(255,216,79,0.05)',
+    lineColor: 'rgba(255,216,79,0.40)',
+    textColor: '#ffd84f',
+  },
+  {
+    label: 'Peak',
+    time: '5 pm – 8 pm',
+    startHour: 17,
+    endHour: 20,
+    fill: 'rgba(255,104,216,0.07)',
+    lineColor: 'rgba(255,104,216,0.45)',
+    textColor: '#ff68d8',
+  },
+  {
+    label: 'Standard',
+    time: '8 pm – 10 pm',
+    startHour: 20,
+    endHour: 22,
+    fill: 'rgba(255,216,79,0.05)',
+    lineColor: 'rgba(255,216,79,0.40)',
+    textColor: '#ffd84f',
+  },
+  {
+    label: 'Off-peak',
+    time: '10 pm – 12 am',
+    startHour: 22,
+    endHour: 24,
+    fill: 'rgba(71,215,255,0.06)',
+    lineColor: 'rgba(71,215,255,0.40)',
+    textColor: '#47d7ff',
+  },
 ]
 
 // Vivid magenta-red for FMP so it is unmistakably distinct from the amber solar line
@@ -73,7 +138,7 @@ function makeTariffPlugin(getState) {
 
       for (const band of TARIFF_BANDS) {
         const x0 = area.left + (band.startHour / totalHours) * w
-        const x1 = area.left + (band.endHour   / totalHours) * w
+        const x1 = area.left + (band.endHour / totalHours) * w
         ctx.save()
         ctx.fillStyle = band.fill
         ctx.fillRect(x0, area.top, x1 - x0, area.bottom - area.top)
@@ -94,7 +159,9 @@ function makeTariffPlugin(getState) {
       if (state.inputs && state.inputs.strikePrice) {
         const yFmpScale = chart.scales['yFmp']
         if (yFmpScale) {
-          const strikeY = yFmpScale.getPixelForValue(convertMoney(state.inputs.strikePrice, state.currency))
+          const strikeY = yFmpScale.getPixelForValue(
+            convertMoney(state.inputs.strikePrice, state.currency),
+          )
           if (strikeY >= area.top && strikeY <= area.bottom) {
             ctx.save()
             ctx.setLineDash([8, 5])
@@ -110,7 +177,11 @@ function makeTariffPlugin(getState) {
             ctx.fillStyle = 'rgba(82, 144, 255, 0.9)'
             ctx.textAlign = 'right'
             ctx.textBaseline = 'bottom'
-            ctx.fillText(`Strike ${formatMoney(state.inputs.strikePrice, { currency: state.currency, precise: state.currency === 'USD' })}`, area.right - 2, strikeY - 2)
+            ctx.fillText(
+              `Strike ${formatMoney(state.inputs.strikePrice, { currency: state.currency, precise: state.currency === 'USD' })}`,
+              area.right - 2,
+              strikeY - 2,
+            )
             ctx.restore()
           }
         }
@@ -139,12 +210,12 @@ function makeTariffPlugin(getState) {
       // that would collide; only keep the band name when space is very tight.
       for (const band of TARIFF_BANDS) {
         const x0 = area.left + (band.startHour / totalHours) * w
-        const x1 = area.left + (band.endHour   / totalHours) * w
+        const x1 = area.left + (band.endHour / totalHours) * w
         const cx = (x0 + x1) / 2
         const bw = x1 - x0 - 4
         // Width thresholds: below 58 px only show the name; below 72 px skip tariff/spot rows
-        const showTime    = bw >= 72
-        const showRates   = bw >= 88 && !!state.inputs
+        const showTime = bw >= 72
+        const showRates = bw >= 88 && !!state.inputs
 
         ctx.save()
         ctx.textAlign = 'center'
@@ -170,7 +241,11 @@ function makeTariffPlugin(getState) {
           // Flat retail reference shown for context only in this v1 teaching model.
           ctx.font = '8px "Segoe UI", sans-serif'
           ctx.fillStyle = band.textColor
-          ctx.fillText(`Illustrative retail: ${formatMoney(state.inputs.retailTariff, { currency: state.currency, precise: state.currency === 'USD' })}`, cx, area.top + 27)
+          ctx.fillText(
+            `Illustrative retail: ${formatMoney(state.inputs.retailTariff, { currency: state.currency, precise: state.currency === 'USD' })}`,
+            cx,
+            area.top + 27,
+          )
 
           // Per-band FMP: use the midpoint hour of this band to read from fmpCurve
           const midHour = Math.floor((band.startHour + band.endHour) / 2)
@@ -178,7 +253,11 @@ function makeTariffPlugin(getState) {
             ? (state.inputs.fmpCurve[midHour] ?? state.inputs.marketPrice)
             : state.inputs.marketPrice
           ctx.fillStyle = FMP_COLOR
-          ctx.fillText(`FMP: ${formatMoney(bandFmp, { currency: state.currency, precise: state.currency === 'USD', perKwh: true })}`, cx, area.top + 38)
+          ctx.fillText(
+            `FMP: ${formatMoney(bandFmp, { currency: state.currency, precise: state.currency === 'USD', perKwh: true })}`,
+            cx,
+            area.top + 38,
+          )
         }
 
         ctx.restore()
@@ -193,10 +272,10 @@ function baseOptions(inputs, currency = 'VND') {
   const fmpCurve = inputs?.fmpCurve ?? []
   const fmpMin = fmpCurve.length ? Math.min(...fmpCurve) : 800
   const fmpMax = fmpCurve.length ? Math.max(...fmpCurve) : 3000
-  let yFmpMin = Math.floor(Math.min(fmpMin, strikePrice) * 0.88 / 100) * 100
-  let yFmpMax = Math.ceil(Math.max(fmpMax, strikePrice) * 1.08 / 100) * 100
+  let yFmpMin = Math.floor((Math.min(fmpMin, strikePrice) * 0.88) / 100) * 100
+  let yFmpMax = Math.ceil((Math.max(fmpMax, strikePrice) * 1.08) / 100) * 100
   if (yFmpMin === yFmpMax) {
-    const pad = Math.max(100, Math.round(strikePrice * 0.1 / 100) * 100)
+    const pad = Math.max(100, Math.round((strikePrice * 0.1) / 100) * 100)
     yFmpMin -= pad
     yFmpMax += pad
   }
@@ -245,15 +324,24 @@ function baseOptions(inputs, currency = 'VND') {
   }
 }
 
-export function renderProfileChart(canvas, labels, intervals, selectedHour, onSelect, inputs, currency = 'VND') {
+export function renderProfileChart(
+  canvas,
+  labels,
+  intervals,
+  selectedHour,
+  onSelect,
+  inputs,
+  currency = 'VND',
+) {
   // Shared, module-level state bag read by the plugin on every draw — mutated
   // in place below rather than reassigned, so the plugin's captured closure
   // (set once, at chart creation) always sees the latest values.
   profileChartState.inputs = inputs
   profileChartState.currency = currency
-  const isNarrowViewport = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-    ? window.matchMedia('(max-width: 520px)').matches
-    : false
+  const isNarrowViewport =
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(max-width: 520px)').matches
+      : false
   const basePoint = isNarrowViewport ? 3 : 4
   const selPoint = isNarrowViewport ? 6 : 8
   const baseHover = isNarrowViewport ? 5 : 6
@@ -267,33 +355,33 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
     return [
       {
         label: 'Factory load',
-        data: ivs.map(i => i.load),
+        data: ivs.map((i) => i.load),
         borderColor: '#47d7ff',
         backgroundColor: 'rgba(71,215,255,0.14)',
         fill: true,
         tension: 0.35,
         borderWidth: 3,
-        pointRadius: ivs.map((_, idx) => idx === selHour ? selPoint : basePoint),
-        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? selHover : baseHover),
-        pointBackgroundColor: ivs.map((_, idx) => idx === selHour ? '#c9f7ff' : '#47d7ff'),
+        pointRadius: ivs.map((_, idx) => (idx === selHour ? selPoint : basePoint)),
+        pointHoverRadius: ivs.map((_, idx) => (idx === selHour ? selHover : baseHover)),
+        pointBackgroundColor: ivs.map((_, idx) => (idx === selHour ? '#c9f7ff' : '#47d7ff')),
         yAxisID: 'y',
       },
       {
         label: 'Solar generation',
-        data: ivs.map(i => i.generation),
+        data: ivs.map((i) => i.generation),
         borderColor: '#ffd84f',
         backgroundColor: 'rgba(255,216,79,0.14)',
         fill: true,
         tension: 0.35,
         borderWidth: 3,
-        pointRadius: ivs.map((_, idx) => idx === selHour ? selPoint : basePoint),
-        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? selHover : baseHover),
-        pointBackgroundColor: ivs.map((_, idx) => idx === selHour ? '#fff1b5' : '#ffd84f'),
+        pointRadius: ivs.map((_, idx) => (idx === selHour ? selPoint : basePoint)),
+        pointHoverRadius: ivs.map((_, idx) => (idx === selHour ? selHover : baseHover)),
+        pointBackgroundColor: ivs.map((_, idx) => (idx === selHour ? '#fff1b5' : '#ffd84f')),
         yAxisID: 'y',
       },
       {
         label: 'Matched volume',
-        data: ivs.map(i => i.matched),
+        data: ivs.map((i) => i.matched),
         borderColor: '#f5fbff',
         backgroundColor: 'rgba(245,251,255,0.16)',
         fill: true,
@@ -304,15 +392,15 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
       },
       {
         label: `FMP (${curr}/kWh)`,
-        data: ivs.map(i => convertMoney(i.fmp, curr)),
+        data: ivs.map((i) => convertMoney(i.fmp, curr)),
         borderColor: FMP_COLOR,
         backgroundColor: 'rgba(255,61,127,0)',
         fill: false,
         tension: 0.35,
         borderWidth: 2.5,
         borderDash: [6, 4],
-        pointRadius: ivs.map((_, idx) => idx === selHour ? fmpSel : fmpBase),
-        pointHoverRadius: ivs.map((_, idx) => idx === selHour ? fmpSelHover : fmpBaseHover),
+        pointRadius: ivs.map((_, idx) => (idx === selHour ? fmpSel : fmpBase)),
+        pointHoverRadius: ivs.map((_, idx) => (idx === selHour ? fmpSelHover : fmpBaseHover)),
         pointBackgroundColor: FMP_COLOR,
         yAxisID: 'yFmp',
       },
@@ -342,7 +430,12 @@ export function renderProfileChart(canvas, labels, intervals, selectedHour, onSe
     options: {
       ...baseOptions(inputs, currency),
       onClick: (event) => {
-        const pts = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
+        const pts = profileChart.getElementsAtEventForMode(
+          event,
+          'index',
+          { intersect: false },
+          true,
+        )
         if (pts.length) onSelect(pts[0].index)
       },
     },
@@ -411,7 +504,8 @@ export function renderMultiYearChart(canvas, multiYear, currency) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 200 },
+      animation:
+        typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 200 },
       plugins: {
         legend: { labels: { color: tickColor, usePointStyle: true, boxWidth: 10, boxHeight: 10 } },
         tooltip: {

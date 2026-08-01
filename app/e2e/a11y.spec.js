@@ -1,13 +1,13 @@
-import { test, expect } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
+import { test, expect } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
 
 // Scoped to serious/critical impact only: minor/moderate findings are
 // reported but do not fail, so the gate is adoptable today rather than
 // after a long triage (PHASE-05 TASK-05-05).
-const IMPACTS = ["serious", "critical"];
+const IMPACTS = ['serious', 'critical']
 
 function seriousViolations(results) {
-  return results.violations.filter((v) => IMPACTS.includes(v.impact));
+  return results.violations.filter((v) => IMPACTS.includes(v.impact))
 }
 
 // WebKit's color-contrast axe rule misreports the background of elements
@@ -21,34 +21,34 @@ function seriousViolations(results) {
 // skipped there.
 function skipWebkitPresentThemeContrast(testInfo) {
   test.skip(
-    testInfo.project.name === "webkit-mobile",
+    testInfo.project.name === 'webkit-mobile',
     "WebKit's axe color-contrast sampling misreports backdrop-filter panel backgrounds in the present theme (confirmed correct via direct getComputedStyle inspection)",
-  );
+  )
 }
 
-test("no serious/critical a11y violations on the default view", async ({ page }, testInfo) => {
-  skipWebkitPresentThemeContrast(testInfo);
-  await page.goto("/?present=1");
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(seriousViolations(results)).toEqual([]);
-});
+test('no serious/critical a11y violations on the default view', async ({ page }, testInfo) => {
+  skipWebkitPresentThemeContrast(testInfo)
+  await page.goto('/?present=1')
+  const results = await new AxeBuilder({ page }).analyze()
+  expect(seriousViolations(results)).toEqual([])
+})
 
-test("no serious/critical a11y violations in teach mode", async ({ page }, testInfo) => {
-  skipWebkitPresentThemeContrast(testInfo);
-  await page.goto("/?teach=1");
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(seriousViolations(results)).toEqual([]);
-});
+test('no serious/critical a11y violations in teach mode', async ({ page }, testInfo) => {
+  skipWebkitPresentThemeContrast(testInfo)
+  await page.goto('/?teach=1')
+  const results = await new AxeBuilder({ page }).analyze()
+  expect(seriousViolations(results)).toEqual([])
+})
 
-test("no serious/critical a11y violations with the tour overlay open", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator("#tourOverlay")).toBeVisible();
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(seriousViolations(results)).toEqual([]);
-});
+test('no serious/critical a11y violations with the tour overlay open', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('#tourOverlay')).toBeVisible()
+  const results = await new AxeBuilder({ page }).analyze()
+  expect(seriousViolations(results)).toEqual([])
+})
 
-test("no serious/critical a11y violations with a localized DOM", async ({ page }) => {
-  await page.goto("/?lang=vi");
-  const results = await new AxeBuilder({ page }).analyze();
-  expect(seriousViolations(results)).toEqual([]);
-});
+test('no serious/critical a11y violations with a localized DOM', async ({ page }) => {
+  await page.goto('/?lang=vi')
+  const results = await new AxeBuilder({ page }).analyze()
+  expect(seriousViolations(results)).toEqual([])
+})
