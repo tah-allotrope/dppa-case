@@ -1,7 +1,7 @@
 ---
 title: "October 2026 Readiness Checklist"
 date: "2026-07-11"
-status: "open — a live pre-session checklist: 6 human-blocked register items (H1-H6) are still pending, and every Mid-September, content-freeze, late-September, and day-of item remains unticked as of 2026-07-31"
+status: "abandoned — closed 2026-08-10 by owner directive to unblock nightly planning; NOT complete and still live for the assumed 2026-10-01 session: all 6 human-blocked register items (H1-H6) and every Mid-September, content-freeze, late-September, and day-of item remain outstanding. Track these by hand — the automated backlog no longer surfaces them."
 plan_type: "checklist"
 ---
 

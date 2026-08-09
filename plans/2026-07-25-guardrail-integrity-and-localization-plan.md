@@ -1,7 +1,7 @@
 ---
 title: "Guardrail Integrity, Trilingual App & Pre-Freeze Hardening"
 date: "2026-07-25"
-status: "in-progress - PHASE-01..05 committed and verified (commits 082b5aa..2df2874); PHASE-06 TASK-06-01/02/03 (style unification format pass) committed as 84e5503 on 2026-08-02; TASK-06-05..06-12 still open"
+status: "abandoned — closed 2026-08-10 by owner directive to unblock nightly planning; NOT complete: PHASE-01..05 shipped (082b5aa..2df2874) and TASK-06-01/02/03 landed as 84e5503, but TASK-05-03 (drop continue-on-error from e2e:visual — blocked on human item H6) and TASK-06-04..06-12 (prettier --check gate, eslint scripts/** un-ignore, .js import extensions, root CLAUDE.md, activeContext.md/lessons.md hygiene, learning-record 0005, NOTES.md pointer) remain genuinely unimplemented in the tree"
 request: "Turn research/2026-07-25-guardrail-integrity-and-audience-localization-brainstorm.md into a multi-phase execution plan saved to plans/"
 plan_type: "multi-phase"
 research_inputs:
