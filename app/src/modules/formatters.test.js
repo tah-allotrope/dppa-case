@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { EXCHANGE_RATE, convertMoney, formatMoney } from './formatters'
+import { EXCHANGE_RATE, convertMoney, formatMoney } from './formatters.js'
 
 describe('formatters', () => {
   it('converts VND amounts to USD using the fixed display rate', () => {

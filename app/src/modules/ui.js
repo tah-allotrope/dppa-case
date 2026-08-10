@@ -1,6 +1,6 @@
-import { formatMoney, formatNumber } from './formatters'
-import { renderCancellationFlow } from './flow-diagram'
-import { t } from './i18n'
+import { formatMoney, formatNumber } from './formatters.js'
+import { renderCancellationFlow } from './flow-diagram.js'
+import { t } from './i18n.js'
 
 function compactPill(label, value, tone = 'default') {
   return `

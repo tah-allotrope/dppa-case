@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest'
-import { resolveLang, t, setLang, getActiveLang } from './i18n'
-import { STRINGS } from '../data/strings'
+import { resolveLang, t, setLang, getActiveLang } from './i18n.js'
+import { STRINGS } from '../data/strings.js'
 
 function storageWith(key, value) {
   return {

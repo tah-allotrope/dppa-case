@@ -9,7 +9,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js'
-import { convertMoney, formatMoney, EXCHANGE_RATE } from './formatters'
+import { convertMoney, formatMoney, EXCHANGE_RATE } from './formatters.js'
 
 // PHASE-04: explicit registration instead of chart.js/auto trims the bundle to
 // only the line-chart building blocks this app actually renders (both charts

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { deriveVolumes, scaleProfile, sumVolume } from './profiles'
+import { deriveVolumes, scaleProfile, sumVolume } from './profiles.js'
 import {
   buildFmpCurve,
   buildWorkshopFmpCurve,
   defaultInputs,
   scenarioProfiles,
-} from '../data/default-scenarios'
-import { calculateSettlement } from './settlement'
+} from '../data/default-scenarios.js'
+import { calculateSettlement } from './settlement.js'
 
 describe('scaleProfile', () => {
   it('scales each value by the given factor and rounds to integer', () => {

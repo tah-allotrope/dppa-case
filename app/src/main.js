@@ -8,15 +8,15 @@ import {
   settlementModes,
   buildFmpCurve,
   buildWorkshopFmpCurve,
-} from './data/default-scenarios'
-import { renderMultiYearChart, renderProfileChart } from './modules/chart'
+} from './data/default-scenarios.js'
+import { renderMultiYearChart, renderProfileChart } from './modules/chart.js'
 import {
   buildFiveLineBill,
   buildFormulaBreakdown,
   buildSelectedWalkthroughCase,
   calculateSettlement,
   projectMultiYear,
-} from './modules/settlement'
+} from './modules/settlement.js'
 import {
   renderAppShell,
   renderFiveLineBill,
@@ -27,11 +27,11 @@ import {
   setActiveCurrency,
   setActiveScenario,
   updateControlOutputs,
-} from './modules/ui'
-import { initTeachMode } from './modules/teach'
-import { initTheme } from './modules/theme'
-import { initTour } from './modules/tour'
-import { initI18n, t } from './modules/i18n'
+} from './modules/ui.js'
+import { initTeachMode } from './modules/teach.js'
+import { initTheme } from './modules/theme.js'
+import { initTour } from './modules/tour.js'
+import { initI18n, t } from './modules/i18n.js'
 
 if (navigator.webdriver) {
   // Headless-Chromium's backdrop-filter blur compositing is not pixel-stable

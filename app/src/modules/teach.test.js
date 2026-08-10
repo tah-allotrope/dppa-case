@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { describe, expect, it, beforeEach } from 'vitest'
-import { renderAppShell } from './ui'
-import { scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios'
-import { teachSteps } from '../data/teach-steps'
-import { STRINGS } from '../data/strings'
-import { initTeachMode } from './teach'
+import { renderAppShell } from './ui.js'
+import { scenarioOrder, scenarioProfiles, settlementModes } from '../data/default-scenarios.js'
+import { teachSteps } from '../data/teach-steps.js'
+import { STRINGS } from '../data/strings.js'
+import { initTeachMode } from './teach.js'
 
 function setup(search) {
   document.body.innerHTML = '<div id="app"></div>'

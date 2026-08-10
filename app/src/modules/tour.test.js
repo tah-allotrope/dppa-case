@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from 'vitest'
-import { shouldAutoStartTour } from './tour'
+import { shouldAutoStartTour } from './tour.js'
 describe('tour gating', () => {
   beforeEach(() => localStorage.clear())
   it('honors first visit and mode flags', () => {

@@ -6,21 +6,21 @@ import {
   scenarioOrder,
   scenarioProfiles,
   settlementModes,
-} from '../data/default-scenarios'
-import { formatMoney } from './formatters'
+} from '../data/default-scenarios.js'
+import { formatMoney } from './formatters.js'
 import {
   buildFiveLineBill,
   buildSelectedWalkthroughCase,
   calculateSettlement,
   buildFormulaBreakdown,
-} from './settlement'
+} from './settlement.js'
 import {
   renderAppShell,
   renderFiveLineBill,
   renderFormulas,
   renderSelectedHourDetails,
   renderWalkthroughCases,
-} from './ui'
+} from './ui.js'
 
 function normalizedText(selector) {
   return document.querySelector(selector).textContent.replace(/\s+/g, ' ').trim()

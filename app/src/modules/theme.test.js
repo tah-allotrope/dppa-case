@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from 'vitest'
-import { applyTheme, resolveTheme } from './theme'
+import { applyTheme, resolveTheme } from './theme.js'
 
 describe('theme', () => {
   beforeEach(() => localStorage.clear())

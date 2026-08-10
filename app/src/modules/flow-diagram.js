@@ -1,4 +1,4 @@
-import { formatMoney, formatNumber } from './formatters'
+import { formatMoney, formatNumber } from './formatters.js'
 
 function money(value, opts) {
   return formatMoney(value, opts)

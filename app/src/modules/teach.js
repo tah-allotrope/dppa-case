@@ -1,8 +1,8 @@
 // PHASE-02: presenter-facing step-through ("teach mode") for the six scripted
 // app moments in the Modules 1-6 teaching revamp. Activated only by ?teach=1
 // so normal app UX is untouched without the flag (RISK-02-01 in the plan).
-import { teachSteps } from '../data/teach-steps'
-import { t } from './i18n'
+import { teachSteps } from '../data/teach-steps.js'
+import { t } from './i18n.js'
 
 function setControlValue(id, value) {
   const el = document.querySelector(`#${id}`)

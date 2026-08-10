@@ -7,7 +7,7 @@ import {
   calculateSettlement,
   classifyInterval,
   projectMultiYear,
-} from './settlement'
+} from './settlement.js'
 
 describe('calculateSettlement', () => {
   it('reproduces the simple matched case from the report logic', () => {
@@ -279,7 +279,7 @@ describe('calculateSettlement', () => {
   })
 
   it('keeps the default pricing basis aligned with verified 2026 reference values', async () => {
-    const { defaultInputs, settlementModes } = await import('../data/default-scenarios')
+    const { defaultInputs, settlementModes } = await import('../data/default-scenarios.js')
 
     // Strike: deck Case 6 reference offer (illustrative teaching value)
     expect(defaultInputs.strikePrice).toBe(2000)
