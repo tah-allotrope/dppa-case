@@ -1,5 +1,14 @@
 # Teaching Notes & Preferences
 
+> **Start with `CLAUDE.md`** (repo root) — it is the authoritative entry point for project rules:
+> repo layout, exact build/test/deploy commands, the `PYTHONPATH= py` prefix, code style, the
+> explicit-`.js`-import rule, the retirement rules, and the regeneration order. This file holds
+> teaching facts and preferences; `CLAUDE.md` holds the rules for working in the repo.
+>
+> For *why* the teaching material is shaped the way it is — the July 2026 symbol-overload failure,
+> the design rules that came out of it, the number-provenance pipeline, and what is still unproven —
+> see `learning-records/0005-teaching-revamp-and-hardening-arc.md`.
+
 ## Repo layout (2026-07-25)
 - The repo root now carries exactly **six** live build/verify scripts, each with a `# LIVE:`
   header comment naming what runs it and the exact regenerate command: `audit_teaching_deck.py`,
@@ -16,7 +25,7 @@
 - **Retirement rule:** whenever a headline figure changes (e.g. the gate-sweep pass count), add
   the superseded value to `tools/retired_figures.json`'s `retired` list in the *same commit*.
   `tools/check_retired_figures.py` scans both prose (`NOTES.md`, `RESOURCES.md`, `MISSION.md`,
-  `lessons.md`, `facilitator/**/*.md`, `lessons/**/*.html`) and the six live generator scripts
+  `corrections-log.md`, `facilitator/**/*.md`, `lessons/**/*.html`) and the six live generator scripts
   themselves — a build script that still hard-codes a retired figure is caught even before it
   produces a slide with the wrong number on it (this closed a real gap: `build_callouts.py`, now
   archived, still hard-coded the pre-gate-sweep placeholder value — see `archive/README.md` for

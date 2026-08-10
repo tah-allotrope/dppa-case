@@ -28,9 +28,9 @@ LITERALS_PATH = REPO_ROOT / "tools" / "prose_figure_literals.json"
 
 # Living prose = documents that must always state the current answer.
 # Historical records (plans/, research/, reports/, learning-records/,
-# activeContext.md, deck-qa/) are never scanned (ASM-003).
+# archive/, deck-qa/) are never scanned (ASM-003).
 SCAN_PATTERNS = [
-    "NOTES.md", "RESOURCES.md", "MISSION.md", "lessons.md",
+    "NOTES.md", "RESOURCES.md", "MISSION.md", "corrections-log.md",
     "facilitator/**/*.md", "lessons/**/*.html",
 ]
 

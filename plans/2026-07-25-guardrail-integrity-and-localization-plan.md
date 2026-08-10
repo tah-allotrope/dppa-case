@@ -1,7 +1,7 @@
 ---
 title: "Guardrail Integrity, Trilingual App & Pre-Freeze Hardening"
 date: "2026-07-25"
-status: "abandoned — closed 2026-08-10 by owner directive to unblock nightly planning; NOT complete: PHASE-01..05 shipped (082b5aa..2df2874) and TASK-06-01/02/03 landed as 84e5503, but TASK-05-03 (drop continue-on-error from e2e:visual — blocked on human item H6) and TASK-06-04..06-12 (prettier --check gate, eslint scripts/** un-ignore, .js import extensions, root CLAUDE.md, activeContext.md/lessons.md hygiene, learning-record 0005, NOTES.md pointer) remain genuinely unimplemented in the tree"
+status: "complete — PHASE-01..06 executed and verified 2026-08-10 (lint, prettier --check, 73 unit tests, 57 e2e, build, 55 python tests, both prose guards, both deck audits, zero export drift — all green). One task is deliberately left open and is NOT closable by a coding session: TASK-05-03 (drop continue-on-error from the e2e:visual step) requires Linux pixel baselines from a human-triggered visual-bootstrap workflow_dispatch run, tracked as H6 in plans/2026-october-readiness-checklist.md (due 2026-08-15). Until H6 lands there is no working visual-regression gate."
 request: "Turn research/2026-07-25-guardrail-integrity-and-audience-localization-brainstorm.md into a multi-phase execution plan saved to plans/"
 plan_type: "multi-phase"
 research_inputs:
@@ -1114,18 +1114,18 @@ documents.
       minified files: `src/modules/tour.js`, `src/modules/tour.test.js`, `src/theme.css`,
       `e2e/tour.spec.js`, and `e2e/visual.spec.js` (if PHASE-05 has not already reformatted the
       last one).
-- [ ] TASK-06-04: Verify nothing broke: `cd app && npm run lint && npm test && npm run e2e && npm run build`.
-- [ ] TASK-06-05: Add `- run: npx prettier --check src e2e scripts` to the `quality` job in
+- [x] TASK-06-04: Verify nothing broke: `cd app && npm run lint && npm test && npm run e2e && npm run build`.
+- [x] TASK-06-05: Add `- run: npx prettier --check src e2e scripts` to the `quality` job in
       `.github/workflows/ci.yml`, immediately after `npm run lint`.
-- [ ] TASK-06-06: Normalize relative imports to explicit `.js` extensions across `app/src/**` and
+- [x] TASK-06-06: Normalize relative imports to explicit `.js` extensions across `app/src/**` and
       `app/scripts/**` (currently 21 extensionless imports across `main.js`, `ui.js`, `chart.js`,
       `flow-diagram.js`, `teach.js`, `tour.js`, and the `*.test.js` files, versus `settlement.js`
       which is already explicit). Then delete `app/scripts/js-resolve-loader.mjs` if nothing
       references it after the change — check with
       `grep -rn "js-resolve-loader" app --include=*.mjs --include=*.js --include=*.json --include=*.md`.
-- [ ] TASK-06-07: Remove `"scripts/**"` from the `ignores` array in `app/eslint.config.js` so
+- [x] TASK-06-07: Remove `"scripts/**"` from the `ignores` array in `app/eslint.config.js` so
       `app/scripts/*.mjs` (which generate CI-verified JSON) are linted. Fix whatever it reports.
-- [ ] TASK-06-08: Create root `CLAUDE.md` documenting, at minimum: the two-part repo layout
+- [x] TASK-06-08: Create root `CLAUDE.md` documenting, at minimum: the two-part repo layout
       (`app/` web app, root deck tooling); the exact install/build/test/deploy commands including
       that `npm install` is deliberate and `npm ci` is not to be used; the `PYTHONPATH= py` Windows
       prefix; the code style now unified by `.prettierrc`; the explicit-`.js`-import rule and why;
@@ -1134,17 +1134,17 @@ documents.
       `build_oct_teaching_deck.py` → `audit_teaching_deck.py` + `verify_deck_numbers.py`); the
       `git mv`-not-`rm` retirement rule; `--workers=1` for local Windows visual snapshots; that
       `assets/teaching/*.json` are generated and never hand-edited; and that `archive/` is never run.
-- [ ] TASK-06-09: Retire `activeContext.md`: `git mv activeContext.md archive/activeContext-through-2026-06-29.md`
+- [x] TASK-06-09: Retire `activeContext.md`: `git mv activeContext.md archive/activeContext-through-2026-06-29.md`
       and add a note at its top stating it was superseded on 2026-07-25 by `plans/` (forward work)
       and `reports/` (completed work), and that it covers work only through 2026-06-29. Reference
       this decision in `CLAUDE.md` so no future session recreates it by habit.
-- [ ] TASK-06-10: Rename the root corrections log to remove the collision with the `lessons/` course
+- [x] TASK-06-10: Rename the root corrections log to remove the collision with the `lessons/` course
       directory: `git mv lessons.md corrections-log.md`. Update every reference —
       check with `grep -rln "lessons\.md" --include=*.md --include=*.py --include=*.json . | grep -v node_modules`
       — including `tools/retired_figures.json`'s `scan` array and
       `tools/verify_prose_figures.py`'s `SCAN_PATTERNS`, both of which name `lessons.md` explicitly
       and will silently stop scanning it otherwise.
-- [ ] TASK-06-11: Write `learning-records/0005-teaching-revamp-and-hardening-arc.md` synthesizing
+- [x] TASK-06-11: Write `learning-records/0005-teaching-revamp-and-hardening-arc.md` synthesizing
       the arc from the July 2026 symbol-overload failure through the October redesign and the three
       hardening plans. Source material already in the repo:
       `research/2026-07-04_dppa-modules-teaching-revamp-brainstorm.md` (the failure diagnosis),
@@ -1155,7 +1155,7 @@ documents.
       that came out of it (distill, don't reproduce; defer decree symbols to a decoder slide), the
       pipeline that was built to keep numbers honest, and what remains unproven (the fresh-viewer
       test has not been run).
-- [ ] TASK-06-12: Update `NOTES.md` with a short pointer to `CLAUDE.md` as the entry point for
+- [x] TASK-06-12: Update `NOTES.md` with a short pointer to `CLAUDE.md` as the entry point for
       project rules, and to `learning-records/0005` for the arc narrative.
 
 **File Changes**
@@ -1226,6 +1226,45 @@ documents.
   unchecked: the CI `prettier --check` step, import-extension normalization, eslint `scripts/**`
   un-ignore, root `CLAUDE.md`, `activeContext.md` retirement, `lessons.md` rename, learning record
   `0005`, and the `NOTES.md` pointer. These remain open.
+
+**Phase Completion Notes (2026-08-10)**
+- TASK-06-04 through TASK-06-12 executed and verified. PHASE-06 is closed.
+- **TASK-06-06:** 34 extensionless relative imports normalized across 13 files in `app/src/**`
+  (the plan estimated 21; PHASE-03's i18n work added the rest). The count includes one *dynamic*
+  `await import('../data/default-scenarios')` in `settlement.test.js` that a `from`-anchored grep
+  misses. `app/scripts/**` needed no changes. The production bundle hash was **identical before and
+  after** (`index-DAb2bQ32.js`), proving the change is semantically inert.
+  `app/scripts/js-resolve-loader.mjs` was then deleted: the repo-root grep required by RISK-06-03
+  found references only in historical plan/report/research prose, never in an invocation. Proof the
+  shim is genuinely unnecessary — `node scripts/export-spine.mjs` and `node scripts/export-sweep.mjs`
+  both run clean under bare `node` with it gone, and produce zero drift.
+- **TASK-06-07:** `scripts/**` removed from `ignores`; eslint reported nothing to fix. Confirmed the
+  glob is genuinely covered (not silently skipped) via `npx eslint scripts --format json` → 5 files
+  linted, 0 messages.
+- **TASK-06-10:** the rename is complete for every *functional* reference — `tools/retired_figures.json`
+  (`scan`), `tools/verify_prose_figures.py` (`SCAN_PATTERNS`), and `NOTES.md`. Historical references
+  in `plans/`, `reports/`, and `research/` were deliberately **left as-is**: those documents record
+  what was true when written, and rewriting them would falsify the record. Verified the rename did
+  not silently drop the file from either guard's scan set: both still report **28 prose files**
+  (4 root + 5 `facilitator/**/*.md` + 19 `lessons/**/*.html`), which is only reachable if
+  `corrections-log.md` matches. A stale pattern would have shown 27.
+- **TASK-06-09:** also added an `archive/README.md` row, per that file's own convention of
+  documenting every archived artifact.
+- **TASK-06-04 (full re-verification, 2026-08-10):** `npm run lint` clean · `npx prettier --check
+  src e2e scripts` clean · `npm test` 73/73 · `npm run e2e -- --workers=1` 57 passed / 3 skipped / 0
+  failed · `npm run build` OK · `py -m pytest tools/tests` 55/55 · `check_retired_figures.py` and
+  `verify_prose_figures.py` PASS · `audit_teaching_deck.py` PASS · `verify_deck_numbers.py` PARITY
+  PASS · `git diff --exit-code` on the four generated `assets/teaching/*.json` clean.
+- **Note on the e2e baseline:** a *parallel* run flakes 2 webkit-mobile specs on Windows with
+  `Object with guid ... was not bound in the connection`. This reproduces on the pre-change tree, so
+  it is a Playwright/WebKit driver transport issue, not a regression — the same specs pass serially
+  and pass in CI on Linux. This is why `--workers=1` is the documented local convention
+  (now recorded in `CLAUDE.md` §7).
+- **TASK-05-03 is the one task left open, and a coding session cannot close it.** Removing
+  `continue-on-error` without committing Linux baselines first would simply turn a non-blocking step
+  into a red build. It needs a human to run the `visual-bootstrap` `workflow_dispatch` job and commit
+  the `*-linux.png` artifacts — tracked as **H6** in `plans/2026-october-readiness-checklist.md`,
+  due 2026-08-15.
 
 ## Gotchas
 

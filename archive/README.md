@@ -45,6 +45,7 @@ was checked (see PHASE-02 of `plans/2026-07-25-guardrail-integrity-and-localizat
 | `DPPA 2025 ref.pptx` | Originally at `ref/DPPA 2025 ref.pptx`; the reference deck `build_2026_from_ref.py` (also archived) was built from. The now-empty `ref/` directory was removed (git does not track empty directories). |
 | `current-app-screenshot.png`, `desktop-current.png` | Manual QA screenshots from 2026-07-11; a prior cleanup pass (commit `d24ed9b`, "phase-6: remove obsolete root-level manual-QA screenshots and probe files") removed similar files but these were added after or survived it. |
 | `factory-presentation-instructions.md` | Build brief for the three `.pptx` files above; not referenced by any other current document. Archived alongside the artifacts it describes so it doesn't dangle at the repo root pointing at files that no longer exist there. |
+| `activeContext-through-2026-06-29.md` | Was `activeContext.md` at the repo root — a rolling task scratchpad that stopped being updated after 2026-06-29. Superseded by `plans/` (forward work) and `reports/` (completed work); retired 2026-08-10 per TASK-06-09 of `plans/2026-07-25-guardrail-integrity-and-localization-plan.md`. `CLAUDE.md` records the convention so no future session recreates it at the root by habit. |
 
 ## The six scripts that are NOT here (still live at the repo root)
 

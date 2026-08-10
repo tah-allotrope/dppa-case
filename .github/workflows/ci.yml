@@ -50,6 +50,7 @@ jobs:
       # of platform-optional-dependency resolution difference.
       - run: npm install
       - run: npm run lint
+      - run: npx prettier --check src e2e scripts
       - run: npm test
       - run: npm run coverage
       - run: npx playwright install --with-deps chromium webkit

@@ -1,7 +1,7 @@
 ---
 title: "October 2026 Readiness Checklist"
 date: "2026-07-11"
-status: "abandoned — closed 2026-08-10 by owner directive to unblock nightly planning; NOT complete and still live for the assumed 2026-10-01 session: all 6 human-blocked register items (H1-H6) and every Mid-September, content-freeze, late-September, and day-of item remain outstanding. Track these by hand — the automated backlog no longer surfaces them."
+status: "abandoned — closed 2026-08-10 by owner directive to unblock nightly planning. NOT complete: all 6 human-blocked register items (H1-H6) and every Mid-September, content-freeze, late-September, and day-of item remain outstanding for the assumed 2026-10-01 session. This status closes the plan to nightly TRIAGE ONLY — it does not disable the deadline alarm: tools/check_human_blocked_register.py still parses the register table below on the Mondays 09:00 UTC freshness-checks run and exits 1 on any item overdue or due within 7 days. As of 2026-08-10 it reports H1 and H6 DUE-SOON (both 2026-08-15). H6 additionally blocks TASK-05-03 of plans/2026-07-25-guardrail-integrity-and-localization-plan.md, which is otherwise complete — until H6 lands there is no working visual-regression gate."
 plan_type: "checklist"
 ---
 

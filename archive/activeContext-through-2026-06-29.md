@@ -1,4 +1,13 @@
-# Active Context
+# Active Context (retired)
+
+> **Superseded on 2026-07-25.** Forward work now lives in `plans/`; completed work is
+> written up in `reports/`. This file was a rolling scratchpad and covers work only
+> **through 2026-06-29** — nothing after that date was ever recorded here, so it is a
+> historical record, not a status board. Do not resume appending to it and do not
+> recreate `activeContext.md` at the repo root; see `CLAUDE.md` ("Where work is tracked")
+> for the current convention.
+
+
 
 ## Plan
 
