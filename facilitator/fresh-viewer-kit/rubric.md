@@ -59,7 +59,7 @@ diagnostic data that matters if a later run fails)
 ## Overall result
 
 - [ ] **PASS** — proceed toward content freeze (see
-      `plans/2026-october-readiness-checklist.md`).
+      `facilitator/october-run-plan.md`).
 - [ ] **FAIL / PARTIAL** — identify which module(s) lost the volunteer using
       the table above, fix the specific slide(s)/pacing, then re-run this
       kit with a different fresh volunteer before freezing.

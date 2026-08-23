@@ -1,131 +1,79 @@
 ---
-title: "October 2026 Readiness Checklist"
+title: "October 2026 Readiness Checklist — Coding-Session Tasks"
 date: "2026-07-11"
-status: "abandoned — closed 2026-08-10 by owner directive to unblock nightly planning. NOT complete: all 6 human-blocked register items (H1-H6) and every Mid-September, content-freeze, late-September, and day-of item remain outstanding for the assumed 2026-10-01 session. This status closes the plan to nightly TRIAGE ONLY — it does not disable the deadline alarm: tools/check_human_blocked_register.py still parses the register table below on the Mondays 09:00 UTC freshness-checks run and exits 1 on any item overdue or due within 7 days. As of 2026-08-10 it reports H1 and H6 DUE-SOON (both 2026-08-15). H6 additionally blocks TASK-05-03 of plans/2026-07-25-guardrail-integrity-and-localization-plan.md, which is otherwise complete — until H6 lands there is no working visual-regression gate."
+status: "open — split 2026-08-23 (PHASE-04 of plans/2026-08-22-delivery-stall-recovery-plan.md) from the original combined checklist. The human-only, date-bound items (the H1-H6 register, physical dry-runs, print tests, day-of logistics) moved to facilitator/october-run-plan.md — a presenter's artifact, not a coding plan, which is why it was competing for \"is this done\" semantics here. This file now holds only what a nightly coding session can actually execute and close."
 plan_type: "checklist"
 ---
 
-# October 2026 Readiness Checklist
+# October 2026 Readiness Checklist — Coding-Session Tasks
 
-Backward-planned from an assumed **October 1, 2026** session date (Q-001 in
-`research/2026-07-04_dppa-modules-teaching-revamp-brainstorm.md` is still
-open — no confirmed date/venue as of this checklist's writing, 2026-07-11).
-Adjust the dates below if the real date is confirmed; the sequence and gates
-do not change.
+The presenter-facing, human-only counterpart to this file is
+`facilitator/october-run-plan.md` — it carries the human-blocked register (H1-H6),
+the dry-run/fresh-viewer/print-test items, and day-of logistics.
+`tools/check_human_blocked_register.py` parses **that** file now, not this one.
 
-## Human-blocked register
+This file holds only tasks a coding session can execute without a person's decision or physical
+action. Everything here is backward-planned from the same assumed **October 1, 2026** session date
+as the human-blocked register (still unconfirmed — see H1 in `facilitator/october-run-plan.md`).
 
-Every item below needs a person, not a coding session — dates are
-backward-planned from the same assumed **October 1, 2026** session date as
-the rest of this checklist (ASM-008 of
-`plans/2026-07-17-prose-parity-second-pipeline-plan.md`) and move together if
-the real date is confirmed.
-
-| # | Item | Owner | Needed by | Blocks |
-|---|---|---|---|---|
-| H1 | Confirm session date & venue (Q-001, open since 2026-07-04) | Presenter | 2026-08-15 | every date below |
-| H2 | Engage qualified VI/ZH translator for `assets/teaching/terminology-map.json` | Presenter | 2026-08-25 | localization (deck + app), late-Sept print run |
-| H3 | Recalibrate lender/investor gate proxies with real Allotrope deal data — or accept the illustrative band | Presenter + Allotrope | 2026-09-01 | gate-sweep credibility work, M5 rehearsal |
-| H4 | Firebase deploy credentials → enable the commented `deploy` job in `.github/workflows/ci.yml` | Presenter | 2026-09-08 | QR codes pointing at a current build |
-| H5 | Schedule fresh-viewer volunteer (kit: `facilitator/fresh-viewer-kit/`) | Presenter | 2026-09-08 | content freeze (gate for 2026-09-15) |
-| H6 | Trigger the `visual-bootstrap` `workflow_dispatch` job on GitHub Actions, download the Linux `-linux.png` baselines, and commit them to `app/e2e/visual.spec.js-snapshots/` (then remove `continue-on-error` from the `e2e:visual` step and delete the bootstrap job) | Presenter | 2026-08-15 | PHASE-05's real visual-regression gate; requires pushing/running a workflow, which an unattended local coding session must not do |
-
-Status legend: **[x] done** (verified in this session or an earlier one) ·
-**[ ] pending** · **(human-only)** = cannot be executed by an autonomous
-coding session, needs a person with a browser/PowerPoint/printer.
-
-## Already done (as of 2026-07-11, ahead of the original early-September target)
+## Already done
 
 - [x] Six teach-mode fallback recordings (MP4 + poster), automated and
       regenerable via `cd app && npm run record:demos`
       (`plans/2026-07-10-october-readiness-hardening-plan.md` PHASE-02).
 - [x] Real 56-scenario gate sweep behind the M5 heatmap — computed
-      `assets/teaching/gate-sweep.json`, current result **5 of 56** (PHASE-03).
+      `assets/teaching/gate-sweep.json` (PHASE-03).
 - [x] QR code on the close slide (PHASE-04).
 - [x] Deck↔engine numbers parity check, wired into CI as the `deck-parity`
       job (PHASE-04).
 - [x] Terminology map + fresh-viewer test kit (PHASE-05, this checklist).
 - [x] Repo integrity: worksheet template and July reference deck tracked in
       git; stale Firebase cache untracked (PHASE-01).
+- [x] App deployed and `sw.js` verified serving real JavaScript
+      (`plans/2026-08-22-delivery-stall-recovery-plan.md` PHASE-02, 2026-08-23;
+      supersedes the 2026-07-25 deploy this row used to cite).
 
-## Early September (or ~8 weeks before the session)
+## Once the translator (H2) delivers both files
 
-- [ ] **(human-only)** Open `ceba/DPPA Presentation Oct 2026 To Teach.pptx`
-      in real PowerPoint; confirm the 6 embedded MP4 fallback slides autoplay
-      or are easy to click-to-play; confirm hidden-slide unhide/reveal works
-      in slideshow mode.
-- [x] **(human-only)** Deploy the app (`cd app && npm run predeploy` then the
-      Firebase deploy command in `app/deployment.md`) so
-      `https://dppa-case.web.app` reflects the teach-mode banner, presenter
-      theme, and current scenario numbers. — done 2026-07-25, verified by
-      `python tools/check_deploy_freshness.py` (PASS, commit `22bae59`, no
-      `-dirty` marker; see `app/deployment.md`'s Last Deploy table).
-- [ ] If the illustrative lender/investor gate proxy constants in
-      `app/scripts/export-sweep.mjs` (currently 1,380 / 1,450 VND/kWh) should
-      be recalibrated with real developer economics, do it now — re-run
-      `node scripts/export-sweep.mjs`, re-render visuals
-      (`PYTHONPATH= py build_teaching_visuals.py --lang en`), rebuild the
-      deck, and update the two facilitator-guide references to the pass
-      count (`facilitator/dppa-workshop-facilitator-guide.md`).
-
-## Mid September (~4–6 weeks before)
-
-- [ ] **(human-only)** Timed solo dry-run: the presenter runs the full
-      60-minute run-of-show alone, including a deliberate fallback drill
-      (kill the app mid-M3, unhide the fallback slide, confirm the recording
-      carries the point). Checklist already in
-      `facilitator/dppa-workshop-facilitator-guide.md` under "Pre-session
-      validation."
-- [ ] **(human-only)** Fresh-viewer test using
-      `facilitator/fresh-viewer-kit/` — the direct test of the session's
-      success criterion (DEC-003). Do not skip; do not simulate. If it
-      fails, fix the specific module(s) it flags and re-run with a different
-      volunteer before freezing.
-- [ ] **(human-only)** Physical duplex print test of
-      `lessons/0012-reference-card/reference-card.html` and
-      `m5-worksheet.html` on a real printer (A4, 0.75in margins).
-
-## Content freeze (gated on the two items above passing)
-
-- [ ] Declare EN content freeze. After this point, do not edit
-      `build_oct_teaching_deck.py`'s `TEXT["en"]` dict or
-      `build_teaching_visuals.py`'s English captions without re-running the
-      fresh-viewer test — late edits after freeze triple the translation
-      rework (CON-004 in the teaching-revamp plan).
-
-## Late September (~1–2 weeks before)
-
-- [ ] Translate the remaining `UNTRANSLATED` entries in
-      `assets/teaching/terminology-map.json` (31 VI / 33 ZH entries as of
-      this checklist — see `research/dppa-terminology-map.md` for the
-      already-sourced vocabulary to reuse). A qualified VI/ZH speaker should
-      do this, not a guess.
 - [ ] Run `PYTHONPATH= py build_oct_teaching_deck.py --lang vi` and
-      `--lang zh` — the build now refuses to proceed while any consumed key
-      is still `UNTRANSLATED`, so a clean run is itself the completeness
-      check.
+      `--lang zh` — the build refuses to proceed while any consumed key is
+      still `UNTRANSLATED`, so a clean run is itself the completeness check.
 - [ ] Run `PYTHONPATH= py build_teaching_visuals.py --lang vi` and `--lang
       zh` to refresh localized visuals if any translated wording changed
       chart captions.
-- [ ] Print per-language A4 reference cards and worksheets.
-- [ ] Translate `app/src/data/strings.js`'s `vi`/`zh` values alongside
-      `assets/teaching/terminology-map.json`, then re-run
-      `cd app && npm run i18n:report` to confirm the untranslated count is 0
-      for both languages.
+- [ ] Confirm `cd app && npm run i18n:check` still passes (the string table
+      must still match the frozen baseline — see
+      `app/src/data/strings.baseline.json`) and
+      `cd app && node scripts/i18n-report.mjs` reports 0 untranslated for
+      both `vi` and `zh`.
 - [ ] Re-run `PYTHONPATH= py audit_teaching_deck.py` and
-      `PYTHONPATH= py verify_deck_numbers.py` against each language build.
+      `PYTHONPATH= py verify_deck_numbers.py --lang vi --deck "ceba/DPPA Presentation Oct 2026 To Teach vi.pptx"`
+      (and the `zh` equivalent) against each language build.
+- [ ] Re-run `PYTHONPATH= py tools/check_terminology_numbers.py` to confirm the
+      translator didn't hand-type a figure over a `{placeholder}` token.
 
-## Day before / day of
+## If the lender/investor gate proxies are recalibrated (H3)
 
-- [ ] Confirm venue wifi is not required: `cd app && npm run build && npm run
-      preview` serves the app locally; the deck's hidden fallback slides are
-      the wifi-independent backup for every app moment.
-- [ ] Bring printed A4 cards + worksheets (per language mix of the actual
-      audience).
-- [ ] Bring a laptop with the deck, the local app build, and this repo
-      checked out (in case a last-minute number needs re-verifying against
-      `assets/teaching/spine-s1.json` or `gate-sweep.json`).
-- [ ] Venue offline drill: load `https://dppa-case.web.app` once on the
-      presenter laptop and on one phone, then enable airplane mode and
-      confirm the app still loads and the five-line bill still renders
-      (PHASE-04's service worker).
+- [ ] Re-run `cd app && node scripts/export-sweep.mjs`.
+- [ ] Re-render visuals: `PYTHONPATH= py build_teaching_visuals.py --lang en`
+      (and `vi`/`zh` if those builds already exist).
+- [ ] Rebuild the deck: `PYTHONPATH= py build_oct_teaching_deck.py --lang en`.
+- [ ] Update the pass-count references in
+      `facilitator/dppa-workshop-facilitator-guide.md`, and add the
+      superseded pass count to `tools/retired_figures.json`'s `retired` list
+      in the same commit (`CLAUDE.md` §6).
+- [ ] Re-run `python tools/check_retired_figures.py`,
+      `python audit_teaching_deck.py`, and `python verify_deck_numbers.py` —
+      all must pass before committing.
+
+## Day-of technical confirmation (coding-verifiable part only)
+
+- [x] Confirm venue wifi is not required: verified 2026-08-23 against the live
+      deploy (`app/deployment.md`'s "Offline drill" section) — the service
+      worker precaches the app and a reload while offline still renders all
+      four charts. The *physical* re-confirmation at the actual venue is
+      `facilitator/october-run-plan.md`'s job, not this file's.
+- [ ] `cd app && npm run build && npm run preview` still serves the app
+      locally as the wifi-independent local fallback — re-verify this is
+      still true close to the session date, since dependencies may have
+      moved.

@@ -178,20 +178,32 @@ is course handout HTML. They are unrelated, which is why the log is no longer ca
   this needs a human: run the `visual-bootstrap` `workflow_dispatch` job, commit the `*-linux.png`
   artifacts into `app/e2e/visual.spec.js-snapshots/`, then delete the bootstrap job and remove
   `continue-on-error` in the same commit. Tracked as **H6** in
-  `plans/2026-october-readiness-checklist.md`.
+  `facilitator/october-run-plan.md`.
 
 ## 8. CI
 
 `.github/workflows/ci.yml`
-- `quality` — install, lint, prettier check, unit tests, coverage, functional e2e, visual e2e
-  (non-blocking, see §7), build.
+- `quality` — install, lint, prettier check, `i18n:check` (string-table freeze, see §3), unit
+  tests, coverage, functional e2e, visual e2e (non-blocking, see §7), build.
 - `deck-parity` — regenerates the spine/sweep exports and fails if the committed JSON drifted from
-  the engine, then runs the two Python deck audits.
-- The Firebase `deploy` job is commented out pending credentials (**H4**).
+  the engine, then runs `audit_teaching_deck.py`, `verify_deck_numbers.py`,
+  `check_retired_figures.py`, `verify_prose_figures.py`, `check_terminology_numbers.py`,
+  `check_plan_status.py`, and the `tools/tests` unit suite.
+- The Firebase `deploy` job is commented out pending credentials (**H4**); `npm run deploy` works
+  today from a machine with Firebase credentials (see §2).
 
 `.github/workflows/freshness-checks.yml` — Mondays 09:00 UTC.
-- `check_deploy_freshness.py` — compares the deployed build marker against the repo.
+- `check_deploy_freshness.py --strict` — compares the deployed build marker against the repo; the
+  job now installs Node first, so a build failure is a hard failure here instead of a silently
+  green `UNKNOWN`.
+- `check_delivery_pipeline.py --max-age-days 3` — reports uncommitted / unpushed / undeployed
+  commit distances and fails if any has sat that way for more than 3 days. This is the guard class
+  the repo lacked before 2026-08-23: every other check asks "is this number right", this one asks
+  "did the work reach anyone."
 - `check_human_blocked_register.py` — parses the human-blocked register table in
-  `plans/2026-october-readiness-checklist.md` and **exits 1 when a dated item is overdue or due
-  within 7 days**, so a deadline fires a notification instead of waiting for someone to reread the
-  checklist. A failing scheduled run here is usually a real deadline, not a broken build.
+  `facilitator/october-run-plan.md` (moved from `plans/2026-october-readiness-checklist.md` on
+  2026-08-23 — that file now holds only coding-session tasks) and **exits 1 when a dated item is
+  overdue or due within 7 days**. A failing scheduled run here is usually a real deadline, not a
+  broken build. `--acknowledged-through DATE` (not currently passed by the scheduled job) prints a
+  covered row as `ACKNOWLEDGED` instead of failing on it — use it by hand when a slip is already
+  known and accepted, so the next *new* slip is still loud.

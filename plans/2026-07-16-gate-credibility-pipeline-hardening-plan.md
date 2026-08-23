@@ -1,7 +1,7 @@
 ---
 title: "Gate Credibility & Pipeline Hardening"
 date: "2026-07-16"
-status: "complete — bulk-corrected 2026-07-31 per directive: plan predates 2026-07-20 and is presumed fully implemented (NOT individually verified against git/code evidence)"
+status: "open — never executed; retained as the specification for the gate-credibility and deck-build work. Corrected 2026-08-23 (PHASE-04 of plans/2026-08-22-delivery-stall-recovery-plan.md): the 2026-07-31 bulk-correction to \"complete\" was verified false — 0 of 80 tasks ticked, no reports/ artifact, and 4 sampled tasks confirmed undone against current code (see research/2026-08-15-deploy-drift-and-unverifiable-status-brainstorm.md Theme C1). Some of this plan's scope was independently completed under later plans (see NOTES.md's repo-layout section and plans/2026-october-readiness-checklist.md's \"Already done\"); the unticked tasks here are a real, mostly-outstanding backlog, not a stale duplicate."
 request: "Multi-phase implementation plan from research/2026-07-16-post-hardening-next-level-brainstorm.md: make the M5 gate sweep defensible before content freeze, declare the Python toolchain, close generator↔artifact drift in CI, strengthen the deck verifiers, reorganize the root scripts, then complete localization and app evolution."
 plan_type: "multi-phase"
 research_inputs:

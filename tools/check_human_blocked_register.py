@@ -4,10 +4,15 @@ check_human_blocked_register.py
 
 Freshness guard (PHASE-02 of plans/2026-07-21-deploy-drift-repo-hygiene-plan.md):
 parses the "## Human-blocked register" table in
-plans/2026-october-readiness-checklist.md and classifies each row's
+facilitator/october-run-plan.md and classifies each row's
 "Needed by" date against today, so a deadline that has arrived or is
 about to doesn't depend on someone remembering to re-open the
 checklist.
+
+(Moved 2026-08-23, PHASE-04 of plans/2026-08-22-delivery-stall-recovery-plan.md,
+from plans/2026-october-readiness-checklist.md — that file now holds only
+coding-session tasks; the human-blocked register lives with the rest of the
+presenter's human-only run plan.)
 
 Exits 1 (failing a scheduled CI run, which triggers GitHub's default
 notification) if any row is OVERDUE or DUE-SOON (due within 7 days
@@ -25,7 +30,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_CHECKLIST = REPO_ROOT / "plans" / "2026-october-readiness-checklist.md"
+DEFAULT_CHECKLIST = REPO_ROOT / "facilitator" / "october-run-plan.md"
 HEADING = "## Human-blocked register"
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 

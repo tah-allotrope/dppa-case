@@ -56,14 +56,14 @@
   exists in the repo (breadcrumb labels, worksheet terms); `build_oct_teaching_deck.py
   --lang vi|zh` now reads this map and refuses to build while any consumed key is
   `UNTRANSLATED` — translate the map, don't touch the build script, when that work
-  starts (see `plans/2026-october-readiness-checklist.md`).
+  starts (see `facilitator/translation-brief.md`).
 - **Fresh-viewer test kit:** `facilitator/fresh-viewer-kit/` makes the one
   validation that actually proves the redesign works (DEC-003) schedulable — hand
   the folder to a volunteer who didn't attend July.
 - **Human-blocked register:** every item that needs a person, not a coding session
   (date/venue confirmation, translator, Firebase creds, fresh-viewer scheduling), is
   tracked in one dated table — see the "Human-blocked register" section of
-  `plans/2026-october-readiness-checklist.md`.
+  `facilitator/october-run-plan.md`.
 
 ## How the user wants to be taught
 - **Distill, don't reproduce.** The deck is too wordy; each lesson = one crisp visual

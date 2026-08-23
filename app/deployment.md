@@ -96,7 +96,7 @@ Locally on Windows, running visual snapshots requires `--workers=1` — running 
 
 ### Visual baseline bootstrap (one-time)
 
-No snapshot baselines are committed yet. Local Windows-generated (`-win32.png`) baselines are intentionally **not** committed — Playwright suffixes snapshot filenames by OS, so they wouldn't match CI's Linux run anyway, and cross-OS font rendering differs enough to produce false failures (this is why `npm run e2e:visual` is `continue-on-error: true` in `.github/workflows/ci.yml` for now). A `visual-bootstrap` job is already wired into `ci.yml` (`workflow_dispatch`-triggered) to generate them — **this is a human-only step (H6 in `plans/2026-october-readiness-checklist.md`)**, since it requires triggering a GitHub Actions run:
+No snapshot baselines are committed yet. Local Windows-generated (`-win32.png`) baselines are intentionally **not** committed — Playwright suffixes snapshot filenames by OS, so they wouldn't match CI's Linux run anyway, and cross-OS font rendering differs enough to produce false failures (this is why `npm run e2e:visual` is `continue-on-error: true` in `.github/workflows/ci.yml` for now). A `visual-bootstrap` job is already wired into `ci.yml` (`workflow_dispatch`-triggered) to generate them — **this is a human-only step (H6 in `facilitator/october-run-plan.md`)**, since it requires triggering a GitHub Actions run:
 
 1. From the repo's Actions tab, run the `app-quality` workflow manually (`workflow_dispatch`) — this runs the `visual-bootstrap` job.
 2. Download its `visual-baselines` artifact.
@@ -119,6 +119,6 @@ Verified 2026-08-23 against `https://dppa-case.web.app` (headless Chromium, `con
 after a first successful load): the service worker registration reaches `active`/`activated`,
 `navigator.serviceWorker.controller` is set, and a full page reload while offline still renders the
 app shell with all four canvases (`profileChart`, `fmpStrip`, `multiYearChart`, `savingsStrip`) and
-non-empty body text. This is the drill `plans/2026-october-readiness-checklist.md` describes as
+non-empty body text. This is the drill `facilitator/october-run-plan.md` describes as
 "load the app once, enable airplane mode, confirm it still loads" — it now passes on the live
 deploy, not just in the local `app/e2e/offline.spec.js` suite.
