@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Report :: Delivery-Stall Recovery</title>
+  <meta name="color-scheme" content="dark light">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    async function initMermaid() {
+      const blocks = document.querySelectorAll('.mermaid');
+      if (!blocks.length) {
+        return;
+      }
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        securityLevel: 'loose',
+        themeVariables: {
+          primaryColor: '#f3ead9',
+          primaryTextColor: '#1f1912',
+          primaryBorderColor: '#9d6b37',
+          lineColor: '#3b6f76',
+          secondaryColor: '#efe4d0',
+          tertiaryColor: '#ffffff',
+          background: '#fbf7f1',
+          mainBkg: '#fbf7f1',
+          nodeBorder: '#9d6b37',
+          clusterBkg: '#f7efdf',
+          clusterBorder: '#3b6f76',
+          edgeLabelBackground: '#fbf7f1'
+        }
+      });
+
+      await mermaid.run({ nodes: blocks });
+    }
+
+    const run = () => initMermaid().catch((error) => console.error('Mermaid render failed', error));
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #fbf7f1;
+      --paper-strong: #fffdf9;
+      --ink: #1f1912;
+      --ink-soft: #5f564c;
+      --line: #dccdb6;
+      --line-strong: #bfa37d;
+      --accent: #9d6b37;
+      --accent-soft: #efe4d0;
+      --accent-2: #3b6f76;
+      --shadow: 0 18px 40px rgba(49, 33, 16, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --page-width: 1040px;
+      --display-font: Georgia, "Times New Roman", serif;
+      --body-font: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --mono-font: "Cascadia Code", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(157, 107, 55, 0.09), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(59, 111, 118, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f1e7 0%, #fbf7f1 28%, #f6efe5 100%);
+      font-family: var(--body-font);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+    }
+
+    a { color: var(--accent-2); }
+
+    code, pre, .technical, .meta-chip, .section-index, .eyebrow, .stat-label, .stat-value, .mermaid {
+      font-family: var(--mono-font);
+    }
+
+    .page-shell { width: min(var(--page-width), calc(100vw - 32px)); margin: 0 auto; padding: 28px 0 56px; }
+
+    .hero {
+      padding: 34px;
+      border: 1px solid rgba(159, 123, 79, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(157, 107, 55, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.86)),
+        var(--paper-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr); gap: 24px; align-items: end; }
+
+    .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+
+    .title { margin: 0; max-width: 16ch; font-family: var(--display-font); font-size: clamp(2.4rem, 4.4vw, 4.2rem); line-height: 0.98; letter-spacing: -0.03em; text-wrap: balance; }
+
+    .lede { margin: 18px 0 0; max-width: 60ch; color: var(--ink-soft); font-size: 1rem; }
+
+    .takeaway { margin-top: 22px; padding: 18px 20px; border-left: 4px solid var(--accent-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: rgba(59, 111, 118, 0.08); color: #20373a; font-size: 1.02rem; }
+
+    .meta-grid { display: grid; gap: 12px; }
+
+    .meta-card, .section, .subcard, .empty-state {
+      border: 1px solid rgba(95, 72, 46, 0.12);
+      background: rgba(255, 253, 249, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .meta-card { padding: 16px 18px; border-radius: var(--radius-md); }
+    .meta-label { color: var(--ink-soft); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .meta-chip { margin-top: 8px; color: var(--accent); font-size: 1rem; font-weight: 700; word-break: break-word; }
+
+    .section { margin-top: 22px; padding: 24px; border-radius: var(--radius-lg); break-inside: avoid; page-break-inside: avoid; }
+
+    .section-header { display: flex; justify-content: space-between; gap: 12px 18px; align-items: end; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+
+    .section-index { color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+    .section-title { margin: 0; font-family: var(--display-font); font-size: clamp(1.45rem, 2vw, 2rem); line-height: 1.05; }
+
+    .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { display: grid; gap: 16px; }
+    .summary-grid, .dual-grid, .phase-grid, .appendix-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .subcard { padding: 18px; border-radius: var(--radius-md); break-inside: avoid; page-break-inside: avoid; }
+    .subcard h3, .subcard h4 { margin: 0 0 10px; font-size: 1rem; line-height: 1.2; }
+    .subcard p:first-child, .subcard ul:first-child, .subcard ol:first-child { margin-top: 0; }
+
+    .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 16px; }
+    .stat { padding: 14px 16px; border: 1px solid rgba(59, 111, 118, 0.16); border-radius: var(--radius-sm); background: rgba(59, 111, 118, 0.06); break-inside: avoid; page-break-inside: avoid; }
+    .stat-label { color: var(--ink-soft); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .stat-value { margin-top: 8px; color: var(--accent-2); font-size: 1.18rem; font-weight: 700; }
+
+    .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame {
+      padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.54);
+      break-inside: avoid; page-break-inside: avoid;
+    }
+
+    .diagram-frame { overflow-x: auto; overflow-y: auto; overscroll-behavior-x: contain; overscroll-behavior-y: contain; max-height: min(70vh, 720px); }
+    .chart-frame, .viz-frame { overflow: hidden; }
+    .mermaid { width: 100%; max-width: 100%; min-width: 0; color: var(--ink); }
+    .mermaid svg { display: block; width: auto !important; min-width: 100%; max-width: none !important; height: auto !important; }
+    .diagram-frame.compact-diagram { padding: 12px; max-height: min(62vh, 560px); }
+    .diagram-frame.compact-diagram .mermaid { min-width: 900px; }
+
+    .chart-frame canvas, .technical-frame > canvas, .viz-frame canvas, canvas.report-chart {
+      display: block; width: 100% !important; max-width: 100%; height: 300px !important; min-height: 300px; max-height: 300px;
+    }
+
+    .technical-frame table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .technical-frame th, .technical-frame td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    .technical-frame th { color: var(--accent); font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .empty-state { padding: 20px; border-radius: var(--radius-md); text-align: center; color: var(--ink-soft); break-inside: avoid; page-break-inside: avoid; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--accent); font-size: 0.84rem; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    ul, ol { margin: 0; padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    p:last-child, li:last-child { margin-bottom: 0; }
+
+    .footer-note { margin-top: 18px; color: rgba(95, 86, 76, 0.74); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; }
+    .badge.done { background: rgba(59, 111, 118, 0.14); color: var(--accent-2); }
+    .badge.open { background: rgba(157, 107, 55, 0.16); color: var(--accent); }
+
+    @media (max-width: 920px) {
+      .hero-grid, .summary-grid, .dual-grid, .phase-grid, .stat-grid, .appendix-grid { grid-template-columns: 1fr; }
+      .title { max-width: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { width: min(100vw - 20px, var(--page-width)); padding-top: 16px; padding-bottom: 36px; }
+      .hero, .section { padding: 18px; border-radius: 20px; }
+      .title { font-size: clamp(2.1rem, 12vw, 3.2rem); }
+    }
+
+    @media print {
+      :root { --paper: #ffffff; --paper-strong: #ffffff; --ink: #111111; --ink-soft: #444444; --line: #d6d1c8; }
+      @page { size: A4; margin: 14mm; }
+      body { background: #ffffff; }
+      .page-shell { width: 100%; max-width: none; padding: 0; }
+      .hero, .meta-card, .section, .subcard, .narrative, .chart-frame, .technical-frame, .diagram-frame, .viz-frame, .empty-state, .stat {
+        background: #ffffff; box-shadow: none;
+      }
+      .hero, .section { margin-top: 0; margin-bottom: 10mm; }
+      .diagram-frame { overflow: visible; max-height: none; }
+      .diagram-frame.compact-diagram .mermaid { min-width: 0; }
+      .section-header, .takeaway { break-after: avoid; page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero" id="title-hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Final Report / Shareable Analysis Artifact</p>
+          <h1 class="title">Delivery-Stall Recovery</h1>
+          <p class="lede">
+            A six-phase recovery of the DPPA teaching pipeline: an uncommitted redesign, a stalled
+            deploy, and a set of guards that reported green while missing exactly what they existed
+            to catch — all closed out, verified, and live.
+          </p>
+          <div class="takeaway">
+            All three stalled delivery stages (commit → push → deploy) are clear; every guard that
+            used to pass silently can now fail for the reason it exists; the app's default state now
+            demonstrates the mission it was built to teach. 16 commits, 6 phases, CI green on every
+            push, production redeployed and verified with zero console errors.
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="meta-label">Project</div>
+            <div class="meta-chip">Vietnam DPPA Teaching Tool</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Repository</div>
+            <div class="meta-chip">dppa-case</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-label">Date</div>
+            <div class="meta-chip">2026-08-23</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="executive-summary">
+      <div class="section-header">
+        <div>
+          <div class="section-index">01 / Executive Summary</div>
+          <h2 class="section-title">Executive Summary</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="subcard">
+          <h3>What was found</h3>
+          <p>A brainstorm pass on 2026-08-22 found the repository's delivery pipeline stalled at all
+          three stages at once: a large, competent UI redesign sat uncommitted; three commits
+          (including the one that added the CI formatting gate) had never been pushed; and the
+          production app had been 28 days and 14 commits stale, silently serving a broken
+          service-worker registration the whole time. The guard built to catch exactly this had
+          reported green for three consecutive Mondays because its CI job never had Node installed.</p>
+        </div>
+        <div class="subcard">
+          <h3>What was done</h3>
+          <p>A six-phase recovery plan executed the same day: stabilise and ship the redesign, build
+          the missing "did this reach anyone" guard class, freeze the translation surface before a
+          translator is engaged, convert five silently-passing checks into real gates, make the
+          Python deck pipeline installable and CI-verified, and fix what the app teaches by default.
+          Every phase is committed, pushed, green in CI, and — where it touched the live app or
+          deck — deployed and verified against production.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="background-objective">
+      <div class="section-header">
+        <div>
+          <div class="section-index">02 / Background &amp; Objective</div>
+          <h2 class="section-title">Background &amp; Objective</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>dppa-case</strong> is two linked projects sharing one dataset: a Vite/vanilla-JS
+        teaching app (<code>app/</code>, deployed to <code>dppa-case.web.app</code>) that models
+        Vietnam's virtual-DPPA settlement mechanics, and a set of Python scripts that build a
+        PowerPoint teaching deck, worksheets, and figures from the same settlement engine. The
+        project exists to prepare a presenter for an October 2026 teaching session — the app is the
+        live demo aid, the deck is the walkthrough, and a settlement-engine → JSON-export → deck
+        pipeline exists specifically so no number on a slide can silently disagree with what the
+        engine computes.</p>
+        <p>A prior session's brainstorm (2026-08-22) found that pipeline's <em>propagation</em> —
+        not its numbers — had quietly broken: work was being produced but not reaching either GitHub
+        or the audience, and several of the guards meant to catch that class of failure had never
+        actually been exercised. The objective of this effort was to close every one of those gaps
+        in one pass, verify each fix against the real repository and the live site rather than in
+        the abstract, and leave the pipeline in a state where the next stall would be caught by a
+        machine within a week instead of by the next manual audit.</p>
+      </div>
+    </section>
+
+    <section class="section" id="inputs-scope">
+      <div class="section-header">
+        <div>
+          <div class="section-index">03 / Inputs &amp; Scope</div>
+          <h2 class="section-title">Inputs &amp; Scope</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Primary inputs</h3>
+          <ul>
+            <li><code>plans/2026-08-22-delivery-stall-recovery-plan.md</code> — the six-phase
+            executable plan, with binding-default assumptions for every unsourced figure.</li>
+            <li><code>research/2026-08-22-delivery-stall-and-in-flight-redesign-brainstorm.md</code>
+            and the 2026-08-15 predecessor brief — the diagnostic groundwork.</li>
+            <li>The live repository state at session start: an uncommitted 11-file redesign, 3
+            unpushed commits, a 28-day-stale production deploy.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>In scope this session</h3>
+          <ul>
+            <li>Stabilising and shipping the in-flight redesign; a new propagation guard; the
+            translation-surface freeze; converting five silently-passing checks into real gates; the
+            Python deck pipeline's dependencies and CI coverage; the app's default teaching state and
+            the gate-sweep grid.</li>
+          </ul>
+          <h4 style="margin-top:14px">Explicitly out of scope</h4>
+          <ul>
+            <li>Producing the Vietnamese/Chinese translations themselves (needs a qualified human
+            translator — H2).</li>
+            <li>Recalibrating lender/investor gate thresholds with real deal data (needs Allotrope
+            deal data — H3).</li>
+            <li>Committing Linux visual-regression baselines (needs a browser-triggered GitHub
+            Actions run — H6).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="assumptions-constraints">
+      <div class="section-header">
+        <div>
+          <div class="section-index">04 / Assumptions &amp; Constraints</div>
+          <h2 class="section-title">Assumptions &amp; Constraints</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Binding-default assumptions applied</h3>
+          <ul>
+            <li><strong>ASM-001:</strong> the uncommitted working-tree changes were deliberate,
+            wanted work — fixed rather than reverted.</li>
+            <li><strong>ASM-003:</strong> the deploy step only proceeds if Firebase credentials are
+            already authenticated in the environment (they were).</li>
+            <li><strong>ASM-004:</strong> the self-hosted webfont uses <code>@fontsource/inter</code>
+            with a specific subset list, chosen for parity with the removed
+            <code>fonts.googleapis.com</code> link.</li>
+            <li><strong>ASM-005:</strong> <code>strikeEscalation</code> defaults to 2.0%/yr —
+            explicitly not a sourced figure, chosen only so the escalation differential the app
+            teaches is non-zero and a crossover exists inside the horizon.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Constraints honored throughout</h3>
+          <ul>
+            <li>No translation was invented, machine-translated, or guessed — every
+            <code>UNTRANSLATED</code> sentinel stays until a qualified human replaces it.</li>
+            <li>Every headline-figure change (the gate-sweep pass count) was retired in the same
+            commit that changed it, per the repository's own integrity rule.</li>
+            <li>Deploys and pushes were treated as outward-facing, confirmable actions — verified
+            against the live site and CI after each one, not assumed.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="methodology">
+      <div class="section-header">
+        <div>
+          <div class="section-index">05 / Methodology</div>
+          <h2 class="section-title">Methodology</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p>Each phase followed the same discipline: make the change, run the full local gate set
+        (lint, Prettier, unit tests, coverage, the Python guard suite), run the functional e2e suite,
+        push, and watch the resulting GitHub Actions run to completion rather than assuming success.
+        Two defects were caught this way that inline reading would have missed — a USD-currency
+        display bug in the redesigned chart, and a URL-state regression that silently stripped
+        <code>?teach=1</code>/<code>?test=1</code> before the modules that read them could see it,
+        found only because 6 of 60 e2e tests failed and were run down to a root cause rather than
+        retried. One flaky test (a documented browser-launch race under parallel CI workers,
+        unrelated to this session's changes) was confirmed as a flake by isolated re-run before being
+        addressed with a scoped CI-only retry, not by re-running until green.</p>
+        <p>Where a figure changed (the gate-sweep pass count), the fix was verified three ways
+        before being called done: the settlement-engine export was re-run and diffed against the
+        prior committed JSON, the full deck-rebuild pipeline was executed end to end, and a
+        repository-wide search confirmed no stale copy of the superseded figure survived anywhere
+        the retirement guard scans — including inside the guard's own test fixtures, which had
+        hard-coded the old figure as a "current, not yet retired" example and needed updating in the
+        same pass.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Phases executed</div><div class="stat-value">6 of 6</div></div>
+        <div class="stat"><div class="stat-label">Commits</div><div class="stat-value">16</div></div>
+        <div class="stat"><div class="stat-label">CI runs watched to green</div><div class="stat-value">9</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="phase-analysis">
+      <div class="section-header">
+        <div>
+          <div class="section-index">06 / Phase-by-Phase Analysis</div>
+          <h2 class="section-title">Phase-by-Phase Analysis</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Phase 1 — Stabilise and commit <span class="badge done">done</span></h3>
+          <p>The uncommitted redesign (direct chart labels, a vertical net-first cancellation
+          breakdown replacing the horizontal strikethrough equation that lost the room in July) had
+          a real bug: the USD strike-reference line silently failed to draw because a currency field
+          had been dropped from shared chart state. Fixed, plus a render-blocking Google Fonts link
+          was replaced with a self-hosted, service-worker-cached font, and the coverage
+          denominator — previously blind to 42% of the app's JavaScript — was corrected and
+          re-baselined honestly (49/49/51/49, with a per-file floor on the settlement engine).</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 2 — Propagation guard &amp; deploy <span class="badge done">done</span></h3>
+          <p>Built <code>tools/check_delivery_pipeline.py</code> — the guard class the repository
+          lacked: every other check asks "is this number right", this one asks "did the work reach
+          anyone." Made the Monday deploy-freshness job able to fail (it had never had Node
+          installed, so a build failure silently reported green for three weeks). Pushed 20 days of
+          backlog, deployed, and verified the offline drill against the live URL: the service worker
+          activates and a reload while offline still renders the full app.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 3 — Freeze the translation surface <span class="badge done">done</span></h3>
+          <p>Froze the 151-key English string table before a translator is engaged (H2, then 2 days
+          out), added a CI check that fails if the frozen key set drifts, converted two
+          figure-embedding deck-text entries to a placeholder-slot contract so a translator never
+          types a number, made number formatting locale-aware, and fixed a Vietnamese worksheet
+          where the loss-factor coefficients were typeset in the wrong numeral convention — a 1000×
+          misreading risk on the two most confusable numbers in the whole settlement.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 4 — Convert silent passes to real gates <span class="badge done">done</span></h3>
+          <p>Extended the deck-number verifier to scan speaker notes (the numbers a presenter says
+          out loud), not just slide bodies — reconciled figures roughly doubled. Deleted a dead
+          numeric-reconciliation loop that discarded every mismatch it found. Widened two guards'
+          scan surface to include the shipped app and the hand-maintained terminology map. Built a
+          plan-status checker that found one plan mislabeled "complete" with 0 of 80 tasks done, and
+          four more genuinely done but never marked so — corrected both directions.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 5 — Installable, CI-verified deck pipeline <span class="badge done">done</span></h3>
+          <p>Added a pinned <code>requirements.txt</code> for the Python deck/visual builders, a
+          text-level deck comparator (binary PowerPoint diffing is useless — timestamps churn even
+          with no visible change), and a <code>deck-build</code> CI job that rebuilds the deck to a
+          scratch directory and confirms it's identical to the committed one. One real bug surfaced
+          and fixed in CI itself: the builder's <code>--out</code> path didn't create its target
+          directory on a fresh runner.</p>
+        </div>
+        <div class="subcard">
+          <h3>Phase 6 — Fix what the app teaches by default <span class="badge done">done</span></h3>
+          <p>The app's landing scenario is now the canonical teaching case (S1 Matched) instead of a
+          synthetic curve that appears nowhere else in the material, with a non-zero escalation
+          differential so the mission's core claim is visible on first load — plus a one-click
+          "Locked strike" preset and a differential pill, using string keys that had sat unused since
+          an earlier phase. The gate-sweep grid was extended so its headline figure — the strike axis
+          previously stopped exactly at the investor threshold — no longer looks like an artifact of
+          where the chart was cropped: <strong>15 of 70</strong> now clear all three gates, up from
+          5 of 56, with the full per-gate breakdown published alongside it.</p>
+        </div>
+      </div>
+      <div class="diagram-frame compact-diagram">
+        <pre class="mermaid">
+flowchart LR
+  A["Found: 3 stages stalled<br/>uncommitted + unpushed + undeployed"] --> B["P1: stabilise + fix<br/>USD chart bug"]
+  B --> C["P2: propagation guard<br/>+ push + deploy"]
+  C --> D["P3: freeze translation<br/>surface"]
+  D --> E["P4: silent-pass guards<br/>-> real gates"]
+  E --> F["P5: deck pipeline<br/>installable + CI-verified"]
+  F --> G["P6: teaching defaults<br/>+ gate-sweep grid"]
+  G --> H["Verified: CI green x9<br/>prod redeployed, 0 console errors"]
+        </pre>
+      </div>
+    </section>
+
+    <section class="section" id="findings-recommendation">
+      <div class="section-header">
+        <div>
+          <div class="section-index">07 / Findings &amp; Recommendation</div>
+          <h2 class="section-title">Findings &amp; Recommendation</h2>
+        </div>
+      </div>
+      <div class="narrative">
+        <p><strong>Finding 1 — the repository had a well-developed guard system for content
+        correctness and none for propagation.</strong> Every check that existed asked whether a
+        number was right; none asked whether finished work had reached GitHub or the audience. That
+        blind spot is what let a 28-day-stale deploy and a 20-day unpushed backlog accumulate without
+        any alert firing. <code>tools/check_delivery_pipeline.py</code> closes it, and is now the
+        highest-leverage single file added this session.</p>
+        <p><strong>Finding 2 — several existing guards had degraded into checks that could not fail
+        for the reason they existed.</strong> The Monday deploy-freshness job had no Node installed,
+        so a build failure always reported "UNKNOWN" and exited 0 — three consecutive Mondays of
+        false-green while the site was genuinely stale. A numeric-reconciliation loop in the deck
+        auditor discarded every mismatch it found rather than reporting it. Both are now real gates;
+        the general pattern (a check that was built in good faith and then quietly stopped carrying
+        information) is worth a standing habit of auditing, not just this one pass.</p>
+        <p><strong>Finding 3 — the gate-sweep headline was sensitive to an unexamined chart-axis
+        choice.</strong> The old strike grid stopped at exactly the investor bankability threshold,
+        so every passing scenario sat in the single edge column — "5 of 56" was a property of where
+        the axis was cropped, not a finding about DPPA economics. Extending the grid two steps past
+        the threshold more than doubled the combined pass rate and is now defensible against exactly
+        the question a lender in the room would ask.</p>
+        <p><strong>Recommendation:</strong> treat the propagation guard as a permanent addition to
+        the Monday job, keep the plan-status checker running so "what's left" stays answerable by a
+        machine, and prioritize engaging the translator (H2) and confirming the session date (H1) —
+        both are now the binding constraints on the calendar, not anything left uncovered by this
+        session's code.</p>
+      </div>
+      <div class="viz-frame chart-frame">
+        <canvas id="gateSweepChart" role="img" aria-label="Gate-sweep pass counts before and after extending the strike grid"></canvas>
+      </div>
+    </section>
+
+    <section class="section" id="implementation-path">
+      <div class="section-header">
+        <div>
+          <div class="section-index">08 / Implementation Path</div>
+          <h2 class="section-title">Implementation Path</h2>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="subcard">
+          <h3>Already shipped, no further action</h3>
+          <ul>
+            <li>All 6 phases committed, pushed, CI-green, and — where they touched the app or
+            deck — deployed and verified against production.</li>
+            <li>Delivery-pipeline guard, strict deploy-freshness, and the plan-status checker are
+            wired into <code>.github/workflows/</code> and will run on their own schedule.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Waiting on a person, tracked in <code>facilitator/october-run-plan.md</code></h3>
+          <ul>
+            <li><strong>H1</strong> — confirm the session date &amp; venue (overdue).</li>
+            <li><strong>H2</strong> — engage the VI/ZH translator, using
+            <code>facilitator/translation-brief.md</code> (due in 2 days).</li>
+            <li><strong>H3</strong> — recalibrate lender/investor gate proxies with real deal data,
+            or formally accept the illustrative band.</li>
+            <li><strong>H5 / H6</strong> — schedule the fresh-viewer volunteer; trigger the
+            Linux visual-baseline bootstrap job from the Actions tab.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Next coding session, once the translator delivers</h3>
+          <ul>
+            <li>Run <code>build_oct_teaching_deck.py --lang vi</code> / <code>--lang zh</code>
+            and the matching audits — <code>plans/2026-october-readiness-checklist.md</code>
+            has the exact command sequence already staged.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Opportunistic, before the 2026-09-15 content freeze</h3>
+          <ul>
+            <li>A presenter rehearsal harness — the one artifact that would measure MISSION.md's
+            actual success criterion, which nothing in the repository currently does.</li>
+            <li><code>docs/pipeline-architecture.md</code> naming the settlement→export→deck
+            pipeline as a reusable capability, not a one-workshop artifact.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="risks-open-questions">
+      <div class="section-header">
+        <div>
+          <div class="section-index">09 / Risks / Open Questions</div>
+          <h2 class="section-title">Risks / Open Questions</h2>
+        </div>
+      </div>
+      <div class="dual-grid">
+        <div class="subcard">
+          <h3>Open risks</h3>
+          <ul>
+            <li><strong>Calendar pressure:</strong> H1 (session date) is overdue and H2 (translator)
+            is due in 2 days; every other date in the plan is backward-planned from these two.</li>
+            <li><strong>Lender/investor gate proxies remain illustrative</strong> (flat per-kWh
+            floors, not modelled debt schedules or equity IRR) until H3 lands — the deck now states
+            this caveat explicitly in the M5 speaker notes, but the underlying model is unchanged.</li>
+            <li><strong>Coverage floor is honest but still low</strong> (49% branches
+            repository-wide) — the re-baseline fixed the measurement, not the coverage itself;
+            raising it is future work, not a regression from this session.</li>
+            <li><strong><code>.git</code> is 152 MB</strong>, dominated by repeatedly-committed
+            PowerPoint binaries — not urgent before October, but worth a decision (Git LFS, or
+            committing the deck only at tagged milestones) before vi/zh builds triple the count.</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Open questions for the presenter</h3>
+          <ul>
+            <li>Is 2026-10-01 still the working session date, or has H1 resolved to something else?</li>
+            <li>Is the 2%/yr strike-escalation default (ASM-005, explicitly unsourced) acceptable as
+            the teaching illustration, or is there a real negotiated index to use instead?</li>
+            <li>Should the lender/investor gate thresholds be recalibrated with real Allotrope deal
+            data before the freeze, or is the illustrative band acceptable for October with the
+            caveat now in the speaker notes?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="appendices-evidence">
+      <div class="section-header">
+        <div>
+          <div class="section-index">10 / Appendices / Evidence Notes</div>
+          <h2 class="section-title">Appendices / Evidence Notes</h2>
+        </div>
+      </div>
+      <div class="appendix-grid">
+        <div class="technical-frame" style="grid-column: 1 / -1;">
+          <table>
+            <thead><tr><th>Metric</th><th>Before</th><th>After</th><th>Verified via</th></tr></thead>
+            <tbody>
+              <tr><td>Unpushed commits</td><td>3 (12 days old)</td><td>0</td><td><code>git rev-list --count origin/master..master</code></td></tr>
+              <tr><td>Undeployed commits</td><td>14 (28 days stale)</td><td>0 (same-day docs only)</td><td><code>tools/check_deploy_freshness.py</code> → PASS</td></tr>
+              <tr><td>App unit tests</td><td>73</td><td>95</td><td><code>npm test</code></td></tr>
+              <tr><td>Python guard tests</td><td>74</td><td>104</td><td><code>python -m unittest discover -s tools/tests</code></td></tr>
+              <tr><td>Deck-number reconciliation</td><td>5 figures (body only)</td><td>11 figures (body + notes)</td><td><code>verify_deck_numbers.py</code></td></tr>
+              <tr><td>Gate-sweep grid</td><td>56 cells, 5 pass all three</td><td>70 cells, 15 pass all three</td><td><code>node scripts/export-sweep.mjs</code></td></tr>
+              <tr><td>Retired-figures scan surface</td><td>42 files</td><td>82 files</td><td><code>tools/check_retired_figures.py</code></td></tr>
+              <tr><td>Coverage denominator</td><td>13 of ~15 source files</td><td>full <code>src/</code> tree</td><td><code>npm run coverage</code></td></tr>
+              <tr><td>CI runs this session</td><td>—</td><td>9 watched to completion, all green</td><td><code>gh run view</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="subcard">
+          <h3>Key commits</h3>
+          <ul>
+            <li><code>6de5bed</code> redesign: chart legibility pass</li>
+            <li><code>fc1ddbf</code> guards: propagation checker</li>
+            <li><code>1dfeb1f</code> deploy: redeploy + verify offline</li>
+            <li><code>6f08973</code> / <code>0723633</code> i18n: freeze + slots contract</li>
+            <li><code>765a101</code> guards: notes-level deck parity</li>
+            <li><code>44e4dda</code> plans: trustworthy status metadata</li>
+            <li><code>474e06b</code> deck-pipeline: requirements + deck-build CI</li>
+            <li><code>cb750e5</code> app: teaching-canon landing state + URL state</li>
+            <li><code>9c85512</code> deck: extend gate-sweep grid</li>
+          </ul>
+        </div>
+        <div class="subcard">
+          <h3>Source documents</h3>
+          <ul>
+            <li><code>plans/2026-08-22-delivery-stall-recovery-plan.md</code> — the executed plan</li>
+            <li><code>research/2026-08-22-delivery-stall-and-in-flight-redesign-brainstorm.md</code></li>
+            <li><code>reports/2026-08-22-chart-legibility-redesign.md</code></li>
+            <li><code>reports/2026-08-23-plan-status-verification.md</code></li>
+            <li><code>facilitator/translation-brief.md</code>,
+            <code>facilitator/october-run-plan.md</code></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-note">designed for html first, printable without reconstruction</div>
+    </section>
+  </main>
+  <script>
+    (function() {
+      const chartCanvases = document.querySelectorAll('canvas');
+      chartCanvases.forEach((canvas) => {
+        canvas.classList.add('report-chart');
+        const parent = canvas.parentElement;
+        if (parent && parent.classList.contains('technical-frame') && !parent.classList.contains('chart-frame')) {
+          parent.classList.add('chart-frame');
+        }
+      });
+    })();
+
+    if (window.Chart) {
+      Chart.defaults.devicePixelRatio = 1;
+      Chart.defaults.animation = false;
+      Chart.defaults.resizeDelay = 150;
+      Chart.defaults.normalized = true;
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.responsive = true;
+
+      const ctx = document.getElementById('gateSweepChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Buyer gate', 'Lender gate', 'Investor gate', 'All three gates'],
+            datasets: [
+              {
+                label: 'Old grid (56 cells)',
+                data: [52, 14, 7, 5],
+                backgroundColor: 'rgba(157, 107, 55, 0.55)',
+                borderColor: '#9d6b37',
+                borderWidth: 1,
+                animation: false
+              },
+              {
+                label: 'New grid (70 cells)',
+                data: [62, 28, 21, 15],
+                backgroundColor: 'rgba(59, 111, 118, 0.6)',
+                borderColor: '#3b6f76',
+                borderWidth: 1,
+                animation: false
+              }
+            ]
+          },
+          options: {
+            animation: false,
+            resizeDelay: 150,
+            normalized: true,
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+              y: { beginAtZero: true, title: { display: true, text: 'Scenarios passing' } }
+            },
+            plugins: {
+              legend: { position: 'bottom' },
+              title: { display: true, text: 'Gate-sweep pass counts, before vs. after extending the strike grid' }
+            }
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
