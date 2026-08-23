@@ -94,6 +94,51 @@ _SIMPLE_TEXT_KEYS = [
 ]
 _LIST_TEXT_KEYS = {"divider": 6, "checkpoint": 6, "appendix_titles": 3, "appendix_takeaways": 3}
 
+# PHASE-03 (2026-08-23, plans/2026-08-22-delivery-stall-recovery-plan.md): matches
+# app/src/modules/formatters.js's LOCALE_BY_LANG -- vi-VN groups thousands with
+# ".", en-US/zh-CN group with ",". A translator never types a figure (see the
+# "slots" contract in assets/teaching/terminology-map.json's meta block); the
+# builder substitutes every {placeholder} from spine-s1.json at build time,
+# formatted for the target language, so no slide figure can diverge from the
+# settlement engine and no translation carries a typo'd number.
+_GROUPING_SEPARATOR_BY_LANG = {"en": ",", "vi": ".", "zh": ","}
+
+
+def format_number_for_lang(value, lang):
+    """Format an integer with the target language's thousands-grouping separator."""
+    grouped = f"{value:,}"
+    sep = _GROUPING_SEPARATOR_BY_LANG.get(lang, ",")
+    return grouped.replace(",", sep) if sep != "," else grouped
+
+
+def resolve_slot_path(path, spine):
+    """Walk a "/a/b/c" pointer into `spine` and return the numeric leaf value."""
+    node = spine
+    for part in path.strip("/").split("/"):
+        node = node[part]
+    return node
+
+
+def resolve_slot_value(slot, spine):
+    """A slot is a single "/a/b/c" path, or a list of paths to sum (a derived figure,
+    e.g. "fees" = systemService + diffClearing, which has no field of its own)."""
+    if isinstance(slot, list):
+        return sum(resolve_slot_path(p, spine) for p in slot)
+    return resolve_slot_path(slot, spine)
+
+
+def substitute_slots(text, slots, lang, spine):
+    """Replace every {name} token in `text` with its slots[name] value, resolved
+    from `spine` and formatted for `lang`. Raises KeyError naming the token if
+    the template references a placeholder no slots entry provides."""
+    for name, slot in slots.items():
+        token = "{" + name + "}"
+        if token not in text:
+            continue
+        value = resolve_slot_value(slot, spine)
+        text = text.replace(token, format_number_for_lang(round(value), lang))
+    return text
+
 
 def load_text(lang):
     """Returns the TEXT layer for `lang`. "en" is always the literal TEXT["en"]
@@ -114,7 +159,12 @@ def load_text(lang):
         if entry is None:
             return None
         value = entry.get(lang)
-        return None if value == "UNTRANSLATED" else value
+        if value == "UNTRANSLATED":
+            return None
+        slots = entry.get("slots")
+        if slots:
+            value = substitute_slots(value, slots, lang, SPINE)
+        return value
 
     missing = []
     result = dict(base)
