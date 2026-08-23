@@ -6,7 +6,16 @@
   --series-solar: #ffd84f;
   --series-matched: #f5fbff;
   --series-fmp: #ff3d7f;
-  font-family: 'Segoe UI', sans-serif;
+  /* Type scale — one family, restrained steps */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --text-xs: 0.8rem;
+  --text-sm: 0.8rem;
+  --text-md: 0.875rem;
+  --text-base: 0.95rem;
+  --text-lg: 1.05rem;
+  --text-xl: 1.25rem;
+  --text-2xl: clamp(1.35rem, 1.1rem + 0.9vw, 1.7rem);
+  font-family: var(--font-sans);
   color: #f4fbff;
   background: #050816;
   font-synthesis: none;
@@ -15,18 +24,25 @@
   -moz-osx-font-smoothing: grayscale;
 
   --bg: #050816;
-  --panel: rgba(9, 15, 33, 0.8);
+  --panel: rgba(13, 20, 40, 0.72);
   --panel-strong: rgba(10, 18, 41, 0.92);
-  --border: rgba(136, 195, 255, 0.14);
-  --line: rgba(181, 228, 255, 0.12);
+  --border: rgba(136, 195, 255, 0.12);
+  --line: rgba(181, 228, 255, 0.1);
   --text: #f4fbff;
-  --muted: #97abc7;
+  --muted: #9aabc4;
   --cyan: #47d7ff;
   --yellow: #ffd84f;
   --magenta: #ff68d8;
   --amber: #ffc84b;
   --mint: #9affde;
-  --shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 10px 30px rgba(2, 5, 14, 0.35);
+
+  /* One shared spacing rhythm: every panel, grid gap and card pulls from these */
+  --panel-pad-x: 28px;
+  --panel-pad-y: 26px;
+  --grid-gap: 22px;
+  --card-gap: 12px;
+  --card-pad: 12px;
 }
 
 * {
@@ -37,10 +53,9 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(71, 215, 255, 0.18), transparent 24%),
-    radial-gradient(circle at top right, rgba(255, 104, 216, 0.14), transparent 26%),
-    radial-gradient(circle at bottom center, rgba(255, 216, 79, 0.12), transparent 24%),
-    linear-gradient(180deg, #050816 0%, #091127 48%, #060b19 100%);
+    radial-gradient(circle at top left, rgba(71, 215, 255, 0.07), transparent 30%),
+    radial-gradient(circle at top right, rgba(255, 104, 216, 0.05), transparent 32%),
+    linear-gradient(180deg, #050816 0%, #081026 52%, #060b19 100%);
 }
 
 button,
@@ -57,75 +72,55 @@ button {
 }
 
 .app-shell {
-  max-width: 1580px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 10px 16px 16px;
+  padding: 20px clamp(16px, 4vw, 32px) 48px;
 }
 
 .panel {
   border: 1px solid var(--border);
   background: var(--panel);
-  backdrop-filter: blur(18px);
-  border-radius: 24px;
+  border-radius: 16px;
   box-shadow: var(--shadow);
 }
 
-.glow-frame {
-  position: relative;
-  overflow: hidden;
-}
-
-:root[data-webdriver] .panel {
-  backdrop-filter: none;
-}
-
-:root[data-webdriver] .glow-frame::after {
-  content: none;
-}
-
-.glow-frame::after {
-  content: '';
-  position: absolute;
-  inset: -20%;
-  background: linear-gradient(
-    120deg,
-    rgba(71, 215, 255, 0.1),
-    transparent 35%,
-    rgba(255, 104, 216, 0.07) 60%,
-    transparent 78%
-  );
-  pointer-events: none;
-}
-
 .topbar {
-  padding: 10px 14px;
+  padding: 14px 20px;
   display: flex;
   justify-content: space-between;
-  gap: 14px;
+  gap: 16px;
   align-items: center;
-  background: linear-gradient(135deg, rgba(8, 18, 46, 0.92), rgba(11, 25, 59, 0.82));
+  background: linear-gradient(135deg, rgba(10, 18, 42, 0.85), rgba(12, 24, 54, 0.75));
 }
 
 .brand-block {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   min-width: 0;
 }
 
 .brand-logo {
-  width: 76px;
+  width: 56px;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.08));
+}
+
+/* Disclaimer line sits quietly under the header, out of the way */
+.hero-note {
+  margin-top: 12px;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 .eyebrow {
-  margin: 0 0 4px;
+  margin: 0 0 2px;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--mint);
-  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
 }
 
 h1,
@@ -138,27 +133,26 @@ ul {
 }
 
 h1 {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(1.2rem, 1.7vw, 1.8rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
-  text-shadow: 0 0 20px rgba(71, 215, 255, 0.18);
-}
-
-h2,
-h3 {
-  font-family: Georgia, 'Times New Roman', serif;
-  letter-spacing: -0.03em;
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 h2 {
-  font-size: 1.18rem;
-}
-h3 {
-  font-size: 1.02rem;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
-.hero-copy,
+h3 {
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.hero-note,
 .panel-note,
 .metric-detail,
 .explain-list li,
@@ -168,44 +162,50 @@ h3 {
   color: var(--muted);
 }
 
-.hero-copy {
-  margin-top: 2px;
-  font-size: 0.8rem;
-  line-height: 1.28;
-}
-
 .topbar-actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Secondary controls (language, presenter theme, tour) sit quieter than currency */
+.topbar-secondary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 10px;
+  border-left: 1px solid var(--line);
 }
 
 .toggle-group,
 .scenario-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .toggle-button,
 .scenario-tab,
 .ghost-button,
 .summary-pill {
-  border: 1px solid rgba(154, 255, 222, 0.18);
+  border: 1px solid rgba(154, 255, 222, 0.16);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
-  border-radius: 999px;
+  border-radius: 8px;
+  font-size: var(--text-sm);
+  font-weight: 500;
 }
 
 .toggle-button,
 .scenario-tab,
 .ghost-button {
-  padding: 0.5rem 0.82rem;
+  padding: 0.42rem 0.75rem;
   transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease;
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
   cursor: pointer;
 }
 
@@ -218,16 +218,8 @@ h3 {
   .toggle-button:hover,
   .scenario-tab:hover,
   .ghost-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 18px rgba(71, 215, 255, 0.14);
+    background: rgba(255, 255, 255, 0.08);
   }
-}
-
-.toggle-button:active,
-.scenario-tab:active,
-.ghost-button:active {
-  transform: translateY(0);
-  box-shadow: 0 0 24px rgba(71, 215, 255, 0.22);
 }
 
 .toggle-button:focus-visible,
@@ -239,57 +231,48 @@ h3 {
 
 .toggle-button.is-active,
 .scenario-tab.is-active {
-  background: linear-gradient(135deg, rgba(71, 215, 255, 0.18), rgba(255, 216, 79, 0.12));
-  border-color: rgba(255, 216, 79, 0.45);
+  background: rgba(71, 215, 255, 0.14);
+  border-color: rgba(71, 215, 255, 0.45);
+  color: #eaffff;
 }
 
 .story-grid {
-  margin-top: 10px;
+  margin-top: 28px;
   display: grid;
-  grid-template-columns: minmax(0, 1.24fr) minmax(360px, 0.88fr);
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--grid-gap);
   align-items: stretch;
 }
 
 .lower-grid {
-  margin-top: 12px;
+  margin-top: 16px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--grid-gap);
   align-items: start;
 }
 
-.focus-column,
-.story-column {
-  display: grid;
-  gap: 14px;
-}
-
-.story-column {
-  grid-template-rows: auto;
-}
-
 .focus-column {
-  min-height: 100%;
+  display: grid;
+  gap: var(--grid-gap);
+  min-width: 0;
 }
 
 /* chart and walkthrough panel side-by-side on desktop */
 .chart-walkthrough-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.58fr) minmax(430px, 0.86fr);
-  gap: 14px;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1.3fr) minmax(440px, 1fr);
+  gap: var(--grid-gap);
+  align-items: start;
 }
 
 .chart-walkthrough-row .chart-panel {
   min-height: 100%;
 }
 
+/* Walkthrough flows vertically at desktop widths — never an internal scrollbar */
 .chart-walkthrough-row .walkthrough-panel {
   margin-top: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  max-height: 560px;
   min-width: 0;
 }
 
@@ -300,7 +283,7 @@ h3 {
 .hour-panel,
 .controls-panel,
 .walkthrough-panel {
-  padding: 12px;
+  padding: var(--panel-pad-y) var(--panel-pad-x);
 }
 
 .chart-headline,
@@ -312,7 +295,11 @@ h3 {
 }
 
 .chart-headline {
-  margin-bottom: 8px;
+  margin-bottom: 14px;
+}
+
+.panel-header {
+  margin-bottom: 16px;
 }
 
 .summary-pills {
@@ -327,7 +314,7 @@ h3 {
   align-items: center;
   gap: 8px;
   padding: 0.36rem 0.72rem;
-  font-size: 0.76rem;
+  font-size: 0.8rem;
 }
 
 .summary-pill.result {
@@ -343,7 +330,7 @@ h3 {
 .chart-wrap {
   position: relative;
   height: 344px;
-  border-radius: 22px;
+  border-radius: 12px;
   border: 1px solid var(--line);
   background: linear-gradient(180deg, rgba(9, 16, 36, 0.82), rgba(7, 11, 24, 0.94));
   padding: 10px;
@@ -356,6 +343,23 @@ h3 {
 
 .profile-wrap {
   flex: 1;
+  height: 448px;
+}
+
+/* Slim FMP sparkline strip beneath the main plot — price lives here so the
+   main plot stays purely in kWh on a single axis */
+.fmp-strip-wrap {
+  height: 104px;
+  margin-top: 8px;
+  padding: 4px 10px;
+}
+
+/* Hero strip beneath the multi-year chart — cumulative savings on its own
+   scale so the headline takeaway is never a flat line hugging zero */
+.savings-strip-wrap {
+  height: 120px;
+  margin-top: 8px;
+  padding: 4px 10px;
 }
 
 .chart-tap-hint {
@@ -366,10 +370,83 @@ h3 {
   letter-spacing: 0.02em;
 }
 
+/* HTML legend row — replaces Chart.js's in-canvas legend on both charts */
+.chart-legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin: 0 2px 10px;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.legend-dash {
+  width: 16px;
+  height: 0;
+  border-top: 2px dashed rgba(82, 144, 255, 0.85);
+  flex: 0 0 auto;
+}
+
+/* Caption chip strip — tariff bands + strike explanation, below the profile chart */
+.chart-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 10px;
+}
+
+.caption-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.caption-chip b {
+  color: var(--text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.caption-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.caption-strike .caption-dot {
+  width: 14px;
+  height: 0;
+  border-radius: 0;
+  border-top: 2px dashed rgba(82, 144, 255, 0.85);
+}
+
 .five-line-bill {
   margin-top: 10px;
   border: 1px solid rgba(154, 255, 222, 0.18);
-  border-radius: 18px;
+  border-radius: 12px;
   padding: 12px;
   background: linear-gradient(180deg, rgba(154, 255, 222, 0.08), rgba(255, 255, 255, 0.025));
 }
@@ -447,30 +524,23 @@ h3 {
 
 .hour-nav-btn {
   flex: 0 0 auto;
-  border: 1px solid rgba(154, 255, 222, 0.18);
+  border: 1px solid rgba(154, 255, 222, 0.16);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
-  border-radius: 999px;
-  padding: 0.42rem 0.78rem;
-  font-size: 0.78rem;
+  border-radius: 8px;
+  padding: 0.42rem 0.75rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
   transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease;
+    border-color 160ms ease,
+    background 160ms ease;
 }
 
 @media (hover: hover) {
   .hour-nav-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 18px rgba(71, 215, 255, 0.14);
+    background: rgba(255, 255, 255, 0.08);
   }
-}
-
-.hour-nav-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 0 24px rgba(71, 215, 255, 0.22);
 }
 
 .hour-nav-btn:focus-visible {
@@ -496,7 +566,7 @@ h3 {
 
 .walkthrough-card {
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: 12px;
   padding: 18px 16px 16px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
   display: grid;
@@ -557,28 +627,122 @@ h3 {
 
 .walkthrough-lines {
   display: grid;
-  gap: 10px;
+  gap: 2px;
   font-size: 0.86rem;
   line-height: 1.5;
   min-width: 0;
 }
 
-.wl-eq-head {
-  margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.55;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+/* One term per row: label left, muted formula center, value right on a shared baseline */
+.bill-line-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 8px 0;
 }
 
-.wl-eq-head strong {
+.bill-line-row + .bill-line-row {
+  border-top: 1px solid var(--line);
+}
+
+.bill-line-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.bill-line-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Full-width term lines under the head row — no mid-term wrapping */
+.bill-line-formula {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.bill-term {
+  display: block;
+}
+
+.bill-line-value {
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bill-line-developer .bill-line-value {
+  color: #ff8e98;
+}
+
+.bill-line-net {
+  border-top: 1px solid var(--border);
+}
+
+.bill-line-net .bill-line-label {
+  color: var(--mint);
+}
+
+.walkthrough-derivation {
+  margin-top: 6px;
+  border-top: 1px solid var(--line);
+  padding-top: 4px;
+}
+
+.walkthrough-derivation summary,
+.fmp-cancel-derivation summary {
+  cursor: pointer;
+  padding: 6px 2px;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted, #8b97a8);
+  user-select: none;
+}
+
+/* The strip stays dark in every theme, so its summary must keep a light color */
+.fmp-cancel-derivation summary {
+  color: rgba(203, 213, 225, 0.78);
+}
+
+.walkthrough-derivation summary:hover,
+.fmp-cancel-derivation summary:hover {
+  color: var(--text);
+}
+
+.walkthrough-derivation summary:focus-visible,
+.fmp-cancel-derivation summary:focus-visible {
+  outline: 2px solid rgba(71, 215, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.net-derivation {
+  display: grid;
+  gap: 4px;
+  margin-top: 4px;
+  padding-bottom: 6px;
+}
+
+.net-derivation-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  min-width: 0;
+}
+
+.net-derivation-total .net-total {
   font-size: 0.95rem;
 }
 
 .walkthrough-panel h2 {
-  font-size: 1rem;
-  line-height: 1.22;
-  max-width: 22ch;
+  font-size: var(--text-base);
+  line-height: 1.35;
+  max-width: 24ch;
   overflow-wrap: anywhere;
 }
 
@@ -599,57 +763,32 @@ h3 {
   text-shadow: 0 0 10px rgba(154, 255, 222, 0.4);
 }
 
-.net-formula-line {
-  margin: 0;
-  color: rgba(244, 251, 255, 0.88);
-  font-size: 0.82rem;
-  line-height: 1.6;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-.net-formula-simplified {
-  color: rgba(244, 251, 255, 0.96);
-  font-weight: 600;
-}
-
+/* Cancelled terms are marked with a ✕ prefix on their own row — no stacked strikethroughs */
 .net-cancelled-term,
 .net-retained-term {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 10px;
-  padding: 0.05rem 0;
+  display: inline;
   min-width: 0;
 }
 
 .net-cancelled-term {
   color: #ff8a8f;
   font-weight: 700;
-  text-decoration-line: line-through;
-  text-decoration-color: #ff4d5f;
-  text-decoration-thickness: 2px;
+}
+
+.net-cancelled-term::before {
+  content: '✕ ';
+  opacity: 0.7;
 }
 
 .net-retained-term {
-  color: rgba(244, 251, 255, 0.96);
+  color: var(--text);
 }
 
 .net-operator {
   display: inline-flex;
   align-items: center;
-  color: rgba(244, 251, 255, 0.72);
-}
-
-.net-equals {
-  display: inline-flex;
-  align-items: center;
-  color: rgba(244, 251, 255, 0.64);
-  font-weight: 700;
-  margin-right: 2px;
+  min-width: 1ch;
+  color: var(--muted);
 }
 
 .walkthrough-note {
@@ -670,8 +809,8 @@ h3 {
 .flow-card,
 .bars-card {
   border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 12px;
+  border-radius: 12px;
+  padding: var(--card-pad);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
 }
 
@@ -700,7 +839,8 @@ h3 {
 .metric-label,
 .formula-label {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -709,9 +849,10 @@ h3 {
 .flow-value {
   display: block;
   margin-top: 6px;
-  font-size: 1.18rem;
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
 .metric-detail {
@@ -725,7 +866,7 @@ h3 {
 .controls-grid,
 .bars-grid {
   display: grid;
-  gap: 12px;
+  gap: var(--card-gap);
 }
 
 .formula-grid {
@@ -769,7 +910,7 @@ h3 {
 
 .comparison-card {
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 12px;
   padding: 12px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
 }
@@ -784,7 +925,7 @@ h3 {
   box-shadow: inset 0 0 0 1px rgba(255, 104, 216, 0.18);
 }
 
-/* ─── FMP Cancellation Strip ─────────────────────────────────────────────── */
+/* ─── FMP Cancellation Breakdown ──────────────────────────────────────────── */
 .fmp-cancel-strip {
   margin-top: 12px;
   padding: 14px 16px;
@@ -795,55 +936,49 @@ h3 {
 
 .fmp-cancel-header {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-bottom: 10px;
 }
 
 .fmp-cancel-context {
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   color: rgba(244, 251, 255, 0.68);
   line-height: 1.35;
 }
 
 .fmp-cancel-title {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted, rgba(255, 255, 255, 0.45));
 }
 
-.fmp-cancel-hint {
-  font-size: 0.68rem;
-  color: var(--text-muted, rgba(255, 255, 255, 0.32));
-  font-style: italic;
+.fmp-step-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 1.25rem auto;
+  gap: 10px;
+  align-items: baseline;
 }
 
-.fmp-cancel-equation {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  row-gap: 8px;
-}
-
-.cancel-eq-term {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
+.fmp-cancel-steps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 2px;
-  padding: 6px 10px;
+  margin-top: 4px;
+}
+
+.fmp-step-row {
+  padding: 6px 8px;
   border-radius: 9px;
   border: 1px solid transparent;
-  min-width: 92px;
-  text-align: center;
-  cursor: default;
-  transition: box-shadow 0.2s;
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
-.cancel-eq-owner {
+.fmp-step-owner {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -856,145 +991,108 @@ h3 {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.82;
+  white-space: nowrap;
 }
 
-.cancel-eq-sign {
-  font-size: 0.65rem;
+.fmp-step-label {
+  min-width: 0;
+  color: rgba(244, 251, 255, 0.78);
+  overflow-wrap: anywhere;
+}
+
+.fmp-step-sign {
+  text-align: right;
   font-weight: 600;
   opacity: 0.7;
-  align-self: flex-start;
-  min-height: 12px;
 }
 
-.cancel-eq-value {
+.fmp-step-value {
+  justify-self: end;
   font-size: 0.88rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
+  white-space: nowrap;
 }
 
-.cancel-eq-label {
-  font-size: 0.58rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  opacity: 0.65;
-  white-space: normal;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.cancel-eq-separator {
-  font-size: 0.9rem;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.25);
-  padding: 0 2px;
-  align-self: center;
-}
-
-.cancel-eq-equals {
-  font-size: 1rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-/* FMP term — shown in amber, labelled so the CFO knows it can cancel */
-.cancel-term-shown {
-  background: rgba(255, 185, 30, 0.1);
-  border-color: rgba(255, 185, 30, 0.3);
-  color: rgb(255, 215, 90);
-}
-.cancel-term-shown .cancel-eq-value {
-  color: rgb(255, 215, 90);
-  text-shadow: 0 0 12px rgba(255, 185, 30, 0.5);
-}
-
-.cancel-term-crossed .cancel-eq-value,
-.cancel-term-crossed .cancel-eq-owner {
-  text-decoration: line-through;
-  text-decoration-thickness: 2px;
-}
-
-.cancel-term-shown.cancel-term-crossed .cancel-eq-value,
-.cancel-term-shown.cancel-term-crossed .cancel-eq-owner {
-  text-decoration-color: rgba(255, 185, 30, 0.9);
-}
-
-/* FMP cancellation term — red with strikethrough on the value */
-.cancel-term-cancel {
-  background: rgba(255, 80, 80, 0.1);
-  border-color: rgba(255, 80, 80, 0.3);
-  color: rgb(255, 120, 120);
-  position: relative;
-}
-.cancel-term-cancel .cancel-eq-value {
-  color: rgb(255, 110, 110);
-  text-decoration-color: rgba(255, 80, 80, 0.9);
-  text-shadow: 0 0 10px rgba(255, 60, 60, 0.4);
-}
-.cancel-term-cancel.cancel-term-crossed .cancel-eq-owner {
-  text-decoration-color: rgba(255, 80, 80, 0.9);
-}
-.cancel-term-cancel .cancel-eq-label::before {
-  content: '✕ ';
-  opacity: 0.7;
-}
-
-/* Strike price — blue/teal */
-.cancel-term-strike {
-  background: rgba(63, 184, 255, 0.1);
-  border-color: rgba(63, 184, 255, 0.28);
-}
-.cancel-term-strike .cancel-eq-value {
-  color: rgb(110, 200, 255);
-  text-shadow: 0 0 12px rgba(63, 184, 255, 0.4);
-}
-
-/* DPPA charge — cyan */
-.cancel-term-charge {
-  background: rgba(71, 215, 255, 0.08);
-  border-color: rgba(71, 215, 255, 0.24);
-}
-.cancel-term-charge .cancel-eq-value {
-  color: rgb(100, 230, 255);
-  text-shadow: 0 0 10px rgba(71, 215, 255, 0.35);
-}
-
-/* Loss adjustment — muted grey */
-.cancel-term-loss {
-  background: rgba(180, 180, 200, 0.06);
-  border-color: rgba(180, 180, 200, 0.18);
-}
-.cancel-term-loss .cancel-eq-value {
-  color: rgba(200, 200, 210, 0.75);
-}
-
-/* Shortfall retail — amber-yellow */
-.cancel-term-retail {
-  background: rgba(255, 200, 75, 0.08);
-  border-color: rgba(255, 200, 75, 0.22);
-}
-.cancel-term-retail .cancel-eq-value {
-  color: rgb(255, 210, 100);
-}
-
-/* Result chip — green */
-.cancel-term-result {
-  background: rgba(154, 255, 222, 0.1);
+/* Net headline — always visible above the collapsed derivation */
+.fmp-step-result {
   border-color: rgba(154, 255, 222, 0.3);
+  background: rgba(154, 255, 222, 0.08);
+  margin-top: 2px;
 }
-.cancel-term-result .cancel-eq-value {
+.fmp-step-result .fmp-step-value {
   color: rgb(154, 255, 222);
   font-size: 1rem;
   text-shadow: 0 0 14px rgba(154, 255, 222, 0.45);
 }
-.cancel-term-result .cancel-eq-label {
-  color: rgba(154, 255, 222, 0.65);
+.fmp-step-result .fmp-step-label {
+  color: rgba(154, 255, 222, 0.75);
+}
+
+.fmp-cancel-derivation {
+  margin-top: 6px;
+}
+
+/* Term tone accents — one row each, colour only, never overlapping strikethroughs */
+.cancel-term-shown {
+  background: rgba(255, 185, 30, 0.08);
+  border-color: rgba(255, 185, 30, 0.24);
+  color: rgb(255, 215, 90);
+}
+.cancel-term-shown .fmp-step-value {
+  color: rgb(255, 215, 90);
+}
+
+.cancel-term-cancel {
+  background: rgba(255, 80, 80, 0.08);
+  border-color: rgba(255, 80, 80, 0.26);
+  color: rgb(255, 120, 120);
+}
+.cancel-term-cancel .fmp-step-value {
+  color: rgb(255, 110, 110);
+}
+.cancel-term-cancel .fmp-step-label::before {
+  content: '✕ ';
+  opacity: 0.7;
+}
+
+.cancel-term-strike {
+  background: rgba(63, 184, 255, 0.08);
+  border-color: rgba(63, 184, 255, 0.22);
+}
+.cancel-term-strike .fmp-step-value {
+  color: rgb(110, 200, 255);
+}
+
+.cancel-term-charge {
+  background: rgba(71, 215, 255, 0.06);
+  border-color: rgba(71, 215, 255, 0.2);
+}
+.cancel-term-charge .fmp-step-value {
+  color: rgb(100, 230, 255);
+}
+
+.cancel-term-loss {
+  background: rgba(180, 180, 200, 0.05);
+  border-color: rgba(180, 180, 200, 0.16);
+}
+.cancel-term-loss .fmp-step-value {
+  color: rgba(200, 200, 210, 0.75);
+}
+
+.cancel-term-retail {
+  background: rgba(255, 200, 75, 0.07);
+  border-color: rgba(255, 200, 75, 0.2);
+}
+.cancel-term-retail .fmp-step-value {
+  color: rgb(255, 210, 100);
 }
 
 /* Inline note below the details strip */
 .cancellation-note-inline {
   margin: 8px 0 0;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   line-height: 1.55;
   padding: 8px 12px;
   border-radius: 8px;
@@ -1011,30 +1109,17 @@ h3 {
 }
 
 @media (max-width: 640px) {
-  .fmp-cancel-equation {
-    gap: 3px;
-  }
-  .cancel-eq-term {
-    min-width: 64px;
-    padding: 5px 7px;
-  }
-  .cancel-eq-owner {
-    font-size: 0.48rem;
-    padding: 0.08rem 0.32rem;
-  }
-  .cancel-eq-value {
+  .fmp-step-row {
+    grid-template-columns: 4.5rem minmax(0, 1fr) 1rem auto;
+    gap: 6px;
     font-size: 0.78rem;
   }
-  .cancel-eq-label {
-    font-size: 0.55rem;
-    white-space: normal;
-  }
 }
-/* ─── end FMP Cancellation Strip ──────────────────────────────────────────── */
+/* ─── end FMP Cancellation Breakdown ──────────────────────────────────────── */
 
 .figure-card {
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 12px;
   padding: 9px 11px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
 }
@@ -1062,7 +1147,7 @@ h3 {
 .formula-card pre {
   margin-top: 6px;
   font-family: Consolas, 'Courier New', monospace;
-  font-size: 0.76rem;
+  font-size: 0.8rem;
   white-space: pre-wrap;
   color: #f6fbff;
 }
@@ -1070,7 +1155,7 @@ h3 {
 .cancellation-flow-card {
   margin-top: 8px;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 12px;
   padding: 12px 14px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
   overflow: visible;
@@ -1112,12 +1197,12 @@ h3 {
   border: 1px solid rgba(154, 255, 222, 0.18);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   line-height: 1.25;
 }
 
 .flow-label {
-  font-size: 0.62rem;
+  font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted, #8b97a8);
@@ -1207,7 +1292,7 @@ h3 {
 
 .warning-banner {
   margin-top: 10px;
-  border-radius: 18px;
+  border-radius: 12px;
   padding: 10px 12px;
   border: 1px solid rgba(255, 200, 75, 0.3);
   background: rgba(255, 200, 75, 0.08);
@@ -1228,7 +1313,7 @@ h3 {
   align-items: center;
   border-radius: 999px;
   padding: 0.35rem 0.65rem;
-  font-size: 0.74rem;
+  font-size: 0.8rem;
 }
 
 .hour-chip {
@@ -1283,40 +1368,52 @@ h3 {
 }
 
 .formula-detail-card {
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 10px 11px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border: none;
+  border-radius: 12px;
+  padding: 2px 0 0;
+  background: none;
 }
 
 .payment-panel {
   display: grid;
+  grid-template-rows: auto 1fr auto;
   gap: 10px;
 }
 
+/* The developer card carries a single equation against the EVN card's three;
+   centering the stack keeps both cards visually balanced instead of leaving
+   an empty band above the developer total */
 .payment-stack {
   display: grid;
-  gap: 8px;
+  gap: 0;
+  align-content: center;
 }
 
+/* Flat rows separated by hairline dividers instead of stacked bordered cards */
 .payment-equation {
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 10px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px 2px;
+  background: none;
 }
-
-.payment-equation.evn {
-  box-shadow: inset 0 0 0 1px rgba(63, 184, 255, 0.16);
+.payment-stack .payment-equation:last-child {
+  border-bottom: none;
+}
+.payment-equation.evn,
+.payment-equation.accent,
+.payment-equation.warning,
+.payment-equation.developer {
+  box-shadow: inset 3px 0 0 0 rgba(63, 184, 255, 0.45);
 }
 .payment-equation.accent {
-  box-shadow: inset 0 0 0 1px rgba(154, 255, 222, 0.16);
+  box-shadow: inset 3px 0 0 0 rgba(154, 255, 222, 0.45);
 }
 .payment-equation.warning {
-  box-shadow: inset 0 0 0 1px rgba(255, 200, 75, 0.18);
+  box-shadow: inset 3px 0 0 0 rgba(255, 200, 75, 0.5);
 }
 .payment-equation.developer {
-  box-shadow: inset 0 0 0 1px rgba(255, 104, 216, 0.16);
+  box-shadow: inset 3px 0 0 0 rgba(255, 104, 216, 0.5);
 }
 
 .payment-equation-head,
@@ -1338,12 +1435,14 @@ h3 {
 .payment-total-card span,
 .cancellation-note {
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   line-height: 1.35;
 }
 
 .equation-formula {
   margin-top: 6px;
+  color: var(--text);
+  opacity: 0.85;
   font-family: Consolas, 'Courier New', monospace;
 }
 
@@ -1354,10 +1453,11 @@ h3 {
 .payment-total-card {
   display: grid;
   gap: 4px;
-  border-radius: 16px;
-  padding: 10px;
-  border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border-radius: 12px;
+  padding: 10px 2px;
+  border: none;
+  border-top: 1px solid var(--line);
+  background: none;
 }
 
 .payment-total-card strong {
@@ -1365,10 +1465,10 @@ h3 {
 }
 
 .evn-tone {
-  box-shadow: inset 0 0 0 1px rgba(63, 184, 255, 0.18);
+  box-shadow: inset 3px 0 0 0 rgba(63, 184, 255, 0.6);
 }
 .developer-tone {
-  box-shadow: inset 0 0 0 1px rgba(255, 104, 216, 0.18);
+  box-shadow: inset 3px 0 0 0 rgba(255, 104, 216, 0.6);
 }
 
 .cancellation-highlight {
@@ -1487,7 +1587,7 @@ h3 {
 .bars-legend {
   margin-top: 8px;
   color: var(--muted);
-  font-size: 0.76rem;
+  font-size: 0.8rem;
 }
 
 .bars-values {
@@ -1513,16 +1613,35 @@ h3 {
 
 .control-card {
   display: grid;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+  row-gap: 6px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
 }
 
-.control-card span {
-  font-size: 0.9rem;
+.control-card > span {
+  font-size: 0.85rem;
   line-height: 1.25;
+  color: var(--muted);
+}
+
+.control-card > strong {
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.control-card > input[type='range'],
+.control-card > select {
+  grid-column: 1 / -1;
 }
 
 .control-card input[type='range'] {
   width: 100%;
+  height: 6px;
   accent-color: var(--cyan);
 }
 
@@ -1591,11 +1710,9 @@ h3 {
     flex-direction: column;
     align-items: flex-start;
   }
-  .brand-block {
-    align-items: flex-start;
-  }
-  .brand-logo {
-    width: 72px;
+  .topbar-secondary {
+    padding-left: 0;
+    border-left: none;
   }
   .cancellation-figures,
   .flow-grid,
@@ -1618,7 +1735,7 @@ h3 {
   }
   .summary-pill {
     padding: 0.32rem 0.6rem;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
   }
   .scenario-tabs {
     gap: 6px;
@@ -1650,16 +1767,9 @@ h3 {
   .comparison-grid {
     grid-template-columns: 1fr;
   }
-  .story-column {
-    display: contents;
-  }
   /* stack chart and walkthrough vertically on tablet/mobile */
   .chart-walkthrough-row {
     grid-template-columns: 1fr;
-  }
-  .chart-walkthrough-row .walkthrough-panel {
-    max-height: none;
-    overflow-y: visible;
   }
 
   .walkthrough-panel h2 {
@@ -1674,13 +1784,21 @@ h3 {
   .details-panel,
   .formula-panel,
   .controls-panel {
-    padding: 10px;
+    padding: 14px;
   }
 
   .chart-wrap {
     height: min(52vh, 320px);
     min-height: 260px;
     padding: 8px;
+  }
+
+  .profile-wrap {
+    height: min(60vh, 360px);
+  }
+
+  .fmp-strip-wrap {
+    height: 84px;
   }
 
   /* Topbar: stack brand block and actions vertically */
@@ -1694,11 +1812,8 @@ h3 {
     width: 100%;
     justify-content: flex-start;
   }
-  .brand-logo {
-    width: 56px;
-  }
-  /* Suppress hero subtitle on very small screens to save vertical space */
-  .hero-copy {
+  /* Suppress hero disclaimer on very small screens to save vertical space */
+  .hero-note {
     display: none;
   }
 
@@ -1726,10 +1841,13 @@ h3 {
     font-size: 0.82rem;
   }
 
-  .wl-eq-head,
-  .net-formula-line {
-    font-size: 0.78rem;
-    line-height: 1.55;
+  .bill-line-row {
+    grid-template-columns: 1fr auto;
+    gap: 4px 8px;
+  }
+  .bill-line-formula {
+    grid-column: 1 / -1;
+    order: 3;
   }
 
   .net-cancelled-term,
@@ -1753,16 +1871,12 @@ h3 {
     font-size: 0.7rem;
   }
 
-  /* FMP cancellation strip: let chips shrink freely, allow label wrapping */
+  /* FMP cancellation strip: tighten padding on small screens */
   .fmp-cancel-strip {
     padding: 10px;
   }
-  .cancel-eq-term {
-    min-width: 0;
-    flex: 1 1 auto;
-  }
-  .cancel-eq-label {
-    white-space: normal;
+  .fmp-step-row {
+    padding: 5px 6px;
   }
 
   /* Comparison cards: tighten padding to reduce stacked height */
@@ -1801,7 +1915,7 @@ h3 {
   .toggle-button,
   .ghost-button {
     padding: 0.38rem 0.6rem;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
   }
 
   /* Comparison cards: absolute minimum padding */
@@ -1809,12 +1923,12 @@ h3 {
     padding: 7px 8px;
   }
 
-  /* FMP equation chips: even smaller font on very narrow screens */
-  .cancel-eq-value {
-    font-size: 0.72rem;
+  /* FMP equation rows: smaller value font on very narrow screens */
+  .fmp-step-value {
+    font-size: 0.78rem;
   }
-  .cancel-eq-label {
-    font-size: 0.52rem;
+  .fmp-step-label {
+    font-size: 0.8rem;
   }
 
   /* Cancellation flow: tighter font and padding on extra-small phones */
@@ -1822,11 +1936,11 @@ h3 {
     padding: 8px;
   }
   .flow-node {
-    font-size: 0.66rem;
+    font-size: 0.75rem;
     padding: 6px 8px;
   }
   .flow-value {
-    font-size: 0.72rem;
+    font-size: 0.8rem;
   }
   .flow-total {
     font-size: 0.78rem;

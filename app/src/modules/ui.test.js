@@ -182,14 +182,15 @@ describe('selected-hour layout', () => {
     const text = normalizedText('#walkthroughCases')
 
     expect(text).toContain('Load = Gen')
-    expect(text).toContain('EVN =')
+    expect(text).toContain('EVN component')
+    expect(text).toContain('Developer component')
+    expect(text).toContain('Net result')
     expect(text).toContain('Net = EVN + Developer')
     const kppText = inputs.lossFactor.toFixed(3)
     expect(text).toContain(`FMP (${fmpText}) × Kpp (${kppText}) × 4,700 kWh`)
-    expect(text).toContain('Developer =')
     expect(text).toContain(`− FMP (${fmpText}) × 4,700 kWh + Strike (${strikeText}) × 4,700 kWh`)
     expect(text).toContain(
-      `EVN = FMP (${fmpText}) × Kpp (${kppText}) × 4,700 kWh + CDPPA (523.30 VND/kWh) × 4,700 kWh =`,
+      `FMP (${fmpText}) × Kpp (${kppText}) × 4,700 kWh + CDPPA (523.30 VND/kWh) × 4,700 kWh`,
     )
     expect(text).toContain('FMP cancellation')
     expect(document.querySelector('#walkthroughCases').innerHTML).toContain('net-cancelled-term')
@@ -249,9 +250,9 @@ describe('selected-hour layout', () => {
 
     expect(normalizedText('#selectedHourDetailsPanel')).not.toContain('FMP cancellation')
     expect(text).toContain(
-      `EVN = FMP (${fmpText}) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh`,
+      `FMP (${fmpText}) × Kpp (1.027) × 4,700 kWh + CDPPA (523.34 VND/kWh) × 4,700 kWh`,
     )
-    expect(text).toContain('Developer =')
+    expect(text).toContain('Developer component')
     expect(text).toContain(`− FMP (${fmpText}) × 4,700 kWh + Strike (1,741.35 VND/kWh) × 4,700 kWh`)
     expect(text).toContain('FMP cancellation')
     expect(text).toContain('per kWh on factory load')
@@ -364,19 +365,24 @@ describe('selected-hour layout', () => {
       breakdown,
     )
 
-    const netLines = document.querySelectorAll('#walkthroughCases .net-formula-line')
+    const derivations = document.querySelectorAll('#walkthroughCases .net-derivation')
+    const derivationRows = [...document.querySelectorAll('#walkthroughCases .net-derivation-row')]
     const text = normalizedText('#walkthroughCases')
 
-    expect(netLines).toHaveLength(1)
-    expect(text).toContain(
-      'Net = EVN + Developer = =Retail (1,833.00 VND/kWh) × 2,600 kWh=4,765,800 VND',
-    )
-    expect(document.querySelector('#walkthroughCases').innerHTML).toContain(
-      'cancel-term-shown cancel-term-crossed',
-    )
-    expect(document.querySelector('#walkthroughCases').innerHTML).toContain(
-      'cancel-term-cancel cancel-term-crossed',
-    )
+    // Exactly one derivation list — never two stacked expanded/simplified net lines
+    expect(derivations).toHaveLength(1)
+    expect(derivationRows.length).toBeGreaterThanOrEqual(1)
+    expect(text).toContain('Retail (1,833.00 VND/kWh) × 2,600 kWh')
+    expect(
+      derivationRows.filter((row) =>
+        row.textContent.includes('Retail (1,833.00 VND/kWh) × 2,600 kWh'),
+      ),
+    ).toHaveLength(1)
+    expect(text).toContain('4,765,800 VND')
+    const html = document.querySelector('#walkthroughCases').innerHTML
+    expect(html).toContain('cancel-term-shown')
+    expect(html).toContain('cancel-term-cancel')
+    expect(html).not.toContain('cancel-term-crossed')
   })
 
   it('keeps a matched below-strike hour visible in the settlement story', () => {
@@ -473,5 +479,75 @@ describe('selected-hour layout', () => {
       `(1,741.35 VND/kWh - ${formatMoney(interval.fmp, { currency: 'VND', precise: true, perKwh: true })})`,
     )
     expect(text).not.toContain('(1,741.35 VND/kWh - 1,700.00 VND/kWh)')
+  })
+})
+
+describe('walkthrough derivation markup', () => {
+  it('renders a closed term-by-term details block for a shortfall hour', () => {
+    document.body.innerHTML = '<div id="walkthroughCases"></div>'
+
+    const inputs = {
+      loadProfile: [9000],
+      generationProfile: [4700],
+      settlementMode: 'matched',
+      strikePrice: 1741.35,
+      marketPrice: 1700,
+      fmpCurve: buildFmpCurve(1700),
+      dppaCharge: 523.34,
+      lossFactor: 1.027263,
+      retailTariff: 1833,
+    }
+
+    const settlement = calculateSettlement(inputs)
+    const interval = settlement.intervals[0]
+    const formulas = buildFormulaBreakdown(inputs, interval)
+    const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
+
+    expect(selectedCase.shortfall).toBeGreaterThan(0)
+
+    renderWalkthroughCases(
+      document.querySelector('#walkthroughCases'),
+      selectedCase,
+      'VND',
+      formulas,
+    )
+
+    const details = document.querySelector('#walkthroughCases details.walkthrough-derivation')
+    expect(details).not.toBeNull()
+    expect(details.open).toBe(false)
+    expect(details.querySelector('summary').textContent).toBe('Term-by-term derivation')
+  })
+
+  it('lists the EVN, Developer and Net bill-line rows in order', () => {
+    document.body.innerHTML = '<div id="walkthroughCases"></div>'
+
+    const inputs = {
+      loadProfile: [4700],
+      generationProfile: [4700],
+      settlementMode: 'matched',
+      strikePrice: 1741.35,
+      marketPrice: 1700,
+      fmpCurve: buildFmpCurve(1700),
+      dppaCharge: 523.34,
+      lossFactor: 1.027263,
+      retailTariff: 1833,
+    }
+
+    const settlement = calculateSettlement(inputs)
+    const interval = settlement.intervals[0]
+    const formulas = buildFormulaBreakdown(inputs, interval)
+    const selectedCase = buildSelectedWalkthroughCase(inputs, interval)
+
+    renderWalkthroughCases(
+      document.querySelector('#walkthroughCases'),
+      selectedCase,
+      'VND',
+      formulas,
+    )
+
+    const rows = [...document.querySelectorAll('#walkthroughCases .bill-line-row')]
+    const labels = rows.map((row) => row.querySelector('.bill-line-label').textContent)
+
+    expect(labels).toEqual(['EVN component', 'Developer component', 'Net result'])
   })
 })

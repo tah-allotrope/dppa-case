@@ -18,7 +18,8 @@ export function applyTheme(theme, { persist = false } = {}) {
 
 export function initTheme() {
   applyTheme(resolveTheme())
-  const actions = document.querySelector('.topbar-actions')
+  const actions =
+    document.querySelector('#topbarSecondary') || document.querySelector('.topbar-actions')
   if (!actions || document.querySelector('#themeToggle')) return
   const button = document.createElement('button')
   button.id = 'themeToggle'

@@ -1,3 +1,12 @@
+// Self-hosted Inter subsets (replaces the fonts.googleapis.com <link> that used to
+// render-block first paint on a slow venue network — the service worker cannot cache
+// a cross-origin stylesheet, so these must ship with the bundle instead).
+import '@fontsource/inter/latin-400.css'
+import '@fontsource/inter/latin-500.css'
+import '@fontsource/inter/latin-600.css'
+import '@fontsource/inter/latin-700.css'
+import '@fontsource/inter/vietnamese-400.css'
+import '@fontsource/inter/vietnamese-600.css'
 import './style.css'
 import './theme.css'
 import {
@@ -9,7 +18,12 @@ import {
   buildFmpCurve,
   buildWorkshopFmpCurve,
 } from './data/default-scenarios.js'
-import { renderMultiYearChart, renderProfileChart } from './modules/chart.js'
+import {
+  renderFmpStrip,
+  renderMultiYearChart,
+  renderProfileChart,
+  renderSavingsStrip,
+} from './modules/chart.js'
 import {
   buildFiveLineBill,
   buildFormulaBreakdown,
@@ -117,6 +131,20 @@ async function updateView() {
   } catch (error) {
     console.error('Profile chart render failed:', error)
   }
+  try {
+    renderFmpStrip(
+      document.querySelector('#fmpStrip'),
+      hourLabels,
+      settlement.intervals,
+      state.currency,
+      (hour) => {
+        state.selectedHour = hour
+        updateView()
+      },
+    )
+  } catch (error) {
+    console.error('FMP strip render failed:', error)
+  }
   renderWalkthroughCases(
     document.querySelector('#walkthroughCases'),
     selectedWalkthroughCase,
@@ -172,6 +200,11 @@ async function updateView() {
     renderMultiYearChart(document.querySelector('#multiYearChart'), multiYear, state.currency)
   } catch (error) {
     console.error('Multi-year chart render failed:', error)
+  }
+  try {
+    renderSavingsStrip(document.querySelector('#savingsStrip'), multiYear, state.currency)
+  } catch (error) {
+    console.error('Savings strip render failed:', error)
   }
 }
 
@@ -243,7 +276,8 @@ function syncInputsFromState() {
 }
 
 function initLangSelector() {
-  const actions = document.querySelector('.topbar-actions')
+  const actions =
+    document.querySelector('#topbarSecondary') || document.querySelector('.topbar-actions')
   if (!actions || document.querySelector('#langSelector')) return
   const group = document.createElement('div')
   group.id = 'langSelector'

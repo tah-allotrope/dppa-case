@@ -6,14 +6,15 @@ import {
   LinearScale,
   CategoryScale,
   Tooltip,
-  Legend,
   Filler,
 } from 'chart.js'
-import { convertMoney, formatMoney, EXCHANGE_RATE } from './formatters.js'
+import { convertMoney, EXCHANGE_RATE, formatMoney } from './formatters.js'
+import { t } from './i18n.js'
 
 // PHASE-04: explicit registration instead of chart.js/auto trims the bundle to
-// only the line-chart building blocks this app actually renders (both charts
-// are `type: 'line'`; no bar/pie/radar chart is used anywhere).
+// only the line-chart building blocks this app actually renders (all charts
+// are `type: 'line'`). Legend is not registered — series names are written
+// directly at their line ends by the directLabels plugin below.
 Chart.register(
   LineController,
   LineElement,
@@ -21,15 +22,17 @@ Chart.register(
   LinearScale,
   CategoryScale,
   Tooltip,
-  Legend,
   Filler,
 )
 
 let profileChart
+let fmpStripChart
+let savingsStripChart
 let multiYearChart
+let crossoverIndex = -1
 // Mutated in place on every renderProfileChart call so the tariffOverlay
 // plugin's getState() closure (captured once, at chart creation) always
-// reads the latest inputs/currency instead of a throwaway per-call object.
+// reads the latest inputs instead of a throwaway per-call object.
 const profileChartState = { inputs: null, currency: 'VND' }
 
 function token(name, fallback) {
@@ -38,11 +41,17 @@ function token(name, fallback) {
 }
 
 export function refreshChartTheme() {
-  for (const chart of [profileChart, multiYearChart]) {
+  const grid = token('--chart-grid', neonGrid)
+  const tick = token('--chart-tick', tickColor)
+  for (const chart of [profileChart, fmpStripChart, savingsStripChart, multiYearChart]) {
     if (!chart) continue
     chart.options.animation = false
-    chart.options.scales.x.ticks.color = token('--chart-tick', '#bcd5ff')
-    chart.options.scales.x.grid.color = token('--chart-grid', 'rgba(160, 183, 217, 0.12)')
+    for (const scaleId of ['x', 'y']) {
+      const scale = chart.options.scales[scaleId]
+      if (!scale) continue
+      if (scale.ticks) scale.ticks.color = tick
+      if (scale.grid) scale.grid.color = grid
+    }
     chart.update('none')
   }
 }
@@ -55,77 +64,22 @@ const tickColor = '#bcd5ff'
 // Illustrative tariff-style time blocks for storytelling only.
 // They help a CFO read the day shape, but the current app still uses a flat
 // retail tariff input rather than time-of-use tariff settlement.
-// startHour/endHour map to the 0-23 hour axis.
+// startHour/endHour map to the 0-23 hour axis. Only the very subtle fill is
+// drawn on the plot; band names/prices live in #tariffCaption below the chart.
 const TARIFF_BANDS = [
-  {
-    label: 'Off-peak',
-    time: '10 pm – 4 am',
-    startHour: 0,
-    endHour: 4,
-    fill: 'rgba(71,215,255,0.06)',
-    lineColor: 'rgba(71,215,255,0.40)',
-    textColor: '#47d7ff',
-  },
-  {
-    label: 'Standard',
-    time: '4 am – 9:30 am',
-    startHour: 4,
-    endHour: 9,
-    fill: 'rgba(255,216,79,0.05)',
-    lineColor: 'rgba(255,216,79,0.40)',
-    textColor: '#ffd84f',
-  },
-  {
-    label: 'Peak',
-    time: '9:30 am – 11:30 am',
-    startHour: 9,
-    endHour: 11,
-    fill: 'rgba(255,104,216,0.07)',
-    lineColor: 'rgba(255,104,216,0.45)',
-    textColor: '#ff68d8',
-  },
-  {
-    label: 'Standard',
-    time: '11:30 am – 5 pm',
-    startHour: 11,
-    endHour: 17,
-    fill: 'rgba(255,216,79,0.05)',
-    lineColor: 'rgba(255,216,79,0.40)',
-    textColor: '#ffd84f',
-  },
-  {
-    label: 'Peak',
-    time: '5 pm – 8 pm',
-    startHour: 17,
-    endHour: 20,
-    fill: 'rgba(255,104,216,0.07)',
-    lineColor: 'rgba(255,104,216,0.45)',
-    textColor: '#ff68d8',
-  },
-  {
-    label: 'Standard',
-    time: '8 pm – 10 pm',
-    startHour: 20,
-    endHour: 22,
-    fill: 'rgba(255,216,79,0.05)',
-    lineColor: 'rgba(255,216,79,0.40)',
-    textColor: '#ffd84f',
-  },
-  {
-    label: 'Off-peak',
-    time: '10 pm – 12 am',
-    startHour: 22,
-    endHour: 24,
-    fill: 'rgba(71,215,255,0.06)',
-    lineColor: 'rgba(71,215,255,0.40)',
-    textColor: '#47d7ff',
-  },
+  { key: 'band_off_peak', startHour: 0, endHour: 4, fill: 'rgba(71,215,255,0.05)' },
+  { key: 'band_standard', startHour: 4, endHour: 9, fill: 'rgba(255,216,79,0.04)' },
+  { key: 'band_peak', startHour: 9, endHour: 11, fill: 'rgba(255,104,216,0.05)' },
+  { key: 'band_standard', startHour: 11, endHour: 17, fill: 'rgba(255,216,79,0.04)' },
+  { key: 'band_peak', startHour: 17, endHour: 20, fill: 'rgba(255,104,216,0.05)' },
+  { key: 'band_standard', startHour: 20, endHour: 22, fill: 'rgba(255,216,79,0.04)' },
+  { key: 'band_off_peak', startHour: 22, endHour: 24, fill: 'rgba(71,215,255,0.05)' },
 ]
 
 // Vivid magenta-red for FMP so it is unmistakably distinct from the amber solar line
 const FMP_COLOR = '#ff3d7f'
 
-function makeTariffPlugin(getState) {
+function makeTariffPlugin() {
   return {
     id: 'tariffOverlay',
 
@@ -145,180 +99,197 @@ function makeTariffPlugin(getState) {
         ctx.restore()
       }
     },
+  }
+}
+
+// ─── Direct series labels ────────────────────────────────────────────────────
+// Series names are drawn at the line's last point instead of a detached
+// dot-chip legend row, so the eye never leaves the plot to decode colors.
+function makeDirectLabelPlugin() {
+  return {
+    id: 'directLabels',
 
     afterDatasetsDraw(chart) {
-      const { ctx } = chart
-      const area = chart.chartArea
-      if (!area) return
+      const { ctx, chartArea } = chart
+      if (!chartArea) return
+      const meta = chart.getDatasetMeta(0)
+      if (!meta || !meta.data.length) return
 
-      const totalHours = 24
-      const w = area.right - area.left
-      const state = getState()
+      // Collect every visible series end-point first, then resolve collisions
+      // deterministically: sort by y and push labels apart until each has a
+      // guaranteed 14px lane, clamped inside the plot area.
+      const pending = []
+      chart.data.datasets.forEach((dataset, index) => {
+        const dsMeta = chart.getDatasetMeta(index)
+        if (!dsMeta || dsMeta.hidden) return
+        const lastPoint = [...dsMeta.data].reverse().find((p) => p && !Number.isNaN(p.x))
+        if (!lastPoint) return
+        const label = dataset.endLabel ?? dataset.label ?? ''
+        if (!label) return
+        pending.push({ label, color: dataset.borderColor, y: lastPoint.y })
+      })
+      if (!pending.length) return
 
-      // ── strike price reference line on yFmp axis ─────────────────────────
-      if (state.inputs && state.inputs.strikePrice) {
-        const yFmpScale = chart.scales['yFmp']
-        if (yFmpScale) {
-          const strikeY = yFmpScale.getPixelForValue(
-            convertMoney(state.inputs.strikePrice, state.currency),
-          )
-          if (strikeY >= area.top && strikeY <= area.bottom) {
-            ctx.save()
-            ctx.setLineDash([8, 5])
-            ctx.strokeStyle = 'rgba(82, 144, 255, 0.65)'
-            ctx.lineWidth = 1.4
-            ctx.beginPath()
-            ctx.moveTo(area.left, strikeY)
-            ctx.lineTo(area.right, strikeY)
-            ctx.stroke()
-            ctx.setLineDash([])
-            // Label on right edge
-            ctx.font = '8px "Segoe UI", sans-serif'
-            ctx.fillStyle = 'rgba(82, 144, 255, 0.9)'
-            ctx.textAlign = 'right'
-            ctx.textBaseline = 'bottom'
-            ctx.fillText(
-              `Strike ${formatMoney(state.inputs.strikePrice, { currency: state.currency, precise: state.currency === 'USD' })}`,
-              area.right - 2,
-              strikeY - 2,
-            )
-            ctx.restore()
-          }
+      pending.sort((a, b) => a.y - b.y)
+      const lane = 17
+      for (let i = 1; i < pending.length; i++) {
+        if (pending[i].y - pending[i - 1].y < lane) pending[i].y = pending[i - 1].y + lane
+      }
+      const overflow = pending[pending.length - 1].y - (chartArea.bottom - 6)
+      if (overflow > 0) {
+        for (const item of pending) item.y -= overflow
+        for (let i = 1; i < pending.length; i++) {
+          if (pending[i].y - pending[i - 1].y < lane) pending[i].y = pending[i - 1].y + lane
         }
       }
 
-      // ── dashed vertical dividers (start below the 52px label block) ──────
-      const labelZoneBottom = area.top + 52
       ctx.save()
-      ctx.setLineDash([5, 5])
-      ctx.lineWidth = 1
-      for (const band of TARIFF_BANDS) {
-        if (band.startHour === 0) continue
-        const x = area.left + (band.startHour / totalHours) * w
-        ctx.strokeStyle = band.lineColor
-        ctx.beginPath()
-        ctx.moveTo(x, labelZoneBottom)
-        ctx.lineTo(x, area.bottom)
-        ctx.stroke()
+      ctx.font = '600 10px Inter, system-ui, sans-serif'
+      ctx.textBaseline = 'middle'
+      ctx.textAlign = 'left'
+      for (const item of pending) {
+        ctx.fillStyle = item.color
+        ctx.fillText(item.label, chartArea.right + 7, Math.max(item.y, chartArea.top + 6))
       }
-      ctx.setLineDash([])
       ctx.restore()
-
-      // ── band header labels ────────────────────────────────────────────────
-      // Reserve the top ~52 px of the chart area for the tariff label rows.
-      // On narrow canvases each band may be < 60 px wide — skip sub-labels
-      // that would collide; only keep the band name when space is very tight.
-      for (const band of TARIFF_BANDS) {
-        const x0 = area.left + (band.startHour / totalHours) * w
-        const x1 = area.left + (band.endHour / totalHours) * w
-        const cx = (x0 + x1) / 2
-        const bw = x1 - x0 - 4
-        // Width thresholds: below 58 px only show the name; below 72 px skip tariff/spot rows
-        const showTime = bw >= 72
-        const showRates = bw >= 88 && !!state.inputs
-
-        ctx.save()
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'top'
-        ctx.beginPath()
-        ctx.rect(x0 + 2, area.top, bw, 56)
-        ctx.clip()
-
-        // Name (white bold) — scale font down proportionally on very narrow bands
-        const nameFontSize = bw < 58 ? 8 : 9.5
-        ctx.font = `bold ${nameFontSize}px "Segoe UI", sans-serif`
-        ctx.fillStyle = '#f4fbff'
-        ctx.fillText(band.label, cx, area.top + 3)
-
-        if (showTime) {
-          // Time range (band colour)
-          ctx.font = '8.5px "Segoe UI", sans-serif'
-          ctx.fillStyle = band.textColor
-          ctx.fillText(band.time, cx, area.top + 15)
-        }
-
-        if (showRates) {
-          // Flat retail reference shown for context only in this v1 teaching model.
-          ctx.font = '8px "Segoe UI", sans-serif'
-          ctx.fillStyle = band.textColor
-          ctx.fillText(
-            `Illustrative retail: ${formatMoney(state.inputs.retailTariff, { currency: state.currency, precise: state.currency === 'USD' })}`,
-            cx,
-            area.top + 27,
-          )
-
-          // Per-band FMP: use the midpoint hour of this band to read from fmpCurve
-          const midHour = Math.floor((band.startHour + band.endHour) / 2)
-          const bandFmp = state.inputs.fmpCurve
-            ? (state.inputs.fmpCurve[midHour] ?? state.inputs.marketPrice)
-            : state.inputs.marketPrice
-          ctx.fillStyle = FMP_COLOR
-          ctx.fillText(
-            `FMP: ${formatMoney(bandFmp, { currency: state.currency, precise: state.currency === 'USD', perKwh: true })}`,
-            cx,
-            area.top + 38,
-          )
-        }
-
-        ctx.restore()
-      }
+      drawnBoxes = drawnBoxes.filter((box) => box.chart !== chart)
     },
   }
 }
 
-function baseOptions(inputs, currency = 'VND') {
-  // Determine a sensible range for the FMP axis based on the curve + strike
-  const strikePrice = inputs?.strikePrice ?? 1741
-  const fmpCurve = inputs?.fmpCurve ?? []
-  const fmpMin = fmpCurve.length ? Math.min(...fmpCurve) : 800
-  const fmpMax = fmpCurve.length ? Math.max(...fmpCurve) : 3000
-  let yFmpMin = Math.floor((Math.min(fmpMin, strikePrice) * 0.88) / 100) * 100
-  let yFmpMax = Math.ceil((Math.max(fmpMax, strikePrice) * 1.08) / 100) * 100
-  if (yFmpMin === yFmpMax) {
-    const pad = Math.max(100, Math.round((strikePrice * 0.1) / 100) * 100)
-    yFmpMin -= pad
-    yFmpMax += pad
+// Scratch space for per-draw label collision avoidance (reset after each draw)
+let drawnBoxes = []
+
+// Vertical marker at the first year DPPA becomes cheaper than BAU (when one
+// exists within the horizon) so the crossover is read, not implied.
+const crossoverMarkerPlugin = {
+  id: 'crossoverMarker',
+
+  afterDatasetsDraw(chart) {
+    if (crossoverIndex < 0 || chart.canvas.id !== 'multiYearChart') return
+    const { ctx, chartArea, data } = chart
+    if (!chartArea || !data.labels || crossoverIndex >= data.labels.length) return
+    const x = chart.scales.x.getPixelForValue(crossoverIndex)
+    if (x < chartArea.left || x > chartArea.right) return
+
+    ctx.save()
+    ctx.setLineDash([4, 4])
+    ctx.strokeStyle = 'rgba(76, 175, 130, 0.7)'
+    ctx.lineWidth = 1.2
+    ctx.beginPath()
+    ctx.moveTo(x, chartArea.top)
+    ctx.lineTo(x, chartArea.bottom)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.font = '600 10px Inter, system-ui, sans-serif'
+    ctx.textAlign = x > chartArea.right - 90 ? 'right' : 'left'
+    ctx.fillStyle = '#4caf82'
+    const label = `${t('legend_crossover')} ${data.labels[crossoverIndex]}`
+    ctx.fillText(label, x + (ctx.textAlign === 'left' ? 5 : -5), chartArea.top + 10)
+    ctx.restore()
+  },
+}
+
+const directLabelsPlugin = makeDirectLabelPlugin()
+
+// ─── Caption builder ─────────────────────────────────────────────────────────
+// All tariff-band names/FMP values and the strike explanation live in a muted
+// chip strip below the profile chart — never inside the plot. It reads from
+// the same inputs as the shading plugin so they can never disagree.
+
+function range(start, end) {
+  const out = []
+  for (let h = start; h < end; h++) out.push(h)
+  return out
+}
+
+// One chip per distinct band name (Standard/Peak/Off-peak each repeat across
+// the day): name + FMP min–max over every hour that band covers.
+function mergedBandChips(inputs, currency) {
+  const groups = []
+  for (const band of TARIFF_BANDS) {
+    let group = groups.find((g) => g.key === band.key)
+    if (!group) {
+      group = { key: band.key, hours: [] }
+      groups.push(group)
+    }
+    group.hours.push(...range(band.startHour, band.endHour))
   }
-  yFmpMin = convertMoney(yFmpMin, currency)
-  yFmpMax = convertMoney(yFmpMax, currency)
-  const isUsd = currency === 'USD'
+
+  const fmtOpts = { maximumFractionDigits: currency === 'USD' ? 3 : 0 }
+  return groups.map((group) => {
+    const values = inputs.fmpCurve
+      ? group.hours.map((h) => inputs.fmpCurve[h] ?? inputs.marketPrice)
+      : [inputs.marketPrice]
+    const min = convertMoney(Math.min(...values), currency)
+    const max = convertMoney(Math.max(...values), currency)
+    const fmpText =
+      min === max
+        ? `${min.toLocaleString('en-US', fmtOpts)}`
+        : `${min.toLocaleString('en-US', fmtOpts)}–${max.toLocaleString('en-US', fmtOpts)}`
+    return `
+      <span class="caption-chip">
+        ${t(group.key)}
+        <b>${fmpText} ${currency}/kWh</b>
+      </span>`
+  })
+}
+
+export function renderTariffCaption(inputs, currency = 'VND') {
+  if (typeof document === 'undefined') return
+  const el = document.getElementById('tariffCaption')
+  if (!el) return
+  if (!inputs) {
+    el.innerHTML = ''
+    return
+  }
+
+  const chips = []
+  if (inputs.strikePrice != null) {
+    chips.push(`
+      <span class="caption-chip caption-strike">
+        ${t('caption_strike_ref').replace('{value}', formatMoney(inputs.strikePrice, { currency, precise: currency === 'USD' }))}
+      </span>`)
+  }
+  chips.push(...mergedBandChips(inputs, currency))
+  el.innerHTML = chips.join('')
+}
+
+function sharedTooltipStyle() {
+  return {
+    backgroundColor: 'rgba(9, 14, 31, 0.92)',
+    borderColor: 'rgba(82, 188, 255, 0.45)',
+    borderWidth: 1,
+    titleColor: '#f6fbff',
+    bodyColor: '#dcecff',
+  }
+}
+
+function baseOptions() {
+  const gridColor = token('--chart-grid', neonGrid)
+  const tickCol = token('--chart-tick', tickColor)
+  const tickFont = { size: 10 }
 
   return {
     responsive: true,
     maintainAspectRatio: false,
     animation: typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 350 },
-    layout: { padding: { top: 64 } },
+    // Right padding reserves a gutter so the end-of-line series labels fit
+    // inside the canvas without overlapping the plotted data.
+    layout: { padding: { top: 8, right: 92 } },
     plugins: {
-      legend: {
-        labels: { color: tickColor, usePointStyle: true, boxWidth: 10, boxHeight: 10 },
-      },
-      tooltip: {
-        backgroundColor: 'rgba(9, 14, 31, 0.92)',
-        borderColor: 'rgba(82, 188, 255, 0.45)',
-        borderWidth: 1,
-        titleColor: '#f6fbff',
-        bodyColor: '#dcecff',
-      },
+      legend: { display: false },
+      tooltip: sharedTooltipStyle(),
     },
     scales: {
-      x: { grid: { color: neonGrid }, ticks: { color: tickColor } },
-      y: { grid: { color: neonGrid }, ticks: { color: tickColor } },
-      yFmp: {
-        type: 'linear',
-        position: 'right',
-        min: yFmpMin,
-        max: yFmpMax,
-        grid: { drawOnChartArea: false },
-        ticks: {
-          color: FMP_COLOR,
-          callback: (v) => (isUsd ? v.toFixed(3) : `${(v / 1000).toFixed(1)}k`),
-        },
-        title: {
-          display: true,
-          text: `${currency}/kWh`,
-          color: FMP_COLOR,
-          font: { size: 10 },
-        },
+      x: {
+        grid: { color: gridColor },
+        ticks: { color: tickCol, font: tickFont, maxRotation: 0, maxTicksLimit: 12 },
+      },
+      y: {
+        grid: { color: gridColor },
+        ticks: { color: tickCol, font: tickFont, maxTicksLimit: 6 },
+        title: { display: true, text: 'kWh', color: tickCol, font: { size: 10 } },
       },
     },
   }
@@ -338,6 +309,7 @@ export function renderProfileChart(
   // (set once, at chart creation) always sees the latest values.
   profileChartState.inputs = inputs
   profileChartState.currency = currency
+  renderTariffCaption(inputs, currency)
   const isNarrowViewport =
     typeof window !== 'undefined' && typeof window.matchMedia === 'function'
       ? window.matchMedia('(max-width: 520px)').matches
@@ -346,15 +318,11 @@ export function renderProfileChart(
   const selPoint = isNarrowViewport ? 6 : 8
   const baseHover = isNarrowViewport ? 5 : 6
   const selHover = isNarrowViewport ? 8 : 10
-  const fmpBase = isNarrowViewport ? 2 : 3
-  const fmpSel = isNarrowViewport ? 5 : 7
-  const fmpBaseHover = isNarrowViewport ? 4 : 6
-  const fmpSelHover = isNarrowViewport ? 7 : 10
 
-  function buildDatasets(ivs, selHour, curr) {
+  function buildDatasets(ivs, selHour) {
     return [
       {
-        label: 'Factory load',
+        label: t('series_load'),
         data: ivs.map((i) => i.load),
         borderColor: '#47d7ff',
         backgroundColor: 'rgba(71,215,255,0.14)',
@@ -364,10 +332,9 @@ export function renderProfileChart(
         pointRadius: ivs.map((_, idx) => (idx === selHour ? selPoint : basePoint)),
         pointHoverRadius: ivs.map((_, idx) => (idx === selHour ? selHover : baseHover)),
         pointBackgroundColor: ivs.map((_, idx) => (idx === selHour ? '#c9f7ff' : '#47d7ff')),
-        yAxisID: 'y',
       },
       {
-        label: 'Solar generation',
+        label: t('series_solar'),
         data: ivs.map((i) => i.generation),
         borderColor: '#ffd84f',
         backgroundColor: 'rgba(255,216,79,0.14)',
@@ -377,10 +344,9 @@ export function renderProfileChart(
         pointRadius: ivs.map((_, idx) => (idx === selHour ? selPoint : basePoint)),
         pointHoverRadius: ivs.map((_, idx) => (idx === selHour ? selHover : baseHover)),
         pointBackgroundColor: ivs.map((_, idx) => (idx === selHour ? '#fff1b5' : '#ffd84f')),
-        yAxisID: 'y',
       },
       {
-        label: 'Matched volume',
+        label: t('series_matched'),
         data: ivs.map((i) => i.matched),
         borderColor: '#f5fbff',
         backgroundColor: 'rgba(245,251,255,0.16)',
@@ -388,47 +354,22 @@ export function renderProfileChart(
         tension: 0.25,
         borderWidth: 2,
         pointRadius: 0,
-        yAxisID: 'y',
-      },
-      {
-        label: `FMP (${curr}/kWh)`,
-        data: ivs.map((i) => convertMoney(i.fmp, curr)),
-        borderColor: FMP_COLOR,
-        backgroundColor: 'rgba(255,61,127,0)',
-        fill: false,
-        tension: 0.35,
-        borderWidth: 2.5,
-        borderDash: [6, 4],
-        pointRadius: ivs.map((_, idx) => (idx === selHour ? fmpSel : fmpBase)),
-        pointHoverRadius: ivs.map((_, idx) => (idx === selHour ? fmpSelHover : fmpBaseHover)),
-        pointBackgroundColor: FMP_COLOR,
-        yAxisID: 'yFmp',
       },
     ]
   }
 
   if (profileChart) {
-    profileChart.data.datasets = buildDatasets(intervals, selectedHour, currency)
+    profileChart.data.datasets = buildDatasets(intervals, selectedHour)
     profileChart.data.labels = labels
-    // Refresh scale bounds/formatting when inputs or currency change
-    const updatedOptions = baseOptions(inputs, currency)
-    profileChart.options.scales.yFmp.min = updatedOptions.scales.yFmp.min
-    profileChart.options.scales.yFmp.max = updatedOptions.scales.yFmp.max
-    profileChart.options.scales.yFmp.ticks.callback = updatedOptions.scales.yFmp.ticks.callback
-    profileChart.options.scales.yFmp.title.text = updatedOptions.scales.yFmp.title.text
-    profileChart.options.onClick = (event) => {
-      const pts = profileChart.getElementsAtEventForMode(event, 'index', { intersect: false }, true)
-      if (pts.length) onSelect(pts[0].index)
-    }
     profileChart.update('none')
     return profileChart
   }
 
   profileChart = new Chart(canvas, {
     type: 'line',
-    data: { labels, datasets: buildDatasets(intervals, selectedHour, currency) },
+    data: { labels, datasets: buildDatasets(intervals, selectedHour) },
     options: {
-      ...baseOptions(inputs, currency),
+      ...baseOptions(),
       onClick: (event) => {
         const pts = profileChart.getElementsAtEventForMode(
           event,
@@ -439,10 +380,103 @@ export function renderProfileChart(
         if (pts.length) onSelect(pts[0].index)
       },
     },
-    plugins: [makeTariffPlugin(() => profileChartState)],
+    plugins: [makeTariffPlugin(), directLabelsPlugin],
   })
 
   return profileChart
+}
+
+// Slim sparkline-style strip beneath the main plot: the FMP curve (VND/kWh)
+// lives here on its own implicit price axis so the main plot stays purely in
+// kWh. Shares the same hour axis and click-to-select-hour behavior.
+export function renderFmpStrip(canvas, labels, intervals, currency = 'VND', onSelect) {
+  if (!canvas) return
+
+  function buildDataset(ivs, curr) {
+    return {
+      label: `${t('series_fmp')} (${curr}/kWh)`,
+      endLabel: t('series_fmp'),
+      data: ivs.map((i) => convertMoney(i.fmp, curr)),
+      borderColor: FMP_COLOR,
+      backgroundColor: 'rgba(255,61,127,0)',
+      fill: false,
+      tension: 0.35,
+      borderWidth: 1.6,
+      pointRadius: 0,
+      pointHitRadius: 8,
+    }
+  }
+
+  const strikeLine = {
+    id: 'fmpStrikeLine',
+    beforeDatasetsDraw(chart) {
+      const strike = profileChartState.inputs?.strikePrice
+      if (!strike) return
+      const { ctx, chartArea } = chart
+      const y = chart.scales.y.getPixelForValue(convertMoney(strike, profileChartState.currency))
+      if (!chartArea || y < chartArea.top || y > chartArea.bottom) return
+      ctx.save()
+      ctx.setLineDash([6, 4])
+      ctx.strokeStyle = 'rgba(82, 144, 255, 0.65)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(chartArea.left, y)
+      ctx.lineTo(chartArea.right, y)
+      ctx.stroke()
+      ctx.restore()
+    },
+  }
+
+  if (fmpStripChart) {
+    fmpStripChart.data.labels = labels
+    fmpStripChart.data.datasets = [buildDataset(intervals, currency)]
+    fmpStripChart.options.onClick = makeStripClickHandler(onSelect)
+    fmpStripChart.update('none')
+    return fmpStripChart
+  }
+
+  const gridColor = token('--chart-grid', neonGrid)
+  const tickCol = token('--chart-tick', tickColor)
+
+  function makeStripClickHandler(select) {
+    if (!select) return undefined
+    return (event) => {
+      const pts = fmpStripChart.getElementsAtEventForMode(
+        event,
+        'index',
+        { intersect: false },
+        true,
+      )
+      if (pts.length) select(pts[0].index)
+    }
+  }
+
+  fmpStripChart = new Chart(canvas, {
+    type: 'line',
+    data: { labels, datasets: [buildDataset(intervals, currency)] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: typeof navigator !== 'undefined' && navigator.webdriver ? false : undefined,
+      layout: { padding: { top: 4, right: 92 } },
+      plugins: { legend: { display: false }, tooltip: sharedTooltipStyle() },
+      scales: {
+        x: {
+          grid: { color: gridColor },
+          ticks: { color: tickCol, font: { size: 9 }, maxRotation: 0, maxTicksLimit: 6 },
+        },
+        y: {
+          grid: { drawOnChartArea: false },
+          border: { display: false },
+          ticks: { display: false },
+        },
+      },
+      onClick: makeStripClickHandler(onSelect),
+    },
+    plugins: [strikeLine, directLabelsPlugin],
+  })
+
+  return fmpStripChart
 }
 
 export function renderMultiYearChart(canvas, multiYear, currency) {
@@ -451,40 +485,40 @@ export function renderMultiYearChart(canvas, multiYear, currency) {
   const { yearlyData } = multiYear
   const isUsd = currency === 'USD'
   const divisor = isUsd ? EXCHANGE_RATE * 1e6 : 1e9
-  const unitLabel = isUsd ? 'M USD' : 'B VND'
+  const unitLabel = isUsd ? 'Million USD' : 'Billion VND'
 
   const labels = yearlyData.map((y) => `Y${y.year}`)
   const cumBauData = yearlyData.map((y) => +(y.cumBau / divisor).toFixed(3))
   const cumDppaData = yearlyData.map((y) => +(y.cumDppa / divisor).toFixed(3))
-  const cumSavData = yearlyData.map((y) => +(y.cumSavings / divisor).toFixed(3))
 
+  // Crossover = first year DPPA becomes cheaper than BAU; annotated in-plot by
+  // the crossoverMarker plugin below. -1 when the horizon never crosses over.
+  crossoverIndex = yearlyData.findIndex((y) => y.cumSavings > 0)
+
+  // BAU vs DPPA cumulative cost lines; the gap between them IS the savings
+  // story, so the band between the two lines is filled green. Cumulative
+  // savings itself gets its own hero strip below (renderSavingsStrip).
   const datasets = [
     {
-      label: `Cum. BAU (${unitLabel})`,
+      label: t('legend_cum_bau'),
+      endLabel: t('legend_cum_bau'),
       data: cumBauData,
       borderColor: '#e06c6c',
+      borderDash: [6, 4],
       backgroundColor: 'rgba(224,108,108,0.08)',
       tension: 0.3,
       pointRadius: 2,
       fill: false,
     },
     {
-      label: `Cum. DPPA (${unitLabel})`,
+      label: t('legend_cum_dppa'),
+      endLabel: t('legend_cum_dppa'),
       data: cumDppaData,
       borderColor: '#4fc3f7',
-      backgroundColor: 'rgba(79,195,247,0.08)',
+      backgroundColor: 'rgba(76,175,130,0.22)',
       tension: 0.3,
       pointRadius: 2,
-      fill: false,
-    },
-    {
-      label: `Cum. savings (${unitLabel})`,
-      data: cumSavData,
-      borderColor: '#4caf82',
-      backgroundColor: 'rgba(76,175,130,0.12)',
-      tension: 0.3,
-      pointRadius: 2,
-      fill: true,
+      fill: '-1',
     },
   ]
 
@@ -497,7 +531,6 @@ export function renderMultiYearChart(canvas, multiYear, currency) {
     multiYearChart.update('none')
     return multiYearChart
   }
-
   multiYearChart = new Chart(canvas, {
     type: 'line',
     data: { labels, datasets },
@@ -506,26 +539,115 @@ export function renderMultiYearChart(canvas, multiYear, currency) {
       maintainAspectRatio: false,
       animation:
         typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 200 },
+      layout: { padding: { top: 8, right: 118 } },
       plugins: {
-        legend: { labels: { color: tickColor, usePointStyle: true, boxWidth: 10, boxHeight: 10 } },
-        tooltip: {
-          backgroundColor: 'rgba(9, 14, 31, 0.92)',
-          borderColor: 'rgba(82, 188, 255, 0.45)',
-          borderWidth: 1,
-          titleColor: '#f6fbff',
-          bodyColor: '#dcecff',
-        },
+        legend: { display: false },
+        tooltip: sharedTooltipStyle(),
       },
       scales: {
-        x: { grid: { color: neonGrid }, ticks: { color: tickColor } },
+        x: {
+          grid: { color: token('--chart-grid', neonGrid) },
+          ticks: {
+            color: token('--chart-tick', tickColor),
+            font: { size: 10 },
+            maxRotation: 0,
+            maxTicksLimit: 12,
+          },
+        },
         y: {
-          grid: { color: neonGrid },
-          ticks: { color: tickColor, callback: (v) => v.toFixed(1) },
-          title: { display: true, text: unitLabel, color: tickColor, font: { size: 10 } },
+          grid: { color: token('--chart-grid', neonGrid) },
+          ticks: {
+            color: token('--chart-tick', tickColor),
+            font: { size: 10 },
+            maxTicksLimit: 6,
+            callback: (v) => v.toLocaleString('en-US'),
+          },
+          title: {
+            display: true,
+            text: unitLabel,
+            color: token('--chart-tick', tickColor),
+            font: { size: 11, weight: '600' },
+          },
         },
       },
     },
+    plugins: [directLabelsPlugin, crossoverMarkerPlugin],
   })
 
   return multiYearChart
+}
+
+// Hero strip beneath the multi-year chart: cumulative savings on its own
+// scale so the headline financial takeaway is never a flat line hugging zero.
+export function renderSavingsStrip(canvas, multiYear, currency) {
+  if (!canvas || !multiYear) return
+
+  const { yearlyData } = multiYear
+  const isUsd = currency === 'USD'
+  const divisor = isUsd ? EXCHANGE_RATE * 1e6 : 1e9
+
+  const labels = yearlyData.map((y) => `Y${y.year}`)
+  const cumSavData = yearlyData.map((y) => +(y.cumSavings / divisor).toFixed(3))
+
+  function buildDataset(ivs) {
+    return {
+      label: t('legend_cum_savings'),
+      endLabel: t('legend_cum_savings'),
+      data: ivs,
+      borderColor: '#4caf82',
+      backgroundColor: 'rgba(76,175,130,0.14)',
+      tension: 0.3,
+      pointRadius: 0,
+      borderWidth: 2.4,
+      fill: true,
+    }
+  }
+
+  if (savingsStripChart) {
+    savingsStripChart.data.labels = labels
+    savingsStripChart.data.datasets = [buildDataset(cumSavData)]
+    savingsStripChart.update('none')
+    return savingsStripChart
+  }
+
+  savingsStripChart = new Chart(canvas, {
+    type: 'line',
+    data: { labels, datasets: [buildDataset(cumSavData)] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation:
+        typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 200 },
+      layout: { padding: { top: 4, right: 118 } },
+      plugins: { legend: { display: false }, tooltip: sharedTooltipStyle() },
+      scales: {
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            color: token('--chart-tick', tickColor),
+            font: { size: 9 },
+            maxRotation: 0,
+            maxTicksLimit: 6,
+          },
+        },
+        y: {
+          // No min: 0 — cumulative savings can be negative all horizon long,
+          // and pinning the floor at zero plots the whole series out of view.
+          grace: '12%',
+          grid: { drawOnChartArea: false },
+          border: { display: false },
+          ticks: {
+            color: token('--chart-tick', tickColor),
+            font: { size: 9 },
+            maxTicksLimit: 4,
+            callback: (v) => (v === 0 ? '0' : v.toLocaleString('en-US')),
+          },
+        },
+      },
+    },
+    plugins: [directLabelsPlugin],
+  })
+
+  return savingsStripChart
 }

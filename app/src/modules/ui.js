@@ -30,7 +30,7 @@ function paymentEquation(label, rate, quantityText, amount, formula, tone = 'def
 function roleMeta() {
   return {
     shown: { cls: 'cancel-term-shown', sign: '+', title: t('role_shown_title') },
-    cancel: { cls: 'cancel-term-cancel', sign: '', title: t('role_cancel_title') },
+    cancel: { cls: 'cancel-term-cancel', sign: '−', title: t('role_cancel_title') },
     strike: { cls: 'cancel-term-strike', sign: '+', title: t('role_strike_title') },
     charge: { cls: 'cancel-term-charge', sign: '+', title: t('role_charge_title') },
     loss: { cls: 'cancel-term-loss', sign: '+', title: t('role_loss_title') },
@@ -38,24 +38,24 @@ function roleMeta() {
   }
 }
 
+// Vertical step-by-step breakdown: net headline always visible, term rows collapsed
+// behind a keyboard-accessible <details>. No horizontal equation, no stacked strikethroughs.
 function fmpCancelStrip(steps, resultValue, currency, selectedFmp) {
   const roleMetaMap = roleMeta()
-  const terms = steps
+  const rows = steps
     .map((step) => {
       const meta = roleMetaMap[step.role] || roleMetaMap.loss
       const valueStr = formatMoney(Math.abs(step.value), { currency, precise: true, perKwh: true })
-      const sign = step.role === 'cancel' ? '−' : meta.sign || '+'
-      const crossed = step.role === 'shown' || step.role === 'cancel' ? ' cancel-term-crossed' : ''
       return `
-      <span class="cancel-eq-term ${meta.cls}${crossed}" title="${meta.title}">
-        <span class="cancel-eq-owner">${step.owner || t('fmp_cancel_owner_default')}</span>
-        <span class="cancel-eq-sign">${sign}</span>
-        <span class="cancel-eq-value">${valueStr}</span>
-        <span class="cancel-eq-label">${step.label}</span>
-      </span>
-    `
+        <div class="fmp-step-row ${meta.cls}" title="${meta.title}">
+          <span class="fmp-step-owner">${step.owner || t('fmp_cancel_owner_default')}</span>
+          <span class="fmp-step-label">${step.label}</span>
+          <span class="fmp-step-sign">${meta.sign}</span>
+          <span class="fmp-step-value">${valueStr}</span>
+        </div>
+      `
     })
-    .join('<span class="cancel-eq-separator"></span>')
+    .join('')
 
   return `
     <div class="fmp-cancel-strip">
@@ -64,14 +64,21 @@ function fmpCancelStrip(steps, resultValue, currency, selectedFmp) {
         <span class="fmp-cancel-context">${t('fmp_cancel_context_selected')} ${formatMoney(selectedFmp, { currency, precise: true, perKwh: true })}</span>
         <span class="fmp-cancel-context">${t('fmp_cancel_context_note')}</span>
       </div>
-      <div class="fmp-cancel-equation">
-        ${terms}
-        <span class="cancel-eq-separator cancel-eq-equals">=</span>
-        <span class="cancel-eq-term cancel-term-result">
-          <span class="cancel-eq-value">${formatMoney(resultValue, { currency, precise: true, perKwh: true })}</span>
-          <span class="cancel-eq-label">${t('fmp_cancel_net_label')}</span>
-        </span>
+      <div class="fmp-step-row fmp-step-result">
+        <span class="fmp-step-owner"></span>
+        <span class="fmp-step-label">${t('fmp_cancel_net_label')}</span>
+        <span class="fmp-step-sign"></span>
+        <strong class="fmp-step-value">${formatMoney(resultValue, { currency, precise: true, perKwh: true })}</strong>
       </div>
+      ${
+        steps.length > 0
+          ? `
+      <details class="fmp-cancel-derivation">
+        <summary>${t('fmp_cancel_derivation_summary')}</summary>
+        <div class="fmp-cancel-steps">${rows}</div>
+      </details>`
+          : ''
+      }
     </div>
   `
 }
@@ -80,8 +87,16 @@ function netTerm(text, kind = 'retained') {
   return `<span class="net-${kind}-term default">${text}</span>`
 }
 
-function joinNetTerms(terms) {
-  return terms.filter(Boolean).join('<span class="net-operator"> + </span>')
+function billLineRow(labelKey, formulaHtml, valueHtml, extraCls = '') {
+  return `
+    <div class="bill-line-row ${extraCls}">
+      <div class="bill-line-head">
+        <span class="bill-line-label">${t(labelKey)}</span>
+        <strong class="bill-line-value">${valueHtml}</strong>
+      </div>
+      <div class="bill-line-formula">${formulaHtml}</div>
+    </div>
+  `
 }
 
 function buildNetEquations(item, formulas, currency) {
@@ -115,53 +130,49 @@ function buildNetEquations(item, formulas, currency) {
       ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained')
       : '',
     lossAmount > 0 ? netTerm(`${t('netterm_loss_adj')} ${fmtT(lossAmount)}`, 'retained') : '',
-  ]
+  ].filter(Boolean)
 
-  const retainedTerms = [
-    item.matched > 0
-      ? netTerm(`CDPPA (${fmt(item.dppaCharge)}) × ${fmtN(item.matched)} kWh`, 'retained')
-      : '',
-    item.contractQuantity > 0
-      ? netTerm(
-          `Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`,
-          'retained',
-        )
-      : '',
-    item.shortfall > 0
-      ? netTerm(`Retail (${fmt(item.retailTariff)}) × ${fmtN(item.shortfall)} kWh`, 'retained')
-      : '',
-    lossAmount > 0 ? netTerm(`${t('netterm_loss_adj')} ${fmtT(lossAmount)}`, 'retained') : '',
-  ]
-
-  return {
-    expanded: joinNetTerms(visibleTerms),
-    simplified: joinNetTerms(retainedTerms),
-    showExpanded: visibleTerms.filter(Boolean).length > 0,
-    showSimplified:
-      retainedTerms.filter(Boolean).length > 0 &&
-      joinNetTerms(visibleTerms) !== joinNetTerms(retainedTerms),
-  }
+  return { expandedTerms: visibleTerms }
 }
 
 function walkthroughCaseCard(item, currency, formulas) {
-  const fmt = (v) => formatMoney(v, { currency, precise: true, perKwh: true })
   const fmtN = (v) => formatNumber(v)
   const fmtT = (v) => formatMoney(v, { currency })
   const fmtS = (v) => formatMoney(v, { currency, signed: true })
   const netEquations = buildNetEquations(item, formulas, currency)
 
-  const fmpFig = fmt(item.fmp)
+  // Structured term lines instead of one wrapped prose formula — compact
+  // figures so every factor fits on its own single unwrapped line.
+  const fmtC = (v) => formatMoney(Math.round(v), { currency })
   const kppFig = item.lossFactor != null ? item.lossFactor.toFixed(3) : '1.000'
-  const dppachargeFig = fmt(item.dppaCharge)
-  const retailFig = fmt(item.retailTariff)
-
-  const evnFormula =
-    item.shortfall > 0
-      ? `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh + Retail (${retailFig}) × ${fmtN(item.shortfall)} kWh`
-      : `FMP (${fmpFig}) × Kpp (${kppFig}) × ${fmtN(item.matched)} kWh + CDPPA (${dppachargeFig}) × ${fmtN(item.matched)} kWh`
+  const fmpFigC = fmtC(item.fmp)
+  const dppaFigC = fmtC(item.dppaCharge)
+  const retailFigC = fmtC(item.retailTariff)
+  const strikeFigC = fmtC(item.strikePrice)
+  const evnTerms = [
+    `<span class="bill-term">FMP ${fmpFigC} × Kpp ${kppFig} × ${fmtN(item.matched)} kWh</span>`,
+    `<span class="bill-term">CDPPA ${dppaFigC} × ${fmtN(item.matched)} kWh</span>`,
+    ...(item.shortfall > 0
+      ? [`<span class="bill-term">Retail ${retailFigC} × ${fmtN(item.shortfall)} kWh</span>`]
+      : []),
+  ].join('')
 
   const netTotal = item.evnAmount + item.cfdAmount
-  const developerFormula = `− FMP (${fmpFig}) × ${fmtN(item.contractQuantity)} kWh + Strike (${fmt(item.strikePrice)}) × ${fmtN(item.contractQuantity)} kWh`
+  const developerTerms = [
+    `<span class="bill-term">− FMP ${fmpFigC} × ${fmtN(item.contractQuantity)} kWh</span>`,
+    `<span class="bill-term">+ Strike ${strikeFigC} × ${fmtN(item.contractQuantity)} kWh</span>`,
+  ].join('')
+
+  const derivationRows = netEquations.expandedTerms
+    .map(
+      (term, i) => `
+      <div class="net-derivation-row">
+        <span class="net-operator">${i === 0 ? '' : '+'}</span>
+        ${term}
+      </div>
+    `,
+    )
+    .join('')
 
   return `
     <article class="walkthrough-card ${item.tone} is-selected">
@@ -178,15 +189,24 @@ function walkthroughCaseCard(item, currency, formulas) {
         ${compactPill('DPPA', `${fmtN(item.contractQuantity)} kWh`, item.contractQuantity === item.matched ? 'result' : 'warning')}
       </div>
       <div class="walkthrough-lines">
-        <p class="wl-eq-head">EVN = ${evnFormula} = <strong>${fmtT(item.evnAmount)}</strong></p>
-
-        <p class="wl-eq-head">Developer = ${developerFormula} = <strong class="developer-total">${fmtS(item.cfdAmount)}</strong></p>
-
-        <div class="net-row">
-          <p class="wl-eq-head net-label">Net = EVN + Developer =</p>
-          ${netEquations.showExpanded ? `<p class="net-formula-line"><span class="net-equals">=</span>${netEquations.expanded}${!netEquations.showSimplified ? `<span class="net-equals">=</span><strong class="net-total">${fmtT(netTotal)}</strong>` : ''}</p>` : ''}
-          ${netEquations.showSimplified ? `<p class="net-formula-line net-formula-simplified"><span class="net-equals">=</span>${netEquations.simplified}<span class="net-equals">=</span><strong class="net-total">${fmtT(netTotal)}</strong></p>` : ''}
-        </div>
+        ${billLineRow('wt_row_evn', evnTerms, fmtT(item.evnAmount))}
+        ${billLineRow('wt_row_developer', developerTerms, fmtS(item.cfdAmount), 'bill-line-developer')}
+        ${billLineRow('wt_row_net', 'Net = EVN + Developer', fmtT(netTotal), 'bill-line-net')}
+        ${
+          derivationRows
+            ? `
+        <details class="walkthrough-derivation">
+          <summary>${t('wt_derivation_summary')}</summary>
+          <div class="net-derivation">
+            ${derivationRows}
+            <div class="net-derivation-row net-derivation-total">
+              <span class="net-operator">=</span>
+              <strong class="net-total">${fmtT(netTotal)}</strong>
+            </div>
+          </div>
+        </details>`
+            : ''
+        }
       </div>
     </article>
   `
@@ -195,13 +215,12 @@ function walkthroughCaseCard(item, currency, formulas) {
 export function renderAppShell(root, scenarios, settlementModes) {
   root.innerHTML = `
     <div class="app-shell">
-      <header class="topbar panel glow-frame">
+      <header class="topbar panel">
         <div class="brand-block">
           <img class="brand-logo" src="/brand/allotrope-logo.png" alt="Allotrope logo" />
           <div>
             <p class="eyebrow">${t('header_eyebrow')}</p>
             <h1>${t('header_title')}</h1>
-            <p class="hero-copy">${t('header_hero')}</p>
           </div>
         </div>
         <div class="topbar-actions">
@@ -209,8 +228,10 @@ export function renderAppShell(root, scenarios, settlementModes) {
             <button class="toggle-button" data-currency="VND" type="button">${t('currency_vnd')}</button>
             <button class="toggle-button" data-currency="USD" type="button">${t('currency_usd')}</button>
           </div>
+          <div class="topbar-secondary" id="topbarSecondary"></div>
         </div>
       </header>
+      <p class="hero-note">${t('header_hero')}</p>
 
       <main class="story-grid">
         <section class="focus-column">
@@ -225,9 +246,14 @@ export function renderAppShell(root, scenarios, settlementModes) {
               <div class="scenario-tabs" id="scenarioTabs">
                 ${scenarios.map((scenario) => `<button class="scenario-tab" data-scenario="${scenario.id}">${scenario.label}</button>`).join('')}
               </div>
+              <div class="chart-legend-row" id="profileLegend"></div>
               <div class="chart-wrap profile-wrap">
                 <canvas id="profileChart" aria-label="${t('chart_aria')}"></canvas>
               </div>
+              <div class="chart-wrap fmp-strip-wrap">
+                <canvas id="fmpStrip" aria-label="${t('fmp_strip_aria')}"></canvas>
+              </div>
+              <div class="chart-caption" id="tariffCaption"></div>
               <p class="chart-tap-hint" id="chartTapHint">${t('chart_tap_hint')}</p>
               <div id="fiveLineBill"></div>
               <div class="hour-nav" id="hourNav">
@@ -237,7 +263,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
               </div>
             </div>
 
-            <section class="panel walkthrough-panel glow-frame" tabindex="0">
+            <section class="panel walkthrough-panel" tabindex="0">
               <div class="panel-header">
               <div>
                 <p class="eyebrow">${t('walkthrough_eyebrow')}</p>
@@ -256,8 +282,12 @@ export function renderAppShell(root, scenarios, settlementModes) {
               </div>
             </div>
             <div class="multi-year-rollups" id="multiYearRollups"></div>
+            <div class="chart-legend-row" id="multiYearLegend"></div>
             <div class="chart-wrap multi-year-chart-wrap" style="height:260px">
               <canvas id="multiYearChart" aria-label="${t('multiyear_chart_aria')}"></canvas>
+            </div>
+            <div class="chart-wrap savings-strip-wrap">
+              <canvas id="savingsStrip" aria-label="${t('savings_strip_aria')}"></canvas>
             </div>
             <div class="assumptions-inline" id="multiYearParams"></div>
           </section>
@@ -276,7 +306,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
       </main>
 
       <section class="lower-grid">
-        <div class="panel formula-panel glow-frame">
+        <div class="panel formula-panel">
           <div class="panel-header">
             <div>
               <p class="eyebrow">${t('flow_eyebrow')}</p>
@@ -325,7 +355,6 @@ export function renderAppShell(root, scenarios, settlementModes) {
             <select id="settlementMode">
               ${settlementModes.map((mode) => `<option value="${mode.value}">${mode.label}</option>`).join('')}
             </select>
-            <strong data-output="settlementMode"></strong>
           </label>
           <label class="control-card">
             <span>${t('control_evn_esc_label')}</span>
@@ -544,10 +573,6 @@ export function updateControlOutputs(state, settlementModes, currency) {
     perKwh: true,
   })
   document.querySelector('[data-output="lossFactor"]').textContent = state.lossFactor.toFixed(3)
-  const activeMode = settlementModes.find((mode) => mode.value === state.settlementMode)
-  document.querySelector('[data-output="settlementMode"]').textContent = activeMode
-    ? activeMode.label
-    : state.settlementMode
   document.querySelector('[data-output="evnEscalation"]').textContent =
     `${(state.evnEscalation * 100).toFixed(1)}%/yr`
   document.querySelector('[data-output="strikeEscalation"]').textContent =

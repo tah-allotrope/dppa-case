@@ -26,6 +26,7 @@ function cleanFlow(result, currency) {
         <span class="flow-arrow" aria-hidden="true">→</span>
         <div class="flow-node flow-node-compare">
           <span class="flow-label">Selected hour comparison</span>
+          <span class="flow-value">DPPA ${dppa}</span>
         </div>
       </li>
       <li class="flow-row flow-cancel">
@@ -48,6 +49,7 @@ function cleanFlow(result, currency) {
         <span class="flow-arrow" aria-hidden="true">→</span>
         <div class="flow-node flow-node-keep">
           <span class="flow-label">Keep strike + DPPA charge + loss</span>
+          <span class="flow-value">${money(result.impliedCancellation, { currency, precise: true, perKwh: true })}</span>
         </div>
       </li>
       <li class="flow-row flow-final">
@@ -58,6 +60,7 @@ function cleanFlow(result, currency) {
         <span class="flow-arrow" aria-hidden="true">→</span>
         <div class="flow-node flow-node-compare">
           <span class="flow-label">Selected hour comparison</span>
+          <span class="flow-value">BAU ${bau}</span>
         </div>
         <span class="flow-arrow" aria-hidden="true">→</span>
         <div class="flow-node flow-node-savings">
@@ -84,6 +87,7 @@ function partialFlow(result, currency) {
         <span class="flow-arrow" aria-hidden="true">→</span>
         <div class="flow-node flow-node-compare">
           <span class="flow-label">Selected hour comparison</span>
+          <span class="flow-value">DPPA ${dppa}</span>
         </div>
       </li>
       <li class="flow-row flow-cancel">
@@ -118,6 +122,7 @@ function partialFlow(result, currency) {
         <span class="flow-arrow" aria-hidden="true">→</span>
         <div class="flow-node flow-node-compare">
           <span class="flow-label">Selected hour comparison</span>
+          <span class="flow-value">BAU ${bau}</span>
         </div>
         <span class="flow-arrow" aria-hidden="true">→</span>
         <div class="flow-node flow-node-savings">

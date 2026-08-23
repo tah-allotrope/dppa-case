@@ -55,6 +55,8 @@ export function initTour() {
   b.textContent = '?'
   b.setAttribute('aria-label', t('tour_launch_aria'))
   b.addEventListener('click', startTour)
-  document.querySelector('.topbar-actions')?.appendChild(b)
+  ;(
+    document.querySelector('#topbarSecondary') || document.querySelector('.topbar-actions')
+  )?.appendChild(b)
   if (shouldAutoStartTour()) startTour()
 }

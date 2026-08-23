@@ -23,8 +23,49 @@
   box-shadow: none;
   border-color: var(--border);
 }
-[data-theme='present'] .glow-frame::after {
-  display: none;
+[data-theme='present'] .topbar {
+  background: #fff;
+}
+[data-theme='present'] .eyebrow {
+  color: var(--cyan);
+}
+[data-theme='present'] .hero-note,
+[data-theme='present'] .metric-label {
+  color: var(--muted);
+}
+[data-theme='present'] .toggle-button,
+[data-theme='present'] .scenario-tab,
+[data-theme='present'] .ghost-button,
+[data-theme='present'] .theme-toggle,
+[data-theme='present'] .tour-launch,
+[data-theme='present'] .hour-nav-btn {
+  background: #fff;
+  border-color: #9ca3af;
+  color: var(--text);
+}
+[data-theme='present'] .toggle-button.is-active,
+[data-theme='present'] .scenario-tab.is-active {
+  background: rgba(0, 90, 120, 0.1);
+  border-color: var(--cyan);
+  color: var(--text);
+}
+[data-theme='present'] .topbar-secondary {
+  border-left-color: #d1d5db;
+}
+[data-theme='present'] .chart-wrap,
+[data-theme='present'] .five-line-bill,
+[data-theme='present'] .walkthrough-card,
+[data-theme='present'] .formula-detail-card,
+[data-theme='present'] .payment-equation,
+[data-theme='present'] .comparison-card,
+[data-theme='present'] .figure-card,
+[data-theme='present'] .cancellation-flow-card {
+  background: #fff;
+}
+/* Legend/caption strips need a visible chip border on the white presenter theme */
+[data-theme='present'] .caption-chip {
+  background: #f9fafb;
+  border-color: #d1d5db;
 }
 [data-theme='present'] .hour-nav-label,
 [data-theme='present'] .formula-card pre,
@@ -37,26 +78,55 @@
   border-color: rgba(255, 255, 255, 0.12);
   color: #f4fbff;
 }
-[data-theme='present'] .cancel-term-result .cancel-eq-label {
+[data-theme='present'] .fmp-step-result .fmp-step-label {
   color: rgba(154, 255, 222, 0.92);
 }
-[data-theme='present'] .cancel-eq-label {
+[data-theme='present'] .fmp-step-label {
   opacity: 0.92;
 }
 [data-theme='present'] .fmp-cancel-title {
   color: rgba(255, 255, 255, 0.72);
 }
-[data-theme='present'] .cancel-eq-owner {
+[data-theme='present'] .fmp-step-owner {
   opacity: 0.96;
+}
+/* Cancelled-term reds and the developer pink fail 4.5:1 on white cards — darken in present theme */
+[data-theme='present'] .bill-line-developer .bill-line-value,
+[data-theme='present'] .developer-total {
+  color: #b91c1c;
+}
+[data-theme='present'] .net-cancelled-term {
+  color: #b91c1c;
+}
+/* Mint #9affe0 fails 4.5:1 on the white flow card — pre-existing, surfaced when the
+   glow overlay was removed; darken to the present-theme mint for axe compliance */
+[data-theme='present'] .flow-total {
+  color: #0f6b52;
 }
 .theme-toggle,
 .tour-launch {
-  min-height: 40px;
-  padding: 8px 12px;
-  border: 1px solid var(--cyan);
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid rgba(154, 255, 222, 0.16);
   border-radius: 8px;
-  background: var(--panel);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .theme-toggle:hover,
+  .tour-launch:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.theme-toggle:focus-visible,
+.tour-launch:focus-visible {
+  outline: 2px solid rgba(71, 215, 255, 0.5);
+  outline-offset: 2px;
 }
 #teachBanner {
   position: fixed;
