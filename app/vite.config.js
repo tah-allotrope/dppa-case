@@ -48,15 +48,28 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary'],
+      all: true,
+      include: ['src/**/*.js'],
       exclude: ['e2e/**', 'scripts/**', '**/*.test.js', 'dist/**'],
       // PHASE-05: thresholds are a ratchet set from a real measurement
       // (rounded down), not an aspirational target — raise deliberately,
       // never lower silently. See deployment.md's Quality commands section.
+      // `all: true` + explicit `include` (2026-08-23) makes the denominator the
+      // whole src/ tree, not just the files some test happens to import — chart.js
+      // and main.js were previously invisible to this ratio entirely, which is why
+      // this re-baseline (49/49/51/49) reads lower than the pre-2026-08-23 ratchet
+      // (78/71/79/77): the earlier number described 13 of the ~15 source files.
       thresholds: {
-        lines: 78,
-        branches: 71,
-        functions: 79,
-        statements: 77,
+        lines: 49,
+        branches: 49,
+        functions: 51,
+        statements: 49,
+        'src/modules/settlement.js': {
+          lines: 92,
+          branches: 75,
+          functions: 85,
+          statements: 91,
+        },
       },
     },
   },
