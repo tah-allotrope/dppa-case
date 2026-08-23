@@ -73,8 +73,17 @@ def parse_register_table(markdown: str) -> list[dict]:
     return rows
 
 
-def classify(needed_by: date, today: date) -> str:
-    """Return "OVERDUE", "DUE-SOON" (<=7 days out inclusive), or "OK"."""
+def classify(needed_by: date, today: date, acknowledged_through: date | None = None) -> str:
+    """Return "ACKNOWLEDGED", "OVERDUE", "DUE-SOON" (<=7 days out inclusive), or "OK".
+
+    A row whose needed_by is on or before acknowledged_through is a known, accepted
+    slip -- reported so it stays visible, but does not raise the failure flag. This
+    exists so the weekly notification still carries a signal once every H-item has
+    been triaged once: a *known* slip prints ACKNOWLEDGED; a *new* one still prints
+    OVERDUE or DUE-SOON and fails the job.
+    """
+    if acknowledged_through is not None and needed_by <= acknowledged_through:
+        return "ACKNOWLEDGED"
     days_remaining = (needed_by - today).days
     if days_remaining < 0:
         return "OVERDUE"
@@ -84,9 +93,26 @@ def classify(needed_by: date, today: date) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # PHASE-02 (2026-08-23): stdout is reconfigured to UTF-8 because this file's
+    # register rows contain "->" as a literal arrow (U+2192) and other non-ASCII
+    # punctuation; a Windows cp1252 console otherwise raises UnicodeEncodeError
+    # mid-table instead of printing the register. CI's runners are UTF-8 already,
+    # so this is a no-op there.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checklist", default=str(DEFAULT_CHECKLIST), help="Path to the readiness checklist markdown file")
     parser.add_argument("--today", default=None, help="Override today's date (YYYY-MM-DD) for deterministic testing")
+    parser.add_argument(
+        "--acknowledged-through",
+        default=None,
+        help=(
+            "YYYY-MM-DD. Rows whose needed_by is on or before this date print "
+            "ACKNOWLEDGED and do not fail the job -- a known, accepted slip. Rows "
+            "after this date classify and gate exactly as they do without the flag."
+        ),
+    )
     args = parser.parse_args(argv)
 
     checklist_path = Path(args.checklist)
@@ -95,6 +121,11 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     today = datetime.strptime(args.today, "%Y-%m-%d").date() if args.today else date.today()
+    acknowledged_through = (
+        datetime.strptime(args.acknowledged_through, "%Y-%m-%d").date()
+        if args.acknowledged_through
+        else None
+    )
 
     try:
         rows = parse_register_table(checklist_path.read_text(encoding="utf-8"))
@@ -104,9 +135,9 @@ def main(argv: list[str] | None = None) -> int:
 
     any_urgent = False
     for row in rows:
-        classification = classify(row["needed_by"], today)
+        classification = classify(row["needed_by"], today, acknowledged_through)
         days_remaining = (row["needed_by"] - today).days
-        if classification != "OK":
+        if classification not in ("OK", "ACKNOWLEDGED"):
             any_urgent = True
         print(
             f'{row["id"]} [{classification}] needed by {row["needed_by"].isoformat()} '

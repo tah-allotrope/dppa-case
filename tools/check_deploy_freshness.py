@@ -140,16 +140,28 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--url", default=DEFAULT_URL, help="Live URL to check (default: %(default)s)")
     parser.add_argument("--skip-build", action="store_true", help="Skip the local build; use existing app/dist/index.html")
     parser.add_argument("--write-log", action="store_true", help="On PASS, update app/deployment.md's Last Deploy table")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help=(
+            "Treat a failed local build or a missing app/dist/index.html as a hard failure "
+            "(exit 1) instead of the lenient default (exit 0). Network unreachability stays "
+            "exit 0 in both modes -- that one really is transient. Intended for CI, where a "
+            "build that cannot run is a configuration bug, not a flake."
+        ),
+    )
     args = parser.parse_args(argv)
+
+    unknown_exit_code = 1 if args.strict else 0
 
     if not args.skip_build:
         if not run_local_build():
             print("DEPLOY-FRESHNESS UNKNOWN: local build failed")
-            return 0
+            return unknown_exit_code
 
     if not DIST_INDEX.exists():
         print(f"DEPLOY-FRESHNESS UNKNOWN: {DIST_INDEX} does not exist (build first, or omit --skip-build)")
-        return 0
+        return unknown_exit_code
 
     local_html = DIST_INDEX.read_text(encoding="utf-8")
     local_assets = local_asset_paths(local_html)

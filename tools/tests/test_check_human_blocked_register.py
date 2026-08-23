@@ -61,6 +61,68 @@ class TestClassify(unittest.TestCase):
     def test_one_day_past_is_overdue(self):
         self.assertEqual(chbr.classify(date(2026, 7, 21), today=date(2026, 7, 22)), "OVERDUE")
 
+    def test_acknowledged_through_covers_overdue_row(self):
+        self.assertEqual(
+            chbr.classify(
+                date(2026, 8, 15), today=date(2026, 8, 22), acknowledged_through=date(2026, 8, 31)
+            ),
+            "ACKNOWLEDGED",
+        )
+
+    def test_acknowledged_through_does_not_cover_later_row(self):
+        self.assertEqual(
+            chbr.classify(
+                date(2026, 9, 8), today=date(2026, 8, 22), acknowledged_through=date(2026, 8, 31)
+            ),
+            "OK",
+        )
+
+    def test_acknowledged_through_boundary_is_inclusive(self):
+        self.assertEqual(
+            chbr.classify(
+                date(2026, 8, 31), today=date(2026, 8, 22), acknowledged_through=date(2026, 8, 31)
+            ),
+            "ACKNOWLEDGED",
+        )
+
+    def test_no_acknowledged_through_behaves_as_before(self):
+        self.assertEqual(
+            chbr.classify(date(2026, 8, 25), today=date(2026, 8, 22), acknowledged_through=None),
+            "DUE-SOON",
+        )
+
+
+class TestMainAcknowledgement(unittest.TestCase):
+    def _write_fixture(self, tmp_path: Path) -> Path:
+        checklist = tmp_path / "checklist.md"
+        checklist.write_text(FIXTURE_TABLE, encoding="utf-8")
+        return checklist
+
+    def test_all_rows_acknowledged_returns_zero(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            checklist = self._write_fixture(Path(tmp))
+            exit_code = chbr.main(
+                [
+                    "--checklist",
+                    str(checklist),
+                    "--today",
+                    "2026-08-22",
+                    "--acknowledged-through",
+                    "2026-08-31",
+                ]
+            )
+        self.assertEqual(exit_code, 0)
+
+    def test_without_acknowledgement_returns_one(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            checklist = self._write_fixture(Path(tmp))
+            exit_code = chbr.main(["--checklist", str(checklist), "--today", "2026-08-22"])
+        self.assertEqual(exit_code, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

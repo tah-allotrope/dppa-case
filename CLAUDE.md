@@ -45,9 +45,15 @@ npm test             # vitest, unit
 npm run e2e          # playwright, functional (excludes @visual)
 npm run e2e:visual   # playwright, pixel snapshots (Chromium projects only)
 npm run build        # vite production build
-npm run predeploy    # lint + test + e2e + build, the local CI equivalent
-npx firebase deploy --only hosting --project dppa-case
+npm run coverage     # vitest with the v8 coverage gate (thresholds in vite.config.js)
+npm run predeploy    # lint + prettier --check + test + coverage + e2e + build
+npm run deploy       # predeploy, then firebase deploy --only hosting --project dppa-case
+py ../tools/check_deploy_freshness.py --write-log   # confirm + log the deploy (see below for the py/python split)
 ```
+
+`predeploy` mirrors every step of the `quality` CI job except installing browsers and the
+non-blocking `e2e:visual` pixel-snapshot pass — it is close to but not literally "the local CI
+equivalent"; if you change one, check whether the other needs the matching change.
 
 **Use `npm install`, never `npm ci`.** This is deliberate, not sloppiness. `npm ci` fails in this
 project on optional-native-binary lockfile drift (`@emnapi/core` missing) caused by an npm-version

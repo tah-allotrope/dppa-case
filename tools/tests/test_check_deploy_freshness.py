@@ -180,6 +180,24 @@ class TestMain(unittest.TestCase):
             exit_code = cdf.main([])
         self.assertEqual(exit_code, 0)
 
+    def test_strict_failed_local_build_is_hard_failure(self):
+        with mock.patch.object(cdf, "run_local_build", return_value=False):
+            exit_code = cdf.main(["--strict"])
+        self.assertEqual(exit_code, 1)
+
+    def test_strict_missing_dist_index_is_hard_failure(self):
+        missing = Path(self._tmpdir.name) / "does-not-exist.html"
+        with mock.patch.object(cdf, "DIST_INDEX", missing):
+            exit_code = cdf.main(["--strict"])
+        self.assertEqual(exit_code, 1)
+
+    def test_strict_unreachable_network_stays_unknown(self):
+        import urllib.error
+
+        with mock.patch.object(cdf, "fetch_html", side_effect=urllib.error.URLError("unreachable")):
+            exit_code = cdf.main(["--strict"])
+        self.assertEqual(exit_code, 0)
+
     def test_write_log_updates_deployment_md_on_pass(self):
         deployment_md = Path(self._tmpdir.name) / "deployment.md"
         deployment_md.write_text(

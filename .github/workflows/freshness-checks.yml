@@ -8,10 +8,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Install app deps
+        working-directory: app
+        run: npm install
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python tools/check_deploy_freshness.py
+      # --strict: on this runner a failed `npm run build` or a missing app/dist
+      # is a configuration bug (see the two setup steps above), not a flake, so
+      # it must fail the job instead of silently reporting UNKNOWN. Network
+      # unreachability still exits 0 in strict mode -- that one really is
+      # transient.
+      - run: python tools/check_deploy_freshness.py --strict
+  delivery-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # --max-age-days 3: a scheduled run should not fail on an ordinary
+      # in-progress working day; it should fail when work has sat uncommitted,
+      # unpushed, or undeployed for multiple days running.
+      - run: python tools/check_delivery_pipeline.py --max-age-days 3
   human-blocked-register:
     runs-on: ubuntu-latest
     steps:
