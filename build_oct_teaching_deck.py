@@ -443,7 +443,9 @@ def build(lang, out_dir=None):
         appendix_slide(prs, i + 1, title, takeaway, f"cfd-s{i+1}-en")
 
     suffix = "" if lang == "en" else f" {lang}"
-    out = os.path.join(out_dir or "ceba", f"DPPA Presentation Oct 2026 To Teach{suffix}.pptx")
+    target_dir = out_dir or "ceba"
+    os.makedirs(target_dir, exist_ok=True)
+    out = os.path.join(target_dir, f"DPPA Presentation Oct 2026 To Teach{suffix}.pptx")
     prs.save(out)
     print("Saved:", out, "-", len(prs.slides.__iter__.__self__._sldIdLst) if False else len(prs.slides._sldIdLst), "slides")
     return out
