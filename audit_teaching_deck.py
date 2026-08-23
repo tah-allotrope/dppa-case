@@ -1,12 +1,19 @@
 # LIVE: run by CI's deck-parity job (.github/workflows/ci.yml). Regenerate: PYTHONPATH= py audit_teaching_deck.py
 """PHASE-03 TASK-03-03: audit the rebuilt teaching deck against CON-002
-(<=30 words/content slide, Decree-57 symbols deferred until the M6 decoder)
-and reconcile every numeric string against assets/teaching/spine-s1.json.
+(<=30 words/content slide, Decree-57 symbols deferred until the M6 decoder).
+
+Numeric reconciliation against assets/teaching/spine-s1.json is
+verify_deck_numbers.py's job, not this script's -- an earlier version of this
+file had a second, dead loop that walked every slide's numbers and discarded
+the result (`pass  # informational only`); removed 2026-08-23 (PHASE-04 of
+plans/2026-08-22-delivery-stall-recovery-plan.md) rather than fixed, since
+verify_deck_numbers.py already does the job correctly and now covers speaker
+notes too.
 
 Run: PYTHONPATH= py audit_teaching_deck.py "ceba/DPPA Presentation Oct 2026 To Teach.pptx"
 Exit code 0 = pass, 1 = violations found.
 """
-import json, os, re, sys
+import os, re, sys
 from pptx import Presentation
 
 WORD_BUDGET = 30
@@ -37,14 +44,6 @@ def is_hidden(slide):
 
 
 def main(path):
-    with open(os.path.join("assets", "teaching", "spine-s1.json"), encoding="utf-8") as f:
-        spine = json.load(f)
-    known_millions = {str(v) for v in [
-        spine["bill"]["cEvn"]["vndMillionsRounded"],
-        spine["bill"]["cKh"]["vndMillionsRounded"],
-        spine["comparison"]["bauMonthlyVndMillionsRounded"],
-    ] + [line["vndMillionsRounded"] for line in spine["bill"]["lines"].values()]}
-
     prs = Presentation(path)
     violations = []
     seen_decoder = False
@@ -69,12 +68,6 @@ def main(path):
                     m = SYMBOL_PATTERN.search(t)
                     if m:
                         violations.append(f"Slide {i} ('{title}'): pre-decoder symbol '{m.group(0)}' found in '{t}'")
-
-        for t in texts:
-            for num in re.findall(r"\b\d{1,3}(?:,\d{3})+\b", t):
-                normalized = num.replace(",", "")
-                if len(normalized) >= 3 and normalized not in known_millions:
-                    pass  # informational only; large numbers not in spine are flagged for manual review
 
     print(f"Audited {len(list(prs.slides))} slides in '{path}'.")
     if violations:

@@ -6,13 +6,16 @@
     "MISSION.md",
     "corrections-log.md",
     "facilitator/**/*.md",
-    "lessons/**/*.html"
+    "lessons/**/*.html",
+    "app/docs/**/*.md",
+    "assets/teaching/*.json"
   ],
   "scanScripts": [
     "*.py",
     "*.js",
     "tools/*.py",
-    "app/scripts/*.mjs"
+    "app/scripts/*.mjs",
+    "app/src/**/*.js"
   ],
   "scanScriptsNote": "Generator files are scanned for retired figures too, not just the prose they produce -- a build script that still hard-codes a retired figure (e.g. build_callouts.py's '0 of 56') will render it onto a slide the next time someone runs it, even though no prose file currently states it. Excluded from this scan: tools/tests/** (unit-test fixtures legitimately contain retired strings on purpose, see test_check_retired_figures.py), archive/** (retired scripts are kept for history, not run), node_modules/**, and .git/**.",
   "retired": [

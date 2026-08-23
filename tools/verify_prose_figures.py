@@ -32,6 +32,7 @@ LITERALS_PATH = REPO_ROOT / "tools" / "prose_figure_literals.json"
 SCAN_PATTERNS = [
     "NOTES.md", "RESOURCES.md", "MISSION.md", "corrections-log.md",
     "facilitator/**/*.md", "lessons/**/*.html",
+    "app/docs/**/*.md", "assets/teaching/*.json",
 ]
 
 TOKEN_RE = re.compile(r"\d{1,3}(?:,\d{3}){2,}")

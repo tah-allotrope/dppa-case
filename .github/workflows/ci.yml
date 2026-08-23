@@ -7,7 +7,7 @@ jobs:
   # PHASE-05 TASK-05-02: one-time bootstrap to generate Linux visual-regression
   # baselines (Playwright suffixes snapshots by OS; Windows-generated
   # `-win32.png` baselines are not valid for this Linux CI runner). Human-only
-  # step (H6 in plans/2026-october-readiness-checklist.md): trigger this job
+  # step (H6 in facilitator/october-run-plan.md): trigger this job
   # from the Actions tab, download the `visual-baselines` artifact, commit its
   # `*-linux.png` files into `app/e2e/visual.spec.js-snapshots/`, then delete
   # this job and remove `continue-on-error` from the `quality` job's
@@ -50,7 +50,7 @@ jobs:
       # of platform-optional-dependency resolution difference.
       - run: npm install
       - run: npm run lint
-      - run: npx prettier --check src e2e scripts
+      - run: npx prettier --check src e2e scripts *.config.js
       - run: npm run i18n:check
       - run: npm test
       - run: npm run coverage
@@ -94,6 +94,7 @@ jobs:
       - run: python tools/check_retired_figures.py
       - run: python tools/verify_prose_figures.py
       - run: python tools/check_terminology_numbers.py
+      - run: python tools/check_plan_status.py
       - run: python -m unittest discover -s tools/tests -v
   # Q-001 fallback: Firebase deployment intentionally disabled until credentials exist.
   # deploy:
