@@ -376,7 +376,7 @@ def appendix_slide(prs, idx, title, takeaway, gif_stub):
     return s
 
 
-def build(lang):
+def build(lang, out_dir=None):
     t = load_text(lang)
     prs = Presentation(MASTER)
     clear_slides(prs)
@@ -443,7 +443,7 @@ def build(lang):
         appendix_slide(prs, i + 1, title, takeaway, f"cfd-s{i+1}-en")
 
     suffix = "" if lang == "en" else f" {lang}"
-    out = os.path.join("ceba", f"DPPA Presentation Oct 2026 To Teach{suffix}.pptx")
+    out = os.path.join(out_dir or "ceba", f"DPPA Presentation Oct 2026 To Teach{suffix}.pptx")
     prs.save(out)
     print("Saved:", out, "-", len(prs.slides.__iter__.__self__._sldIdLst) if False else len(prs.slides._sldIdLst), "slides")
     return out
@@ -452,5 +452,12 @@ def build(lang):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--lang", default="en", choices=["en", "vi", "zh"])
+    parser.add_argument(
+        "--out",
+        default=None,
+        help="Directory to write the built .pptx into (default: ceba/, the committed path). "
+        "Used by the deck-build CI job (tools/compare_deck.py) to build to a scratch "
+        "directory without touching the committed binary.",
+    )
     args = parser.parse_args()
-    build(args.lang)
+    build(args.lang, out_dir=args.out)

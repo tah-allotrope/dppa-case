@@ -88,7 +88,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install python-pptx
+      - run: pip install -r requirements.txt
       - run: python audit_teaching_deck.py
       - run: python verify_deck_numbers.py
       - run: python tools/check_retired_figures.py
@@ -96,6 +96,22 @@ jobs:
       - run: python tools/check_terminology_numbers.py
       - run: python tools/check_plan_status.py
       - run: python -m unittest discover -s tools/tests -v
+  deck-build:
+    # PHASE-05 of plans/2026-08-22-delivery-stall-recovery-plan.md: deck-parity
+    # (above) verifies the *committed* deck against the spine/sweep exports; it
+    # never runs the builder itself, so generator/artifact drift between
+    # build_oct_teaching_deck.py and the committed .pptx was invisible to CI.
+    # This job builds to a scratch directory (never touching the committed
+    # binary) and text-compares the result via tools/compare_deck.py.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python build_oct_teaching_deck.py --lang en --out /tmp/deck-build-out
+      - run: python tools/compare_deck.py "/tmp/deck-build-out/DPPA Presentation Oct 2026 To Teach.pptx" "ceba/DPPA Presentation Oct 2026 To Teach.pptx"
   # Q-001 fallback: Firebase deployment intentionally disabled until credentials exist.
   # deploy:
   #   needs: quality

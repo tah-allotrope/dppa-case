@@ -61,9 +61,12 @@ mismatch when the lockfile was last regenerated. `npm install` tolerates that cl
 platform-optional-dependency difference. The CI workflow carries the same note at the same step —
 if you "fix" one, you must fix both, and you must first prove `npm ci` actually works.
 
-Python (deck tooling) runs from the repo root. **On Windows, prefix with `PYTHONPATH= py`:**
+Python (deck tooling) runs from the repo root; install its dependencies with
+`pip install -r requirements.txt` (pinned versions — see the file's header comment for which
+script needs which package). **On Windows, prefix with `PYTHONPATH= py`:**
 
 ```bash
+pip install -r requirements.txt
 PYTHONPATH= py build_oct_teaching_deck.py --lang en
 PYTHONPATH= py tools/check_retired_figures.py
 ```
@@ -120,18 +123,30 @@ still untranslated). It still needs a qualified VI/ZH speaker — do not guess t
 ## 5. Regeneration order
 
 When `app/src/modules/settlement.js`, `app/src/data/default-scenarios.js`, or the escalation
-assumptions change, regenerate **in this order**:
+assumptions change, regenerate with the single supported entry point:
 
 ```
-cd app && node scripts/export-spine.mjs && node scripts/export-sweep.mjs
+PYTHONPATH= py tools/pipeline.py --lang en
+```
+
+It runs every step below **in this order**, failing loudly at the first missing dependency or
+non-zero exit and naming the exact command to re-run by hand — this is what makes "skipping a step
+produces a deck whose figures disagree with its own charts" (below) a testable property instead of
+a warning to remember:
+
+```
+node scripts/export-spine.mjs && node scripts/export-sweep.mjs   (from app/)
         ↓        (writes assets/teaching/spine-*.json, gate-sweep.json)
 PYTHONPATH= py build_teaching_visuals.py --lang en
         ↓        (renders the PNG/GIF figures from that JSON)
 PYTHONPATH= py build_oct_teaching_deck.py --lang en
         ↓        (assembles the .pptx)
-PYTHONPATH= py audit_teaching_deck.py  +  PYTHONPATH= py verify_deck_numbers.py
+PYTHONPATH= py audit_teaching_deck.py  +  PYTHONPATH= py verify_deck_numbers.py --lang en
                  (parity checks — must both pass)
 ```
+
+`tools/pipeline.py --lang en` requires `requirements.txt`'s dependencies (see §2) and Node; it does
+not install either for you.
 
 Skipping a step produces a deck whose figures disagree with its own charts. For `vi` / `zh`, repeat
 the last three with the matching `--lang`.

@@ -1,0 +1,26 @@
+# Python dependencies for the six root-level deck/worksheet/visual builders and
+# the tools/ integrity guards. Install with: pip install -r requirements.txt
+# (Windows, if the default python is shadowed: py -m pip install -r requirements.txt)
+#
+# Pinned to the versions verified working together on 2026-08-23
+# (plans/2026-08-22-delivery-stall-recovery-plan.md PHASE-05). Bump
+# deliberately, not by dependabot-style drift -- these scripts render pixel
+# content (matplotlib) and parse binary Office formats (python-pptx/python-docx),
+# both of which can silently change output between minor versions.
+#
+# Who needs what:
+#   python-pptx  -- audit_teaching_deck.py, verify_deck_numbers.py,
+#                    build_oct_teaching_deck.py, build_cfd_slide.py
+#   python-docx  -- build_worksheet_answer_docx.py
+#   matplotlib   -- build_teaching_visuals.py, build_cfd_slide.py
+#   numpy        -- build_teaching_visuals.py
+#   Pillow       -- build_teaching_visuals.py, build_cfd_slide.py
+#
+# ffmpeg is a separate system binary (build_cfd_slide.py shells out to it via
+# shutil.which), not a pip package -- install it via your OS package manager if
+# MP4 output is needed; the script skips MP4 generation gracefully without it.
+python-pptx==1.0.2
+python-docx==1.2.0
+matplotlib==3.10.8
+numpy==2.4.0
+Pillow==12.3.0
