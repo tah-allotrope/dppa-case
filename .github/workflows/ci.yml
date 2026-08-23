@@ -51,6 +51,7 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npx prettier --check src e2e scripts
+      - run: npm run i18n:check
       - run: npm test
       - run: npm run coverage
       - run: npx playwright install --with-deps chromium webkit
@@ -92,6 +93,7 @@ jobs:
       - run: python verify_deck_numbers.py
       - run: python tools/check_retired_figures.py
       - run: python tools/verify_prose_figures.py
+      - run: python tools/check_terminology_numbers.py
       - run: python -m unittest discover -s tools/tests -v
   # Q-001 fallback: Firebase deployment intentionally disabled until credentials exist.
   # deploy:

@@ -18,6 +18,7 @@
     "record:demos": "node scripts/record-teach-demos.mjs",
     "export:sweep": "node scripts/export-sweep.mjs",
     "i18n:report": "node scripts/i18n-report.mjs",
+    "i18n:check": "node scripts/i18n-report.mjs --check",
     "coverage": "vitest run --coverage"
   },
   "devDependencies": {
