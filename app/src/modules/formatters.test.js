@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import {
   EXCHANGE_RATE,
+  EXCHANGE_RATE_AS_OF,
   convertMoney,
   formatMoney,
   formatNumber,
@@ -17,6 +18,10 @@ describe('formatters', () => {
   it('converts VND amounts to USD using the fixed display rate', () => {
     expect(EXCHANGE_RATE).toBe(26500)
     expect(convertMoney(26500, 'USD')).toBe(1)
+  })
+
+  it('carries a provenance date for the exchange rate', () => {
+    expect(EXCHANGE_RATE_AS_OF).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
   it('formats per-kWh values in both currencies', () => {

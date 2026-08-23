@@ -30,5 +30,7 @@ Source: `research/2026-06-22_vietnam-dppa-2026.md`
 - Settlement interval: app uses **hourly** for teaching clarity; VWEM operates on **30-minute** intervals (Circular 16/2025/TT-BCT, amended by 36/2025).
 - Retail tariff: flat slider in v1 (not full TOU table). The 2,204 VND/kWh represents the weighted average basis.
 - FMP is held flat across years in the multi-year projection; escalation only applies to retail tariff (→ BAU + shortfall) and strike price.
-- Internal math stays in VND; USD display divides by 25,000.
+- Internal math stays in VND; USD display divides by 26,500 (`EXCHANGE_RATE` in
+  `app/src/modules/formatters.js`, as of 2026-08-23 — not a live/sourced rate; see the provenance
+  comment on the constant).
 - Loss factor is folded into one coefficient (`k × K_pp`). The underlying split is k (price conversion) = 1.026 and K_pp (grid loss, ≥22–<110 kV) = 1.008.
