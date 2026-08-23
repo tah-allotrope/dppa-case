@@ -23,6 +23,7 @@ the fact.
 
 | Date | Commit | Description |
 |---|---|---|
+| 2026-08-23 | `05ae80d` | Verified fresh by tools/check_deploy_freshness.py --write-log |
 | 2026-07-25 | `22bae59` | Verified fresh by tools/check_deploy_freshness.py --write-log |
 | 2026-07-22 | `e55319e` (marker; built from an uncommitted tree — see the 2026-07-25 row for the corrected, honest deploy) | Redeploy after Oct teaching-revamp + readiness-hardening + prose-parity work (18 commits since the prior 2026-07-05 deploy) |
 | 2026-07-05 | `ed21985`+ | App quality, visuals & testing uplift (PHASE-01..06): lint/CI, Playwright functional suite (scenarios/controls/teach mode), presenter theme + token system, bilingual guided tour, visual-snapshot scaffolding |
@@ -111,3 +112,13 @@ No snapshot baselines are committed yet. Local Windows-generated (`-win32.png`) 
 - [ ] Test venue Wi-Fi and preload the production URL.
 - [ ] Keep `npm run build && npm run preview -- --host 0.0.0.0` ready as the local fallback.
 - [ ] Confirm the green release commit is tagged `v1.1-oct-workshop-hardened`.
+
+## Offline drill
+
+Verified 2026-08-23 against `https://dppa-case.web.app` (headless Chromium, `context.setOffline(true)`
+after a first successful load): the service worker registration reaches `active`/`activated`,
+`navigator.serviceWorker.controller` is set, and a full page reload while offline still renders the
+app shell with all four canvases (`profileChart`, `fmpStrip`, `multiYearChart`, `savingsStrip`) and
+non-empty body text. This is the drill `plans/2026-october-readiness-checklist.md` describes as
+"load the app once, enable airplane mode, confirm it still loads" — it now passes on the live
+deploy, not just in the local `app/e2e/offline.spec.js` suite.
