@@ -45,7 +45,8 @@ import {
 import { initTeachMode } from './modules/teach.js'
 import { initTheme } from './modules/theme.js'
 import { initTour } from './modules/tour.js'
-import { initI18n, t } from './modules/i18n.js'
+import { initI18n, setLang, t } from './modules/i18n.js'
+import { parseState, serializeState } from './modules/url-state.js'
 
 if (navigator.webdriver) {
   // Headless-Chromium's backdrop-filter blur compositing is not pixel-stable
@@ -94,6 +95,38 @@ function applyScenarioDefaults(scenario) {
   }
 }
 
+// Resolves state from three layers, each overriding the last: the shared
+// defaults, the landing/URL scenario's own price overrides, then any
+// explicit URL params (so `?scenarioId=workshop2` alone still gets workshop2's
+// strike/FMP, while `?strikeEsc=0` alone keeps the landing scenario's prices
+// and only moves the escalation slider).
+function resolveInitialState(search) {
+  const scenarioOnly = parseState(search, defaultInputs)
+  Object.assign(state, defaultInputs)
+  state.scenarioId = scenarioOnly.scenarioId
+  applyScenarioDefaults(scenarioProfiles[state.scenarioId])
+  Object.assign(state, parseState(search, state))
+}
+
+// Non-state flags that other modules read directly from the URL (teach mode,
+// the tour-suppression/theme test flags, the language override). Merged back
+// in below so serializeState's state-only params never clobber them -- an
+// earlier version replaced the whole query string, which silently stripped
+// ?teach=1 before initTeachMode() ever read it.
+const NON_STATE_PARAM_KEYS = ['teach', 'test', 'present', 'lang']
+
+function syncUrlFromState() {
+  const currentParams = new URLSearchParams(window.location.search)
+  const stateParams = new URLSearchParams(serializeState(state))
+  for (const key of NON_STATE_PARAM_KEYS) {
+    const value = currentParams.get(key)
+    if (value !== null) stateParams.set(key, value)
+  }
+  const query = stateParams.toString()
+  const url = query ? `${window.location.pathname}?${query}` : window.location.pathname
+  window.history.replaceState(null, '', url)
+}
+
 function getWarningText(totals, scenario) {
   if (totals.excessRisk) {
     return t('warning_excess_risk_template').replace('{scenario}', scenario.label)
@@ -107,6 +140,7 @@ function getWarningText(totals, scenario) {
 }
 
 async function updateView() {
+  syncUrlFromState()
   const inputs = buildInputs()
   const scenario = scenarioProfiles[state.scenarioId]
   const settlement = calculateSettlement(inputs)
@@ -249,6 +283,13 @@ function syncControls() {
 
   document.querySelector('#resetButton').addEventListener('click', () => {
     Object.assign(state, defaultInputs)
+    applyScenarioDefaults(scenarioProfiles[state.scenarioId])
+    syncInputsFromState()
+    updateView()
+  })
+
+  document.querySelector('#lockedStrikeButton').addEventListener('click', () => {
+    state.strikeEscalation = 0
     syncInputsFromState()
     updateView()
   })
@@ -292,9 +333,26 @@ function initLangSelector() {
   group.addEventListener('click', (event) => {
     const button = event.target.closest('[data-lang]')
     if (!button) return
-    const params = new URLSearchParams(window.location.search)
-    params.set('lang', button.dataset.lang)
-    window.location.search = params.toString()
+
+    // Teach mode is presenter-only, flag-gated by ?teach=1, and attaches a
+    // window-level keydown listener + banner that a full re-render would
+    // duplicate rather than replace (they live outside the #app subtree
+    // renderAppShell rewrites). A reload is simpler and correct there.
+    if (new URLSearchParams(window.location.search).get('teach') === '1') {
+      const params = new URLSearchParams(window.location.search)
+      params.set('lang', button.dataset.lang)
+      window.location.search = params.toString()
+      return
+    }
+
+    setLang(button.dataset.lang)
+    renderAppShell(document.querySelector('#app'), getScenarioList(), settlementModes)
+    initTheme()
+    initLangSelector()
+    initTour()
+    syncControls()
+    syncInputsFromState()
+    updateView()
   })
   actions.appendChild(group)
 }
@@ -303,6 +361,7 @@ initI18n()
 renderAppShell(document.querySelector('#app'), getScenarioList(), settlementModes)
 initTheme()
 initLangSelector()
+resolveInitialState(window.location.search)
 syncControls()
 syncInputsFromState()
 updateView()

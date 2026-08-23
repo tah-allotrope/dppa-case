@@ -34,10 +34,19 @@ export const teachSteps = [
     expectedKey: 'teach_m3_expected',
   },
   {
+    // Deliberately NOT workshop1: at workshop1's basis (strike 1,250 / FMP
+    // 1,150) the DPPA line is already below BAU from year 1 regardless of
+    // strikeEscalation (0, 0.02, or 0.04 all give crossoverYear 1) -- the
+    // buyer-gate question this step asks has a fixed answer no matter what
+    // the presenter does, which demonstrates nothing. The 'balanced' curve
+    // scenario (strike 2,000 / FMP ~1,427, the app's original constants)
+    // genuinely depends on strikeEscalation: no crossover within 20 years at
+    // 0.04, year 14 at the default 0.02, year 9 with the "Locked strike"
+    // preset (strikeEscalation 0) -- a real, visible before/after.
     module: 4,
     titleKey: 'teach_m4_title',
-    scenarioId: 'workshop1',
-    controls: { marketPrice: 1150, strikePrice: 1250, horizonYears: 20 },
+    scenarioId: 'balanced',
+    controls: { marketPrice: 1427, strikePrice: 2000, horizonYears: 20 },
     scrollTo: '#multiYearChart',
     annotationKey: 'teach_m4_annotation',
     expectedKey: 'teach_m4_expected',

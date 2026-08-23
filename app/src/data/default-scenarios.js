@@ -112,7 +112,7 @@ export const scenarioProfiles = {
   workshop1: {
     id: 'workshop1',
     kind: 'workshop',
-    label: 'Workshop 1',
+    label: 'S1 Matched',
     description: 'July deck Scenario 1: contracted quantity matches factory consumption.',
     overrides: { strikePrice: 1250, marketPrice: 1150 },
     monthlyVolumes: { contracted: 5000000, total: 5000000 },
@@ -131,7 +131,7 @@ export const scenarioProfiles = {
   workshop2: {
     id: 'workshop2',
     kind: 'workshop',
-    label: 'Workshop 2',
+    label: 'S2 Shortfall',
     description: 'July deck Scenario 2: contracted quantity falls short of factory consumption.',
     overrides: { strikePrice: 1500, marketPrice: 1600 },
     monthlyVolumes: { contracted: 8000000, total: 9000000 },
@@ -149,7 +149,7 @@ export const scenarioProfiles = {
   workshop3: {
     id: 'workshop3',
     kind: 'workshop',
-    label: 'Workshop 3',
+    label: 'S3 Excess',
     description:
       'Workshop Scenario 3 (excess): overbuilt solar generates more than the factory consumes. Consumption is fully matched (line 4 = 0); the excess settles nothing — spot only, no CfD.',
     overrides: { strikePrice: 1250, marketPrice: 1100 },
@@ -179,7 +179,14 @@ export const scenarioOrder = [
 ]
 
 export const defaultInputs = {
-  scenarioId: 'balanced',
+  // Landing scenario is S1 Matched (workshop1), not a synthetic curve case:
+  // it is the canonical basis the deck, spine exports, worksheets and
+  // facilitator guide are all built on (strike 1,250 / FMP 1,150), so the
+  // first thing a QR-code visitor sees matches what they're being taught.
+  // applyScenarioDefaults() (main.js) overlays workshop1's price overrides
+  // onto state at startup and on Reset -- the strikePrice/marketPrice below
+  // are the curve-scenario baseline, used when scenarioId has no overrides.
+  scenarioId: 'workshop1',
   // Strike: deck Case 6 reference offer — illustrative teaching value that shows "Year 1 ≥ BAU"
   strikePrice: 2000,
   // FMP: deck ~1,427 VND/kWh 2025 reference — illustrative; no NSMO/ERAV primary source yet
@@ -199,7 +206,26 @@ export const defaultInputs = {
   selectedHour: 12,
   // Multi-year horizon defaults (used by projectMultiYear in settlement.js)
   evnEscalation: 0.04, // 4%/yr EVN tariff escalation (historical trend 2015-2024)
-  strikeEscalation: 0.04, // 4%/yr strike escalation (fixed-VND index; negotiate separately)
+  // 2.0%/yr — illustrative, NOT a sourced figure (ASM-005 of
+  // plans/2026-08-22-delivery-stall-recovery-plan.md, 2026-08-23). Defensible
+  // as a partially-indexed strike; chosen below evnEscalation so the
+  // escalation differential (the multi-year panel's "Differential +2.0%/yr"
+  // pill) is visibly non-zero regardless of scenario. At the prior default of
+  // 0.04 (== evnEscalation), the differential was zero, contradicting
+  // MISSION.md's claim that the value comes from EVN escalation outpacing a
+  // locked strike. The *crossover year* this produces varies by scenario:
+  // workshop1 (the landing scenario) crosses in year 1 at any of 0/0.02/0.04
+  // because its strike (1,250) already undercuts its FMP (1,150); the curve
+  // scenarios (e.g. balanced, strike 2,000 / FMP 1,427) show the differential
+  // driving the crossover more visibly -- no crossover within 20 years at
+  // 0.04, year 14 at 0.02, year 9 at 0 -- which is what the "Locked strike"
+  // preset (sets strikeEscalation to 0) is for demonstrating. Replace with a real
+  // negotiated index when one exists; re-run the full CLAUDE.md §5
+  // regeneration chain when this changes (DEC-001: today it does not feed
+  // assets/teaching/*.json, since export-spine.mjs/export-sweep.mjs read
+  // their own constants rather than these -- verify that is still true after
+  // any change here).
+  strikeEscalation: 0.02,
   horizonYears: 20, // default lifetime horizon in years
 }
 

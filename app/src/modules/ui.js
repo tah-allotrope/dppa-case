@@ -327,7 +327,10 @@ export function renderAppShell(root, scenarios, settlementModes) {
             <p class="eyebrow">${t('controls_eyebrow')}</p>
             <h2>${t('controls_title')}</h2>
           </div>
-          <button class="ghost-button" id="resetButton" type="button">${t('controls_reset')}</button>
+          <div class="controls-header-actions">
+            <button class="ghost-button" id="lockedStrikeButton" type="button">${t('controls_locked_strike')}</button>
+            <button class="ghost-button" id="resetButton" type="button">${t('controls_reset')}</button>
+          </div>
         </div>
         <div class="controls-grid">
           <label class="control-card">
@@ -594,6 +597,18 @@ export function renderMultiYearPanel(multiYear, currency) {
     ? `${t('crossover_year_prefix')} ${crossoverYear}`
     : `${t('crossover_gt_prefix')} ${years} ${t('crossover_gt_suffix')}`
 
+  // The differential (EVN escalation minus strike escalation) is the quantity
+  // MISSION.md's second success criterion is actually about -- "why a virtual
+  // DPPA is rarely a Year-1 discount, and where the value comes from (EVN
+  // escalation vs a locked strike)". Showing EVN%/yr and strike%/yr as two
+  // separate facts (below, in #multiYearParams) never states the differential
+  // itself; this pill does.
+  const differential = evnEscalation - strikeEscalation
+  const differentialText = t('multiyear_differential_template')
+    .replace('{sign}', differential >= 0 ? '+' : '-')
+    .replace('{value}', Math.abs(differential * 100).toFixed(1))
+  const differentialTone = differential > 0 ? 'result' : differential < 0 ? 'warning' : 'default'
+
   if (titleEl) titleEl.textContent = t('multiyear_title_template').replace('{years}', years)
 
   rollupsEl.innerHTML = `
@@ -601,6 +616,7 @@ export function renderMultiYearPanel(multiYear, currency) {
     ${rollups.year10 ? compactPill(t('pill_10yr_cumulative'), fmt(rollups.year10.savings), savTone(rollups.year10.savings)) : ''}
     ${compactPill(`${years}${t('pill_lifetime_suffix')}`, fmt(rollups.lifetime.savings), savTone(rollups.lifetime.savings))}
     ${compactPill(t('pill_crossover'), crossoverText, crossoverYear ? 'accent' : 'default')}
+    ${compactPill('', differentialText, differentialTone)}
   `
 
   if (paramsEl) {

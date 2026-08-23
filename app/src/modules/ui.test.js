@@ -89,7 +89,7 @@ describe('storytelling shell', () => {
 
     renderFiveLineBill(node, bill, 'VND', scenarioProfiles.workshop1)
 
-    expect(normalizedText('#fiveLineBill')).toContain('Workshop 1 deck bill')
+    expect(normalizedText('#fiveLineBill')).toContain('S1 Matched deck bill')
     expect(normalizedText('#fiveLineBill')).toContain('5,946,696,000 VND')
     expect(normalizedText('#fiveLineBill')).toContain('8,563,196,000 VND')
     expect(normalizedText('#fiveLineBill')).toContain('9,063,196,000 VND')

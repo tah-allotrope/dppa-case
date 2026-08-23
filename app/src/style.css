@@ -309,6 +309,13 @@ h3 {
   justify-content: flex-end;
 }
 
+.controls-header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .summary-pill {
   display: inline-flex;
   align-items: center;
