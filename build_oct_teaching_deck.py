@@ -33,6 +33,12 @@ CKH = SPINE["bill"]["cKh"]["vndMillionsRounded"]
 BAU = SPINE["comparison"]["bauMonthlyVndMillionsRounded"]
 FACTORY = SPINE["factory"]["name"]
 PASS_COUNT = SWEEP["passCount"]
+# PHASE-06 (2026-08-23): was hard-coded to the literal "56" in three slide
+# strings below even though the grid's actual size lives in the sweep export
+# -- when STRIKES grew from 8 to 10 entries (70 cells), those three strings
+# would have silently kept citing the old, wrong denominator. Deriving it here
+# means it can never drift from what the sweep actually computed again.
+SWEEP_CELL_COUNT = len(SWEEP["cells"])
 
 TEXT = {
     "en": {
@@ -44,7 +50,7 @@ TEXT = {
             "Which of the five lines disappears when consumption exactly equals matched volume?",
             "If the market price jumps above the strike mid-afternoon, who pays whom?",
             "Which of the three doors is hardest to pass when the strike is set too high?",
-            "In the 56-scenario sweep, how many pass all three gates at once?",
+            f"In the {SWEEP_CELL_COUNT}-scenario sweep, how many pass all three gates at once?",
             "Name one lever that would have flipped this month's CfD sign.",
         ],
         "m1_title": "What you pay EVN today",
@@ -58,8 +64,8 @@ TEXT = {
         "m3_app": "App moment: drag the market-price slider through the strike and watch the CfD line flip sign.",
         "m4_title": "Three doors the deal must pass",
         "m4_body": "Buyer: cost below doing nothing. Lender: covered every year. Investor: return earned. All three, or no deal.",
-        "m5_title": "56 scenarios, how many clear the window",
-        "m5_body": f"Sweep strike x volume across both case studies: {PASS_COUNT} of 56 combinations clear all three doors at once.",
+        "m5_title": f"{SWEEP_CELL_COUNT} scenarios, how many clear the window",
+        "m5_body": f"Sweep strike x volume across both case studies: {PASS_COUNT} of {SWEEP_CELL_COUNT} combinations clear all three doors at once.",
         "m5_exercise": "Your turn: compute this factory's five-line bill from the worksheet, then verify it in the app.",
         "m6_decoder_title": "Decoder: your words, the decree's symbols",
         "m6_decoder_rows": [
@@ -111,31 +117,37 @@ def format_number_for_lang(value, lang):
     return grouped.replace(",", sep) if sep != "," else grouped
 
 
-def resolve_slot_path(path, spine):
-    """Walk a "/a/b/c" pointer into `spine` and return the numeric leaf value."""
-    node = spine
-    for part in path.strip("/").split("/"):
+def resolve_slot_path(path, documents):
+    """Walk a "doc:/a/b/c" pointer (doc defaults to "spine" when omitted, for
+    backward compatibility with slots written before sweep-sourced figures were
+    needed) into documents[doc] and return the numeric leaf value."""
+    doc_name, _, pointer = path.partition(":")
+    if not pointer:
+        doc_name, pointer = "spine", path
+    node = documents[doc_name]
+    for part in pointer.strip("/").split("/"):
         node = node[part]
     return node
 
 
-def resolve_slot_value(slot, spine):
-    """A slot is a single "/a/b/c" path, or a list of paths to sum (a derived figure,
-    e.g. "fees" = systemService + diffClearing, which has no field of its own)."""
+def resolve_slot_value(slot, documents):
+    """A slot is a single "doc:/a/b/c" path, or a list of paths to sum (a derived
+    figure, e.g. "fees" = systemService + diffClearing, which has no field of
+    its own)."""
     if isinstance(slot, list):
-        return sum(resolve_slot_path(p, spine) for p in slot)
-    return resolve_slot_path(slot, spine)
+        return sum(resolve_slot_path(p, documents) for p in slot)
+    return resolve_slot_path(slot, documents)
 
 
-def substitute_slots(text, slots, lang, spine):
+def substitute_slots(text, slots, lang, documents):
     """Replace every {name} token in `text` with its slots[name] value, resolved
-    from `spine` and formatted for `lang`. Raises KeyError naming the token if
-    the template references a placeholder no slots entry provides."""
+    from `documents` (a dict with "spine" and "sweep" keys) and formatted for
+    `lang`."""
     for name, slot in slots.items():
         token = "{" + name + "}"
         if token not in text:
             continue
-        value = resolve_slot_value(slot, spine)
+        value = resolve_slot_value(slot, documents)
         text = text.replace(token, format_number_for_lang(round(value), lang))
     return text
 
@@ -163,7 +175,7 @@ def load_text(lang):
             return None
         slots = entry.get("slots")
         if slots:
-            value = substitute_slots(value, slots, lang, SPINE)
+            value = substitute_slots(value, slots, lang, {"spine": SPINE, "sweep": SWEEP})
         return value
 
     missing = []
@@ -427,10 +439,16 @@ def build(lang, out_dir=None):
                  f"residual {L['additionalPurchase']['vndMillionsRounded']:,}, CfD {L['cfd']['vndMillionsRounded']:,}, "
                  f"total {CKH:,} tr VND. APP MOMENT: verify against the five-line-bill panel.")
     fallback_slide(prs, 5)
-    content_slide(prs, "The window, revealed", f"Now scale your month x12 x20 strikes: {PASS_COUNT} of 56 pass all three doors.",
+    content_slide(prs, "The window, revealed", f"Now scale your month x12 x20 strikes: {PASS_COUNT} of {SWEEP_CELL_COUNT} pass all three doors.",
                   os.path.join(ASSETS, "m5-gate-heatmap-en.png"),
                   "M5 REVEAL (2 min). This is the punchline: the exercise they just did, multiplied across a lifetime "
-                  f"and a strike sweep, is why only {PASS_COUNT} of 56 combinations clear every gate in these two case studies.")
+                  f"and a strike sweep, is why only {PASS_COUNT} of {SWEEP_CELL_COUNT} combinations clear every gate in these two case studies. "
+                  f"Per-gate breakdown: buyer {SWEEP['buyerPassCount']}, lender {SWEEP['lenderPassCount']}, "
+                  f"investor {SWEEP['investorPassCount']} -- see which gate actually binds. CAVEAT if asked: "
+                  "the lender and investor gates are one-dimensional per-kWh proxies (flat debt-service and "
+                  "LCOE floors), not modelled debt schedules or equity IRR -- settlement.js is buyer-side only. "
+                  "The buyer gate is the exact lifetime-cost comparison; treat lender/investor as illustrative "
+                  "until H3 (real Allotrope deal data) lands.")
 
     divider(prs, 6, t)
     m6_decoder_slide(prs, t)

@@ -82,9 +82,12 @@
       "zh": "UNTRANSLATED"
     },
     "checkpoint.4": {
-      "en": "In the 56-scenario sweep, how many pass all three gates at once?",
+      "en": "In the {sweepCellCount}-scenario sweep, how many pass all three gates at once?",
       "vi": "UNTRANSLATED",
-      "zh": "UNTRANSLATED"
+      "zh": "UNTRANSLATED",
+      "slots": {
+        "sweepCellCount": "sweep:cellCount"
+      }
     },
     "checkpoint.5": {
       "en": "Name one lever that would have flipped this month's CfD sign.",
@@ -161,16 +164,23 @@
       "zh": "UNTRANSLATED"
     },
     "m5_title": {
-      "en": "56 scenarios, how many clear the window",
+      "en": "{sweepCellCount} scenarios, how many clear the window",
       "vi": "UNTRANSLATED",
       "zh": "UNTRANSLATED",
-      "note": "Related non-verbatim asset: build_teaching_visuals.py TEXTS.{vi,zh}.m5_title ('56 kịch bản: bao nhiêu vượt cả ba cửa?' / '56种情景:有多少能通过全部三道门?') is worded differently (different question), not a match. Reuse its vocabulary when translating."
+      "note": "Related non-verbatim asset: build_teaching_visuals.py TEXTS.{vi,zh}.m5_title (templated as \"{total} kich ban...\" / \"{total} zhong qingjing...\") is worded differently (different question), not a match. Reuse its vocabulary when translating.",
+      "slots": {
+        "sweepCellCount": "sweep:cellCount"
+      }
     },
     "m5_body": {
-      "en": "Sweep strike x volume across both case studies: 5 of 56 combinations clear all three doors at once.",
+      "en": "Sweep strike x volume across both case studies: {passCount} of {sweepCellCount} combinations clear all three doors at once.",
       "vi": "UNTRANSLATED",
       "zh": "UNTRANSLATED",
-      "note": "The figure '5 of 56' is computed (assets/teaching/gate-sweep.json passCount) and will need re-verification after translation, not just word substitution."
+      "note": "Numbers are supplied by the deck builder from slots (sweep:passCount, sweep:cells -- the length of the cells array), never hand-typed.",
+      "slots": {
+        "passCount": "sweep:passCount",
+        "sweepCellCount": "sweep:cellCount"
+      }
     },
     "m5_exercise": {
       "en": "Your turn: compute this factory's five-line bill from the worksheet, then verify it in the app.",

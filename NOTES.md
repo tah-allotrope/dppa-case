@@ -38,12 +38,17 @@
   `cd app && npm run record:demos`, then rebuild the deck
   (`PYTHONPATH= py build_oct_teaching_deck.py --lang en`). See
   `plans/2026-07-10-october-readiness-hardening-plan.md` PHASE-02.
-- The M5 heatmap's "N of 56" figure is now computed from a real strike x volume
+- The M5 heatmap's "N of M" figure is now computed from a real strike x volume
   gate sweep (`cd app && node scripts/export-sweep.mjs` → `assets/teaching/gate-sweep.json`),
-  not a hard-coded placeholder. Current computed result: **5 of 56** combinations
-  clear all three gates (buyer/lender/investor) at once. Re-run the sweep, then
-  `PYTHONPATH= py build_teaching_visuals.py --lang en` and rebuild the deck, whenever
-  `settlement.js` or the escalation assumptions change. See PHASE-03 of the same plan.
+  not a hard-coded placeholder. The grid is 10 strikes (1,100–1,550) x 7 volume
+  ratios = 70 cells (extended 2026-08-23 from 8 strikes/56 cells so both the
+  lender and investor thresholds sit interior to the grid, not at its edge —
+  see `plans/2026-08-22-delivery-stall-recovery-plan.md` PHASE-06). Current
+  computed result: **15 of 70** combinations clear all three gates
+  (buyer/lender/investor) at once — per-gate: buyer 62, lender 28, investor 21.
+  Re-run the sweep, then `PYTHONPATH= py build_teaching_visuals.py --lang en`
+  and rebuild the deck, whenever `settlement.js` or the escalation assumptions
+  change. See PHASE-03 of the 2026-07-10 plan.
   Fixed along the way: `app/src/modules/settlement.js` had an extensionless import
   (`from './profiles'`) that Vite tolerates but plain Node ESM does not — changed to
   `'./profiles.js'` so `node scripts/export-*.mjs` runs without a custom loader.

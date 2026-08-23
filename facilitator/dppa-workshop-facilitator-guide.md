@@ -103,7 +103,7 @@ Timing flex: if a round runs long, cut the round-2 plant-revenue side first; pro
 - CfD at any strike = `(strike − 1,150) × 5,000,000`. Examples: strike 1,150 → CfD 0; strike 1,250 → +500M (factory pays); strike 1,050 → −500M (developer pays).
 - CfD crosses zero at **strike = 1,150** (= FMP).
 - C_KH at a given strike = `8,563,196,000 + (strike − 1,150) × 5,000,000` (C_EVN is fixed; only the CfD moves).
-- There is no single "right" answer — accept any defensible strike. The teaching point is the **trade-off**: lower strike helps the buyer but fails the lender's DSCR; higher strike is bankable but may leave the buyer above BAU. In the deck's full case study, only **5 of 56 scenarios** (`assets/teaching/gate-sweep.json`, regenerate via `cd app && node scripts/export-sweep.mjs`) passed all three gates at once — surface that tension.
+- There is no single "right" answer — accept any defensible strike. The teaching point is the **trade-off**: lower strike helps the buyer but fails the lender's DSCR; higher strike is bankable but may leave the buyer above BAU. In the deck's full case study, only **15 of 70 scenarios** (`assets/teaching/gate-sweep.json`, regenerate via `cd app && node scripts/export-sweep.mjs`) passed all three gates at once — buyer 62, lender 28, investor 21 individually — surface that tension and which gate binds.
 
 ---
 
@@ -147,7 +147,7 @@ This is a *different, shorter session* than the 90-min group workshop above: it 
 | 0:26–0:34 | M4 — Three Doors | Three-doors slide, no ratio math. Teach mode step 4: multi-year panel, point at the crossover year as the buyer-door check. | Which of the three doors is hardest to pass when the strike is set too high? |
 | 0:34–0:36 | M5 setup | Heatmap slide shown but NOT explained yet — that is the reveal after the exercise. | — |
 | 0:36–0:46 | M5 — Hand-compute | Distribute worksheets. Participants compute all five lines (volumes pre-filled) and total, compare to the BAU bar. Circulate. Teach mode step 5 to self-check. | — |
-| 0:46–0:48 | M5 reveal | "Now scale your month × 12 × 20 strikes" — reveal the 5-of-56 heatmap as the punchline. | In the 56-scenario sweep, how many pass all three gates at once? |
+| 0:46–0:48 | M5 reveal | "Now scale your month × 12 × 20 strikes" — reveal the 15-of-70 heatmap as the punchline. | In the 70-scenario sweep, how many pass all three gates at once? |
 | 0:48–0:56 | M6 — Decide | Decoder slide (only slide with Decree-57 notation — frame as translation, not new content), then the five-levers slide. Teach mode step 6: lower the strike live, show the CfD move. | Name one lever that would have flipped this month's CfD sign. |
 | 0:56–0:60 | Close | Callback to the cold-open bar pair. Five-levers checklist. Invite to the 90-min scenario workshop above. | — |
 

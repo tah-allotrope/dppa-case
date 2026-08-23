@@ -45,7 +45,7 @@ node scripts/export-sweep.mjs
 Both scripts import `settlement.js` directly (the canonical answer-key engine) and
 write to `../assets/teaching/`: `export-spine.mjs` produces `spine-s1.json` (every
 deck/worksheet/card figure); `export-sweep.mjs` produces `gate-sweep.json` (the
-56-cell strike x volume gate sweep behind the M5 heatmap's "N of 56" figure). Re-run
+70-cell strike x volume gate sweep behind the M5 heatmap's "N of M" figure). Re-run
 both whenever `settlement.js`, `default-scenarios.js`, or the escalation assumptions
 change, then re-render visuals (`PYTHONPATH= py build_teaching_visuals.py --lang en`)
 and rebuild the deck.

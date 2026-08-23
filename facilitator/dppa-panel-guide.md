@@ -77,7 +77,7 @@ Scored 0–3 on four axes — **A1** cross-seat tension · **A2** anchor strengt
 **Question (as written):** *Major suppliers say their challenge isn't running an RFP, it's securing enough volume — today's DPPA / virtual-DPPA capacity often covers only a fraction of their target, on very long, high-risk PPAs. How should they navigate that?*
 **Lead:** BUY · **Engaging:** DEV, BANK.
 **Cross-seat tension:** BUY wants partial, flexible volume and short exit; DEV needs a large, long, firm offtake to finance the plant; BANK won't lend against a thin or short contract. The friction is **tenor and firmness vs. flexibility**.
-**Anchor:** the three gates — buyer ≤ BAU on **10-yr & lifetime**, seller IRR 12–15%, lender **DSCR ≥ 1.20×**; and the narrow-window finding (**5 of 56** strike×volume scenarios pass all three at current prices — the computed `passCount` in `assets/teaching/gate-sweep.json`; regenerate via `cd app && node scripts/export-sweep.mjs`). Volume/tenor is exactly where the window narrows.
+**Anchor:** the three gates — buyer ≤ BAU on **10-yr & lifetime**, seller IRR 12–15%, lender **DSCR ≥ 1.20×**; and the narrow-window finding (**15 of 70** strike×volume scenarios pass all three at current prices — the computed `passCount` in `assets/teaching/gate-sweep.json`; regenerate via `cd app && node scripts/export-sweep.mjs`). Volume/tenor is exactly where the window narrows.
 **Gate mapping:** buyer-≤BAU (BUY) vs. lender-tenor/DSCR (BANK) vs. seller-IRR (DEV).
 **A strong answer surfaces:** start with a slice you can actually settle (consumption, not aspiration); layer additional DPPAs over time; a short PPA is often *unbankable*, so "lower risk via shorter tenor" can backfire.
 **Follow-up if they agree too fast:** *"BANK — name the shortest tenor you'd finance for a tier-2 supplier, and what it costs the buyer."*
@@ -117,7 +117,7 @@ Scored 0–3 on four axes — **A1** cross-seat tension · **A2** anchor strengt
 **Question (as written):** *From a lender's view, what makes a DPPA bankable? How do you weigh buyer creditworthiness, contract tenor, and the floor price?*
 **Lead:** BANK · **Engaging:** DEV, BUY.
 **Cross-seat tension:** BANK wants a high floor + long tenor + strong obligor; DEV wants the high strike too (their revenue line); BUY wants the opposite on price. The buyer and lender are *aligned against* the developer on credit/tenor but *opposed* on price.
-**Anchor:** **DSCR ≥ 1.20× every year** is the hardest gate; the strike floor **is** the developer's bankable revenue line; the narrow-window finding (**5/56** pass all three gates) is the blunt truth — bankability and buyer-positivity rarely coexist at current prices.
+**Anchor:** **DSCR ≥ 1.20× every year** is the hardest gate; the strike floor **is** the developer's bankable revenue line; the narrow-window finding (**15/70** pass all three gates) is the blunt truth — bankability and buyer-positivity rarely coexist at current prices.
 **Gate mapping:** lender DSCR ≥ 1.20× (BANK); seller IRR 12–15% (DEV).
 **A strong answer surfaces:** bankability = creditworthy obligor + tenor that outlasts the debt + a floor that clears DSCR in *every* year; if the window is narrow, the fix is **structural** (BESS, volume right-sizing, indexation), not just price.
 **Follow-up:** *"DEV — what's the lowest strike you could still finance, and what would have to change to get there?"*

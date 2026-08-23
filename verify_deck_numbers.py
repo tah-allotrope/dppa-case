@@ -95,6 +95,12 @@ def collect_sweep_numbers(sweep):
     for strike in sweep.get("strikes", []):
         numbers.add(str(round(strike)))
     numbers.add(str(sweep.get("passCount", 0)))
+    # PHASE-06 (2026-08-23): the per-gate pass counts now cited in the M5
+    # notes (see build_oct_teaching_deck.py) alongside the combined count.
+    numbers.add(str(sweep.get("buyerPassCount", 0)))
+    numbers.add(str(sweep.get("lenderPassCount", 0)))
+    numbers.add(str(sweep.get("investorPassCount", 0)))
+    numbers.add(str(len(sweep.get("cells", []))))
     return numbers
 
 

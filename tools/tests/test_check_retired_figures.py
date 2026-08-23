@@ -29,7 +29,10 @@ class TestScanFiles(unittest.TestCase):
             _write(root, "NOTES.md", "The result was 0 of 56 here.\n")
             config = {"scan": ["NOTES.md"], "retired": REAL_CONFIG["retired"]}
             violations = crf.scan_files(root, config)
-            self.assertEqual(len(violations), 1)
+            # "0 of 56" now also matches the broader generic-substring entry "of
+            # 56", so a single stale line can legitimately trip more than one
+            # retired entry -- the test's intent is just that it's caught at all.
+            self.assertGreaterEqual(len(violations), 1)
             self.assertIn("NOTES.md:1", violations[0])
 
     def test_case_insensitive_match(self):
@@ -38,26 +41,30 @@ class TestScanFiles(unittest.TestCase):
             _write(root, "NOTES.md", "ZERO OF 56 scenarios passed.\n")
             config = {"scan": ["NOTES.md"], "retired": REAL_CONFIG["retired"]}
             violations = crf.scan_files(root, config)
-            self.assertEqual(len(violations), 1)
+            # This phrase now also matches "of 56" and "56 scenarios" (both
+            # case-insensitive), on top of the "zero of 56" it was written to
+            # test -- the point is that case-insensitivity itself works.
+            self.assertGreaterEqual(len(violations), 1)
 
     def test_current_value_is_not_flagged(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            _write(root, "NOTES.md", "The current result is 5 of 56.\n")
+            _write(root, "NOTES.md", "The current result is 15 of 70.\n")
             config = {"scan": ["NOTES.md"], "retired": REAL_CONFIG["retired"]}
             violations = crf.scan_files(root, config)
             self.assertEqual(violations, [])
 
     def test_ten_of_56_is_flagged_by_design(self):
-        # Intentional strictness: "10 of 56" contains the substring "0 of 56".
-        # Any future headline phrasing should use the computed figure, not a
-        # hand-typed number that happens to end the same way.
+        # Intentional strictness: "10 of 56" contains the substring "0 of 56"
+        # (and, since 2026-08-23, the broader "of 56"). Any future headline
+        # phrasing should use the computed figure, not a hand-typed number
+        # that happens to end the same way.
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             _write(root, "NOTES.md", "Consider 10 of 56 as a hypothetical.\n")
             config = {"scan": ["NOTES.md"], "retired": REAL_CONFIG["retired"]}
             violations = crf.scan_files(root, config)
-            self.assertEqual(len(violations), 1)
+            self.assertGreaterEqual(len(violations), 1)
 
     def test_empty_retired_list_yields_no_violations(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -70,7 +77,7 @@ class TestScanFiles(unittest.TestCase):
     def test_main_exits_zero_when_clean(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            _write(root, "NOTES.md", "The current result is 5 of 56.\n")
+            _write(root, "NOTES.md", "The current result is 15 of 70.\n")
             config_path = root / "retired_figures.json"
             import json
             config_path.write_text(
@@ -92,7 +99,7 @@ class TestScanScripts(unittest.TestCase):
             _write(root, "build_x.py", 'add_text(slide, "0 of 56")\n')
             config = {"scanScripts": ["*.py"], "retired": REAL_CONFIG["retired"]}
             violations = crf.scan_scripts(root, config)
-            self.assertEqual(len(violations), 1)
+            self.assertGreaterEqual(len(violations), 1)
             self.assertIn("RETIRED-FIGURE IN GENERATOR:", violations[0])
             self.assertIn("build_x.py", violations[0])
 
@@ -115,7 +122,7 @@ class TestScanScripts(unittest.TestCase):
     def test_current_value_in_generator_is_not_flagged(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            _write(root, "build_x.py", 'add_text(slide, "5 of 56")\n')
+            _write(root, "build_x.py", 'add_text(slide, "15 of 70")\n')
             config = {"scanScripts": ["*.py"], "retired": REAL_CONFIG["retired"]}
             violations = crf.scan_scripts(root, config)
             self.assertEqual(violations, [])

@@ -52,9 +52,9 @@ TEXTS = {
         "m4_buyer": "Buyer door", "m4_buyer_rule": "Cost <= doing nothing",
         "m4_lender": "Lender door", "m4_lender_rule": ">= 1.20x cover, every year",
         "m4_investor": "Investor door", "m4_investor_rule": "Equity return 12-15%",
-        "m5_title": "56 scenarios: how many pass all three doors?",
+        "m5_title": "{total} scenarios: how many pass all three doors?",
         "m5_xlabel": "Strike price scenarios", "m5_ylabel": "Contracted-volume scenarios",
-        "m5_caption": "{n} of 56 pass every gate at once.",
+        "m5_caption": "{n} of {total} pass every gate at once.",
         "cold_open_title": "Same factory, one month",
         "cold_open_bau": "Today (EVN retail only)", "cold_open_dppa": "With a DPPA",
         "cold_open_hook": "Where did the difference come from?\nYou will compute it yourself.",
@@ -80,9 +80,9 @@ TEXTS = {
         "m4_buyer": "Cửa người mua", "m4_buyer_rule": "Chi phí <= không làm gì",
         "m4_lender": "Cửa ngân hàng", "m4_lender_rule": ">= 1.20 lần, mỗi năm",
         "m4_investor": "Cửa nhà đầu tư", "m4_investor_rule": "Lợi nhuận vốn 12-15%",
-        "m5_title": "56 kịch bản: bao nhiêu vượt cả ba cửa?",
+        "m5_title": "{total} kịch bản: bao nhiêu vượt cả ba cửa?",
         "m5_xlabel": "Kịch bản giá thực hiện", "m5_ylabel": "Kịch bản sản lượng hợp đồng",
-        "m5_caption": "{n}/56 vượt qua tất cả các cửa cùng lúc.",
+        "m5_caption": "{n}/{total} vượt qua tất cả các cửa cùng lúc.",
         "cold_open_title": "Cùng một nhà máy, một tháng",
         "cold_open_bau": "Hôm nay (chỉ giá bán lẻ EVN)", "cold_open_dppa": "Với DPPA",
         "cold_open_hook": "Khác biệt đến từ đâu?\nBạn sẽ tự tính.",
@@ -108,9 +108,9 @@ TEXTS = {
         "m4_buyer": "买方之门", "m4_buyer_rule": "成本 <= 维持现状",
         "m4_lender": "银行之门", "m4_lender_rule": "每年 >= 1.20倍覆盖率",
         "m4_investor": "投资人之门", "m4_investor_rule": "股本回报 12-15%",
-        "m5_title": "56种情景:有多少能通过全部三道门?",
+        "m5_title": "{total}种情景:有多少能通过全部三道门?",
         "m5_xlabel": "执行价情景", "m5_ylabel": "合同电量情景",
-        "m5_caption": "56种情景中{n}种能同时通过所有门槛。",
+        "m5_caption": "{total}种情景中{n}种能同时通过所有门槛。",
         "cold_open_title": "同一家工厂,同一个月",
         "cold_open_bau": "今天(仅EVN零售价)", "cold_open_dppa": "采用DPPA后",
         "cold_open_hook": "差额从何而来?\n您将亲自计算。",
@@ -305,14 +305,15 @@ def render_m4_three_doors(lang, spine):
     return savefig(fig, "m4-three-doors", lang)
 
 
-# ---------- M5: 56-scenario gate heatmap ----------
+# ---------- M5: gate heatmap (grid size from gate-sweep.json, not hard-coded) ----------
 def render_m5_heatmap(lang, spine, sweep):
     from matplotlib.colors import LinearSegmentedColormap
 
     t = TEXTS[lang]
-    strikes = sweep["strikes"]  # ascending, 8 values -> x-axis (m5_xlabel = strike scenarios)
-    ratios = sweep["ratios"]  # ascending, 7 values -> y-axis (m5_ylabel = contracted-volume scenarios)
+    strikes = sweep["strikes"]  # ascending -> x-axis (m5_xlabel = strike scenarios)
+    ratios = sweep["ratios"]  # ascending -> y-axis (m5_ylabel = contracted-volume scenarios)
     pass_count = sweep["passCount"]
+    cell_count = len(sweep["cells"])
 
     # grid[ratio_idx][strike_idx] = number of gates passed (0-3); row 0 =
     # lowest ratio so origin="lower" reads volume ratios ascending bottom-to-top,
@@ -336,12 +337,12 @@ def render_m5_heatmap(lang, spine, sweep):
     ax.set_yticklabels([f"{round(r * 100)}%" for r in ratios], fontsize=8, color=GRAY)
     for spine_ in ax.spines.values(): spine_.set_color("#E0E0E0")
     ax.text(
-        (len(strikes) - 1) / 2, (len(ratios) - 1) / 2, f"{pass_count} / 56",
+        (len(strikes) - 1) / 2, (len(ratios) - 1) / 2, f"{pass_count} / {cell_count}",
         ha="center", va="center", fontsize=36, fontweight="bold", color=INK,
         bbox=dict(facecolor="white", alpha=0.85, edgecolor="none", boxstyle="round,pad=0.4"),
     )
-    fig.suptitle(t["m5_title"], x=0.5, y=0.98, fontsize=16, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
-    ax.set_title(t["m5_caption"].format(n=pass_count), fontsize=10.5, color=GRAY, pad=8, fontfamily=FONT[lang])
+    fig.suptitle(t["m5_title"].format(total=cell_count), x=0.5, y=0.98, fontsize=16, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
+    ax.set_title(t["m5_caption"].format(n=pass_count, total=cell_count), fontsize=10.5, color=GRAY, pad=8, fontfamily=FONT[lang])
     return savefig(fig, "m5-gate-heatmap", lang)
 
 

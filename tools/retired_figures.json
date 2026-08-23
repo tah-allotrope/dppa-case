@@ -19,10 +19,16 @@
   ],
   "scanScriptsNote": "Generator files are scanned for retired figures too, not just the prose they produce -- a build script that still hard-codes a retired figure (e.g. build_callouts.py's '0 of 56') will render it onto a slide the next time someone runs it, even though no prose file currently states it. Excluded from this scan: tools/tests/** (unit-test fixtures legitimately contain retired strings on purpose, see test_check_retired_figures.py), archive/** (retired scripts are kept for history, not run), node_modules/**, and .git/**.",
   "retired": [
-    { "text": "0 of 56", "reason": "placeholder before the real gate sweep", "replacedBy": "5 of 56 (gate-sweep.json passCount)", "retiredOn": "2026-07-11" },
-    { "text": "zero of 56", "reason": "same, spelled out", "replacedBy": "5 of 56", "retiredOn": "2026-07-11" },
-    { "text": "0-of-56", "reason": "same, hyphenated", "replacedBy": "5 of 56", "retiredOn": "2026-07-11" },
-    { "text": "0/56", "reason": "same, slash form", "replacedBy": "5/56", "retiredOn": "2026-07-11" },
-    { "text": "0 / 56", "reason": "same, spaced slash form", "replacedBy": "5/56", "retiredOn": "2026-07-11" }
+    { "text": "0 of 56", "reason": "placeholder before the real gate sweep", "replacedBy": "15 of 70 (gate-sweep.json passCount / cellCount)", "retiredOn": "2026-07-11" },
+    { "text": "zero of 56", "reason": "same, spelled out", "replacedBy": "15 of 70", "retiredOn": "2026-07-11" },
+    { "text": "0-of-56", "reason": "same, hyphenated", "replacedBy": "15 of 70", "retiredOn": "2026-07-11" },
+    { "text": "0/56", "reason": "same, slash form", "replacedBy": "15/70", "retiredOn": "2026-07-11" },
+    { "text": "0 / 56", "reason": "same, spaced slash form", "replacedBy": "15/70", "retiredOn": "2026-07-11" },
+    { "text": "5 of 56", "reason": "STRIKES grid extended from 8 to 10 strikes (1,100-1,450 -> 1,100-1,550) so the lender (1,380) and investor (1,450) thresholds are interior to the grid, not at its edge -- the old top of the grid was exactly the investor threshold, so every passing cell sat in that one column and the pass rate was an artifact of where the axis stopped", "replacedBy": "15 of 70 (gate-sweep.json passCount / cellCount); per-gate: buyer 62, lender 28, investor 21", "retiredOn": "2026-08-23" },
+    { "text": "5/56", "reason": "same, slash form", "replacedBy": "15/70", "retiredOn": "2026-08-23" },
+    { "text": "of 56", "reason": "same, generic substring form (catches '... of 56 ...' phrasing not already listed above)", "replacedBy": "of 70", "retiredOn": "2026-08-23" },
+    { "text": "56 scenarios", "reason": "grid is now 70 cells", "replacedBy": "70 scenarios", "retiredOn": "2026-08-23" },
+    { "text": "56 kịch bản", "reason": "Vietnamese form of the same", "replacedBy": "70 kịch bản", "retiredOn": "2026-08-23" },
+    { "text": "56种情景", "reason": "Chinese form of the same", "replacedBy": "70种情景", "retiredOn": "2026-08-23" }
   ]
 }

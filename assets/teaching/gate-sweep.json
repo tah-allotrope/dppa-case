@@ -17,7 +17,9 @@
     1300,
     1350,
     1400,
-    1450
+    1450,
+    1500,
+    1550
   ],
   "ratios": [
     0.7,
@@ -588,7 +590,151 @@
       "allPass": false,
       "lifetimeDppaVnd": 4275621458472,
       "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1500,
+      "ratio": 0.7,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3546147606648,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1500,
+      "ratio": 0.8,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3490189677492,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1500,
+      "ratio": 0.9,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3434231748300,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1500,
+      "ratio": 1,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3378273819144,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1500,
+      "ratio": 1.1,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3716101201080,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1500,
+      "ratio": 1.2,
+      "buyerPass": false,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": false,
+      "lifetimeDppaVnd": 4053928582956,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1500,
+      "ratio": 1.3,
+      "buyerPass": false,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": false,
+      "lifetimeDppaVnd": 4391755964892,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1550,
+      "ratio": 0.7,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3608681571672,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1550,
+      "ratio": 0.8,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3561657066096,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1550,
+      "ratio": 0.9,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3514632560448,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1550,
+      "ratio": 1,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3467608054872,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1550,
+      "ratio": 1.1,
+      "buyerPass": true,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": true,
+      "lifetimeDppaVnd": 3814368860376,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1550,
+      "ratio": 1.2,
+      "buyerPass": false,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": false,
+      "lifetimeDppaVnd": 4161129665832,
+      "lifetimeBauVnd": 3937853110868
+    },
+    {
+      "strike": 1550,
+      "ratio": 1.3,
+      "buyerPass": false,
+      "lenderPass": true,
+      "investorPass": true,
+      "allPass": false,
+      "lifetimeDppaVnd": 4507890471348,
+      "lifetimeBauVnd": 3937853110868
     }
   ],
-  "passCount": 5
+  "cellCount": 70,
+  "passCount": 15,
+  "buyerPassCount": 62,
+  "lenderPassCount": 28,
+  "investorPassCount": 21
 }
