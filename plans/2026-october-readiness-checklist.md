@@ -1,7 +1,7 @@
 ---
 title: "October 2026 Readiness Checklist — Coding-Session Tasks"
 date: "2026-07-11"
-status: "open — split 2026-08-23 (PHASE-04 of plans/2026-08-22-delivery-stall-recovery-plan.md) from the original combined checklist. The human-only, date-bound items (the H1-H6 register, physical dry-runs, print tests, day-of logistics) moved to facilitator/october-run-plan.md — a presenter's artifact, not a coding plan, which is why it was competing for \"is this done\" semantics here. This file now holds only what a nightly coding session can actually execute and close."
+status: "abandoned — 2026-08-29: at the user's direction, closed out. Remaining scope was gated on H2 (translator delivery: vi/zh deck builds, i18n:check, notes/numbers re-audit), H3 (gate recalibration: re-export sweep, re-render visuals, rebuild deck, retire the superseded pass count), and a close-to-session re-verification of the local build/preview fallback. None of that work is done; abandoning this file means it is no longer tracked here or anywhere else. The human-only counterpart, facilitator/october-run-plan.md (H1-H6 register, dry-runs, day-of logistics), is untouched by this closure and still governs the actual session prep."
 plan_type: "checklist"
 ---
 
