@@ -1,7 +1,7 @@
 ---
 title: "Delivery-Stall Recovery and Guard Hardening"
 date: "2026-08-22"
-status: "draft"
+status: "complete — all 6 phases executed 2026-08-23 across 16 commits (6de5bed..69535a1), CI green, production redeployed and verified; final report at reports/2026-08-23-final-delivery-stall-recovery.html and per-phase artifacts verified in-repo (tools/check_delivery_pipeline.py, tools/check_plan_status.py, tools/compare_deck.py, tools/pipeline.py, requirements.txt, strings.baseline.json, url-state.js, 70-cell gate sweep)."
 request: "Turn research/2026-08-22-delivery-stall-and-in-flight-redesign-brainstorm.md into a multi-phase implementation plan saved to plans/"
 plan_type: "multi-phase"
 research_inputs:
@@ -382,39 +382,39 @@ with its defect fixed and its offline risk removed, and an honest coverage confi
 
 **Tasks**
 
-- [ ] TASK-01-01: Fix the USD strike-reference-line defect. In `app/src/modules/chart.js`, restore
+- [x] TASK-01-01: Fix the USD strike-reference-line defect. In `app/src/modules/chart.js`, restore
       the `currency` property on the shared state bag (`const profileChartState = { inputs: null,
       currency: 'VND' }`) and assign `profileChartState.currency = currency` immediately after the
       existing `profileChartState.inputs = inputs` assignment inside `renderProfileChart`. Do not
       change the `strikeLine` plugin's guard logic. `app/src/main.js` already calls
       `renderProfileChart` before `renderFmpStrip` in the same `updateView()` pass, so the state is
       always current when the strip draws.
-- [ ] TASK-01-02: Remove the remote webfont. Delete the three font-related `<link>` elements from
+- [x] TASK-01-02: Remove the remote webfont. Delete the three font-related `<link>` elements from
       `app/index.html` (the two `preconnect` hints and the `fonts.googleapis.com` stylesheet).
       Install `@fontsource/inter` (`cd app && npm install --save @fontsource/inter`) and add the six
       subset imports listed in ASM-004 at the very top of `app/src/main.js`, above the existing
       `import './style.css'` line. Leave the inline `<style>` block's `font-family` declaration in
       `app/index.html` untouched — it is the pre-hydration splash and its fallback stack is correct.
-- [ ] TASK-01-03: Confirm the font files are precached. Run `cd app && npm run build`, then confirm
+- [x] TASK-01-03: Confirm the font files are precached. Run `cd app && npm run build`, then confirm
       that `app/dist/sw-manifest.json` contains at least one `.woff2` entry. The
       `swManifestPlugin` in `app/vite.config.js` already emits every non-`.map` bundle entry, so
       fonts imported through CSS are included automatically; no change to `app/public/sw.js` is
       required. If no `.woff2` appears, add the emitted font paths to `STATIC_URLS` in
       `app/public/sw.js` instead.
-- [ ] TASK-01-04: Make the coverage denominator honest and re-baseline it, following the numbered
+- [x] TASK-01-04: Make the coverage denominator honest and re-baseline it, following the numbered
       procedure in `## Specification` S2.
-- [ ] TASK-01-05: Add unit tests for the new caption rendering (see Test Specs). Follow ASM-006 if
+- [x] TASK-01-05: Add unit tests for the new caption rendering (see Test Specs). Follow ASM-006 if
       importing `chart.js` under jsdom fails.
-- [ ] TASK-01-06: Add unit tests for the two new collapsible-derivation markup helpers in
+- [x] TASK-01-06: Add unit tests for the two new collapsible-derivation markup helpers in
       `app/src/modules/ui.js` (see Test Specs), extending the existing
       `app/src/modules/ui.test.js`.
-- [ ] TASK-01-07: Delete the untracked scratch probe if it is still present:
+- [x] TASK-01-07: Delete the untracked scratch probe if it is still present:
       `rm -f app/inspect-tmp.mjs`.
-- [ ] TASK-01-08: Run the full local gate set and make it green:
+- [x] TASK-01-08: Run the full local gate set and make it green:
       ```bash
       cd app && npm run lint && npx prettier --check src e2e scripts && npm test && npm run coverage && npm run build
       ```
-- [ ] TASK-01-09: Run the functional e2e suite. First free port 4173 if a previous session left a
+- [x] TASK-01-09: Run the functional e2e suite. First free port 4173 if a previous session left a
       preview server running — `playwright.config.js` deliberately sets `reuseExistingServer:
       false`, so a leftover listener aborts the run with `http://localhost:4173 is already used`:
       ```bash
@@ -424,11 +424,11 @@ with its defect fixed and its offline risk removed, and an honest coverage confi
       Get-NetTCPConnection -LocalPort 4173 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
       ```
       then `cd app && npm run e2e -- --workers=1`.
-- [ ] TASK-01-10: Write `reports/2026-08-22-chart-legibility-redesign.md` recording what the
+- [x] TASK-01-10: Write `reports/2026-08-22-chart-legibility-redesign.md` recording what the
       redesign changed and why, so the repository's largest change is legible to the next session.
       State plainly that the work was found uncommitted and was stabilised, not authored, by this
       phase.
-- [ ] TASK-01-11: Commit in two commits, in this order, on the current `master` branch:
+- [x] TASK-01-11: Commit in two commits, in this order, on the current `master` branch:
       1. `redesign: chart legibility pass — FMP strip, direct labels, collapsible derivations`
          (all 11 modified source files, the font change, the new tests, the deleted probe, the new
          report).
@@ -540,47 +540,47 @@ that measures whether work reached anyone, not whether a number is right.
 
 **Tasks**
 
-- [ ] TASK-02-01: Create `tools/check_delivery_pipeline.py` implementing `## Specification` S1.
+- [x] TASK-02-01: Create `tools/check_delivery_pipeline.py` implementing `## Specification` S1.
       Reuse `fetch_html` and `extract_build_commit` by importing them from
       `tools/check_deploy_freshness.py` rather than duplicating the HTTP and regex logic.
-- [ ] TASK-02-02: Create `tools/tests/test_check_delivery_pipeline.py` following the existing
+- [x] TASK-02-02: Create `tools/tests/test_check_delivery_pipeline.py` following the existing
       conventions in `tools/tests/test_check_deploy_freshness.py`: prepend the `tools` directory to
       `sys.path`, import the module under test, and mock every network call — no test may touch the
       network.
-- [ ] TASK-02-03: Add `--strict` to `tools/check_deploy_freshness.py`. With the flag, the two
+- [x] TASK-02-03: Add `--strict` to `tools/check_deploy_freshness.py`. With the flag, the two
       lenient `UNKNOWN` paths that today `return 0` — a failed local build, and a missing
       `app/dist/index.html` — instead `return 1`. Network unreachability continues to `return 0` in
       both modes, because that one really is transient. Keep the lenient behaviour as the default so
       laptop runs do not fail on an unrelated build breakage.
-- [ ] TASK-02-04: Extend `tools/tests/test_check_deploy_freshness.py` with strict-mode cases. Keep
+- [x] TASK-02-04: Extend `tools/tests/test_check_deploy_freshness.py` with strict-mode cases. Keep
       the existing `test_failed_local_build_is_unknown` assertion, which documents the lenient
       default, and add its strict-mode counterpart alongside it.
-- [ ] TASK-02-05: Fix `tools/check_human_blocked_register.py` for Windows consoles by reconfiguring
+- [x] TASK-02-05: Fix `tools/check_human_blocked_register.py` for Windows consoles by reconfiguring
       standard output to UTF-8 with replacement at the top of `main()`, and add
       `--acknowledged-through YYYY-MM-DD`: rows whose `needed_by` is on or before that date are
       printed with the classification `ACKNOWLEDGED` and do not set the failure flag. Rows after
       that date classify and gate exactly as they do today.
-- [ ] TASK-02-06: Extend `tools/tests/test_check_human_blocked_register.py` with acknowledgement
+- [x] TASK-02-06: Extend `tools/tests/test_check_human_blocked_register.py` with acknowledgement
       cases (see Test Specs).
-- [ ] TASK-02-07: Rewrite `.github/workflows/freshness-checks.yml`: give the `deploy-freshness` job
+- [x] TASK-02-07: Rewrite `.github/workflows/freshness-checks.yml`: give the `deploy-freshness` job
       `actions/setup-node@v4` (node 24, npm cache keyed on `app/package-lock.json`) plus an
       `npm install` step in `app/`, mirroring the `deck-parity` job in
       `.github/workflows/ci.yml`, and change its run step to
       `python tools/check_deploy_freshness.py --strict`. Add a third job, `delivery-pipeline`,
       that checks out with `fetch-depth: 0` (the distance counts need full history) and runs
       `python tools/check_delivery_pipeline.py`.
-- [ ] TASK-02-08: Add a `deploy` script to `app/package.json` implementing DEC-003, and align
+- [x] TASK-02-08: Add a `deploy` script to `app/package.json` implementing DEC-003, and align
       `predeploy` with what the CI `quality` job actually runs by adding the Prettier check and the
       coverage run. Then correct the sentence in `CLAUDE.md` section 2 that calls `predeploy` "the
       local CI equivalent" so it is either true or no longer claimed.
-- [ ] TASK-02-09: Push: `git push origin master`. Then wait for the `app-quality` workflow to
+- [x] TASK-02-09: Push: `git push origin master`. Then wait for the `app-quality` workflow to
       complete and confirm all three jobs pass. This will be the first CI run in 20 days and the
       first ever execution of the Prettier gate.
-- [ ] TASK-02-10: Deploy, subject to ASM-003: `cd app && npm run deploy`. Then confirm freshness:
+- [x] TASK-02-10: Deploy, subject to ASM-003: `cd app && npm run deploy`. Then confirm freshness:
       `python tools/check_deploy_freshness.py --skip-build` prints `DEPLOY-FRESHNESS PASS`, and
       `curl -sI https://dppa-case.web.app/sw.js | head -1` returns `HTTP/2 200` with a
       `content-type` of `application/javascript` rather than `text/html`.
-- [ ] TASK-02-11: Perform the venue-offline drill by hand, because it is the risk this deploy
+- [x] TASK-02-11: Perform the venue-offline drill by hand, because it is the risk this deploy
       unblocks: load `https://dppa-case.web.app` once in a browser, disable the network, reload,
       and confirm the app still renders with charts. Record the result in
       `app/deployment.md` under a new `## Offline drill` heading.
@@ -694,40 +694,40 @@ correct locale typography — before the engagement begins, not after.
 
 **Tasks**
 
-- [ ] TASK-03-01: Generate `app/src/data/strings.baseline.json` containing the sorted array of
+- [x] TASK-03-01: Generate `app/src/data/strings.baseline.json` containing the sorted array of
       English key names currently in `STRINGS.en` (151 keys), plus a `frozenOn` date field set to
       the date the file is created.
-- [ ] TASK-03-02: Add a `--check` mode to `app/scripts/i18n-report.mjs`. Without the flag it keeps
+- [x] TASK-03-02: Add a `--check` mode to `app/scripts/i18n-report.mjs`. Without the flag it keeps
       today's behaviour exactly: print per-language `UNTRANSLATED` counts and key lists, exit 0.
       With the flag it compares the current `STRINGS.en` key set against the baseline and exits 1
       if any key was added or removed, naming each difference. Also assert key-set parity across
       `en`, `vi` and `zh` and exit 1 on any mismatch.
-- [ ] TASK-03-03: Wire `node scripts/i18n-report.mjs --check` into the `quality` job in
+- [x] TASK-03-03: Wire `node scripts/i18n-report.mjs --check` into the `quality` job in
       `.github/workflows/ci.yml`, immediately after the Prettier step, and add an
       `i18n:check` script to `app/package.json`.
-- [ ] TASK-03-04: Make `app/src/modules/formatters.js` locale-aware per `## Specification` S4.
+- [x] TASK-03-04: Make `app/src/modules/formatters.js` locale-aware per `## Specification` S4.
       Export a `LOCALE_BY_LANG` constant and resolve the active language through the existing i18n
       module. Keep the existing exported function names and parameter shapes so no call site
       changes.
-- [ ] TASK-03-05: Extend `app/src/modules/formatters.test.js` with locale cases (see Test Specs).
-- [ ] TASK-03-06: Fix the Vietnamese worksheet typography defect. In
+- [x] TASK-03-05: Extend `app/src/modules/formatters.test.js` with locale cases (see Test Specs).
+- [x] TASK-03-06: Fix the Vietnamese worksheet typography defect. In
       `lessons/0009-scenario-3-excess-vi.html`, rewrite the two affected passages (around lines 46
       and 90) so numbers are grouped with `.` and decimals use `,` in Vietnamese convention:
       `5.000.000 × 1.100 × 1,026 × 1,008`. Check the whole file for the same pattern rather than
       only those two lines, and leave `lessons/0009-scenario-3-excess.html` (English) and
       `lessons/0009-scenario-3-excess-zh-cn.html` unchanged unless the same defect appears there.
-- [ ] TASK-03-07: Remove embedded figures from the translation layer. In
+- [x] TASK-03-07: Remove embedded figures from the translation layer. In
       `assets/teaching/terminology-map.json`, replace every digit run of three or more characters
       inside a translatable string with a named `{placeholder}` token, and record the placeholder's
       source path within `assets/teaching/spine-s1.json` (or `spine-s2.json` / `spine-s3.json`) in
       a sibling `slots` object on the same entry. Update `build_oct_teaching_deck.py` to substitute
       each slot from the named spine field at build time.
-- [ ] TASK-03-08: Create `tools/check_terminology_numbers.py`, which fails if any translatable
+- [x] TASK-03-08: Create `tools/check_terminology_numbers.py`, which fails if any translatable
       string in `assets/teaching/terminology-map.json` contains a digit run of three or more
       characters, and add it to the `deck-parity` job in `.github/workflows/ci.yml`.
-- [ ] TASK-03-09: Create `tools/tests/test_check_terminology_numbers.py` with a passing fixture and
+- [x] TASK-03-09: Create `tools/tests/test_check_terminology_numbers.py` with a passing fixture and
       a planted-violation fixture.
-- [ ] TASK-03-10: Write `facilitator/translation-brief.md`: exactly which two files the translator
+- [x] TASK-03-10: Write `facilitator/translation-brief.md`: exactly which two files the translator
       touches (`assets/teaching/terminology-map.json` and the `vi` / `zh` blocks of
       `app/src/data/strings.js`), the total unit count, the rule that `{placeholder}` tokens must be
       copied verbatim and never translated or reformatted, the rule that no figure may be typed,
@@ -835,47 +835,47 @@ be uninformative.
 
 **Tasks**
 
-- [ ] TASK-04-01: Extend `verify_deck_numbers.py` to reconcile speaker notes per `## Specification`
+- [x] TASK-04-01: Extend `verify_deck_numbers.py` to reconcile speaker notes per `## Specification`
       S3, and give it a `--deck PATH` argument (defaulting to the current hard-coded English path)
       so it can be pointed at a translated build.
-- [ ] TASK-04-02: Add locale-aware number matching to `verify_deck_numbers.py`: alongside the
+- [x] TASK-04-02: Add locale-aware number matching to `verify_deck_numbers.py`: alongside the
       existing comma-grouped pattern, match dot-grouped tokens (`11.020`) and normalise both forms
       to a bare integer string before comparing against the allow-set. Add a `--lang {en,vi,zh}`
       argument that selects which grouping character is expected, defaulting to `en`.
-- [ ] TASK-04-03: Delete the no-op number-reconciliation loop in `audit_teaching_deck.py` (the
+- [x] TASK-04-03: Delete the no-op number-reconciliation loop in `audit_teaching_deck.py` (the
       `for t in texts:` block whose body is `pass`), the now-unused `known_millions` computation,
       and the sentence in the module docstring that claims it reconciles numeric strings. Leave the
       word-budget and symbol-deferral checks completely alone — they are genuine and valuable.
-- [ ] TASK-04-04: Bring the app's root configuration files under the Prettier gate. Run
+- [x] TASK-04-04: Bring the app's root configuration files under the Prettier gate. Run
       `cd app && npx prettier --write playwright.config.js vite.config.js eslint.config.js`, then
       widen both `app/package.json`'s `format` script and the CI check to
       `src e2e scripts *.config.js`. Re-read `playwright.config.js` afterwards and confirm every
       explanatory comment survived the reformat.
-- [ ] TASK-04-05: Widen the integrity guards' scan surface. In `tools/retired_figures.json`, add
+- [x] TASK-04-05: Widen the integrity guards' scan surface. In `tools/retired_figures.json`, add
       `app/src/**/*.js`, `app/docs/**/*.md` and `assets/teaching/*.json` to the scanned sets, and
       make the corresponding change in `tools/verify_prose_figures.py`'s file list. Run both guards
       and resolve any violation the widened scan exposes.
-- [ ] TASK-04-06: Fix the exchange-rate contradiction. Correct `app/docs/assumptions.md` line 33
+- [x] TASK-04-06: Fix the exchange-rate contradiction. Correct `app/docs/assumptions.md` line 33
       from `25,000` to `26,500`, add a dated provenance comment above
       `export const EXCHANGE_RATE = 26500` in `app/src/modules/formatters.js` in the same style as
       the constants in `app/src/data/default-scenarios.js`, and export
       `EXCHANGE_RATE_AS_OF = '2026-08-22'` (or the true rate date if one is known) beside it. Add a
       line to `app/docs/assumptions.md` recording the rate's date.
-- [ ] TASK-04-07: Create `tools/check_plan_status.py`: for every file in `plans/` whose YAML
+- [x] TASK-04-07: Create `tools/check_plan_status.py`: for every file in `plans/` whose YAML
       `status` field begins with `complete`, fail if the file contains one or more unticked
       `- [ ]` task lines **and** no file in `reports/` mentions the plan's filename. Print one line
       per offending plan.
-- [ ] TASK-04-08: Create `tools/tests/test_check_plan_status.py` with a compliant fixture, an
+- [x] TASK-04-08: Create `tools/tests/test_check_plan_status.py` with a compliant fixture, an
       unticked-tasks-without-report fixture, and an unticked-tasks-with-report fixture.
-- [ ] TASK-04-09: Add `python tools/check_plan_status.py` to the `deck-parity` job in
+- [x] TASK-04-09: Add `python tools/check_plan_status.py` to the `deck-parity` job in
       `.github/workflows/ci.yml`.
-- [ ] TASK-04-10: Correct the status metadata the new checker exposes. Change
+- [x] TASK-04-10: Correct the status metadata the new checker exposes. Change
       `plans/2026-07-16-gate-credibility-pipeline-hardening-plan.md`'s status to
       `open — never executed; retained as the specification for the gate-credibility and deck-build
       work`, and re-audit each of the nine plans bulk-corrected on 2026-07-31 by sampling three
       tasks per plan against the current code; downgrade any plan whose sampled tasks are not
       actually done.
-- [ ] TASK-04-11: Split `plans/2026-october-readiness-checklist.md` into two artifacts: keep the
+- [x] TASK-04-11: Split `plans/2026-october-readiness-checklist.md` into two artifacts: keep the
       coding-session items in `plans/` as an open plan, and move the human-only, date-bound items
       into a new `facilitator/october-run-plan.md`. Update
       `tools/check_human_blocked_register.py`'s `DEFAULT_CHECKLIST` constant and its tests to the
@@ -980,35 +980,35 @@ the deck builder is never executed by CI at all. Fix both.
 
 **Tasks**
 
-- [ ] TASK-05-01: Create `requirements.txt` at the repository root pinning every Python dependency
+- [x] TASK-05-01: Create `requirements.txt` at the repository root pinning every Python dependency
       the six live builders and the guards import: `python-pptx`, `python-docx`, `matplotlib`,
       `numpy`, `Pillow`. Determine each import by reading the six root-level `*.py` files and the
       four `tools/*.py` guards rather than by guessing; pin to the exact versions that install
       cleanly on Python 3.12.
-- [ ] TASK-05-02: Change `pip install python-pptx` to `pip install -r requirements.txt` in the
+- [x] TASK-05-02: Change `pip install python-pptx` to `pip install -r requirements.txt` in the
       `deck-parity` job of `.github/workflows/ci.yml`.
-- [ ] TASK-05-03: Create `tools/compare_deck.py`: extract all slide-body and speaker-notes text
+- [x] TASK-05-03: Create `tools/compare_deck.py`: extract all slide-body and speaker-notes text
       from two `.pptx` files and report the first structural difference, exiting 1 when the text
       differs and 0 when it matches. Binary `.pptx` files cannot be diffed directly; text-level
       comparison is the workable form.
-- [ ] TASK-05-04: Create `tools/tests/test_compare_deck.py` including a planted-change test: build
+- [x] TASK-05-04: Create `tools/tests/test_compare_deck.py` including a planted-change test: build
       two in-memory presentations that differ by exactly one run of text and assert the comparison
       reports that difference.
-- [ ] TASK-05-05: Add a `deck-build` job to `.github/workflows/ci.yml` that installs
+- [x] TASK-05-05: Add a `deck-build` job to `.github/workflows/ci.yml` that installs
       `requirements.txt`, runs `python build_oct_teaching_deck.py --lang en --out <tempdir>`, and
       then runs `python tools/compare_deck.py <tempdir>/<deck> "ceba/DPPA Presentation Oct 2026 To
       Teach.pptx"`. If `build_oct_teaching_deck.py` has no `--out` flag, add one that defaults to
       the current committed path so existing invocations are unaffected.
-- [ ] TASK-05-06: Create `tools/pipeline.py` implementing the documented regeneration order as one
+- [x] TASK-05-06: Create `tools/pipeline.py` implementing the documented regeneration order as one
       command: `node scripts/export-spine.mjs` and `node scripts/export-sweep.mjs` from `app/`,
       then `build_teaching_visuals.py --lang L`, then `build_oct_teaching_deck.py --lang L`, then
       `audit_teaching_deck.py` and `verify_deck_numbers.py`. It must fail loudly and immediately on
       the first missing dependency or non-zero exit, naming the failed step and the exact command to
       re-run.
-- [ ] TASK-05-07: Update `CLAUDE.md` section 5 so the documented regeneration order names
+- [x] TASK-05-07: Update `CLAUDE.md` section 5 so the documented regeneration order names
       `python tools/pipeline.py --lang en` as the single supported entry point, keeping the
       step-by-step chain beneath it as an explanation of what the command does.
-- [ ] TASK-05-08: Verify locally that the previously unrunnable builders now run:
+- [x] TASK-05-08: Verify locally that the previously unrunnable builders now run:
       `pip install -r requirements.txt` then `python build_teaching_visuals.py --lang en`. Confirm
       `git status --porcelain assets/teaching/` afterwards, and investigate rather than commit any
       figure that changed — an unexpected change means the committed figures were rendered from
@@ -1093,27 +1093,27 @@ lender asking where the axis stops.
 
 **Tasks**
 
-- [ ] TASK-06-01: Change the app's landing scenario to the teaching canon. In
+- [x] TASK-06-01: Change the app's landing scenario to the teaching canon. In
       `app/src/data/default-scenarios.js`, set `defaultInputs.scenarioId` to `'workshop1'`, and
       relabel the three workshop scenarios' `label` fields to `S1 Matched`, `S2 Shortfall` and
       `S3 Excess`. Leave the three curve scenarios (`higherLoad`, `balanced`, `higherGen`) and
       `scenarioOrder` unchanged.
-- [ ] TASK-06-02: Set `strikeEscalation: 0.02` per ASM-005, with a provenance comment in the same
+- [x] TASK-06-02: Set `strikeEscalation: 0.02` per ASM-005, with a provenance comment in the same
       style as the neighbouring constants that states explicitly that it is illustrative and
       unsourced.
-- [ ] TASK-06-03: Confirm DEC-001 empirically: run `cd app && node scripts/export-spine.mjs &&
+- [x] TASK-06-03: Confirm DEC-001 empirically: run `cd app && node scripts/export-spine.mjs &&
       node scripts/export-sweep.mjs`, then `git diff --exit-code assets/teaching/spine-s1.json
       assets/teaching/spine-s2.json assets/teaching/spine-s3.json assets/teaching/gate-sweep.json`.
       It must report no change. If it does report a change, stop: the escalation defaults do feed
       the exports after all, and the full regeneration chain plus the retirement rule apply.
-- [ ] TASK-06-04: Build the escalation differential pill using the string key
+- [x] TASK-06-04: Build the escalation differential pill using the string key
       `multiyear_differential_template`, which already exists in `app/src/data/strings.js` and is
       referenced by nothing. Render it in the multi-year panel showing
       `evnEscalation − strikeEscalation` as a signed percentage with one decimal place.
-- [ ] TASK-06-05: Build the "Locked strike" preset button using the existing unused string key
+- [x] TASK-06-05: Build the "Locked strike" preset button using the existing unused string key
       `controls_locked_strike`. Clicking it sets `strikeEscalation` to `0`, re-syncs the input
       controls and re-renders, so the crossover year visibly moves.
-- [ ] TASK-06-06: Serialize the scenario state into the URL. Encode `scenarioId`, `strikePrice`,
+- [x] TASK-06-06: Serialize the scenario state into the URL. Encode `scenarioId`, `strikePrice`,
       `marketPrice`, `dppaCharge`, `lossFactor`, `settlementMode`, `evnEscalation`,
       `strikeEscalation`, `horizonYears`, `selectedHour` and `currency` as query parameters; read
       them at startup after `initI18n()`; update the URL with `history.replaceState` (never
@@ -1121,16 +1121,16 @@ lender asking where the axis stops.
       changes. Then change the language selector in `app/src/main.js` so switching language no
       longer assigns to `window.location.search` and reloads the page — it must re-run `initI18n`
       and re-render in place, preserving the current state.
-- [ ] TASK-06-07: Retarget the M4 teach-mode step in `app/src/data/teach-steps.js` to a
+- [x] TASK-06-07: Retarget the M4 teach-mode step in `app/src/data/teach-steps.js` to a
       configuration where the crossover question can actually fail. Today all six steps drive
       `workshop1` at strike 1,250 and FMP 1,150, where the DPPA line is below the BAU line from year
       one regardless of escalation, so the step demonstrates nothing.
-- [ ] TASK-06-08: Extend the gate-sweep strike grid. In `app/scripts/export-sweep.mjs`, change
+- [x] TASK-06-08: Extend the gate-sweep strike grid. In `app/scripts/export-sweep.mjs`, change
       `STRIKES` from `[1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450]` to
       `[1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550]`, so both the lender threshold
       (1,380) and the investor threshold (1,450) are interior to the grid rather than at its edge.
       Update the module's header comment, which currently describes a 56-cell sweep.
-- [ ] TASK-06-09: Regenerate and retire, all in one commit. Run
+- [x] TASK-06-09: Regenerate and retire, all in one commit. Run
       `cd app && node scripts/export-sweep.mjs`, then `python tools/pipeline.py --lang en`. Add
       every superseded string form of the old headline to the `retired` list in
       `tools/retired_figures.json` — the file's own `notes` field already names the exact forms to
@@ -1140,16 +1140,16 @@ lender asking where the axis stops.
       `facilitator/dppa-panel-guide.md`, `lessons/0005-module-5-canonical-cases.html`,
       `learning-records/0005-teaching-revamp-and-hardening-arc.md`, and the deck's M5 body and
       speaker notes. Then run `python tools/check_retired_figures.py` and require a pass.
-- [ ] TASK-06-10: Publish the per-gate decomposition rather than only the combined count. Add the
+- [x] TASK-06-10: Publish the per-gate decomposition rather than only the combined count. Add the
       individual buyer, lender and investor pass counts to the M5 narrative in
       `facilitator/dppa-workshop-facilitator-guide.md`, and add a footnote to the M5 slide stating
       that the lender and investor gates are one-dimensional per-kWh proxies, not modelled debt
       schedules or equity IRRs — every one of those numbers is already present in
       `assets/teaching/gate-sweep.json`.
-- [ ] TASK-06-11: Regenerate `app/src/data/strings.baseline.json` in the same commit as any new
+- [x] TASK-06-11: Regenerate `app/src/data/strings.baseline.json` in the same commit as any new
       string key this phase introduces, and note the re-freeze date in
       `facilitator/translation-brief.md`.
-- [ ] TASK-06-12: Redeploy and re-verify: `cd app && npm run deploy`, then
+- [x] TASK-06-12: Redeploy and re-verify: `cd app && npm run deploy`, then
       `python tools/check_delivery_pipeline.py` must print `DELIVERY-PIPELINE CLEAN`.
 
 **File Changes**

@@ -1,7 +1,7 @@
 ---
 title: "Gate Credibility & Pipeline Hardening"
 date: "2026-07-16"
-status: "open — never executed; retained as the specification for the gate-credibility and deck-build work. Corrected 2026-08-23 (PHASE-04 of plans/2026-08-22-delivery-stall-recovery-plan.md): the 2026-07-31 bulk-correction to \"complete\" was verified false — 0 of 80 tasks ticked, no reports/ artifact, and 4 sampled tasks confirmed undone against current code (see research/2026-08-15-deploy-drift-and-unverifiable-status-brainstorm.md Theme C1). Some of this plan's scope was independently completed under later plans (see NOTES.md's repo-layout section and plans/2026-october-readiness-checklist.md's \"Already done\"); the unticked tasks here are a real, mostly-outstanding backlog, not a stale duplicate."
+status: "open — never executed; retained as the specification for the gate-credibility and deck-build work. Corrected 2026-08-23 (PHASE-04 of plans/2026-08-22-delivery-stall-recovery-plan.md): the 2026-07-31 bulk-correction to \"complete\" was verified false — 0 of 80 tasks ticked, no reports/ artifact, and 4 sampled tasks confirmed undone against current code (see research/2026-08-15-deploy-drift-and-unverifiable-status-brainstorm.md Theme C1). Some of this plan's scope was independently completed under later plans (see NOTES.md's repo-layout section and plans/2026-october-readiness-checklist.md's \"Already done\"); the unticked tasks here are a real, mostly-outstanding backlog, not a stale duplicate. not a stale duplicate. Re-triaged 2026-08-28 against the working tree: 12 of 47 tasks verified genuinely done and ticked (mostly landed incidentally under plans/2026-08-22-delivery-stall-recovery-plan.md); the remaining 35 are outstanding — PHASE-01's sensitivity band and derived thresholds, PHASE-03's figure manifest and positional verifier, PHASE-04's tools/ reorganization and root README, PHASE-05's deck asset localization, and PHASE-06's sensitivity panel. Stays open."
 request: "Multi-phase implementation plan from research/2026-07-16-post-hardening-next-level-brainstorm.md: make the M5 gate sweep defensible before content freeze, declare the Python toolchain, close generator↔artifact drift in CI, strengthen the deck verifiers, reorganize the root scripts, then complete localization and app evolution."
 plan_type: "multi-phase"
 research_inputs:
@@ -360,7 +360,7 @@ This phase changes slide text and **must merge before content freeze (ASM-005: 2
       instead of duplicating a literal: replace `const LENDER_DEBT_SERVICE_VND_PER_KWH = 1150 * 1.2`
       with a value computed as `FMP1 * DSCR_TARGET`, so `DSCR_TARGET` actually drives the gate it
       documents. Keep the resulting central value at 1,380.
-- [ ] TASK-01-02: Extend `STRIKES` to `[1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550]`
+- [x] TASK-01-02: Extend `STRIKES` to `[1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550]`
       (ASM-003). Leave `RATIOS` unchanged at `[0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3]`.
 - [ ] TASK-01-03: Refactor `evaluateCell(strike, ratio)` to `evaluateCell(strike, ratio, thresholds)`
       where `thresholds = { investorLcoe, dscrTarget }`, so the gate logic can be swept. Preserve
@@ -377,7 +377,7 @@ This phase changes slide text and **must merge before content freeze (ASM-005: 2
       buyer-gate math was altered and TASK-01-03 is wrong.
 - [ ] TASK-01-07: Add unit tests for the sweep (see Test Specs). `export-sweep.mjs` already exports
       `buildSweep()`, so it is importable from a test without running `main()`.
-- [ ] TASK-01-08: Parameterize the grid-size literals per S3 in `build_teaching_visuals.py`:
+- [x] TASK-01-08: Parameterize the grid-size literals per S3 in `build_teaching_visuals.py`:
       `TEXTS.{en,vi,zh}.m5_title` and `.m5_caption` take `{total}`; the big centre label at line 338
       becomes `f"{pass_count} / {total}"` where `total = sweep["cellCount"]`. Reuse the existing
       approved VI/ZH wording verbatim — substitute only the number token.
@@ -503,14 +503,14 @@ regenerate-and-diff pattern covers 2 of ~65 generated artifacts; this phase exte
       (`build_teaching_visuals.py`, `build_cfd_slide.py`), `python-docx`
       (`build_worksheet_answer_docx.py`), `qrcode[pil]` (QR generation). Pin to exact versions
       resolved at authoring time (`pip freeze | grep -iE 'pptx|matplotlib|numpy|pillow|docx|qrcode'`).
-- [ ] TASK-02-02: Create `tools/compare_deck.py` implementing ASM-006 — a text-level deck
+- [x] TASK-02-02: Create `tools/compare_deck.py` implementing ASM-006 — a text-level deck
       comparator, since `.pptx` is not byte-reproducible.
-- [ ] TASK-02-03: Add a `deck-build` job to `.github/workflows/ci.yml` that installs
+- [x] TASK-02-03: Add a `deck-build` job to `.github/workflows/ci.yml` that installs
       `requirements.txt`, rebuilds the deck into a temp directory, and runs `tools/compare_deck.py`
       against the committed deck. Model it on the existing `deck-parity` job's structure.
-- [ ] TASK-02-04: Change the existing `deck-parity` job's `pip install python-pptx` to
+- [x] TASK-02-04: Change the existing `deck-parity` job's `pip install python-pptx` to
       `pip install -r requirements.txt` so both jobs share one declared dependency set.
-- [ ] TASK-02-05: Extend `build_oct_teaching_deck.py` with an `--out DIR` argument (default: the
+- [x] TASK-02-05: Extend `build_oct_teaching_deck.py` with an `--out DIR` argument (default: the
       current `ceba/` behaviour) so CI can build to a temp directory without touching the working
       tree. Preserve the existing `--lang` behaviour and the `suffix` logic at line 394 exactly.
 - [ ] TASK-02-06: Resolve the `e2e:visual` non-test (`ci.yml:27-30`, permanently
@@ -591,13 +591,13 @@ them catch anything.
 - [ ] TASK-03-04: Widen `NUMBER_PATTERN`. It currently matches only `\d{1,3}(?:,\d{3})+`, so
       `163.3` (the clearing fee), `1.0342` (the loss factor) and bare integers like the pass count
       are invisible. Match comma-grouped integers, bare integers ≥ 3 digits, and decimals.
-- [ ] TASK-03-05: Delete the dead loop at `audit_teaching_deck.py:72-76` (a `for` loop whose body is
+- [x] TASK-03-05: Delete the dead loop at `audit_teaching_deck.py:72-76` (a `for` loop whose body is
       `pass`) and correct the module docstring at lines 2-3, which claims the script "reconcile[s]
       every numeric string against `assets/teaching/spine-s1.json`" — it does not; that job now
       belongs to `verify_deck_numbers.py`. Leave the word-budget and symbol-deferral checks alone.
 - [ ] TASK-03-06: Create `tools/tests/` with `unittest` tests (ASM-009) that build a synthetic
       2-slide `.pptx` in a temp directory and prove the verifier **fails** on a planted stale figure.
-- [ ] TASK-03-07: Add the test run to the `deck-parity` CI job.
+- [x] TASK-03-07: Add the test run to the `deck-parity` CI job.
 
 **File Changes**
 - `build_oct_teaching_deck.py` (modify): manifest emission (TASK-03-01/02). The `TEXT` dict and
@@ -677,7 +677,7 @@ including duplicate `.py`/`.js` pairs doing the same job.
       it: `build_oct_teaching_deck.py`, `build_teaching_visuals.py`, `build_cfd_slide.py`,
       `build_worksheet_answer_docx.py`, `audit_teaching_deck.py`, `verify_deck_numbers.py`, and
       `compare_deck.py` (already created there in PHASE-02).
-- [ ] TASK-04-02: Move the consumed one-offs to `tools/archive/` per ASM-010:
+- [x] TASK-04-02: Move the consumed one-offs to `tools/archive/` per ASM-010:
       `apply_corrections.py`, `apply_deck_corrections.py`, `apply_deck_corrections.js`,
       `verify_deck_app_parity.py`, `verify_deck_app_parity.js`, `build_callouts.py`,
       `build_policy_refresh.py`, `build_2026_from_ref.py`, `build_canonical_cases.py`,
@@ -780,10 +780,10 @@ same word for "strike price" in front of the room.
       PHASE-01 may have added M5 entries). A qualified VI/ZH speaker does this — not a guess, not
       machine translation. `research/dppa-terminology-map.md` carries the already-sourced vocabulary
       to reuse.
-- [ ] TASK-05-05: Create `app/src/i18n/strings.js` — an `en`/`vi`/`zh` string table whose VI/ZH
+- [x] TASK-05-05: Create `app/src/i18n/strings.js` — an `en`/`vi`/`zh` string table whose VI/ZH
       values are populated **from the same terminology map**, so the app and the deck cannot drift
       apart vocabulary-wise.
-- [ ] TASK-05-06: Add `?lang=vi|zh` handling to `app/src/main.js` (default `en`), and route the
+- [x] TASK-05-06: Add `?lang=vi|zh` handling to `app/src/main.js` (default `en`), and route the
       hardcoded English strings in `app/src/modules/ui.js` (lines 33-36, 356-359, 447, 463 and
       similar) and the scenario labels in `app/src/data/default-scenarios.js` through the string
       table. The surface is a few dozen strings plus chart legends.
@@ -864,7 +864,7 @@ already done far more valuable, and simplifying teach mode as a side effect), an
 sensitivity panel that finally gives Module 6 its own scripted app moment.
 
 **Tasks**
-- [ ] TASK-06-01: Encode app state in the query string: `?s=<scenarioId>&strike=<n>&fmp=<n>`. Parse
+- [x] TASK-06-01: Encode app state in the query string: `?s=<scenarioId>&strike=<n>&fmp=<n>`. Parse
       on load, update on change via `history.replaceState` (not `pushState` — the presenter must not
       have to press Back 30 times after a demo).
 - [ ] TASK-06-02: Refactor `app/src/data/teach-steps.js` so each step is defined **as a URL**.
