@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pixel-sweep report — dppa-case web app (2026-09-05)</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #0b1020; color: #e8eef7; margin: 0; padding: 32px 20px 64px; line-height: 1.55; }
+  main { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  h2 { font-size: 1.15rem; margin: 32px 0 10px; border-bottom: 1px solid #26314d; padding-bottom: 6px; }
+  .sub { color: #93a1b8; margin: 0 0 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #1e2942; vertical-align: top; }
+  th { color: #9fd8ff; font-weight: 600; white-space: nowrap; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 0.85em; background: #141c33; padding: 1px 6px; border-radius: 4px; }
+  .sev { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+  .major { background: #5b1d1d; color: #ffb4b4; }
+  .minor { background: #1d3a5b; color: #a8d8ff; }
+  ul { margin: 8px 0; padding-left: 22px; }
+  li { margin: 4px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .card { background: #111832; border: 1px solid #26314d; border-radius: 10px; padding: 12px 14px; }
+  .card b { display: block; font-size: 1.25rem; color: #9fd8ff; }
+  .foot { color: #93a1b8; font-size: 0.85rem; margin-top: 36px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pixel-sweep report — dppa-case web app</h1>
+  <p class="sub">2026-09-05 · Full-function user sweep (every section, all 3 languages, every button) + regression passes · Author: nightly QA sweep</p>
+
+  <h2>Outcome</h2>
+  <div class="grid">
+    <div class="card"><b>10</b>bugs found and fixed, each with a regression test</div>
+    <div class="card"><b>104 / 104</b>unit tests green (11 files)</div>
+    <div class="card"><b>69 / 69</b>functional e2e green, 3 projects</div>
+    <div class="card"><b>Deployed</b>to https://dppa-case.web.app, marker verified</div>
+  </div>
+
+  <h2>Findings and fixes</h2>
+  <table>
+    <tr><th>#</th><th>Severity</th><th>Finding</th><th>Fix</th></tr>
+    <tr><td>1</td><td><span class="sev major">major</span></td><td>Language switch blanked all 4 charts and killed click-to-select-hour (module Chart instances kept painting to detached canvases).</td><td><code>chart.js takeOver()</code> guard at all 4 renderers; e2e in <code>lang.spec.js</code>.</td></tr>
+    <tr><td>2</td><td><span class="sev minor">minor</span></td><td><code>?hour=99</code> round-tripped through the URL while the view showed 12:00.</td><td>Clamp 0–23 in <code>parseState</code>; unit tests in <code>url-state.test.js</code>.</td></tr>
+    <tr><td>3</td><td><span class="sev minor">minor</span></td><td>Mirror line read <code>market + -7,000,000,000 VND</code> on negative CfD.</td><td>Sign-aware joiner in <code>renderFiveLineBill</code>; <code>ui.test.js</code> (both signs).</td></tr>
+    <tr><td>4</td><td><span class="sev minor">minor</span></td><td>Strike slider <code>step=0.01</code> made keyboard adjustment useless (5,000 presses for 50 VND).</td><td><code>step=1</code>; e2e arrow-key test in <code>controls.spec.js</code>.</td></tr>
+    <tr><td>5</td><td><span class="sev minor">minor</span></td><td>USD column mixed <code>0 USD</code> with 2-decimal figures.</td><td>Stable fraction digits in <code>formatMoney</code>; <code>formatters.test.js</code>.</td></tr>
+    <tr><td>6</td><td><span class="sev minor">minor</span></td><td>No <code>prefers-reduced-motion</code> support (charts re-animated per input).</td><td><code>chartAnimation()</code> helper + CSS guards; e2e under emulated reduced motion.</td></tr>
+    <tr><td>7</td><td><span class="sev major">major</span></td><td>Settlement <code>&lt;select&gt;</code> unreadable in present theme (near-black on near-black).</td><td>White fill override in <code>theme.css</code>; WCAG-contrast e2e in both themes.</td></tr>
+    <tr><td>8</td><td><span class="sev minor">minor</span></td><td>Hour-axis labels mashed below ~520px width.</td><td>Tick budget 12→4 via existing narrow flag; screenshot-verified at 390px.</td></tr>
+    <tr><td>9</td><td><span class="sev minor">minor</span></td><td>Browser-only helpers dropped unit coverage to 48.97% (gate: 49%).</td><td>Exported + unit-tested <code>takeOver</code>/<code>chartAnimation</code>; gate at 49.85%.</td></tr>
+    <tr><td>10</td><td><span class="sev minor">minor</span></td><td>Service worker cached error responses for offline replay.</td><td><code>response.ok</code> guard on both cache paths in <code>sw.js</code>.</td></tr>
+  </table>
+
+  <h2>Sweep coverage (each pass)</h2>
+  <ul>
+    <li>6 scenario buttons, 26-step hour wrap, VND/USD, 3 settlement modes, 7 sliders at min/max</li>
+    <li>Lock strike, reset defaults, both disclosures, presenter theme toggle + persistence</li>
+    <li>Tour (all 4 steps, skip, persistence), teach mode (6 demos, keys + buttons, in-mode language reload)</li>
+    <li>EN/VI/ZH clicks, direct <code>?lang=</code> loads, malformed URLs, deep links (<code>?strikeEsc=0</code>, bare <code>?scenarioId=</code>)</li>
+    <li>Chart + FMP-strip clicks (desktop, 390px, 320px), keyboard operation, 320–1440px overflow scans</li>
+    <li>Console errors + warnings, failed requests, clip detection, hand-checked settlement arithmetic</li>
+  </ul>
+
+  <h2>Verification matrix</h2>
+  <ul>
+    <li>eslint + prettier: clean</li>
+    <li>vitest: 11 files / 104 tests green (serial <code>--maxWorkers=1</code>; parallel pool starves at ~500MB free RAM on this box)</li>
+    <li>Playwright functional e2e: 69 passed, 0 failed (chromium-desktop, webkit-mobile, chromium-tablet)</li>
+    <li>Coverage gate: 49.85 / 52.36 / 52.6 / 50 vs 49 / 49 / 51 / 49</li>
+    <li>a11y (axe serious/critical, 4 flows) + offline suite: green</li>
+    <li><code>i18n:check</code>: 151 keys frozen, PASS</li>
+    <li>Deploy: Firebase release complete; live <code>build-commit</code> <code>b6c54e2</code> matches pushed HEAD; <code>check_deploy_freshness.py --write-log</code> PASS</li>
+  </ul>
+
+  <h2>Debunked (not bugs)</h2>
+  <ul>
+    <li>Settlement-mode "dead control" — synthetic test event skipped <code>input</code>; real clicks correct (6,000/9,000/7,920 kWh).</li>
+    <li>VI/ZH showing English — ASM-004 design (no machine translation; English fallback).</li>
+    <li>Missing hover tooltips — hover-highlight works; contract is click-to-inspect (standard Chart.js).</li>
+    <li>SW non-registration in the automation browser — tooling quirk; production shows an active controller.</li>
+  </ul>
+
+  <h2>Known limits</h2>
+  <ul>
+    <li>Visual pixel suite: zero committed baselines, non-blocking by design (H6).</li>
+    <li>Real airplane-mode check is MANUAL-003 (harness emulation limits documented in <code>offline.spec.js</code>).</li>
+    <li>ZH ships no CJK font subset — fine while ZH falls back to English; revisit when real translations land.</li>
+  </ul>
+
+  <p class="foot">Commits: <code>b6c54e2</code> (ten fixes) · <code>9a91443</code> (deploy log). Tree files: app/e2e/{a11y,controls,lang}.spec.js, app/index.html, app/public/sw.js, app/src/modules/{chart,chart.test,formatters,formatters.test,ui,ui.test,url-state,url-state.test}.js, app/src/{style,theme}.css.</p>
+</main>
+</body>
+</html>
