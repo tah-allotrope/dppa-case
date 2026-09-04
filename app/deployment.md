@@ -23,6 +23,7 @@ the fact.
 
 | Date | Commit | Description |
 |---|---|---|
+| 2026-09-04 | `b6c54e2` | Verified fresh by tools/check_deploy_freshness.py --write-log |
 | 2026-08-23 | `9c85512` | Verified fresh by tools/check_deploy_freshness.py --write-log |
 | 2026-07-25 | `22bae59` | Verified fresh by tools/check_deploy_freshness.py --write-log |
 | 2026-07-22 | `e55319e` (marker; built from an uncommitted tree — see the 2026-07-25 row for the corrected, honest deploy) | Redeploy after Oct teaching-revamp + readiness-hardening + prose-parity work (18 commits since the prior 2026-07-05 deploy) |
