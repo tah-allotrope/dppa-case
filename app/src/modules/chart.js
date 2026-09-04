@@ -30,6 +30,17 @@ let fmpStripChart
 let savingsStripChart
 let multiYearChart
 let crossoverIndex = -1
+// renderAppShell() replaces the canvases on every language switch, while these
+// cached instances survive in module scope. Reusing a Chart bound to a detached
+// canvas silently paints nowhere and swallows click-to-select-hour, so each
+// renderer reclaims its slot when the canvas changed underneath it.
+export function takeOver(instance, canvas) {
+  if (instance && instance.canvas !== canvas) {
+    instance.destroy()
+    return undefined
+  }
+  return instance
+}
 // Mutated in place on every renderProfileChart call so the tariffOverlay
 // plugin's getState() closure (captured once, at chart creation) always
 // reads the latest inputs instead of a throwaway per-call object.
@@ -38,6 +49,21 @@ const profileChartState = { inputs: null, currency: 'VND' }
 function token(name, fallback) {
   if (typeof document === 'undefined') return fallback
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback
+}
+
+// Every chart re-animates on each slider input — exactly the repeated motion
+// prefers-reduced-motion exists to suppress. Centralized so the webdriver
+// animation kill (deterministic pixels under test) and the user preference
+// cannot drift apart across the four renderers.
+export function chartAnimation(fallback) {
+  if (typeof navigator !== 'undefined' && navigator.webdriver) return false
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+    return false
+  return fallback
 }
 
 export function refreshChartTheme() {
@@ -265,7 +291,7 @@ function sharedTooltipStyle() {
   }
 }
 
-function baseOptions() {
+function baseOptions(narrow = false) {
   const gridColor = token('--chart-grid', neonGrid)
   const tickCol = token('--chart-tick', tickColor)
   const tickFont = { size: 10 }
@@ -273,7 +299,7 @@ function baseOptions() {
   return {
     responsive: true,
     maintainAspectRatio: false,
-    animation: typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 350 },
+    animation: chartAnimation({ duration: 350 }),
     // Right padding reserves a gutter so the end-of-line series labels fit
     // inside the canvas without overlapping the plotted data.
     layout: { padding: { top: 8, right: 92 } },
@@ -284,7 +310,9 @@ function baseOptions() {
     scales: {
       x: {
         grid: { color: gridColor },
-        ticks: { color: tickCol, font: tickFont, maxRotation: 0, maxTicksLimit: 12 },
+        // 24 hourly labels mash together below ~520px (seen at 320px); quarter
+        // the tick budget there — Chart.js auto-skip does the rest.
+        ticks: { color: tickCol, font: tickFont, maxRotation: 0, maxTicksLimit: narrow ? 4 : 12 },
       },
       y: {
         grid: { color: gridColor },
@@ -358,6 +386,7 @@ export function renderProfileChart(
     ]
   }
 
+  profileChart = takeOver(profileChart, canvas)
   if (profileChart) {
     profileChart.data.datasets = buildDatasets(intervals, selectedHour)
     profileChart.data.labels = labels
@@ -369,7 +398,7 @@ export function renderProfileChart(
     type: 'line',
     data: { labels, datasets: buildDatasets(intervals, selectedHour) },
     options: {
-      ...baseOptions(),
+      ...baseOptions(isNarrowViewport),
       onClick: (event) => {
         const pts = profileChart.getElementsAtEventForMode(
           event,
@@ -427,6 +456,7 @@ export function renderFmpStrip(canvas, labels, intervals, currency = 'VND', onSe
     },
   }
 
+  fmpStripChart = takeOver(fmpStripChart, canvas)
   if (fmpStripChart) {
     fmpStripChart.data.labels = labels
     fmpStripChart.data.datasets = [buildDataset(intervals, currency)]
@@ -457,7 +487,7 @@ export function renderFmpStrip(canvas, labels, intervals, currency = 'VND', onSe
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: typeof navigator !== 'undefined' && navigator.webdriver ? false : undefined,
+      animation: chartAnimation(undefined),
       layout: { padding: { top: 4, right: 92 } },
       plugins: { legend: { display: false }, tooltip: sharedTooltipStyle() },
       scales: {
@@ -522,6 +552,7 @@ export function renderMultiYearChart(canvas, multiYear, currency) {
     },
   ]
 
+  multiYearChart = takeOver(multiYearChart, canvas)
   if (multiYearChart) {
     multiYearChart.data.labels = labels
     multiYearChart.data.datasets = datasets
@@ -537,8 +568,7 @@ export function renderMultiYearChart(canvas, multiYear, currency) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation:
-        typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 200 },
+      animation: chartAnimation({ duration: 200 }),
       layout: { padding: { top: 8, right: 118 } },
       plugins: {
         legend: { display: false },
@@ -603,6 +633,7 @@ export function renderSavingsStrip(canvas, multiYear, currency) {
     }
   }
 
+  savingsStripChart = takeOver(savingsStripChart, canvas)
   if (savingsStripChart) {
     savingsStripChart.data.labels = labels
     savingsStripChart.data.datasets = [buildDataset(cumSavData)]
@@ -616,8 +647,7 @@ export function renderSavingsStrip(canvas, multiYear, currency) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation:
-        typeof navigator !== 'undefined' && navigator.webdriver ? false : { duration: 200 },
+      animation: chartAnimation({ duration: 200 }),
       layout: { padding: { top: 4, right: 118 } },
       plugins: { legend: { display: false }, tooltip: sharedTooltipStyle() },
       scales: {

@@ -1959,3 +1959,17 @@ h3 {
     min-height: 240px;
   }
 }
+
+/* prefers-reduced-motion: kill the 160ms control transitions for users who
+ * suppress animation. Chart.js motion is handled in chart.js (chartAnimation);
+ * the boot-screen pulse lives in index.html next to its keyframes. */
+@media (prefers-reduced-motion: reduce) {
+  .scenario-tab,
+  .toggle-button,
+  .ghost-button,
+  .tour-launch,
+  .theme-toggle,
+  .control-card input[type='range'] {
+    transition: none;
+  }
+}

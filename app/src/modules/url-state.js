@@ -55,7 +55,15 @@ export function parseState(search, defaults) {
 
     if (NUMERIC_KEYS.has(key)) {
       const value = Number(raw)
-      if (Number.isFinite(value)) state[key] = value
+      if (!Number.isFinite(value)) continue
+      // An out-of-range hour renders as 12:00 via the ?? fallback but keeps
+      // poisoning the URL (and the next/prev wrap arithmetic), so clamp it at
+      // parse time instead of papering over it at render time.
+      if (key === 'selectedHour') {
+        state[key] = Math.min(23, Math.max(0, Math.floor(value)))
+        continue
+      }
+      state[key] = value
       continue
     }
 

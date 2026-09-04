@@ -35,7 +35,7 @@ export function formatMoney(
   const absolute = Math.abs(convertMoney(value, currency))
   const fractionDigits = precise ? (currency === 'USD' ? 4 : 2) : currency === 'USD' ? 2 : 0
   const formatted = new Intl.NumberFormat(resolveLocale(), {
-    minimumFractionDigits: precise ? fractionDigits : 0,
+    minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   }).format(absolute)
   const prefix = signed ? (value >= 0 ? '+' : '-') : ''

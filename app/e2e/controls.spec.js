@@ -57,3 +57,39 @@ test('hour navigation steps forward and back', async ({ page }) => {
   await page.locator('#prevHour').click()
   await expect(page.locator('#hourNavLabel')).toHaveText('12:00')
 })
+
+test('strike slider moves a whole dong per arrow-key press', async ({ page }) => {
+  await page.goto('/?present=1')
+  await page.locator('#strikePrice').focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(page.locator('#strikePrice')).toHaveValue('1251')
+  await expect(page.locator('#fiveLineBill')).not.toContainText(/NaN|Infinity/)
+})
+
+test('settlement select keeps text contrast in both themes', async ({ page }) => {
+  await page.goto('/?present=1')
+
+  // Relative-luminance contrast (WCAG formula); the present theme once paired
+  // near-black text with a near-black fill here (2026-09 fix).
+  const ratioOf = (selector) =>
+    page.locator(selector).evaluate((el) => {
+      const lum = (css) => {
+        const [r, g, b] = css
+          .match(/[\d.]+/g)
+          .slice(0, 3)
+          .map(Number)
+        const f = (v) => {
+          const s = v / 255
+          return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+        }
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+      }
+      const cs = getComputedStyle(el)
+      const [a, b] = [lum(cs.color), lum(cs.backgroundColor)].sort((x, y) => y - x)
+      return (a + 0.05) / (b + 0.05)
+    })
+
+  expect(await ratioOf('#settlementMode')).toBeGreaterThanOrEqual(4.5)
+  await page.locator('#themeToggle').click()
+  expect(await ratioOf('#settlementMode')).toBeGreaterThanOrEqual(4.5)
+})

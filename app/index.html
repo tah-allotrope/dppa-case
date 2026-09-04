@@ -16,6 +16,7 @@
       #app-loading img { width: 96px; height: 96px; border-radius: 18px; box-shadow: 0 0 28px rgba(71,215,255,0.25); }
       #app-loading p { margin: 0; font-size: 0.95rem; letter-spacing: 0.04em; color: #8b97a8; animation: dppa-pulse 1.6s ease-in-out infinite; }
       @keyframes dppa-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) { #app-loading p { animation: none; } }
     </style>
     <title>Vietnam DPPA Neon CFO Calculator</title>
   </head>

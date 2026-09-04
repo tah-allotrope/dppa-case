@@ -37,6 +37,13 @@ describe('parseState', () => {
     expect(result.currency).toBe(defaultInputs.currency)
   })
 
+  it('clamps an out-of-range hour into 0-23 instead of round-tripping it', () => {
+    expect(parseState('hour=99', defaultInputs).selectedHour).toBe(23)
+    expect(parseState('hour=-3', defaultInputs).selectedHour).toBe(0)
+    expect(parseState('hour=7.8', defaultInputs).selectedHour).toBe(7)
+    expect(serializeState(parseState('hour=99', defaultInputs))).toContain('hour=23')
+  })
+
   it('accepts a leading "?" the same as a bare query string', () => {
     expect(parseState('?strikeEsc=0', defaultInputs).strikeEscalation).toBe(0)
   })

@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defaultInputs, buildFmpCurve } from '../data/default-scenarios.js'
-import { renderTariffCaption } from './chart.js'
-
+import { chartAnimation, renderTariffCaption, takeOver } from './chart.js'
 function setup() {
   document.body.innerHTML = '<div id="tariffCaption"></div>'
 }
@@ -46,5 +45,49 @@ describe('renderTariffCaption', () => {
     const text = document.getElementById('tariffCaption').textContent
     expect(text).toContain('1,427')
     expect(text).not.toContain('–')
+  })
+})
+
+describe('takeOver', () => {
+  it('keeps a live instance bound to the same canvas', () => {
+    const canvas = {}
+    const instance = { canvas, destroy: vi.fn() }
+    expect(takeOver(instance, canvas)).toBe(instance)
+    expect(instance.destroy).not.toHaveBeenCalled()
+  })
+
+  it('destroys a stale instance when the canvas changed underneath it', () => {
+    const instance = { canvas: {}, destroy: vi.fn() }
+    expect(takeOver(instance, {})).toBeUndefined()
+    expect(instance.destroy).toHaveBeenCalledTimes(1)
+  })
+
+  it('tolerates an empty slot', () => {
+    expect(takeOver(undefined, {})).toBeUndefined()
+  })
+})
+
+describe('chartAnimation', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('keeps animation when motion is not reduced', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }))
+    expect(chartAnimation({ duration: 200 })).toEqual({ duration: 200 })
+  })
+
+  it('disables animation under webdriver', () => {
+    vi.stubGlobal('navigator', { webdriver: true })
+    expect(chartAnimation({ duration: 350 })).toBe(false)
+  })
+  it('disables animation when reduced motion is preferred', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }))
+    expect(chartAnimation({ duration: 350 })).toBe(false)
+  })
+
+  it('keeps animation when motion is not reduced', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }))
+    expect(chartAnimation({ duration: 200 })).toEqual({ duration: 200 })
   })
 })

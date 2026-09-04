@@ -46,7 +46,11 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()))
+          // Never cache error responses: a 404/500 shell served offline on
+          // the next visit is worse than no cached copy at all.
+          if (response.ok) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()))
+          }
           return response
         })
         .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html'))),
@@ -58,7 +62,9 @@ self.addEventListener('fetch', (event) => {
     caches.match(request).then((cached) => {
       if (cached) return cached
       return fetch(request).then((response) => {
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()))
+        if (response.ok) {
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()))
+        }
         return response
       })
     }),

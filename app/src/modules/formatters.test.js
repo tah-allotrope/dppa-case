@@ -66,4 +66,10 @@ describe('locale-aware number formatting', () => {
       '0.0755 USD/kWh',
     )
   })
+
+  it('always shows two USD decimals, even for whole amounts', () => {
+    expect(formatMoney(0, { currency: 'USD' })).toBe('0.00 USD')
+    expect(formatMoney(26500, { currency: 'USD' })).toBe('1.00 USD')
+    expect(formatMoney(0, { currency: 'VND' })).toBe('0 VND')
+  })
 })

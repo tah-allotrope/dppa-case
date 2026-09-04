@@ -94,7 +94,25 @@ describe('storytelling shell', () => {
     expect(normalizedText('#fiveLineBill')).toContain('8,563,196,000 VND')
     expect(normalizedText('#fiveLineBill')).toContain('9,063,196,000 VND')
     expect(normalizedText('#fiveLineBill')).toContain('RE GENCO mirror')
+    expect(normalizedText('#fiveLineBill')).toContain(
+      '5,796,000,000 VND market + 500,000,000 VND CfD',
+    )
 
+    // Strike below FMP: the mirror joiner follows the value's sign, never "+ -".
+    const negBill = buildFiveLineBill(
+      {
+        fmp: 2600,
+        strikePrice: 1200,
+        serviceFee: 360,
+        clearingFee: 163.3,
+        lossFactorPrecise: 1.026 * 1.008,
+        retailTariff: 2204,
+      },
+      scenarioProfiles.workshop1.monthlyVolumes,
+    )
+    renderFiveLineBill(node, negBill, 'VND', scenarioProfiles.workshop1)
+    expect(normalizedText('#fiveLineBill')).not.toContain('+ -')
+    expect(normalizedText('#fiveLineBill')).toContain('- 7,000,000,000 VND CfD')
     renderFiveLineBill(node, null, 'VND', scenarioProfiles.balanced)
 
     expect(node.innerHTML).toBe('')

@@ -52,3 +52,22 @@ test('no serious/critical a11y violations with a localized DOM', async ({ page }
   const results = await new AxeBuilder({ page }).analyze()
   expect(seriousViolations(results)).toEqual([])
 })
+
+test.describe('prefers-reduced-motion', () => {
+  test.use({ reducedMotion: 'reduce' })
+
+  test('charts render statically without errors', async ({ page }) => {
+    const errors = []
+    page.on('console', (message) => {
+      if (message.type() === 'error') errors.push(message.text())
+    })
+    page.on('pageerror', (error) => errors.push(error.message))
+    await page.goto('/?present=1')
+    // Chart.js instances size their canvases past the 300x150 default.
+    expect(await page.locator('#profileChart').evaluate((c) => c.width)).toBeGreaterThan(300)
+    await expect(page.locator('#hourNavLabel')).toHaveText('12:00')
+    await page.locator('#nextHour').click()
+    await expect(page.locator('#hourNavLabel')).toHaveText('13:00')
+    expect(errors).toEqual([])
+  })
+})

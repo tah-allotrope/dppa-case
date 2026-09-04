@@ -62,6 +62,11 @@
 [data-theme='present'] .cancellation-flow-card {
   background: #fff;
 }
+/* The settlement-mode select hardcodes a near-black fill that is unreadable
+ * against the present theme's dark text — give it the same white card fill. */
+[data-theme='present'] .control-card select {
+  background: #fff;
+}
 /* Legend/caption strips need a visible chip border on the white presenter theme */
 [data-theme='present'] .caption-chip {
   background: #f9fafb;

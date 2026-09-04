@@ -335,7 +335,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
         <div class="controls-grid">
           <label class="control-card">
             <span>${t('control_strike_label')}</span>
-            <input id="strikePrice" type="range" min="1200" max="3200" step="0.01" />
+            <input id="strikePrice" type="range" min="1200" max="3200" step="1" />
             <strong data-output="strikePrice"></strong>
           </label>
           <label class="control-card">
@@ -445,7 +445,7 @@ export function renderFiveLineBill(container, bill, currency, scenario) {
       </div>
       <div class="plant-revenue-mirror">
         <span>${t('bill_mirror_label')}</span>
-        <strong>${fmt(bill.plantRevenue.market)} ${t('bill_mirror_market_suffix')} + ${fmt(bill.plantRevenue.cfd, true)} ${t('bill_mirror_cfd_suffix')} = ${fmt(bill.plantRevenue.total)}</strong>
+        <strong>${fmt(bill.plantRevenue.market)} ${t('bill_mirror_market_suffix')} ${bill.plantRevenue.cfd >= 0 ? '+' : '-'} ${fmt(Math.abs(bill.plantRevenue.cfd))} ${t('bill_mirror_cfd_suffix')} = ${fmt(bill.plantRevenue.total)}</strong>
       </div>
     </section>
   `
