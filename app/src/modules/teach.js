@@ -2,6 +2,8 @@
 // app moments in the Modules 1-6 teaching revamp. Activated only by ?teach=1
 // so normal app UX is untouched without the flag (RISK-02-01 in the plan).
 import { teachSteps } from '../data/teach-steps.js'
+import { SPINE_FIGURES } from '../data/spine-figures.js'
+import { formatNumber } from './formatters.js'
 import { t } from './i18n.js'
 
 function setControlValue(id, value) {
@@ -14,6 +16,15 @@ function setControlValue(id, value) {
 function selectScenario(scenarioId) {
   const button = document.querySelector(`[data-scenario="${scenarioId}"]`)
   if (button) button.click()
+}
+
+function fillSpineFigures(template) {
+  const figures = SPINE_FIGURES.s1
+  return template
+    .replace('{bau}', formatNumber(figures.bauMillions))
+    .replace('{cEvn}', formatNumber(figures.cEvnMillions))
+    .replace('{cfd}', formatNumber(figures.cfdMillions))
+    .replace('{cKh}', formatNumber(figures.cKhMillions))
 }
 
 function applyStep(index) {
@@ -35,7 +46,7 @@ function applyStep(index) {
       .replace('{total}', teachSteps.length)
       .replace('{title}', t(step.titleKey))
     banner.querySelector('.teach-annotation').textContent = t(step.annotationKey)
-    banner.querySelector('.teach-expected').textContent = t(step.expectedKey)
+    banner.querySelector('.teach-expected').textContent = fillSpineFigures(t(step.expectedKey))
   }
 }
 

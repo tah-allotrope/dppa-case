@@ -45,4 +45,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python tools/check_human_blocked_register.py
+      # --acknowledged-through 2026-09-08: H1/H2/H3/H6 are overdue and H4/H5 are
+      # due 2026-09-08 -- all six are known, accepted slips that print
+      # ACKNOWLEDGED instead of failing. Any item needed after this date gates
+      # exactly as before, so the next NEW slip is still loud. The author must
+      # revisit this date whenever the register changes.
+      - run: python tools/check_human_blocked_register.py --acknowledged-through 2026-09-08

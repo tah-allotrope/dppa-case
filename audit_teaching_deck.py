@@ -44,6 +44,8 @@ def is_hidden(slide):
 
 
 def main(path):
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     prs = Presentation(path)
     violations = []
     seen_decoder = False

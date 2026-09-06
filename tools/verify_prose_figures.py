@@ -33,6 +33,7 @@ SCAN_PATTERNS = [
     "NOTES.md", "RESOURCES.md", "MISSION.md", "corrections-log.md",
     "facilitator/**/*.md", "lessons/**/*.html",
     "app/docs/**/*.md", "assets/teaching/*.json",
+    "app/src/data/strings.js",
 ]
 
 TOKEN_RE = re.compile(r"\d{1,3}(?:,\d{3}){2,}")
@@ -180,6 +181,8 @@ def _token_and_file_counts(root: Path) -> tuple[int, int]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     violations = verify(REPO_ROOT)
 
     if violations:

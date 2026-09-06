@@ -64,6 +64,8 @@ def first_difference(
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     argv = argv if argv is not None else sys.argv[1:]
     if len(argv) != 2:
         print("Usage: python tools/compare_deck.py A.pptx B.pptx", file=sys.stderr)

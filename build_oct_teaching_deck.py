@@ -27,6 +27,50 @@ with open(os.path.join(ASSETS, "spine-s1.json"), encoding="utf-8") as f:
 with open(os.path.join(ASSETS, "gate-sweep.json"), encoding="utf-8") as f:
     SWEEP = json.load(f)
 
+# PHASE-01 (plans/2026-09-05-gate-model-and-october-readiness-plan.md): the
+# --lang argument used to reach every text path but no image path, so a vi/zh
+# deck would build clean and ship English charts. Every image reference below
+# resolves through asset_for_lang, which maps (basename, lang, family) to the
+# language-suffixed file and fails loudly when the translated asset is missing.
+# Two naming conventions coexist: files under assets/teaching/ use -en/-vi/-zh
+# while the CfD animations directly under assets/ use -en/-vi/-zh-cn, so a
+# single f"-{lang}" substitution would fix twelve paths and silently break the
+# two cfd-s1 references. A basename may carry a "{lang}" placeholder for the
+# one mid-stem case (m2-sankey-{lang}-5.png); otherwise the suffix appends.
+LANG_SUFFIX = {
+    "teaching": {"en": "en", "vi": "vi", "zh": "zh"},
+    "cfd": {"en": "en", "vi": "vi", "zh": "zh-cn"},
+}
+
+_EXTENSIONS_BY_FAMILY = {"teaching": (".png", ".gif"), "cfd": (".gif", ".mp4")}
+
+
+def asset_for_lang(basename, lang, family="teaching"):
+    """Return the repository-relative path of the language-specific asset.
+
+    family="teaching" resolves under assets/teaching/ with suffixes en/vi/zh;
+    family="cfd" resolves under assets/ with suffixes en/vi/zh-cn. Raises
+    SystemExit naming the missing path and the regeneration command when the
+    resolved file does not exist, and likewise for an unsupported language.
+    """
+    try:
+        suffix = LANG_SUFFIX[family][lang]
+    except KeyError:
+        sys.exit(f"ERROR: unsupported lang {lang!r} for asset family {family!r} "
+                 f"(expected one of {sorted(LANG_SUFFIX.get(family, {}))})")
+    if "{lang}" in basename:
+        stem = basename.replace("{lang}", suffix)
+    else:
+        stem = f"{basename}-{suffix}"
+    base_dir = ASSETS if family == "teaching" else "assets"
+    for ext in _EXTENSIONS_BY_FAMILY[family]:
+        candidate = os.path.join(base_dir, stem + ext)
+        if os.path.exists(candidate):
+            return candidate
+    missing = os.path.join(base_dir, stem + _EXTENSIONS_BY_FAMILY[family][0])
+    sys.exit(f"ERROR: missing {family} asset for --lang {lang}: {missing} does not exist. "
+             f"Regenerate with: PYTHONPATH= py build_teaching_visuals.py --lang {lang}")
+
 L = SPINE["bill"]["lines"]
 CEVN = SPINE["bill"]["cEvn"]["vndMillionsRounded"]
 CKH = SPINE["bill"]["cKh"]["vndMillionsRounded"]
@@ -271,10 +315,10 @@ def blank_slide(prs):
     return prs.slides.add_slide(prs.slide_layouts[9])  # BLANK
 
 
-def cold_open(prs, t):
+def cold_open(prs, t, lang):
     s = blank_slide(prs)
     add_textbox(s, 0.5, 0.25, 9.0, 0.6, t["cold_open_title"], 24, TEAL, bold=True)
-    add_picture_fit(s, os.path.join(ASSETS, "cold-open-bill-pair-en.png"), 0.5, 0.9, 9.0, 3.6)
+    add_picture_fit(s, asset_for_lang("cold-open-bill-pair", lang, "teaching"), 0.5, 0.9, 9.0, 3.6)
     add_textbox(s, 0.5, 4.6, 9.0, 0.4, t["cold_open_body"], 12, GRAY)
     set_notes(s, "COLD OPEN (2 min). Show the two bars. Do not explain the gap yet — that is the session's promise. "
                  "Hook line: 'In 60 minutes you will compute every line of that difference yourself.' "
@@ -283,10 +327,10 @@ def cold_open(prs, t):
     return s
 
 
-def divider(prs, module_num, t):
+def divider(prs, module_num, t, lang):
     s = blank_slide(prs)
     add_textbox(s, 0.5, 1.8, 9.0, 0.8, t["divider"][module_num - 1], 30, TEAL, bold=True, align=PP_ALIGN.CENTER)
-    breadcrumb = os.path.join(ASSETS, f"breadcrumb-strip-m{module_num}-en.png")
+    breadcrumb = asset_for_lang(f"breadcrumb-strip-m{module_num}", lang, "teaching")
     add_picture_fit(s, breadcrumb, 0.3, 3.0, 9.4, 1.3)
     set_notes(s, f"CHECKPOINT (30 sec, show of hands): {t['checkpoint'][module_num - 1]} "
                  f"Do not move on until at least half the room answers.")
@@ -297,6 +341,8 @@ def fallback_slide(prs, module_num, gif_path=None, note=""):
     from PIL import Image
     s = blank_slide(prs)
     add_textbox(s, 0.5, 0.3, 9.0, 0.5, f"[Fallback — Module {module_num} app demo]", 16, GRAY, bold=True)
+    # No language suffix on purpose: teach-m{N}.mp4 are presenter-fallback
+    # recordings of the English app, shared by every deck language.
     mp4_path = os.path.join(ASSETS, "fallback", f"teach-m{module_num}.mp4")
     poster_path = os.path.join(ASSETS, "fallback", f"teach-m{module_num}-poster.png")
     if os.path.exists(mp4_path):
@@ -362,11 +408,11 @@ def m6_levers_slide(prs, t):
     return s
 
 
-def close_slide(prs, t):
+def close_slide(prs, t, lang):
     s = blank_slide(prs)
     add_textbox(s, 0.5, 0.4, 9.0, 0.6, t["close_title"], 22, TEAL, bold=True, align=PP_ALIGN.CENTER)
-    add_picture_fit(s, os.path.join(ASSETS, "cold-open-bill-pair-en.png"), 0.4, 1.1, 6.8, 3.0)
-    qr_path = os.path.join(ASSETS, "qr-app-en.png")
+    add_picture_fit(s, asset_for_lang("cold-open-bill-pair", lang, "teaching"), 0.4, 1.1, 6.8, 3.0)
+    qr_path = asset_for_lang("qr-app", lang, "teaching")
     if os.path.exists(qr_path):
         add_picture_fit(s, qr_path, 7.5, 1.3, 1.9, 1.9)
         add_textbox(s, 7.5, 3.25, 1.9, 0.3, "Scan: dppa-case.web.app", 8, GRAY, align=PP_ALIGN.CENTER)
@@ -376,10 +422,10 @@ def close_slide(prs, t):
     return s
 
 
-def appendix_slide(prs, idx, title, takeaway, gif_stub):
+def appendix_slide(prs, idx, title, takeaway, gif_stub, lang):
     s = blank_slide(prs)
     add_textbox(s, 0.5, 0.25, 9.0, 0.5, title, 20, TEAL, bold=True)
-    gif_png_fallback = os.path.join("assets", f"{gif_stub}.gif")
+    gif_png_fallback = asset_for_lang(gif_stub, lang, "cfd")
     if os.path.exists(gif_png_fallback):
         add_picture_fit(s, gif_png_fallback, 0.5, 0.85, 9.0, 3.7)
     add_textbox(s, 0.5, 4.6, 9.0, 0.4, takeaway, 11.5, GRAY)
@@ -393,38 +439,41 @@ def build(lang, out_dir=None):
     prs = Presentation(MASTER)
     clear_slides(prs)
 
-    cold_open(prs, t)
+    cold_open(prs, t, lang)
 
-    content_slide(prs, t["m1_title"], t["m1_body"], os.path.join(ASSETS, "m1-tou-strip-en.png"),
+    content_slide(prs, t["m1_title"], t["m1_body"], asset_for_lang("m1-tou-strip", lang, "teaching"),
                   "M1 (4 min). Point at the TOU bands, then the load line. State: 'This is BAU — every DPPA offer "
                   "is judged against this.' App moment: none for M1 (visual only).")
 
-    divider(prs, 1, t)
+    divider(prs, 1, t, lang)
     fallback_slide(prs, 1)
 
-    divider(prs, 2, t)
-    content_slide(prs, t["m2a_title"], t["m2a_body"], os.path.join(ASSETS, "m2-funnel-en.png"),
+    divider(prs, 2, t, lang)
+    content_slide(prs, t["m2a_title"], t["m2a_body"], asset_for_lang("m2-funnel", lang, "teaching"),
                   "M2a (2 min). Walk the funnel top to bottom: generation, loss leak, load gate, contract gate. "
                   "No formulas — 'you only settle what survives both gates.'")
-    content_slide(prs, t["m2b_title"], t["m2b_body"], os.path.join(ASSETS, "m2-sankey-en-5.png"),
-                  "M2b (3 min). Play m2-sankey-build-en.gif in slideshow mode (autoplay). Read each arrow aloud as it "
+    sankey_still = asset_for_lang("m2-sankey-{lang}-5", lang, "teaching")
+    sankey_build = asset_for_lang("m2-sankey-build", lang, "teaching")
+    content_slide(prs, t["m2b_title"], t["m2b_body"], sankey_still,
+                  f"M2b (3 min). Play {os.path.basename(sankey_build)} in slideshow mode (autoplay). Read each arrow aloud as it "
                   "appears. APP MOMENT: switch to the live app, scroll to the five-line-bill panel, confirm the same "
                   f"numbers (C_EVN {CEVN:,}, CfD {L['cfd']['vndMillionsRounded']:,}, C_KH {CKH:,} tr VND).")
-    fallback_slide(prs, 2, os.path.join(ASSETS, "m2-sankey-build-en.gif"))
+    fallback_slide(prs, 2, sankey_build)
 
-    divider(prs, 3, t)
-    content_slide(prs, t["m3_title"], t["m3_body"], os.path.join(ASSETS, "m3-seesaw-en.png"),
-                  "M3 (4 min). Show the seesaw, then play assets/cfd-s1-en.gif for the 24h sign flip. " + t["m3_app"])
-    fallback_slide(prs, 3, os.path.join("assets", "cfd-s1-en.gif"))
+    divider(prs, 3, t, lang)
+    cfd_anim = asset_for_lang("cfd-s1", lang, "cfd")
+    content_slide(prs, t["m3_title"], t["m3_body"], asset_for_lang("m3-seesaw", lang, "teaching"),
+                  f"M3 (4 min). Show the seesaw, then play {cfd_anim.replace(os.sep, '/')} for the 24h sign flip. " + t["m3_app"])
+    fallback_slide(prs, 3, cfd_anim)
 
-    divider(prs, 4, t)
-    content_slide(prs, t["m4_title"], t["m4_body"], os.path.join(ASSETS, "m4-three-doors-en.png"),
+    divider(prs, 4, t, lang)
+    content_slide(prs, t["m4_title"], t["m4_body"], asset_for_lang("m4-three-doors", lang, "teaching"),
                   "M4 (4 min). Name each door once, no ratio math on-slide. APP MOMENT: multi-year panel, point at "
                   "the crossover year as the buyer-door check.")
     fallback_slide(prs, 4)
 
-    divider(prs, 5, t)
-    content_slide(prs, t["m5_title"], t["m5_body"], os.path.join(ASSETS, "m5-gate-heatmap-en.png"),
+    divider(prs, 5, t, lang)
+    content_slide(prs, t["m5_title"], t["m5_body"], asset_for_lang("m5-gate-heatmap", lang, "teaching"),
                   "M5 setup (2 min). Do NOT reveal the heatmap takeaway yet — that comes after the exercise.")
     s = blank_slide(prs)
     add_textbox(s, 0.5, 0.3, 9.0, 0.5, "Your turn: compute the bill", 20, TEAL, bold=True)
@@ -440,25 +489,26 @@ def build(lang, out_dir=None):
                  f"total {CKH:,} tr VND. APP MOMENT: verify against the five-line-bill panel.")
     fallback_slide(prs, 5)
     content_slide(prs, "The window, revealed", f"Now scale your month x12 x20 strikes: {PASS_COUNT} of {SWEEP_CELL_COUNT} pass all three doors.",
-                  os.path.join(ASSETS, "m5-gate-heatmap-en.png"),
+                  asset_for_lang("m5-gate-heatmap", lang, "teaching"),
                   "M5 REVEAL (2 min). This is the punchline: the exercise they just did, multiplied across a lifetime "
                   f"and a strike sweep, is why only {PASS_COUNT} of {SWEEP_CELL_COUNT} combinations clear every gate in these two case studies. "
                   f"Per-gate breakdown: buyer {SWEEP['buyerPassCount']}, lender {SWEEP['lenderPassCount']}, "
                   f"investor {SWEEP['investorPassCount']} -- see which gate actually binds. CAVEAT if asked: "
-                  "the lender and investor gates are one-dimensional per-kWh proxies (flat debt-service and "
-                  "LCOE floors), not modelled debt schedules or equity IRR -- settlement.js is buyer-side only. "
+                  "the lender and investor gates are illustrative two-dimensional proxies (a contracted-revenue "
+                  "DSCR test and a blended-revenue LCOE test), not modelled debt schedules or equity IRR "
+                  "-- settlement.js is buyer-side only. "
                   "The buyer gate is the exact lifetime-cost comparison; treat lender/investor as illustrative "
                   "until H3 (real Allotrope deal data) lands.")
 
-    divider(prs, 6, t)
+    divider(prs, 6, t, lang)
     m6_decoder_slide(prs, t)
     m6_levers_slide(prs, t)
     fallback_slide(prs, 6)
 
-    close_slide(prs, t)
+    close_slide(prs, t, lang)
 
     for i, (title, takeaway) in enumerate(zip(t["appendix_titles"], t["appendix_takeaways"])):
-        appendix_slide(prs, i + 1, title, takeaway, f"cfd-s{i+1}-en")
+        appendix_slide(prs, i + 1, title, takeaway, f"cfd-s{i+1}", lang)
 
     suffix = "" if lang == "en" else f" {lang}"
     target_dir = out_dir or "ceba"
@@ -470,6 +520,8 @@ def build(lang, out_dir=None):
 
 
 if __name__ == "__main__":
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser()
     parser.add_argument("--lang", default="en", choices=["en", "vi", "zh"])
     parser.add_argument(

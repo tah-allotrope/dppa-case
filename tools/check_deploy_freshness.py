@@ -136,6 +136,8 @@ def write_deploy_log(deployment_md: Path, log_date: str, commit_short: str, desc
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--url", default=DEFAULT_URL, help="Live URL to check (default: %(default)s)")
     parser.add_argument("--skip-build", action="store_true", help="Skip the local build; use existing app/dist/index.html")

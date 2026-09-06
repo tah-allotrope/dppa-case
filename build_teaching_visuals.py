@@ -16,7 +16,7 @@ Outputs -> assets/teaching/:
   cold-open-bill-pair-{lang}.png
   breadcrumb-strip-{lang}.png
 """
-import argparse, io, json, os
+import argparse, io, json, os, sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -165,7 +165,7 @@ def render_m1_tou_strip(lang):
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), frameon=False, fontsize=11, prop={"family": FONT[lang]})
     fig.suptitle(t["m1_title"], x=0.5, y=0.99, fontsize=17, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
     ax.set_title(t["m1_caption"], fontsize=10, color=GRAY, pad=8, fontfamily=FONT[lang])
-    return savefig(fig, "m1-tou-strip", lang)
+    return savefig(fig, "m1-tou-strip", lang), []
 
 
 # ---------- M2: volume funnel ----------
@@ -187,12 +187,15 @@ def render_m2_funnel(lang, spine):
     ]
     max_w = 8.0
     y = 5.2
+    numbers = []
     for i, (value, label, color) in enumerate(stages):
         w = max_w * (value / gen)
         x0 = (9 - w) / 2
         ax.add_patch(mpatches.FancyBboxPatch((x0, y), w, 0.9, boxstyle="round,pad=0.02,rounding_size=0.08",
                                               linewidth=0, facecolor=color, alpha=0.85))
-        ax.text(4.5, y + 0.45, f"{label}\n{value/1e6:.2f}M kWh", ha="center", va="center",
+        stage_label = f"{label}\n{value/1e6:.2f}M kWh"
+        numbers.append(f"{value/1e6:.2f}M kWh")
+        ax.text(4.5, y + 0.45, stage_label, ha="center", va="center",
                 fontsize=11.5, color="white" if color != AMBER else INK, fontweight="bold", fontfamily=FONT[lang])
         if i < len(stages) - 1:
             ax.annotate("", xy=(4.5, y - 0.35), xytext=(4.5, y),
@@ -200,7 +203,7 @@ def render_m2_funnel(lang, spine):
         y -= 1.5
     ax.set_xlim(0, 9); ax.set_ylim(0.5, 6.3)
     fig.suptitle(t["m2_funnel_title"], x=0.5, y=0.98, fontsize=16, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
-    return savefig(fig, "m2-funnel", lang)
+    return savefig(fig, "m2-funnel", lang), numbers
 
 
 # ---------- M2: Sankey-style bill build (5 staged frames + GIF) ----------
@@ -215,6 +218,8 @@ def render_m2_sankey(lang, spine):
     total = spine["bill"]["cKh"]["vndMillionsRounded"]
 
     frames = []
+    stage_paths = []
+    stage_numbers = []
     for stage in range(1, 6):
         fig, ax = plt.subplots(figsize=(13, 6.2), dpi=150)
         fig.patch.set_facecolor("white"); ax.set_facecolor("white")
@@ -225,6 +230,7 @@ def render_m2_sankey(lang, spine):
         ax.text(1.2, 3.5, t["m2_lines"][0].split()[0] if False else "S1", ha="center", va="center", color="white", fontweight="bold")
         y_positions = [6.0, 4.9, 3.8, 2.7, 1.6]
         running = 0
+        drawn = []
         for i in range(5):
             active = i < stage
             y = y_positions[i]
@@ -235,10 +241,12 @@ def render_m2_sankey(lang, spine):
             label = f"{names[i]}: {values[i]:,} tr VND" if active else ""
             if active:
                 ax.text(7.3, y, label, ha="left", va="center", fontsize=12, color=INK, fontweight="bold", fontfamily=FONT[lang])
+                drawn.append(f"{values[i]:,} tr VND")
                 running += values[i]
         ax.add_patch(mpatches.FancyBboxPatch((11.7, 3.0), 2.0, 1.0, boxstyle="round,pad=0.02",
                                               facecolor="#212121" if stage == 5 else "#B0BEC5", alpha=0.9))
         total_label = f"{running:,}" if stage < 5 else f"{total:,}"
+        drawn.append(f"{total_label} tr VND")
         ax.text(12.7, 3.5, f"{total_label}\ntr VND", ha="center", va="center", color="white", fontsize=11, fontweight="bold")
         fig.suptitle(t["m2_sankey_title"], x=0.5, y=0.98, fontsize=16, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
         if stage == 5:
@@ -248,13 +256,16 @@ def render_m2_sankey(lang, spine):
         fig.savefig(path, dpi=150, facecolor="white")
         plt.close(fig)
         frames.append(Image.open(path).convert("RGB"))
+        stage_paths.append(path)
+        stage_numbers.append(drawn)
         print("PNG:", path, os.path.getsize(path), "bytes")
 
     gif_path = os.path.join(OUT_DIR, f"m2-sankey-build-{lang}.gif")
     durations = [1200, 1200, 1200, 1200, 2200]
     frames[0].save(gif_path, save_all=True, append_images=frames[1:], duration=durations, loop=0, optimize=True)
     print("GIF:", gif_path, os.path.getsize(gif_path), "bytes")
-
+    gif_numbers = sorted({number for numbers in stage_numbers for number in numbers})
+    return stage_paths + [gif_path], gif_numbers
 
 # ---------- M3: CfD seesaw ----------
 def render_m3_seesaw(lang, spine):
@@ -280,7 +291,7 @@ def render_m3_seesaw(lang, spine):
     ax.text(5, 4.4, t["m3_below"], ha="center", va="center", fontsize=12.5, color=INK, fontweight="bold", fontfamily=FONT[lang])
     fig.suptitle(t["m3_title"], x=0.5, y=0.98, fontsize=17, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
     ax.text(5, 0.15, t["m3_caption"], ha="center", fontsize=10, color=GRAY, fontfamily=FONT[lang])
-    return savefig(fig, "m3-seesaw", lang)
+    return savefig(fig, "m3-seesaw", lang), []
 
 
 # ---------- M4: three doors ----------
@@ -302,7 +313,7 @@ def render_m4_three_doors(lang, spine):
         ax.text(x0 + 1.5, 4.4, name, ha="center", fontsize=14, fontweight="bold", color=color, fontfamily=FONT[lang])
         ax.text(x0 + 1.5, 2.6, rule, ha="center", va="center", fontsize=12, color=INK, wrap=True, fontfamily=FONT[lang])
     fig.suptitle(t["m4_title"], x=0.5, y=0.98, fontsize=17, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
-    return savefig(fig, "m4-three-doors", lang)
+    return savefig(fig, "m4-three-doors", lang), []
 
 
 # ---------- M5: gate heatmap (grid size from gate-sweep.json, not hard-coded) ----------
@@ -343,7 +354,7 @@ def render_m5_heatmap(lang, spine, sweep):
     )
     fig.suptitle(t["m5_title"].format(total=cell_count), x=0.5, y=0.98, fontsize=16, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
     ax.set_title(t["m5_caption"].format(n=pass_count, total=cell_count), fontsize=10.5, color=GRAY, pad=8, fontfamily=FONT[lang])
-    return savefig(fig, "m5-gate-heatmap", lang)
+    return savefig(fig, "m5-gate-heatmap", lang), [f"{pass_count} / {cell_count}"]
 
 
 # ---------- Cold open: BAU vs DPPA bill pair ----------
@@ -363,13 +374,14 @@ def render_cold_open(lang, spine):
     for sp in ["top", "right"]: ax.spines[sp].set_visible(False)
     fig.suptitle(t["cold_open_title"], x=0.5, y=0.99, fontsize=17, fontweight="bold", color="#00727e", fontfamily=FONT[lang])
     ax.set_title(t["cold_open_hook"], fontsize=11.5, color=GRAY, pad=10, fontfamily=FONT[lang])
-    return savefig(fig, "cold-open-bill-pair", lang)
+    return savefig(fig, "cold-open-bill-pair", lang), [f"{bau:,} tr VND", f"{dppa:,} tr VND"]
 
 
 # ---------- Breadcrumb strip (6 module icons) ----------
 def render_breadcrumb(lang):
     t = TEXTS[lang]
     labels = t["breadcrumb_labels"]
+    paths = []
     for active in range(0, 7):  # 0 = full strip (no highlight), 1..6 = "you are here"
         fig, ax = plt.subplots(figsize=(11, 1.4), dpi=200)
         fig.patch.set_facecolor("white"); ax.set_facecolor("white")
@@ -388,7 +400,9 @@ def render_breadcrumb(lang):
         os.makedirs(OUT_DIR, exist_ok=True)
         fig.savefig(path, dpi=200, facecolor="white", bbox_inches="tight")
         plt.close(fig)
+        paths.append(path)
         print("PNG:", path, os.path.getsize(path), "bytes")
+    return paths, []
 
 
 APP_URL = "https://dppa-case.web.app"
@@ -403,24 +417,102 @@ def render_qr(lang):
     img = img.resize((400, 400))
     img.save(path)
     print("PNG:", path, os.path.getsize(path), "bytes")
-    return path
+    return path, []
+
+
+def sha256_of(path):
+    """Lowercase hexadecimal SHA-256 of the file's bytes."""
+    import hashlib
+
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+
+def _posix(rel):
+    return rel.replace(os.sep, "/")
+
+
+def build_manifest(figures, inputs, builder_path):
+    """Return the figures-manifest structure for `figures` (a list of dicts with
+    filename/lang/inputs/renderedNumbers), `inputs` (repo-relative posix paths),
+    and the builder script path."""
+    return {
+        "generatedBy": "build_teaching_visuals.py",
+        "builderSha256": sha256_of(builder_path),
+        "inputs": {path: sha256_of(path) for path in inputs},
+        "figures": {
+            figure["filename"]: {
+                "lang": figure["lang"],
+                "inputs": figure["inputs"],
+                "renderedNumbers": figure["renderedNumbers"],
+            }
+            for figure in figures
+        },
+    }
+
+
+MANIFEST_PATH = os.path.join(OUT_DIR, "figures-manifest.json")
+SPINE_INPUT = _posix(os.path.join("assets", "teaching", "spine-s1.json"))
+SWEEP_INPUT = _posix(os.path.join("assets", "teaching", "gate-sweep.json"))
+
+
+def write_manifest(records, lang):
+    """Merge this run's `records` ((path, inputs, numbers) triples) into the
+    committed manifest, preserving other languages' entries."""
+    try:
+        with open(MANIFEST_PATH, encoding="utf-8") as f:
+            manifest = json.load(f)
+    except (OSError, ValueError):
+        manifest = None
+    figures = manifest.get("figures") if isinstance(manifest, dict) else None
+    figures = figures if isinstance(figures, dict) else {}
+    for path, inputs, numbers in records:
+        figures[_posix(os.path.relpath(path))] = {
+            "lang": lang,
+            "inputs": inputs,
+            "renderedNumbers": numbers,
+        }
+    manifest = build_manifest(
+        [
+            {"filename": name, **entry}
+            for name, entry in sorted(figures.items())
+        ],
+        [SPINE_INPUT, SWEEP_INPUT],
+        __file__,
+    )
+    with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    print("MANIFEST:", MANIFEST_PATH, len(figures), "figures")
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser()
     parser.add_argument("--lang", default="en", choices=["en", "vi", "zh"])
     args = parser.parse_args()
     spine = load_spine()
     sweep = load_sweep()
-    render_m1_tou_strip(args.lang)
-    render_m2_funnel(args.lang, spine)
-    render_m2_sankey(args.lang, spine)
-    render_m3_seesaw(args.lang, spine)
-    render_m4_three_doors(args.lang, spine)
-    render_m5_heatmap(args.lang, spine, sweep)
-    render_qr(args.lang)
-    render_cold_open(args.lang, spine)
-    render_breadcrumb(args.lang)
+    records = []
+
+    def collect(result, inputs):
+        paths, numbers = result
+        if isinstance(paths, str):
+            paths = [paths]
+        for path in paths:
+            records.append((path, inputs, numbers))
+
+    collect(render_m1_tou_strip(args.lang), [])
+    collect(render_m2_funnel(args.lang, spine), [SPINE_INPUT])
+    collect(render_m2_sankey(args.lang, spine), [SPINE_INPUT])
+    collect(render_m3_seesaw(args.lang, spine), [SPINE_INPUT])
+    collect(render_m4_three_doors(args.lang, spine), [SPINE_INPUT])
+    collect(render_m5_heatmap(args.lang, spine, sweep), [SWEEP_INPUT])
+    collect(render_qr(args.lang), [])
+    collect(render_cold_open(args.lang, spine), [SPINE_INPUT])
+    collect(render_breadcrumb(args.lang), [])
+    write_manifest(records, args.lang)
 
 
 if __name__ == "__main__":

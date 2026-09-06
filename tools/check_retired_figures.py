@@ -97,6 +97,8 @@ def scan_scripts(root: Path, config: dict) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     config = load_config(CONFIG_PATH)
     violations = scan_files(root=REPO_ROOT, config=config) + scan_scripts(root=REPO_ROOT, config=config)
 

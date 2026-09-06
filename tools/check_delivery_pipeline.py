@@ -116,15 +116,27 @@ def unpushed_count(upstream: str) -> int | None:
 
 def undeployed_count(marker_commit: str) -> int | None:
     """Return `git rev-list --count <marker_commit>..HEAD`, or None if the commit is unknown."""
-    if _run_git(["cat-file", "-e", f"{marker_commit}^{{commit}}"]) is None and _run_git(
-        ["rev-parse", "--verify", "--quiet", marker_commit]
-    ) is None:
-        return None
     out = _run_git(["rev-list", "--count", f"{marker_commit}..HEAD"])
     if out is None or not out.isdigit():
         return None
     return int(out)
 
+
+def deployable_commits(since_ref: str, paths: list[str]) -> list[str]:
+    """Return commit hashes between since_ref and HEAD touching at least one of paths."""
+    out = _run_git(["rev-list", f"{since_ref}..HEAD", "--", *paths])
+    if out is None:
+        return []
+    return [line for line in out.splitlines() if line]
+
+
+def commit_age_days(commit_hash: str) -> int:
+    """Return the age in days of a single commit, or 0 if unavailable."""
+    out = _run_git(["log", "-1", "--format=%ct", commit_hash])
+    if not out or not out.strip().isdigit():
+        return 0
+    now = datetime.now(timezone.utc).timestamp()
+    return max(0, int((now - int(out.strip())) / 86400))
 
 def oldest_commit_age_days(rev_range: str) -> int:
     """Return the age in days of the oldest commit in `rev_range`, or 0 if unavailable."""
@@ -140,6 +152,8 @@ def oldest_commit_age_days(rev_range: str) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--url", default=DEFAULT_URL, help="Live URL to check (default: %(default)s)")
     parser.add_argument(
@@ -147,6 +161,13 @@ def main(argv: list[str] | None = None) -> int:
         type=int,
         default=0,
         help="Only fail a stage whose oldest blocking commit is older than N days (default: 0)",
+    )
+    parser.add_argument(
+        "--deploy-paths",
+        nargs="*",
+        default=["app/"],
+        help="Undeployed commits touching one of these paths gate the deploy stage; "
+        "all other undeployed commits are reported as informational only (default: app/)",
     )
     args = parser.parse_args(argv)
 
@@ -189,6 +210,13 @@ def main(argv: list[str] | None = None) -> int:
     if undeployed:
         undeployed_age = oldest_commit_age_days(f"{live_marker_clean}..HEAD")
 
+    # Deployable-content filter: only undeployed commits touching --deploy-paths
+    # (default: app/) can stall the deploy stage. Documentation-only commits are
+    # reported as informational and never fail on their own.
+    deployable = deployable_commits(live_marker_clean, args.deploy_paths) if undeployed else []
+    doc_only = (undeployed or 0) - len(deployable)
+    deployable_age = max([commit_age_days(commit) for commit in deployable], default=0)
+
     # A stage fails when it is non-zero AND its oldest blocking commit's age (in
     # days) is >= --max-age-days. dirty_tracked has no commit, so its age is
     # always 0: with the default N=0 that still fails (0 >= 0), matching "any
@@ -198,19 +226,26 @@ def main(argv: list[str] | None = None) -> int:
         stalled_lines.append(f"  uncommitted files: {dirty}")
     if unpushed is not None and unpushed > 0 and unpushed_age >= args.max_age_days:
         stalled_lines.append(f"  unpushed commits: {unpushed} (oldest {unpushed_age}d old, upstream {upstream})")
-    if undeployed and undeployed_age >= args.max_age_days:
+    if deployable and deployable_age >= args.max_age_days:
         stalled_lines.append(
-            f"  undeployed commits: {undeployed} (oldest {undeployed_age}d old, live marker {live_marker_clean[:7]})"
+            f"  undeployed commits: {undeployed} ({len(deployable)} deployable, oldest {deployable_age}d old, live marker {live_marker_clean[:7]})"
         )
 
+    doc_only_line = (
+        f"  documentation-only commits: {doc_only} (informational, does not gate)" if doc_only > 0 else ""
+    )
     if stalled_lines:
         print("DELIVERY-PIPELINE STALLED")
         for line in stalled_lines:
             print(line)
+        if doc_only_line:
+            print(doc_only_line)
         if untracked:
             print(f"  untracked files: {untracked}  (informational, does not gate)")
         return 1
 
+    if doc_only_line:
+        print(doc_only_line)
     print(
         f"DELIVERY-PIPELINE CLEAN (0 uncommitted, "
         f"{unpushed if unpushed is not None else 0} unpushed, "

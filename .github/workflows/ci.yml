@@ -110,6 +110,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
+      - run: python build_teaching_visuals.py --lang en
+      - run: python tools/check_figures_manifest.py
       - run: python build_oct_teaching_deck.py --lang en --out /tmp/deck-build-out
       - run: python tools/compare_deck.py "/tmp/deck-build-out/DPPA Presentation Oct 2026 To Teach.pptx" "ceba/DPPA Presentation Oct 2026 To Teach.pptx"
   # Q-001 fallback: Firebase deployment intentionally disabled until credentials exist.

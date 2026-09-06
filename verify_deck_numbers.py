@@ -129,6 +129,8 @@ def extract_slide_numbers(pptx_path, lang="en"):
 
 
 def main(argv=None):
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--deck", default=DEFAULT_DECK, help=f"Path to the built .pptx (default: {DEFAULT_DECK})")
     parser.add_argument(

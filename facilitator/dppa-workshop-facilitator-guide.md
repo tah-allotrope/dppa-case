@@ -103,7 +103,7 @@ Timing flex: if a round runs long, cut the round-2 plant-revenue side first; pro
 - CfD at any strike = `(strike − 1,150) × 5,000,000`. Examples: strike 1,150 → CfD 0; strike 1,250 → +500M (factory pays); strike 1,050 → −500M (developer pays).
 - CfD crosses zero at **strike = 1,150** (= FMP).
 - C_KH at a given strike = `8,563,196,000 + (strike − 1,150) × 5,000,000` (C_EVN is fixed; only the CfD moves).
-- There is no single "right" answer — accept any defensible strike. The teaching point is the **trade-off**: lower strike helps the buyer but fails the lender's DSCR; higher strike is bankable but may leave the buyer above BAU. In the deck's full case study, only **15 of 70 scenarios** (`assets/teaching/gate-sweep.json`, regenerate via `cd app && node scripts/export-sweep.mjs`) passed all three gates at once — buyer 62, lender 28, investor 21 individually — surface that tension and which gate binds.
+- There is no single "right" answer — accept any defensible strike. The teaching point is the **trade-off**: lower strike helps the buyer but fails the lender's DSCR; higher strike is bankable but may leave the buyer above BAU. In the deck's full case study, only **8 of 70 scenarios** (`assets/teaching/gate-sweep.json`, regenerate via `cd app && node scripts/export-sweep.mjs`) passed all three gates at once — buyer 62, lender 36, investor 15 individually — surface that tension and which gate binds.
 
 ---
 

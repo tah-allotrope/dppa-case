@@ -44,8 +44,8 @@
   ratios = 70 cells (extended 2026-08-23 from 8 strikes/56 cells so both the
   lender and investor thresholds sit interior to the grid, not at its edge —
   see `plans/2026-08-22-delivery-stall-recovery-plan.md` PHASE-06). Current
-  computed result: **15 of 70** combinations clear all three gates
-  (buyer/lender/investor) at once — per-gate: buyer 62, lender 28, investor 21.
+  computed result: **8 of 70** combinations clear all three gates
+  (buyer/lender/investor) at once — per-gate: buyer 62, lender 36, investor 15.
   Re-run the sweep, then `PYTHONPATH= py build_teaching_visuals.py --lang en`
   and rebuild the deck, whenever `settlement.js` or the escalation assumptions
   change. See PHASE-03 of the 2026-07-10 plan.

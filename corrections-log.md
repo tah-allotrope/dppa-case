@@ -1,5 +1,17 @@
 # Lessons
 
+## 2026-09-06
+
+- A guard that verifies a number's provenance does not verify that the computation producing
+  it says anything. The gate sweep's lender and investor gates were strike-only step functions
+  (the lender gate bound in 0 of 70 cells), yet every parity check passed because the checks
+  only asked "does this number come from the engine" and never "does this gate vary along both
+  axes / bind somewhere / change the headline if removed". Rule: any model with a headline
+  figure gets a non-degeneracy assertion alongside its provenance checks — each gate must vary
+  with each input axis somewhere, be the sole blocker somewhere, and move the headline when
+  deleted. `assertNonDegenerate` in `app/scripts/export-sweep.mjs` (PHASE-02 of
+  plans/2026-09-05-gate-model-and-october-readiness-plan.md) is the template.
+
 ## 2026-08-23
 
 - A plan's `status: "complete"` field is not evidence the plan's own work happened — it is

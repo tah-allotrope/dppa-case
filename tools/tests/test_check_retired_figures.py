@@ -49,7 +49,7 @@ class TestScanFiles(unittest.TestCase):
     def test_current_value_is_not_flagged(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            _write(root, "NOTES.md", "The current result is 15 of 70.\n")
+            _write(root, "NOTES.md", "The current result is 8 of 70.\n")
             config = {"scan": ["NOTES.md"], "retired": REAL_CONFIG["retired"]}
             violations = crf.scan_files(root, config)
             self.assertEqual(violations, [])
@@ -77,7 +77,7 @@ class TestScanFiles(unittest.TestCase):
     def test_main_exits_zero_when_clean(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            _write(root, "NOTES.md", "The current result is 15 of 70.\n")
+            _write(root, "NOTES.md", "The current result is 8 of 70.\n")
             config_path = root / "retired_figures.json"
             import json
             config_path.write_text(
@@ -122,7 +122,7 @@ class TestScanScripts(unittest.TestCase):
     def test_current_value_in_generator_is_not_flagged(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            _write(root, "build_x.py", 'add_text(slide, "15 of 70")\n')
+            _write(root, "build_x.py", 'add_text(slide, "8 of 70")\n')
             config = {"scanScripts": ["*.py"], "retired": REAL_CONFIG["retired"]}
             violations = crf.scan_scripts(root, config)
             self.assertEqual(violations, [])

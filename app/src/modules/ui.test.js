@@ -18,9 +18,11 @@ import {
   renderAppShell,
   renderFiveLineBill,
   renderFormulas,
+  renderGatePanel,
   renderSelectedHourDetails,
   renderWalkthroughCases,
 } from './ui.js'
+import { evaluateGates } from './gates.js'
 
 function normalizedText(selector) {
   return document.querySelector(selector).textContent.replace(/\s+/g, ' ').trim()
@@ -567,5 +569,46 @@ describe('walkthrough derivation markup', () => {
     const labels = rows.map((row) => row.querySelector('.bill-line-label').textContent)
 
     expect(labels).toEqual(['EVN component', 'Developer component', 'Net result'])
+  })
+})
+
+describe('gate panel', () => {
+  const passing = evaluateGates({
+    strikeVndPerKwh: 1500,
+    contractedKwhPerMonth: 5000000,
+    referenceLoadKwhPerMonth: 5000000,
+    fmpVndPerKwh: 1150,
+    lifetimeDppaVnd: 1,
+    lifetimeBauVnd: 2,
+  })
+  const lenderFailing = evaluateGates({
+    strikeVndPerKwh: 1550,
+    contractedKwhPerMonth: 4000000,
+    referenceLoadKwhPerMonth: 5000000,
+    fmpVndPerKwh: 1150,
+    lifetimeDppaVnd: 1,
+    lifetimeBauVnd: 2,
+  })
+
+  it('renders three lamps with no NaN or undefined', () => {
+    document.body.innerHTML = '<div id="gatePanel"></div>'
+    const container = document.querySelector('#gatePanel')
+    renderGatePanel(container, passing, 'VND')
+    expect(container.querySelectorAll('.summary-pill').length).toBe(3)
+    expect(container.innerHTML).not.toContain('NaN')
+    expect(container.innerHTML).not.toContain('undefined')
+    expect(container.innerHTML).toContain('All three gates clear.')
+  })
+
+  it('does not throw on a null container', () => {
+    expect(() => renderGatePanel(null, passing, 'VND')).not.toThrow()
+  })
+
+  it('renders headroom in USD with a USD suffix', () => {
+    document.body.innerHTML = '<div id="gatePanel"></div>'
+    const container = document.querySelector('#gatePanel')
+    renderGatePanel(container, lenderFailing, 'USD')
+    expect(container.innerHTML).toContain('USD')
+    expect(container.innerHTML).toContain('Fail')
   })
 })

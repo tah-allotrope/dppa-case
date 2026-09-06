@@ -1,0 +1,568 @@
+{
+  "generatedBy": "build_teaching_visuals.py",
+  "builderSha256": "ab53e4ce85ba64771fa2c5df09514f9ce2d5efef607b6159be905d920c54a9bc",
+  "inputs": {
+    "assets/teaching/spine-s1.json": "f2a9656e02872a9d48c1ed51174e4f3939a4d80f71f64fbd8fb6f59c7dcf4d18",
+    "assets/teaching/gate-sweep.json": "3aa7f9a7e9e9d5c07ce919f349d885fa0b54a9247a40abaecbde1e998bc2eda8"
+  },
+  "figures": {
+    "assets/teaching/breadcrumb-strip-en.png": {
+      "lang": "en",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m1-en.png": {
+      "lang": "en",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m1-vi.png": {
+      "lang": "vi",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m1-zh.png": {
+      "lang": "zh",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m2-en.png": {
+      "lang": "en",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m2-vi.png": {
+      "lang": "vi",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m2-zh.png": {
+      "lang": "zh",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m3-en.png": {
+      "lang": "en",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m3-vi.png": {
+      "lang": "vi",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m3-zh.png": {
+      "lang": "zh",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m4-en.png": {
+      "lang": "en",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m4-vi.png": {
+      "lang": "vi",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m4-zh.png": {
+      "lang": "zh",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m5-en.png": {
+      "lang": "en",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m5-vi.png": {
+      "lang": "vi",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m5-zh.png": {
+      "lang": "zh",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m6-en.png": {
+      "lang": "en",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m6-vi.png": {
+      "lang": "vi",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-m6-zh.png": {
+      "lang": "zh",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-vi.png": {
+      "lang": "vi",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/breadcrumb-strip-zh.png": {
+      "lang": "zh",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/cold-open-bill-pair-en.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "11,020 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/cold-open-bill-pair-vi.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "11,020 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/cold-open-bill-pair-zh.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "11,020 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m1-tou-strip-en.png": {
+      "lang": "en",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/m1-tou-strip-vi.png": {
+      "lang": "vi",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/m1-tou-strip-zh.png": {
+      "lang": "zh",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/m2-funnel-en.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "6.50M kWh",
+        "6.43M kWh",
+        "5.00M kWh",
+        "5.00M kWh"
+      ]
+    },
+    "assets/teaching/m2-funnel-vi.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "6.50M kWh",
+        "6.43M kWh",
+        "5.00M kWh",
+        "5.00M kWh"
+      ]
+    },
+    "assets/teaching/m2-funnel-zh.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "6.50M kWh",
+        "6.43M kWh",
+        "5.00M kWh",
+        "5.00M kWh"
+      ]
+    },
+    "assets/teaching/m2-sankey-build-en.gif": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-build-vi.gif": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-build-zh.gif": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-en-1.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-en-2.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-en-3.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-en-4.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-en-5.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-vi-1.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-vi-2.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-vi-3.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-vi-4.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-vi-5.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-zh-1.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-zh-2.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-zh-3.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-zh-4.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m2-sankey-zh-5.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": [
+        "0 tr VND",
+        "1,800 tr VND",
+        "5,947 tr VND",
+        "500 tr VND",
+        "7,747 tr VND",
+        "8,564 tr VND",
+        "817 tr VND",
+        "9,063 tr VND"
+      ]
+    },
+    "assets/teaching/m3-seesaw-en.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": []
+    },
+    "assets/teaching/m3-seesaw-vi.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": []
+    },
+    "assets/teaching/m3-seesaw-zh.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": []
+    },
+    "assets/teaching/m4-three-doors-en.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": []
+    },
+    "assets/teaching/m4-three-doors-vi.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": []
+    },
+    "assets/teaching/m4-three-doors-zh.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/spine-s1.json"
+      ],
+      "renderedNumbers": []
+    },
+    "assets/teaching/m5-gate-heatmap-en.png": {
+      "lang": "en",
+      "inputs": [
+        "assets/teaching/gate-sweep.json"
+      ],
+      "renderedNumbers": [
+        "8 / 70"
+      ]
+    },
+    "assets/teaching/m5-gate-heatmap-vi.png": {
+      "lang": "vi",
+      "inputs": [
+        "assets/teaching/gate-sweep.json"
+      ],
+      "renderedNumbers": [
+        "8 / 70"
+      ]
+    },
+    "assets/teaching/m5-gate-heatmap-zh.png": {
+      "lang": "zh",
+      "inputs": [
+        "assets/teaching/gate-sweep.json"
+      ],
+      "renderedNumbers": [
+        "8 / 70"
+      ]
+    },
+    "assets/teaching/qr-app-en.png": {
+      "lang": "en",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/qr-app-vi.png": {
+      "lang": "vi",
+      "inputs": [],
+      "renderedNumbers": []
+    },
+    "assets/teaching/qr-app-zh.png": {
+      "lang": "zh",
+      "inputs": [],
+      "renderedNumbers": []
+    }
+  }
+}

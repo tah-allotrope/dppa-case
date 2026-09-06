@@ -21,6 +21,14 @@ import { writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { buildFiveLineBill } from '../src/modules/settlement.js'
+import {
+  DEBT_SHARE,
+  DSCR_TARGET,
+  INVESTOR_LCOE_VND_PER_KWH,
+  LOSS_FACTOR_KPP_ONLY,
+  LOSS_FACTOR_PRECISE,
+  evaluateGates,
+} from '../src/modules/gates.js'
 import { scenarioProfiles, defaultInputs } from '../src/data/default-scenarios.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -31,9 +39,9 @@ const FMP1 = S1.overrides.marketPrice // 1,150 VND/kWh
 const RETAIL1 = defaultInputs.retailTariff // 2,204 VND/kWh
 const SERVICE_FEE = defaultInputs.dppaServiceFee
 const CLEARING_FEE = defaultInputs.dppaClearingFee
-const LOSS_FACTOR_PRECISE = 1.026 * 1.008
-const LOSS_FACTOR_KPP_ONLY = 1.008
-
+// The gate model itself lives in app/src/modules/gates.js and is shared with the
+// application's live gate panel; this exporter keeps only the grid definition, the
+// year-loop lifetime accumulation, the anchor assertion and the degeneracy assertions.
 const ESCALATION = 0.04 // retail + strike, per year (ASM-005)
 const FMP_ESCALATION = 0.04 // FMP, per year (ASM-005)
 const HORIZON_YEARS = 20
@@ -41,14 +49,6 @@ const MONTHS_PER_YEAR = 12
 
 const STRIKES = [1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550]
 const RATIOS = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3]
-
-// Illustrative developer-side proxy constants (ASM-003): settlement.js is
-// buyer-side only and does not model debt schedules or equity IRR, so the
-// lender/investor gates compare the grid's nominal strike (not escalated)
-// against a fixed per-kWh debt-service threshold and a full-LCOE threshold.
-const LENDER_DEBT_SERVICE_VND_PER_KWH = 1150 * 1.2 // 1,380
-const DSCR_TARGET = 1.2
-const INVESTOR_LCOE_VND_PER_KWH = 1450
 
 function contractedForRatio(ratio) {
   return Math.round(LOAD * ratio)
@@ -80,10 +80,22 @@ function evaluateCell(strike, ratio) {
     lifetimeDppaVnd += MONTHS_PER_YEAR * bill.cKh
     lifetimeBauVnd += MONTHS_PER_YEAR * LOAD * RETAIL1 * priceFactor
   }
-  const buyerPass = lifetimeDppaVnd <= lifetimeBauVnd
-  const lenderPass = strike >= LENDER_DEBT_SERVICE_VND_PER_KWH
-  const investorPass = strike >= INVESTOR_LCOE_VND_PER_KWH
-  const allPass = buyerPass && lenderPass && investorPass
+  const gates = evaluateGates({
+    strikeVndPerKwh: strike,
+    contractedKwhPerMonth: contractedForRatio(ratio),
+    referenceLoadKwhPerMonth: LOAD,
+    fmpVndPerKwh: FMP1,
+    lifetimeDppaVnd,
+    lifetimeBauVnd,
+  })
+  const {
+    buyerPass,
+    lenderPass,
+    investorPass,
+    allPass,
+    annualContractRevenueVnd,
+    blendedRevenuePerKwh,
+  } = gates
   return {
     strike,
     ratio,
@@ -93,6 +105,8 @@ function evaluateCell(strike, ratio) {
     allPass,
     lifetimeDppaVnd: Math.round(lifetimeDppaVnd),
     lifetimeBauVnd: Math.round(lifetimeBauVnd),
+    annualContractRevenueVnd: Math.round(annualContractRevenueVnd),
+    blendedRevenuePerKwh,
   }
 }
 
@@ -104,11 +118,10 @@ export function buildSweep() {
     }
   }
   const passCount = cells.filter((cell) => cell.allPass).length
-  // PHASE-06 (2026-08-23): per-gate counts, so "N of M pass all three" can be
-  // shown alongside *which* gate actually binds -- "buyer 62 / lender 28 /
-  // investor 21 / all three 15" is the more defensible and more informative
-  // story than the combined count alone, and every number in it is already
-  // computed per-cell above.
+  // Per-gate counts, so "N of M pass all three" can be shown alongside
+  // *which* gate actually binds -- "buyer 62 / lender 36 / investor 15 /
+  // all three 8" under the S1 model in
+  // plans/2026-09-05-gate-model-and-october-readiness-plan.md.
   const buyerPassCount = cells.filter((cell) => cell.buyerPass).length
   const lenderPassCount = cells.filter((cell) => cell.lenderPass).length
   const investorPassCount = cells.filter((cell) => cell.investorPass).length
@@ -118,10 +131,11 @@ export function buildSweep() {
       horizonYears: HORIZON_YEARS,
       escalation: ESCALATION,
       fmpEscalation: FMP_ESCALATION,
-      lenderDebtServiceVndPerKwh: LENDER_DEBT_SERVICE_VND_PER_KWH,
+      debtShare: DEBT_SHARE,
+      annualDebtServiceVnd: LOAD * 12 * INVESTOR_LCOE_VND_PER_KWH * DEBT_SHARE,
       dscrTarget: DSCR_TARGET,
       investorLcoeVndPerKwh: INVESTOR_LCOE_VND_PER_KWH,
-      note: 'Lender/investor gates use illustrative developer-side proxies (settlement.js is buyer-side only and does not model debt schedules or equity IRR). Buyer gate is the exact lifetime-cost comparison via buildFiveLineBill.',
+      note: 'Lender gate tests contracted revenue against debt service at the target coverage ratio; investor gate tests blended revenue per generated kWh against full LCOE. Both illustrative (settlement.js is buyer-side only) until real deal data lands.',
     },
     strikes: STRIKES,
     ratios: RATIOS,
@@ -131,6 +145,39 @@ export function buildSweep() {
     buyerPassCount,
     lenderPassCount,
     investorPassCount,
+  }
+}
+
+function assertNonDegenerate(cells) {
+  const gates = ['buyerPass', 'lenderPass', 'investorPass']
+  const fail = (message) => {
+    console.error(`DEGENERACY FAIL: ${message}`)
+    process.exit(1)
+  }
+  for (const gate of gates) {
+    const varies = STRIKES.some(
+      (strike) =>
+        new Set(cells.filter((cell) => cell.strike === strike).map((cell) => cell[gate])).size > 1,
+    )
+    if (!varies) {
+      fail(`${gate} is constant along the volume axis at every strike`)
+    }
+    const sole = cells.filter(
+      (cell) =>
+        !cell[gate] && gates.filter((other) => other !== gate).every((other) => cell[other]),
+    ).length
+    if (sole < 1) {
+      fail(`${gate} is never the sole blocker`)
+    }
+  }
+  const passCount = cells.filter((cell) => cell.allPass).length
+  for (const gate of gates) {
+    const without = cells.filter((cell) =>
+      gates.filter((other) => other !== gate).every((other) => cell[other]),
+    ).length
+    if (without === passCount) {
+      fail(`removing ${gate} leaves passCount unchanged`)
+    }
   }
 }
 
@@ -146,6 +193,7 @@ function main() {
     console.error(`Anchor mismatch: expected cKh ${EXPECTED_ANCHOR_CKH_VND}, got ${anchorBill.cKh}`)
     process.exit(1)
   }
+  assertNonDegenerate(sweep.cells)
 
   writeFileSync(
     join(__dirname, '..', '..', 'assets', 'teaching', 'gate-sweep.json'),

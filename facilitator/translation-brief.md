@@ -97,3 +97,19 @@ to build and verify the translated decks. You do not need to run these yourself.
 If a source sentence is ambiguous, or a `{placeholder}` doesn't fit the target language's word
 order, leave a comment in your delivery rather than guessing — a wrong translation of a real
 sentence is a much smaller problem than a mistranslated placeholder contract.
+
+## Chinese typography
+
+The app self-hosts the Inter font (Latin and Vietnamese subsets only) and Inter has no CJK
+coverage, so the ZH build accepts the venue machine's system CJK font fallback for Chinese text.
+The deck aesthetic constraint in `NOTES.md` is knowingly relaxed for ZH: Chinese slides may render
+in a system fallback typeface rather than the deck's display font. Do not add a CJK font subset in
+this cycle.
+
+## Markup and placeholder contract
+
+String values are HTML fragments, not plain text. A literal less-than or greater-than sign
+must be written `&lt;` or `&gt;`; a literal ampersand must be written `&amp;`. Placeholder
+tokens in braces (`{bau}`, `{cEvn}`, `{cfd}`, `{cKh}`, `{years}`, `{index}`, `{total}`,
+`{scenario}`, `{sign}`, `{value}`) must be preserved verbatim and never translated — the app
+substitutes them at render time, and a translated or deleted token breaks the build.

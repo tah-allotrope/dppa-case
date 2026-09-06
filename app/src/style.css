@@ -1973,3 +1973,77 @@ h3 {
     transition: none;
   }
 }
+
+/* PHASE-04 (plans/2026-09-05-gate-model-and-october-readiness-plan.md): the live
+ * three-gate panel beside the multi-year buyer-gate check. Lamps reuse
+ * .summary-pill tones; only the layout wrapper and the binding line are new. */
+.gate-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.gate-panel-title {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gate-lamps {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gate-binding {
+  color: var(--muted);
+}
+
+.gate-panel-fallback {
+  color: var(--muted);
+}
+
+/* PHASE-06 (plans/2026-09-05-gate-model-and-october-readiness-plan.md): presenter
+ * drill overlay (?drill=1). Layout-only rules; colours reuse existing tokens. */
+.drill-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.drill-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drill-inputs label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.drill-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.drill-timer,
+.drill-best {
+  color: var(--muted);
+}
+.drill-line-correct {
+  color: var(--mint);
+}
+
+.drill-line-wrong {
+  color: var(--text);
+  font-weight: 600;
+}

@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test'
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 // NOTE: Chromium's CDP-level network emulation (`context.setOffline(true)`)
 // blocks top-level navigation requests before the service worker's fetch
@@ -85,4 +88,14 @@ test('?lang=vi is cached and resolvable from the precached shell', async ({ page
     return requests.some((r) => new URL(r.url).pathname.endsWith('.js'))
   })
   expect(bundleIsCached).toBe(true)
+})
+
+test('built sw.js carries the build commit, not the version token', async () => {
+  const distSw = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'sw.js'),
+    'utf-8',
+  )
+  expect(distSw).toMatch(/[0-9a-f]{40}/)
+  expect(distSw).not.toContain('__SW_VERSION__')
+  expect(distSw).not.toContain('dppa-app-unknown')
 })

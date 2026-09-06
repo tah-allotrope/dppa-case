@@ -1,5 +1,5 @@
 {
-  "frozenOn": "2026-08-23",
+  "frozenOn": "2026-09-06",
   "keys": [
     "assumptions_2025",
     "assumptions_click_hint",
@@ -72,6 +72,14 @@
     "fmp_cancel_owner_default",
     "fmp_cancel_title",
     "fmp_strip_aria",
+    "gate_all_clear",
+    "gate_binding_template",
+    "gate_buyer_label",
+    "gate_fail_value",
+    "gate_investor_label",
+    "gate_lender_label",
+    "gate_panel_title",
+    "gate_pass_value",
     "header_eyebrow",
     "header_hero",
     "header_title",

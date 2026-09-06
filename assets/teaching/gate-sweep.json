@@ -4,10 +4,11 @@
     "horizonYears": 20,
     "escalation": 0.04,
     "fmpEscalation": 0.04,
-    "lenderDebtServiceVndPerKwh": 1380,
+    "debtShare": 0.75,
+    "annualDebtServiceVnd": 65250000000,
     "dscrTarget": 1.2,
     "investorLcoeVndPerKwh": 1450,
-    "note": "Lender/investor gates use illustrative developer-side proxies (settlement.js is buyer-side only and does not model debt schedules or equity IRR). Buyer gate is the exact lifetime-cost comparison via buildFiveLineBill."
+    "note": "Lender gate tests contracted revenue against debt service at the target coverage ratio; investor gate tests blended revenue per generated kWh against full LCOE. Both illustrative (settlement.js is buyer-side only) until real deal data lands."
   },
   "strikes": [
     1100,
@@ -39,7 +40,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3045875886588,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 46200000000,
+      "blendedRevenuePerKwh": 1115
     },
     {
       "strike": 1100,
@@ -49,7 +52,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2918450568840,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 52800000000,
+      "blendedRevenuePerKwh": 1110
     },
     {
       "strike": 1100,
@@ -59,7 +64,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2791025251056,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 59400000000,
+      "blendedRevenuePerKwh": 1105
     },
     {
       "strike": 1100,
@@ -69,7 +76,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2663599933308,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 66000000000,
+      "blendedRevenuePerKwh": 1100
     },
     {
       "strike": 1100,
@@ -79,27 +88,33 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2929959926688,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 72600000000,
+      "blendedRevenuePerKwh": 1100
     },
     {
       "strike": 1100,
       "ratio": 1.2,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3196319919948,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 79200000000,
+      "blendedRevenuePerKwh": 1100
     },
     {
       "strike": 1100,
       "ratio": 1.3,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3462679913376,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 85800000000,
+      "blendedRevenuePerKwh": 1100
     },
     {
       "strike": 1150,
@@ -109,7 +124,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3108409851588,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 48300000000,
+      "blendedRevenuePerKwh": 1150
     },
     {
       "strike": 1150,
@@ -119,7 +136,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2989917957408,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 55200000000,
+      "blendedRevenuePerKwh": 1150
     },
     {
       "strike": 1150,
@@ -129,7 +148,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2871426063216,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 62100000000,
+      "blendedRevenuePerKwh": 1150
     },
     {
       "strike": 1150,
@@ -139,7 +160,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2752934169048,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 69000000000,
+      "blendedRevenuePerKwh": 1150
     },
     {
       "strike": 1150,
@@ -149,27 +172,33 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3028227585972,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 75900000000,
+      "blendedRevenuePerKwh": 1150
     },
     {
       "strike": 1150,
       "ratio": 1.2,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3303521002848,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 82800000000,
+      "blendedRevenuePerKwh": 1150
     },
     {
       "strike": 1150,
       "ratio": 1.3,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3578814419796,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 89700000000,
+      "blendedRevenuePerKwh": 1150
     },
     {
       "strike": 1200,
@@ -179,7 +208,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3170943816588,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 50400000000,
+      "blendedRevenuePerKwh": 1185
     },
     {
       "strike": 1200,
@@ -189,7 +220,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3061385345976,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 57600000000,
+      "blendedRevenuePerKwh": 1190
     },
     {
       "strike": 1200,
@@ -199,7 +232,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2951826875376,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 64800000000,
+      "blendedRevenuePerKwh": 1195
     },
     {
       "strike": 1200,
@@ -209,37 +244,45 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2842268404788,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 72000000000,
+      "blendedRevenuePerKwh": 1200
     },
     {
       "strike": 1200,
       "ratio": 1.1,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3126495245256,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 79200000000,
+      "blendedRevenuePerKwh": 1200
     },
     {
       "strike": 1200,
       "ratio": 1.2,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3410722085748,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 86400000000,
+      "blendedRevenuePerKwh": 1200
     },
     {
       "strike": 1200,
       "ratio": 1.3,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3694948926216,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 93600000000,
+      "blendedRevenuePerKwh": 1200
     },
     {
       "strike": 1250,
@@ -249,7 +292,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3233477781612,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 52500000000,
+      "blendedRevenuePerKwh": 1220
     },
     {
       "strike": 1250,
@@ -259,7 +304,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3132852734556,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 60000000000,
+      "blendedRevenuePerKwh": 1230
     },
     {
       "strike": 1250,
@@ -269,7 +316,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3032227687512,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 67500000000,
+      "blendedRevenuePerKwh": 1240
     },
     {
       "strike": 1250,
@@ -279,37 +328,45 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 2931602640504,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 75000000000,
+      "blendedRevenuePerKwh": 1250
     },
     {
       "strike": 1250,
       "ratio": 1.1,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3224762904576,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 82500000000,
+      "blendedRevenuePerKwh": 1250
     },
     {
       "strike": 1250,
       "ratio": 1.2,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3517923168576,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 90000000000,
+      "blendedRevenuePerKwh": 1250
     },
     {
       "strike": 1250,
       "ratio": 1.3,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3811083432708,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 97500000000,
+      "blendedRevenuePerKwh": 1250
     },
     {
       "strike": 1300,
@@ -319,7 +376,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3296011746624,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 54600000000,
+      "blendedRevenuePerKwh": 1255
     },
     {
       "strike": 1300,
@@ -329,7 +388,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3204320123136,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 62400000000,
+      "blendedRevenuePerKwh": 1270
     },
     {
       "strike": 1300,
@@ -339,7 +400,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3112628499672,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 70200000000,
+      "blendedRevenuePerKwh": 1285
     },
     {
       "strike": 1300,
@@ -349,37 +412,45 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3020936876232,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 78000000000,
+      "blendedRevenuePerKwh": 1300
     },
     {
       "strike": 1300,
       "ratio": 1.1,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3323030563860,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 85800000000,
+      "blendedRevenuePerKwh": 1300
     },
     {
       "strike": 1300,
       "ratio": 1.2,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3625124251464,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 93600000000,
+      "blendedRevenuePerKwh": 1300
     },
     {
       "strike": 1300,
       "ratio": 1.3,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3927217939140,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 101400000000,
+      "blendedRevenuePerKwh": 1300
     },
     {
       "strike": 1350,
@@ -389,7 +460,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3358545711612,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 56700000000,
+      "blendedRevenuePerKwh": 1290
     },
     {
       "strike": 1350,
@@ -399,7 +472,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3275787511728,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 64800000000,
+      "blendedRevenuePerKwh": 1310
     },
     {
       "strike": 1350,
@@ -409,77 +484,93 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3193029311832,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 72900000000,
+      "blendedRevenuePerKwh": 1330
     },
     {
       "strike": 1350,
       "ratio": 1,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3110271111948,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 81000000000,
+      "blendedRevenuePerKwh": 1350
     },
     {
       "strike": 1350,
       "ratio": 1.1,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3421298223156,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 89100000000,
+      "blendedRevenuePerKwh": 1350
     },
     {
       "strike": 1350,
       "ratio": 1.2,
       "buyerPass": true,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3732325334340,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 97200000000,
+      "blendedRevenuePerKwh": 1350
     },
     {
       "strike": 1350,
       "ratio": 1.3,
       "buyerPass": false,
-      "lenderPass": false,
+      "lenderPass": true,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 4043352445572,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 105300000000,
+      "blendedRevenuePerKwh": 1350
     },
     {
       "strike": 1400,
       "ratio": 0.7,
       "buyerPass": true,
-      "lenderPass": true,
+      "lenderPass": false,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3421079676636,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 58800000000,
+      "blendedRevenuePerKwh": 1325
     },
     {
       "strike": 1400,
       "ratio": 0.8,
       "buyerPass": true,
-      "lenderPass": true,
+      "lenderPass": false,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3347254900308,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 67200000000,
+      "blendedRevenuePerKwh": 1350
     },
     {
       "strike": 1400,
       "ratio": 0.9,
       "buyerPass": true,
-      "lenderPass": true,
+      "lenderPass": false,
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3273430124016,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 75600000000,
+      "blendedRevenuePerKwh": 1375
     },
     {
       "strike": 1400,
@@ -489,7 +580,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3199605347676,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 84000000000,
+      "blendedRevenuePerKwh": 1400
     },
     {
       "strike": 1400,
@@ -499,7 +592,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3519565882464,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 92400000000,
+      "blendedRevenuePerKwh": 1400
     },
     {
       "strike": 1400,
@@ -509,7 +604,9 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 3839526417216,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 100800000000,
+      "blendedRevenuePerKwh": 1400
     },
     {
       "strike": 1400,
@@ -519,37 +616,45 @@
       "investorPass": false,
       "allPass": false,
       "lifetimeDppaVnd": 4159486951992,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 109200000000,
+      "blendedRevenuePerKwh": 1400
     },
     {
       "strike": 1450,
       "ratio": 0.7,
       "buyerPass": true,
-      "lenderPass": true,
-      "investorPass": true,
-      "allPass": true,
+      "lenderPass": false,
+      "investorPass": false,
+      "allPass": false,
       "lifetimeDppaVnd": 3483613641636,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 60900000000,
+      "blendedRevenuePerKwh": 1360
     },
     {
       "strike": 1450,
       "ratio": 0.8,
       "buyerPass": true,
-      "lenderPass": true,
-      "investorPass": true,
-      "allPass": true,
+      "lenderPass": false,
+      "investorPass": false,
+      "allPass": false,
       "lifetimeDppaVnd": 3418722288900,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 69600000000,
+      "blendedRevenuePerKwh": 1390
     },
     {
       "strike": 1450,
       "ratio": 0.9,
       "buyerPass": true,
       "lenderPass": true,
-      "investorPass": true,
-      "allPass": true,
+      "investorPass": false,
+      "allPass": false,
       "lifetimeDppaVnd": 3353830936152,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 78300000000,
+      "blendedRevenuePerKwh": 1420
     },
     {
       "strike": 1450,
@@ -559,7 +664,9 @@
       "investorPass": true,
       "allPass": true,
       "lifetimeDppaVnd": 3288939583416,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 87000000000,
+      "blendedRevenuePerKwh": 1450
     },
     {
       "strike": 1450,
@@ -569,7 +676,9 @@
       "investorPass": true,
       "allPass": true,
       "lifetimeDppaVnd": 3617833541772,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 95700000000,
+      "blendedRevenuePerKwh": 1450
     },
     {
       "strike": 1450,
@@ -579,7 +688,9 @@
       "investorPass": true,
       "allPass": false,
       "lifetimeDppaVnd": 3946727500080,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 104400000000,
+      "blendedRevenuePerKwh": 1450
     },
     {
       "strike": 1450,
@@ -589,27 +700,33 @@
       "investorPass": true,
       "allPass": false,
       "lifetimeDppaVnd": 4275621458472,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 113100000000,
+      "blendedRevenuePerKwh": 1450
     },
     {
       "strike": 1500,
       "ratio": 0.7,
       "buyerPass": true,
-      "lenderPass": true,
-      "investorPass": true,
-      "allPass": true,
+      "lenderPass": false,
+      "investorPass": false,
+      "allPass": false,
       "lifetimeDppaVnd": 3546147606648,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 63000000000,
+      "blendedRevenuePerKwh": 1395
     },
     {
       "strike": 1500,
       "ratio": 0.8,
       "buyerPass": true,
-      "lenderPass": true,
-      "investorPass": true,
-      "allPass": true,
+      "lenderPass": false,
+      "investorPass": false,
+      "allPass": false,
       "lifetimeDppaVnd": 3490189677492,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 72000000000,
+      "blendedRevenuePerKwh": 1430
     },
     {
       "strike": 1500,
@@ -619,7 +736,9 @@
       "investorPass": true,
       "allPass": true,
       "lifetimeDppaVnd": 3434231748300,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 81000000000,
+      "blendedRevenuePerKwh": 1465
     },
     {
       "strike": 1500,
@@ -629,7 +748,9 @@
       "investorPass": true,
       "allPass": true,
       "lifetimeDppaVnd": 3378273819144,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 90000000000,
+      "blendedRevenuePerKwh": 1500
     },
     {
       "strike": 1500,
@@ -639,7 +760,9 @@
       "investorPass": true,
       "allPass": true,
       "lifetimeDppaVnd": 3716101201080,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 99000000000,
+      "blendedRevenuePerKwh": 1500
     },
     {
       "strike": 1500,
@@ -649,7 +772,9 @@
       "investorPass": true,
       "allPass": false,
       "lifetimeDppaVnd": 4053928582956,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 108000000000,
+      "blendedRevenuePerKwh": 1500
     },
     {
       "strike": 1500,
@@ -659,27 +784,33 @@
       "investorPass": true,
       "allPass": false,
       "lifetimeDppaVnd": 4391755964892,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 117000000000,
+      "blendedRevenuePerKwh": 1500
     },
     {
       "strike": 1550,
       "ratio": 0.7,
       "buyerPass": true,
-      "lenderPass": true,
-      "investorPass": true,
-      "allPass": true,
+      "lenderPass": false,
+      "investorPass": false,
+      "allPass": false,
       "lifetimeDppaVnd": 3608681571672,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 65100000000,
+      "blendedRevenuePerKwh": 1430
     },
     {
       "strike": 1550,
       "ratio": 0.8,
       "buyerPass": true,
-      "lenderPass": true,
+      "lenderPass": false,
       "investorPass": true,
-      "allPass": true,
+      "allPass": false,
       "lifetimeDppaVnd": 3561657066096,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 74400000000,
+      "blendedRevenuePerKwh": 1470
     },
     {
       "strike": 1550,
@@ -689,7 +820,9 @@
       "investorPass": true,
       "allPass": true,
       "lifetimeDppaVnd": 3514632560448,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 83700000000,
+      "blendedRevenuePerKwh": 1510
     },
     {
       "strike": 1550,
@@ -699,7 +832,9 @@
       "investorPass": true,
       "allPass": true,
       "lifetimeDppaVnd": 3467608054872,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 93000000000,
+      "blendedRevenuePerKwh": 1550
     },
     {
       "strike": 1550,
@@ -709,7 +844,9 @@
       "investorPass": true,
       "allPass": true,
       "lifetimeDppaVnd": 3814368860376,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 102300000000,
+      "blendedRevenuePerKwh": 1550
     },
     {
       "strike": 1550,
@@ -719,7 +856,9 @@
       "investorPass": true,
       "allPass": false,
       "lifetimeDppaVnd": 4161129665832,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 111600000000,
+      "blendedRevenuePerKwh": 1550
     },
     {
       "strike": 1550,
@@ -729,12 +868,14 @@
       "investorPass": true,
       "allPass": false,
       "lifetimeDppaVnd": 4507890471348,
-      "lifetimeBauVnd": 3937853110868
+      "lifetimeBauVnd": 3937853110868,
+      "annualContractRevenueVnd": 120900000000,
+      "blendedRevenuePerKwh": 1550
     }
   ],
   "cellCount": 70,
-  "passCount": 15,
+  "passCount": 8,
   "buyerPassCount": 62,
-  "lenderPassCount": 28,
-  "investorPassCount": 21
+  "lenderPassCount": 36,
+  "investorPassCount": 15
 }

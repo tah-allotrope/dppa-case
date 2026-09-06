@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -755,4 +756,6 @@ def build() -> None:
 
 
 if __name__ == "__main__":
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     build()

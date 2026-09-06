@@ -84,6 +84,37 @@ class TestFindViolations(unittest.TestCase):
         self.assertEqual(cps.find_violations(self.plans_dir, self.reports_dir), [])
 
 
+class TestSuccessorViolations(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.plans_dir = Path(self.tmp.name) / "plans"
+        self.plans_dir.mkdir()
+
+    def _write_plan(self, name, status, body=""):
+        (self.plans_dir / name).write_text(
+            f'---\nstatus: "{status}"\n---\n\n{body}\n', encoding="utf-8"
+        )
+
+    def test_abandoned_without_successor_is_a_violation(self):
+        self._write_plan("2026-01-01-old.md", "abandoned — closed, nothing tracks the rest")
+        self.assertEqual(
+            cps.find_successor_violations(self.plans_dir), ["2026-01-01-old.md"]
+        )
+
+    def test_superseded_naming_existing_successor_is_not_a_violation(self):
+        self._write_plan("2026-08-22-delivery-stall-recovery-plan.md", "complete")
+        self._write_plan(
+            "2026-01-01-old.md",
+            "superseded — continued in favor of plans/2026-08-22-delivery-stall-recovery-plan.md",
+        )
+        self.assertEqual(cps.find_successor_violations(self.plans_dir), [])
+
+    def test_complete_status_is_unchanged_by_successor_rule(self):
+        self._write_plan("2026-01-01-done.md", "complete")
+        self.assertEqual(cps.find_successor_violations(self.plans_dir), [])
+
+
 class TestMain(unittest.TestCase):
     def test_real_repo_root_plans_have_no_status_violations_after_04_10(self):
         """PHASE-04's TASK-04-10 corrects every plan this checker would otherwise

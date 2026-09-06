@@ -39,7 +39,7 @@ DEFAULT_REPORTS_DIR = REPO_ROOT / "reports"
 
 STATUS_RE = re.compile(r'^status:\s*"?([^"\n]*)"?\s*$', re.MULTILINE)
 UNTICKED_TASK_RE = re.compile(r"^\s*-\s\[ \]", re.MULTILINE)
-
+SUCCESSOR_RE = re.compile(r"plans/[\w\-.]+?\.md")
 
 def extract_status(text: str) -> str | None:
     """Return the YAML frontmatter `status` value, or None if absent."""
@@ -99,12 +99,35 @@ def find_violations(plans_dir: Path, reports_dir: Path) -> list[tuple[str, int]]
     return violations
 
 
+def find_successor_violations(plans_dir: Path) -> list[str]:
+    """Return plan filenames closed as superseded/abandoned that name no
+    successor plan file existing in plans_dir."""
+    violations = []
+    if not plans_dir.exists():
+        return violations
+    for plan_path in sorted(plans_dir.glob("*.md")):
+        text = plan_path.read_text(encoding="utf-8")
+        status = extract_status(text)
+        if status is None:
+            continue
+        lowered = status.lower()
+        if not (lowered.startswith("superseded") or lowered.startswith("abandoned")):
+            continue
+        if any((plans_dir / Path(match).name).exists() for match in SUCCESSOR_RE.findall(text)):
+            continue
+        violations.append(plan_path.name)
+    return violations
+
+
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     argv = argv or []
     plans_dir = Path(argv[0]) if len(argv) > 0 else DEFAULT_PLANS_DIR
     reports_dir = Path(argv[1]) if len(argv) > 1 else DEFAULT_REPORTS_DIR
 
     violations = find_violations(plans_dir, reports_dir)
+    successor_violations = find_successor_violations(plans_dir)
 
     if violations:
         print(f"PLAN-STATUS FAIL: {len(violations)} plan(s) marked complete with no evidence of completion")
@@ -114,6 +137,15 @@ def main(argv: list[str] | None = None) -> int:
             "  Fix: either the plan is genuinely done (tick the tasks and/or add a reports/ "
             "artifact), or it isn't (correct the status field to \"open\" or \"superseded\")."
         )
+    if successor_violations:
+        print(
+            f"PLAN-STATUS FAIL: {len(successor_violations)} plan(s) closed as superseded/abandoned "
+            "without naming an existing successor plan in plans/"
+        )
+        for filename in successor_violations:
+            print(f"  {filename}: names no successor plan file that exists in plans/")
+        print("  Fix: name the successor plan (e.g. plans/2026-09-05-....md) in the status field.")
+    if violations or successor_violations:
         return 1
 
     scanned = len(list(plans_dir.glob("*.md"))) if plans_dir.exists() else 0

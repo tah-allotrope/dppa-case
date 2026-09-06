@@ -282,6 +282,7 @@ export function renderAppShell(root, scenarios, settlementModes) {
               </div>
             </div>
             <div class="multi-year-rollups" id="multiYearRollups"></div>
+            <div class="gate-panel" id="gatePanel"></div>
             <div class="chart-legend-row" id="multiYearLegend"></div>
             <div class="chart-wrap multi-year-chart-wrap" style="height:260px">
               <canvas id="multiYearChart" aria-label="${t('multiyear_chart_aria')}"></canvas>
@@ -627,6 +628,35 @@ export function renderMultiYearPanel(multiYear, currency) {
       <span>${t('param_rep_day')}</span>
     `
   }
+}
+export function renderGatePanel(container, gates, currency) {
+  if (!container || !gates) return
+  const lamp = (labelKey, pass, headroom) =>
+    compactPill(
+      `${t(labelKey)}: ${pass ? t('gate_pass_value') : t('gate_fail_value')}`,
+      headroom,
+      pass ? 'result' : 'warning',
+    )
+  const failing = [
+    ['buyer', gates.buyerPass],
+    ['lender', gates.lenderPass],
+    ['investor', gates.investorPass],
+  ]
+    .filter(([, pass]) => !pass)
+    .map(([name]) => t(`gate_${name}_label`))
+    .join(', ')
+  const bindingText = gates.allPass
+    ? t('gate_all_clear')
+    : t('gate_binding_template').replace('{gate}', failing)
+  container.innerHTML = `
+    <p class="gate-panel-title">${t('gate_panel_title')}</p>
+    <div class="gate-lamps">
+      ${lamp('gate_buyer_label', gates.buyerPass, formatMoney(gates.buyerHeadroomVnd, { currency }))}
+      ${lamp('gate_lender_label', gates.lenderPass, formatMoney(gates.lenderHeadroomVnd, { currency }))}
+      ${lamp('gate_investor_label', gates.investorPass, formatMoney(gates.investorHeadroomVndPerKwh, { currency, precise: true, perKwh: true }))}
+    </div>
+    <p class="gate-binding">${bindingText}</p>
+  `
 }
 
 export function setActiveScenario(scenarioId) {

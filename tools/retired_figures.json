@@ -8,7 +8,8 @@
     "facilitator/**/*.md",
     "lessons/**/*.html",
     "app/docs/**/*.md",
-    "assets/teaching/*.json"
+    "assets/teaching/*.json",
+    "app/src/data/strings.js"
   ],
   "scanScripts": [
     "*.py",
@@ -24,11 +25,17 @@
     { "text": "0-of-56", "reason": "same, hyphenated", "replacedBy": "15 of 70", "retiredOn": "2026-07-11" },
     { "text": "0/56", "reason": "same, slash form", "replacedBy": "15/70", "retiredOn": "2026-07-11" },
     { "text": "0 / 56", "reason": "same, spaced slash form", "replacedBy": "15/70", "retiredOn": "2026-07-11" },
-    { "text": "5 of 56", "reason": "STRIKES grid extended from 8 to 10 strikes (1,100-1,450 -> 1,100-1,550) so the lender (1,380) and investor (1,450) thresholds are interior to the grid, not at its edge -- the old top of the grid was exactly the investor threshold, so every passing cell sat in that one column and the pass rate was an artifact of where the axis stopped", "replacedBy": "15 of 70 (gate-sweep.json passCount / cellCount); per-gate: buyer 62, lender 28, investor 21", "retiredOn": "2026-08-23" },
-    { "text": "5/56", "reason": "same, slash form", "replacedBy": "15/70", "retiredOn": "2026-08-23" },
+    { "text": "5 of 56", "reason": "STRIKES grid extended from 8 to 10 strikes (1,100-1,450 -> 1,100-1,550) so the lender (1,380) and investor (1,450) thresholds are interior to the grid, not at its edge -- the old top of the grid was exactly the investor threshold, so every passing cell sat in that one column and the pass rate was an artifact of where the axis stopped", "replacedBy": "8 of 70 (gate-sweep.json passCount / cellCount); per-gate: buyer 62, lender 36, investor 15", "retiredOn": "2026-08-23" },
+    { "text": "5/56", "reason": "same, slash form", "replacedBy": "8/70", "retiredOn": "2026-08-23" },
     { "text": "of 56", "reason": "same, generic substring form (catches '... of 56 ...' phrasing not already listed above)", "replacedBy": "of 70", "retiredOn": "2026-08-23" },
     { "text": "56 scenarios", "reason": "grid is now 70 cells", "replacedBy": "70 scenarios", "retiredOn": "2026-08-23" },
     { "text": "56 kịch bản", "reason": "Vietnamese form of the same", "replacedBy": "70 kịch bản", "retiredOn": "2026-08-23" },
-    { "text": "56种情景", "reason": "Chinese form of the same", "replacedBy": "70种情景", "retiredOn": "2026-08-23" }
+    { "text": "56种情景", "reason": "Chinese form of the same", "replacedBy": "70种情景", "retiredOn": "2026-08-23" },
+    { "text": "15 of 70", "reason": "degenerate gate model replaced: lender/investor gates were strike-only step functions and the lender gate bound nowhere, so the headline overstated the feasible region", "replacedBy": "8 of 70 (gate-sweep.json passCount / cellCount)", "retiredOn": "2026-09-06" },
+    { "text": "15/70", "reason": "same, slash form", "replacedBy": "8/70", "retiredOn": "2026-09-06" },
+    { "text": "15 / 70", "reason": "same, spaced slash form", "replacedBy": "8 / 70", "retiredOn": "2026-09-06" },
+    { "text": "15 of 70 scenarios", "reason": "same, spelled-out form", "replacedBy": "8 of 70 scenarios", "retiredOn": "2026-09-06" },
+    { "text": "lender 28", "reason": "lender gate now tests contracted revenue against debt service at the coverage ratio (36 cells pass)", "replacedBy": "lender 36", "retiredOn": "2026-09-06" },
+    { "text": "investor 21", "reason": "investor gate now tests blended revenue per generated kWh against full LCOE (15 cells pass)", "replacedBy": "investor 15", "retiredOn": "2026-09-06" }
   ]
 }

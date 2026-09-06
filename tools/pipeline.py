@@ -57,6 +57,8 @@ def run_step(name: str, command: list[str], cwd: str | None = None) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--lang", default="en", choices=["en", "vi", "zh"])
     parser.add_argument(

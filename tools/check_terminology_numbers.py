@@ -58,6 +58,8 @@ def find_violations(data: dict) -> list[tuple[str, str]]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     map_path = Path(argv[0]) if argv else DEFAULT_MAP
     with io.open(map_path, encoding="utf-8") as f:
         data = json.load(f)

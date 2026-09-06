@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 import { execSync } from 'node:child_process'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 function getBuildCommit() {
   try {
@@ -41,8 +43,24 @@ function swManifestPlugin() {
   }
 }
 
+// PHASE-06 (plans/2026-09-05-gate-model-and-october-readiness-plan.md): public/sw.js
+// is copied verbatim, so the cache version cannot be imported. This plugin rewrites
+// the __SW_VERSION__ token in the emitted dist/sw.js after the bundle is written.
+function swVersionPlugin() {
+  const commit = getBuildCommit()
+  return {
+    name: 'inject-sw-version',
+    writeBundle(options) {
+      if (!options.dir) return
+      const swPath = join(options.dir, 'sw.js')
+      if (!existsSync(swPath)) return
+      writeFileSync(swPath, readFileSync(swPath, 'utf-8').replaceAll('__SW_VERSION__', commit))
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [buildCommitPlugin(), swManifestPlugin()],
+  plugins: [buildCommitPlugin(), swManifestPlugin(), swVersionPlugin()],
   test: {
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
     coverage: {

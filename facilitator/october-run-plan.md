@@ -6,10 +6,11 @@ status: "human-only; not tracked by tools/check_plan_status.py (this is a presen
 
 # October 2026 Run Plan — Presenter
 
-Split 2026-08-23 from the original `plans/2026-october-readiness-checklist.md`, which mixed
+Split 2026-08-23 from the original coding checklist, which mixed
 human-only, physical, date-bound work with coding-session tasks and made both harder to track
-honestly. **This file is the human half.** The coding-session half is
-`plans/2026-october-readiness-checklist.md`.
+honestly. **This file is the human half.** The coding-session half is now
+`plans/2026-09-05-gate-model-and-october-readiness-plan.md` (the original checklist
+file was closed as abandoned on 2026-08-29).
 
 Backward-planned from an assumed **October 1, 2026** session date (Q-001 in
 `research/2026-07-04_dppa-modules-teaching-revamp-brainstorm.md` is still open — no confirmed
@@ -46,10 +47,12 @@ Status legend: **done** (verified in a session and noted below) · **pending** �
       commits will land before October.
 - [ ] Decide on H3 (real deal data vs. accept the illustrative gate-proxy band). If recalibrating,
       the mechanical follow-through is a coding-session task — see the corresponding section of
-      `plans/2026-october-readiness-checklist.md`.
+      `plans/2026-09-05-gate-model-and-october-readiness-plan.md`.
 
 ## Mid September (~4–6 weeks before)
 
+- [ ] Presenter self-drill: complete the five-line-bill drill at `https://dppa-case.web.app/?drill=1`
+      until the S1 bill is reproducible from memory inside the persisted best time.
 - [ ] Timed solo dry-run: the presenter runs the full 60-minute run-of-show alone, including a
       deliberate fallback drill (kill the app mid-M3, unhide the fallback slide, confirm the
       recording carries the point). Checklist already in
@@ -72,7 +75,7 @@ Status legend: **done** (verified in a session and noted below) · **pending** �
 - [ ] Translate the remaining `UNTRANSLATED` entries in both files per
       `facilitator/translation-brief.md`. A qualified VI/ZH speaker should do this, not a guess.
       Once delivered, the build/verify steps are a coding-session task — see
-      `plans/2026-october-readiness-checklist.md`'s "Once the translator (H2) delivers both files."
+      `plans/2026-09-05-gate-model-and-october-readiness-plan.md`'s "Once the translator (H2) delivers both files."
 - [ ] Print per-language A4 reference cards and worksheets, once the translated decks build clean.
 
 ## Day before / day of

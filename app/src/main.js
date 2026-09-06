@@ -35,6 +35,7 @@ import {
   renderAppShell,
   renderFiveLineBill,
   renderFormulas,
+  renderGatePanel,
   renderMultiYearPanel,
   renderSelectedHourDetails,
   renderWalkthroughCases,
@@ -42,7 +43,9 @@ import {
   setActiveScenario,
   updateControlOutputs,
 } from './modules/ui.js'
+import { evaluateGates } from './modules/gates.js'
 import { initTeachMode } from './modules/teach.js'
+import { initDrillMode } from './modules/drill.js'
 import { initTheme } from './modules/theme.js'
 import { initTour } from './modules/tour.js'
 import { initI18n, setLang, t } from './modules/i18n.js'
@@ -108,12 +111,12 @@ function resolveInitialState(search) {
   Object.assign(state, parseState(search, state))
 }
 
-// Non-state flags that other modules read directly from the URL (teach mode,
+// Non-state flags that other modules read directly from the URL (teach mode, drill mode,
 // the tour-suppression/theme test flags, the language override). Merged back
 // in below so serializeState's state-only params never clobber them -- an
 // earlier version replaced the whole query string, which silently stripped
 // ?teach=1 before initTeachMode() ever read it.
-const NON_STATE_PARAM_KEYS = ['teach', 'test', 'present', 'lang']
+const NON_STATE_PARAM_KEYS = ['teach', 'drill', 'test', 'present', 'lang']
 
 function syncUrlFromState() {
   const currentParams = new URLSearchParams(window.location.search)
@@ -135,8 +138,17 @@ function getWarningText(totals, scenario) {
   if (totals.blendedPrice > totals.noDppaBlended) {
     return t('warning_expensive')
   }
-
   return ''
+}
+
+function gateVolumesForScenario(scenario) {
+  if (scenario.monthlyVolumes) return scenario.monthlyVolumes
+  // Curve scenarios carry no monthly contract: read the panel as fully contracted
+  // at the scenario's own monthlyized load (daily profile x 365/12, the same
+  // annualization projectMultiYear uses).
+  const dailyKwh = scenario.loadProfile.reduce((sum, kw) => sum + kw, 0)
+  const monthlyKwh = Math.round((dailyKwh * 365) / 12)
+  return { contracted: monthlyKwh, total: monthlyKwh }
 }
 
 async function updateView() {
@@ -230,6 +242,25 @@ async function updateView() {
     strikeEscalation: state.strikeEscalation,
   })
   renderMultiYearPanel(multiYear, state.currency)
+  try {
+    const volumes = gateVolumesForScenario(scenario)
+    renderGatePanel(
+      document.querySelector('#gatePanel'),
+      evaluateGates({
+        strikeVndPerKwh: state.strikePrice,
+        contractedKwhPerMonth: volumes.contracted,
+        referenceLoadKwhPerMonth: volumes.total,
+        fmpVndPerKwh: state.marketPrice,
+        lifetimeDppaVnd: multiYear.rollups.lifetime.dppa,
+        lifetimeBauVnd: multiYear.rollups.lifetime.bau,
+      }),
+      state.currency,
+    )
+  } catch (error) {
+    console.error('Gate panel render failed:', error)
+    const node = document.querySelector('#gatePanel')
+    if (node) node.innerHTML = '<p class="gate-panel-fallback">Gate panel updating…</p>'
+  }
   try {
     renderMultiYearChart(document.querySelector('#multiYearChart'), multiYear, state.currency)
   } catch (error) {
@@ -366,6 +397,7 @@ syncControls()
 syncInputsFromState()
 updateView()
 initTeachMode()
+initDrillMode()
 initTour()
 
 if ('serviceWorker' in navigator) {

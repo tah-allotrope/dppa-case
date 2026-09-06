@@ -16,7 +16,7 @@ mission is to teach *this* deck, and the repo already encodes the verified mecha
 - **October 2026 teaching deck** — `ceba/DPPA Presentation Oct 2026 To Teach.pptx`
   (27 slides, visual-first rebuild from the master). Numbers trace to
   `assets/teaching/spine-s1.json` (five-line bill) and `assets/teaching/gate-sweep.json`
-  (70-scenario gate sweep, current result 15/70). Trust: HIGH (audited + parity-checked in CI).
+  (70-scenario gate sweep, current result 8/70). Trust: HIGH (audited + parity-checked in CI).
 - **Terminology map** — `assets/teaching/terminology-map.json` +
   `research/dppa-terminology-map.md`. The approved EN→VI→ZH vocabulary carrier for
   PHASE-06 (vi/zh-cn deck cloning) — translate here, not by hand-editing the deck script.

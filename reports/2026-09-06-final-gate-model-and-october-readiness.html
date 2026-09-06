@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gate model + October readiness — evidence (2026-09-06)</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #0b1020; color: #e8eef7; margin: 0; padding: 32px 20px 64px; line-height: 1.55; }
+  main { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  h2 { font-size: 1.15rem; margin: 32px 0 10px; border-bottom: 1px solid #26314d; padding-bottom: 6px; }
+  .sub { color: #93a1b8; margin: 0 0 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #1e2942; vertical-align: top; }
+  th { color: #9fd8ff; font-weight: 600; white-space: nowrap; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 0.85em; background: #141c33; padding: 1px 6px; border-radius: 4px; }
+  pre { background: #0e1528; border: 1px solid #26314d; border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-size: 0.82rem; }
+  .pass { color: #7dffa8; font-weight: 700; }
+  ul { margin: 8px 0; padding-left: 22px; }
+  li { margin: 4px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .card { background: #111832; border: 1px solid #26314d; border-radius: 10px; padding: 12px 14px; }
+  .card b { display: block; font-size: 1.25rem; color: #9fd8ff; }
+  .foot { color: #93a1b8; font-size: 0.85rem; margin-top: 36px; }
+</style>
+</head>
+<p class="sub">Plan <code>plans/2026-09-05-gate-model-and-october-readiness-plan.md</code> (draft, six defects) ·
+executed 2026-09-06 on branch <code>master</code> · commit hash and push result recorded in the delivery message.</p>
+
+<div class="grid">
+<div class="card"><b>134</b>JS unit tests pass (was 104)</div>
+<div class="card"><b>128</b>Python guard tests pass (was 104)</div>
+<div class="card"><b>8 / 70</b>new gate headline (was 15)</div>
+<div class="card"><b>60</b>figures in the new manifest</div>
+<div class="card"><b>11</b>deck figures in parity</div>
+<div class="card"><b>159</b>i18n keys, re-frozen 2026-09-06</div>
+</div>
+
+<h2>Defect 1 — Degenerate three-gate model (PHASE-02)</h2>
+<ul>
+<li>Rewrote <code>evaluateCell</code> in <code>app/scripts/export-sweep.mjs</code> per S1: lender tests
+<code>Q × 12 × strike ≥ DSCR × (L × 12 × LCOE × 0.75)</code>, investor tests blended revenue per
+generated kWh against full LCOE. Deleted <code>LENDER_DEBT_SERVICE_VND_PER_KWH</code>; derived
+<code>ANNUAL_DEBT_SERVICE_VND = 65,250,000,000</code>, never hardcoded.</li>
+<li>Added <code>assertNonDegenerate</code> (ratio-variance, sole-blocker, headline-sensitivity) to the exporter.</li>
+</ul>
+<pre>node scripts/export-sweep.mjs  →  passCount: 8 / 70
+gate-sweep.json                →  8 62 36 15 70   (all / buyer / lender / investor / cells)
+sole blockers                  →  buyer 6, lender 1, investor 20 (spec: 6 / 1 / 20)
+grid shape                     →  matches the S2 table in the plan row-for-row</pre>
+<ul>
+<li>Regenerated <code>gate-sweep.json</code>, heatmaps (en/vi/zh), deck; spine JSONs byte-stable (no drift).</li>
+<li>Retired six strings, corrected two <code>replacedBy</code> fields; updated NOTES.md, RESOURCES.md, both
+facilitator guides (panel guide hardest-gate claim rewritten: investor, not DSCR), two lesson handouts, corrections-log.</li>
+<li>M5 speaker-notes caveat corrected to the two-dimensional model (it still described one-dimensional proxies).</li>
+</ul>
+
+<h2>Defect 2 — English charts in vi/zh decks (PHASE-01)</h2>
+<ul>
+<li><code>asset_for_lang(basename, lang, family)</code> + <code>LANG_SUFFIX</code> in
+<code>build_oct_teaching_deck.py</code>; all 14 hardcoded <code>-en</code> paths (plus the mid-stem
+<code>m2-sankey-{lang}-5</code> and the <code>cfd-s{i+1}</code> stubs) resolve through it with an existence
+assertion naming the regeneration command. Fallback MP4s stay unsuffixed by documented decision.</li>
+<li><code>tools/tests/test_deck_asset_paths.py</code>: 9 tests (resolution per family, zh vs zh-cn suffix split,
+mid-stem form, SystemExit contents, unsupported language, suffix-map shape).</li>
+</ul>
+<pre>grep -c '\-en\.\(png\|gif\|mp4\)' build_oct_teaching_deck.py  →  0
+build --lang en --out /tmp/deck-en + compare_deck vs committed  →  IDENTICAL (83 entries)
+build --lang vi                                          →  exit 1, UNTRANSLATED refusal intact</pre>
+
+<h2>Defect 3 — Hand-typed spine figures + translator markup (PHASE-03)</h2>
+<ul>
+<li><code>export-spine.mjs</code> now writes generated <code>app/src/data/spine-figures.js</code>
+(<code>{ bauMillions: 11020, cEvnMillions: 8563, cfdMillions: 500, cKhMillions: 9063 }</code>).</li>
+<li><code>teach_m1/m2_expected</code> are placeholder templates (<code>{bau} {cEvn} {cfd} {cKh}</code>);
+<code>teach.js</code> substitutes via locale-aware <code>formatNumber</code> (vi renders <code>11.020</code>).</li>
+<li><code>app/src/data/strings.test.js</code>: markup validator (0 violations on the real table) + locale grouping
+proofs — 8 tests. <code>strings.js</code> added to both figure-guard scan lists (zero-token, no false positives).</li>
+<li>Translation brief gained the Chinese-typography decision and the markup/placeholder contract.</li>
+</ul>
+<pre>npm run i18n:check  →  I18N-CHECK PASS (151 keys, frozen 2026-08-23)   [pre PHASE-04]</pre>
+
+<h2>Defect 4 — Gates untestable, Module 5 has no demo (PHASE-04)</h2>
+<ul>
+<li>New <code>app/src/modules/gates.js</code> (<code>evaluateGates</code> + constants + shared loss factors);
+exporter delegates to it — regenerated <code>gate-sweep.json</code> is <strong>byte-identical</strong>
+(sha256 <code>3aa7f9a7…2eda</code> before and after).</li>
+<li>Live <code>#gatePanel</code> (three <code>compactPill</code> lamps + binding line + visible fallback) wired into
+<code>updateView()</code>; 8 string keys added (vi <code>UNTRANSLATED</code>), baseline re-frozen at 159 keys;
+teach step 5 retargeted at <code>#gatePanel</code> with strike 1400 (investor visibly failing).</li>
+<li>Curve scenarios (no <code>monthlyVolumes</code>) read the panel as fully contracted at monthlyized load —
+found via a failing e2e, fixed, all three projects green.</li>
+</ul>
+<pre>npx vitest run src/modules/gates.test.js  →  8 passed
+npx playwright test e2e/gates.spec.js --workers=1  →  3/3 projects passed</pre>
+
+<h2>Defect 5 — Pixel-embedded numbers + decaying guards (PHASE-05)</h2>
+<ul>
+<li><code>build_teaching_visuals.py</code> writes <code>assets/teaching/figures-manifest.json</code> (input +
+builder digests, per-figure rendered numbers); <code>tools/check_figures_manifest.py</code> verifies digests,
+existence, and retired-figure matches. Manifest merged across en/vi/zh: 60 figures.</li>
+<li>Guard-can-fail proof: corrupted <code>cellCount</code> → exit 1 naming the digest mismatch; restored via exporter.</li>
+<li><code>check_delivery_pipeline.py</code> gained <code>--deploy-paths</code> (default <code>app/</code>):
+doc-only commits print informationally, never gate. <code>check_plan_status.py</code> requires an existing
+successor plan for superseded/abandoned closures.</li>
+<li>UTF-8 stdout + explicit file encodings across all guards and builders; CI <code>deck-build</code> runs the
+visuals build + manifest check; freshness job passes <code>--acknowledged-through 2026-09-08</code> (all six
+register items ACKNOWLEDGED, exit 0; newer slips still loud).</li>
+</ul>
+<pre>FIGURES-MANIFEST PASS (60 figures checked)
+DELIVERY-PIPELINE unit cases: doc-only → exit 0 + info line; old deployable → exit 1</pre>
+
+<h2>Defect 6 — Unmeasured mission + venue failure modes (PHASE-06)</h2>
+<ul>
+<li><code>?drill=1</code> presenter drill (<code>app/src/modules/drill.js</code>, English literals per ASM-005):
+five-line entry in million VND, ±0.5% grading (zero-line takes no tolerance), first-keystroke timer,
+per-scenario best/streak in <code>localStorage</code> behind try/catch.</li>
+<li>Service worker: build-baked <code>__SW_VERSION__</code> (no more <code>dppa-app-unknown</code> on restart) +
+2,000 ms navigation race to cache. <code>dist/sw.js</code> carries the 40-hex build commit.</li>
+<li>Run-plan cross-references repointed (grep count 0), drill line added; learning record 0006 written;
+root <code>package.json</code> <code>main</code> removed.</li>
+</ul>
+<pre>npx vitest run src/modules/drill.test.js  →  11 passed
+npm run build &amp;&amp; grep -c '__SW_VERSION__' dist/sw.js  →  0
+e2e/drill.spec.js (new: overlay + flag survival)  →  passed</pre>
+
+<h2>Full gates (final state)</h2>
+<table>
+<tr><th>Gate</th><th>Result</th></tr>
+<tr><td><code>npm run lint</code> + <code>prettier --check src e2e scripts *.config.js</code></td><td class="pass">PASS</td></tr>
+<tr><td><code>npm test</code> (vitest)</td><td class="pass">134 passed (12 files)</td></tr>
+<tr><td><code>npm run coverage</code> (ratchet 49/49/51/49 + settlement 92/75/85/91)</td><td class="pass">PASS — 55.4 lines, settlement 92.41/75.18/85.71/91.39</td></tr>
+<tr><td><code>npm run i18n:check</code></td><td class="pass">159 keys, frozen 2026-09-06</td></tr>
+<tr><td><code>npm run predeploy</code> (lint+prettier+test+coverage+e2e+build)</td><td class="pass">PASS (reached build, exit 0)</td></tr>
+<tr><td><code>py -m pytest tools/tests</code></td><td class="pass">128 passed</td></tr>
+<tr><td>export-spine + export-sweep regeneration</td><td class="pass">8/70, deterministic (stable sha256)</td></tr>
+<tr><td>Non-degeneracy probe on committed sweep</td><td class="pass">varies ×3, sole 6/1/20</td></tr>
+<tr><td><code>audit_teaching_deck.py</code> / <code>verify_deck_numbers.py</code></td><td class="pass">word/symbol clean · PARITY 11 figures</td></tr>
+<tr><td>retired / prose / terminology / plan-status / figures-manifest</td><td class="pass">ALL PASS</td></tr>
+<tr><td>scratch en deck vs committed (<code>compare_deck.py</code>)</td><td class="pass">IDENTICAL</td></tr>
+<tr><td>human-blocked register (acknowledged)</td><td class="pass">6 ACKNOWLEDGED, exit 0</td></tr>
+<tr><td>heatmap legibility (MANUAL-001)</td><td class="pass">diagonal feasible band, “8 / 70”</td></tr>
+<tr><td>deploy freshness write-log (OBS-001)</td><td>NOT RUN — no non-interactive Firebase auth (H4 open)</td></tr>
+</table>
+
+<h2>Deliberate deviations from the plan (with reasons)</h2>
+<ul>
+<li><strong>PHASE-03 vi values left as UNTRANSLATED.</strong> The plan assumed translated vi teach strings; all vi
+teach values are still sentinels that fall back to en at runtime, so templating en removes every hand-typed figure
+with zero visible difference. Writing English templates into vi would corrupt the translator's UNTRANSLATED accounting.</li>
+<li><strong>RISK-05-03 did not materialise.</strong> All superseded/abandoned plans already name an existing
+<code>plans/*.md</code> file, so the stricter check passes with no status edits.</li>
+<li><strong>M5 caveat + vi/zh heatmaps regenerated.</strong> The old speaker-notes caveat described one-dimensional
+proxies (false under S1); vi/zh heatmaps would otherwise show the pre-fix model.</li>
+<li><strong>Curve-scenario fallback in the gate panel.</strong> Curve scenarios carry no <code>monthlyVolumes</code>;
+the panel reads them as fully contracted at monthlyized load so all three lamps render on every tab.</li>
+<li><strong>Extra <code>e2e/drill.spec.js</code>.</strong> Covers the <code>?drill=1</code> flag-survival regression the
+plan lists as a test spec without an exit slot.</li>
+</ul>
+
+<p class="foot">Generated 2026-09-06 · dppa-case · plan: gate-model-and-october-readiness · All commands run from
+<code>app/</code> (JS) or repo root with <code>PYTHONPATH= py</code> (Python) per CLAUDE.md.</p>
+</main>
+</body>
+</html>
